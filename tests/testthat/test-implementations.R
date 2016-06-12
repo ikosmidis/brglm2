@@ -9,7 +9,7 @@ treatment <- gl(3,3)
 dobson <- data.frame(counts, outcome, treatment)
 
 tol <- sqrt(.Machine$double.eps)
-test_that("BR estimates and std. errors from brglmFit and from mbest::firthglm.fit are the same for poisson", {
+test_that("BR estimates and std. errors from brglmFit and from brpr are the same for poisson", {
     br1 <- summary(glm(counts ~ outcome + treatment, family = poisson(), method = "brglmFit"))
     br2 <- summary(brpr(counts ~ outcome + treatment, data = dobson))
     c1 <- coef(br1)

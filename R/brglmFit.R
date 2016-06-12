@@ -684,23 +684,35 @@ summary.brglmFit <- function(object, dispersion = NULL,
                              correlation = FALSE, symbolic.cor = FALSE,
                              ...) {
     if (is.null(dispersion)) {
-        dispersion <- object$dispersion
+        if (object$family$family == "Gaussian") {
+            dispersion <- NULL
+        }
+        else {
+            dispersion <- object$dispersion
+        }
     }
-    if (object$family$family == "Gaussian") {
-        dispersion <- NULL
-    }
-    else {
-        summary.glm(object, dispersion = dispersion,
-                    correlation = correlation,
-                    symbolic.cor = symbolic.cor, ...)
-    }
+    summary.glm(object, dispersion = dispersion,
+                correlation = correlation,
+                symbolic.cor = symbolic.cor, ...)
 }
 
+
+#' Method for computing confidence intervals for one or more
+#' regression parameters in a \code{\link{brglmFit}} object
+#'
+#' @inheritParams stats::confint
+#'
+#' @export
 confint.brglmFit <- function(object, parm, level = 0.95, ...) {
     confint.default(object, parm, level, ...)
 }
 
-
+#' Return the variance-covariance matrix for the regression parameters
+#' in a \code{\link{brglmFit}} object
+#'
+#' @inheritParams stats::vcov
+#'
+#' @export
 vcov.brglmFit <- function(object, ...) {
     summary.brglmFit(object, ...)$cov.scaled
 }
