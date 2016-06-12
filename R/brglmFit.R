@@ -680,9 +680,12 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 #' @examples
 #' ## For examples see examples(brglmFit)
 #' @export
-summary.brglmFit <- function (object, dispersion = object$dispersion,
-                              correlation = FALSE, symbolic.cor = FALSE,
-                              ...) {
+summary.brglmFit <- function(object, dispersion = NULL,
+                             correlation = FALSE, symbolic.cor = FALSE,
+                             ...) {
+    if (is.null(dispersion)) {
+        dispersion <- object$dispersion
+    }
     if (object$family$family == "Gaussian") {
         dispersion <- NULL
     }
@@ -691,6 +694,15 @@ summary.brglmFit <- function (object, dispersion = object$dispersion,
                     correlation = correlation,
                     symbolic.cor = symbolic.cor, ...)
     }
+}
+
+confint.brglmFit <- function(object, parm, level = 0.95, ...) {
+    confint.default(object, parm, level, ...)
+}
+
+
+vcov.brglmFit <- function(object, ...) {
+    summary.brglmFit(object, ...)$cov.scaled
 }
 
 DD <- function(expr,name, order = 1) {
