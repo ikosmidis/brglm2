@@ -1,0 +1,705 @@
+#' Fitting function for \code{\link{glm}} that allows reduced-bias estimation and inference
+#'
+#' \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
+#' (see the description of \code{method} and the \code{Fitting
+#' functions} section in \code{\link{glm}} that fits generalized
+#' linear models using implicit and explicit bias reduction
+#' methods. Currently supported methods include the implicit adjusted
+#' scores approach in Firth (1993) and Kosmidis \& Firth (2009) and
+#' the correction of the asymptotic bias in Cordeiro & McCullagh
+#' (1991).  Estimation is performed using a quasi-Fisher scoring
+#' iteration based on the iterative correction of the asymptotic bias
+#' of the Fisher scoring iterates.
+#'
+#' @inheritParams stats::glm.fit
+#' @param control a list of parameters controlling the fitting
+#'     process. See \code{\link{brglmControl}} for details.
+#' @param start starting values for the parameters in the linear
+#'     predictor. If \code{NULL} (default) then the maximum likelihood
+#'     estimates are caluclated and used as starting values
+#' @param mustart applied only when start is not \code{NULL}. Starting
+#'     values for the vector of means to be passed to
+#'     \code{\link{glm.fit}} when computing starting values using
+#'     maximum likelihood.
+#' @param etastart applied only when start is not
+#'     \code{NULL}. Starting values for the linear predictor to be
+#'     passed to \code{\link{glm.fit}} when computing starting values
+#'     using maximum likelihood.
+#' @details \itemize{
+#'
+#' \item The null deviance is evaluated based on estimates of the
+#'     expectations using the bias reduction method specified by the
+#'     \code{type} argument (see \code{\link{brglmControl}}).
+#' }
+#' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
+#' @references
+#' @examples
+#' \dontrun{
+#' ## The lizards example from ?brglm::brglm
+#' data("lizards", package = "brlgm2")
+#' # Fit the model using maximum likelihood
+#' lizardsML <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                      light + time, family = binomial(logit), data = lizards,
+#'                  method = "glm.fit")
+#' # Now the bias-reduced fit:
+#' lizardsBR <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                      light + time, family = binomial(logit), data = lizards,
+#'                  method = "brglmFit")
+#' }
+#'
+#'
+#' ## Another example from
+#' ## King, Gary, James E. Alt, Nancy Elizabeth Burns and Michael Laver
+#' ## (1990).  "A Unified Model of Cabinet Dissolution in Parliamentary
+#' ## Democracies", _American Journal of Political Science_, vol. 34,
+#' ## no. 3, pp. 846-870.
+#'
+#' \dontrun{
+#' data(coalition, package = "Zelig")
+#' # The maximum likelihood fit with log link
+#' coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
+#' # The bias-reduced fit
+#' coalitionBR <- update(coalitionML, method = "brglmFit")
+#' # The bias-corrected fit
+#' coalitionBC <- update(coalitionML, method = "brglmFit", type = "correction")
+#' }
+#'
+#' ## An example with offsets from Venables & Ripley (2002, p.189)
+#' data("anorexia", package = "MASS")
+#'
+#' anorexML <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
+#'                 family = gaussian, data = anorexia)
+#' anorexBR <- update(anorexML, method = "brglmFit")
+#' anorexBC <- update(anorexML, method = "brglmFit", correction = TRUE)
+#'
+#' ## The outputs are identical, because the maximum likelihood
+#' ## estimators of the regression parameters are unbiased when family
+#' ## is Gaussian, and the bias-reduced estimator of the dispersion is
+#' ## the unbiased, by degree of freedom adjustment, estimator of the
+#' ## residual variance.
+#' summary(anorexML)
+#' summary(anorexBR)
+#' summary(anorexBC, start = coef(anorexML))
+#'
+#' @export
+brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
+                      mustart = NULL, offset = rep(0, nobs), family = gaussian(),
+                      control = list(), intercept = TRUE)
+{
+
+    traceFun <- function() {
+        if (iter %% control$trace == 0) {
+            cat("Iter:", sprintf("%3d", iter), "|",
+                "Max abs step:", format(round(max(c(abs(stepBeta), abs(stepZeta))), 6),
+                                        nsmall = 6, scientific = FALSE), "|",
+                "Max abs score:", format(round(max(abs(c(adjustedGradBeta, adjustedGradZeta)), na.rm = TRUE), 6),
+                                         nsmall = 6, scientific = FALSE), "|",
+                "Step factor:", stepFactor - 1, "\n")
+        }
+    }
+
+    ## fitFun, grad, info and bias are ALWAYS in beta, dispersion parameterization
+    fitFun <- function(pars, what = "mean") {
+        betas <- pars[seq.int(nvars)]
+        dispersion <- pars[nvars + 1]
+        prec <- 1/dispersion
+        etas <- drop(x %*% betas + offset)
+        mus <- linkinv(etas)
+        out <- list(precision = prec,
+                    betas = betas,
+                    dispersion = dispersion,
+                    etas = etas,
+                    mus = mus)
+        if (what == "mean") {
+                d1mus <- mu.eta(etas)
+                d2mus <- d2mu.deta(etas)
+                varmus <- variance(mus)
+                workingWeights <- weights * d1mus^2 / varmus
+                wx <- sqrt(workingWeights) * x
+                out$d1mus <- d1mus
+                out$d2mus <- d2mus
+                out$varmus <- varmus
+                out$workingWeights <- workingWeights
+                out$qrDecomposition <- qr(wx)
+        }
+        if (what == "dispersion") {
+            zetas <- -weights * prec
+            out$zetas <- zetas
+            ## Evaluate the derivatives of the a function only for
+            ## objervations with non-zero weight
+            d1afuns <- d2afuns <- d3afuns <- rep(NA, nobs)
+            d1afuns[keep] <- d1afun(zetas[keep])
+            d2afuns[keep] <- d2afun(zetas[keep])
+            d3afuns[keep] <- d3afun(zetas[keep])
+            out$d2afuns <- d2afuns
+            out$d3afuns <- d3afuns
+            out$devianceResiduals <- dev.resids(y, mus, weights)
+            out$EdevianceResiduals <- weights * d1afuns
+        }
+        out
+    }
+
+    gradFun <- function(pars, what = "mean", fit = NULL) {
+        if (is.null(fit)) {
+            fit <- fitFun(pars, what = what)
+        }
+        with(fit, {
+            if (what == "mean") {
+                scoreComponents <- weights * d1mus * (y - mus) / varmus * x
+                return(precision * .Internal(colSums(scoreComponents, nobs, nvars, TRUE)))
+            }
+            if (what == "dispersion") {
+                return(1/2 * precision^2 * sum(devianceResiduals - EdevianceResiduals, na.rm = TRUE))
+            }
+        })
+    }
+
+    infoFun <- function(pars, what = "mean", fit = NULL, inverse = FALSE) {
+        if (is.null(fit)) {
+            fit <- fitFun(pars, what = what)
+        }
+        with(fit, {
+            if (what == "mean") {
+                Rmat <- qr.R(qrDecomposition)
+                if (inverse) {
+                    return(dispersion * tcrossprod(solve(Rmat)))
+                }
+                else {
+                    return(precision * crossprod(Rmat))
+                }
+            }
+            if (what == "dispersion") {
+                info <- 0.5 * sum(weights^2 * d2afuns, na.rm = TRUE)/disp^4
+                if (inverse) {
+                    return(1/info)
+                }
+                else {
+                    return(info)
+                }
+            }
+        })
+    }
+
+    hats <- function(pars, fit = NULL) {
+        if (is.null(fit)) {
+            fit <- fitFun(pars, what = "mean")
+        }
+        with(fit, {
+            Qmat <- qr.Q(qrDecomposition)
+            .Internal(rowSums(Qmat * Qmat, nobs, nvars, FALSE))
+        })
+    }
+
+    adjustmentFun <- function(pars, what = "mean", fit = NULL) {
+        if (is.null(fit)) {
+            fit <- fitFun(pars, what = what)
+        }
+        with(fit, {
+            if (what == "mean") {
+                hatvalues <- hats(pars, fit = fit)
+                ## User only observations with keep = TRUE to ensure that no division with zero takes place
+                return(.Internal(colSums(0.5 * hatvalues * d2mus/d1mus * x, nobs, nvars, TRUE)))
+                }
+            if (what == "dispersion") {
+                s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
+                s2 <- sum(weights^2 * d2afuns, na.rm = TRUE)
+                return((nvars - 2)/(2 * dispersion) + s1/(2 * dispersion^2 * s2))
+            }
+        })
+    }
+
+    control <- do.call("brglmControl", control)
+
+    ## Ensure x is a matrix, extract variable names, observation
+    ## names, nobs, nvars, and initialize weights and offsets if
+    ## needed
+    x <- as.matrix(x)
+    coefNames <- dimnames(x)[[2L]]
+    ynames <- if (is.matrix(y)) rownames(y) else names(y)
+    converged <- FALSE
+    nobs <- NROW(y)
+    nvars <- ncol(x)
+    EMPTY <- nvars == 0
+    if (is.null(weights)) {
+        weights <- rep.int(1, nobs)
+    }
+    if (missingOffset <- is.null(offset)) {
+        offset <- rep.int(0, nobs)
+    }
+
+    ## Enrich the family object with the required derivatives There is
+    ## scope for improvement here by adding an argument to enrich*
+    ## functions that controls what you get (e.g. only d2mu.deta and
+    ## d1afun-d3afun are needed for bias reduction)
+    family <- enrichFamily(family)
+
+    ## Extract functions from the enriched family object
+    variance <- family$variance
+    linkinv <- family$linkinv
+    if (!is.function(variance) || !is.function(linkinv))
+        stop("'family' argument seems not to be a valid family object",
+             call. = FALSE)
+    dev.resids <- family$dev.resids
+    aic <- family$aic
+    mu.eta <- family$mu.eta
+    d2mu.deta <- family$d2mu.deta
+    d1afun <- family$d1afun
+    d2afun <- family$d2afun
+    d3afun <- family$d3afun
+    d1TransDisp <- DD(control$Trans, "disp", order = 1)
+    d2TransDisp <- DD(control$Trans, "disp", order = 2)
+
+    ## Check for invalid etas and mus
+    valideta <- unless_null(family$valideta, function(eta) TRUE)
+    validmu <- unless_null(family$validmu, function(mu) TRUE)
+
+    ## FIXME: mustart and etastart set to NULL by default
+    mustart <- NULL
+    etastart <- NULL
+
+    eval(family$initialize)
+
+    ## If there are no covariates in the model then evaluate only the offset
+    if (EMPTY) {
+        etas <- rep.int(0, nobs) + offset
+        if (!valideta(etas))
+            stop("invalid linear predictor values in empty model", call. = FALSE)
+        mus <- linkinv(etas)
+        if (!validmu(mus))
+            stop("invalid fitted means in empty model", call. = FALSE)
+        ## deviance <- sum(dev.resids(y, mus, weights))
+        workingWeights <- ((weights * mu.eta(etas)^2)/variance(mus))^0.5
+        residuals <- (y - mus)/mu.eta(etas)
+        keep <- rep(TRUE, length(residuals))
+        boundary <- converged <- TRUE
+        coefsAll <- numeric()
+        rank <- 0
+        iter <- 0L
+    }
+    else {
+        ## ## Get Starting values
+        ## coefold <- NULL
+        ## etas <- if (!is.null(etastart)) {
+        ##             etastart
+        ##         }
+        ##         else {
+        ##             if (!is.null(start)) {
+        ##                 if (length(start) != nvars) {
+        ##                     stop(gettextf("length of 'start' should equal %d and correspond to initial coefs for %s",
+        ##                                   nvars, paste(deparse(xnames), collapse = ", ")),
+        ##                          domain = NA)
+        ##                 }
+        ##                 else {
+        ##                     coefold <- start
+        ##                     offset + as.vector(if (NCOL(x) == 1L)
+        ##                                            x * start
+        ##                                        else x %*% start)
+        ##                 }
+        ##             }
+        ##             else {
+        ##                 family$linkfun(mustart)
+        ##             }
+        ##         }
+        ## mus <- linkinv(etas)
+        ## if (!(validmu(mus) && valideta(etas))) {
+        ##     stop("cannot find valid starting values: please specify some", call. = FALSE)
+        ## }
+
+        boundary <- converged <- FALSE
+
+        ## Detect aliasing
+        qrx <- qr(x)
+        rank <- qrx$rank
+        isFullRank <- all.equal(rank, nvars, tolerance = 1e-06)
+
+        if (!isTRUE(isFullRank)) {
+            aliased <- qrx$pivot[seq.int(qrx$rank + 1, nvars)]
+            Xall <- x
+            x <- x[, -aliased]
+            nvarsAll <- nvars
+            nvars <- ncol(x)
+            coefNamesAll <- coefNames
+            coefNames <- coefNames[-aliased]
+        }
+        else {
+            nvarsAll <- nvars
+            coefNamesAll <- coefNames
+        }
+
+        coefsAll <- structure(rep(NA, nvarsAll), .Names = coefNamesAll)
+        keep <- weights > 0
+
+        ## Check for zero weights
+        if (any(!keep)) {
+            warning("Observations with non-positive weights have been omited from the computations")
+        }
+        nkeep <- sum(keep)
+        dfResidual <- nkeep - rank
+
+        ## Handle starting values
+        ## If start is NULL then start at the ML estimator else use start
+        if (is.null(start)) {
+            ## Adjust counts if binomial or Poisson in order to avoid infinite estimates
+            if (family$family == "binomial") {
+                weights.adj <- weights + (!(control$type == "correction")) * nvars/nobs
+                y.adj <- (weights * y + (!(control$type == "correction")) * 0.5 * nvars/nobs)/weights.adj
+            }
+            else {
+                weights.adj <- weights
+                y.adj <- y + if (family$family == "poisson") (!(control$type == "correction")) * 0.5 * nvars/nobs else 0
+            }
+            ## ML fit to get starting values
+            warn <- getOption("warn")
+            ## Get startng values and kill warnings whilst doing that
+            options(warn = -1)
+            temp.fit <- glm.fit(x = x, y = y.adj, weights = weights.adj,
+                                etastart = etastart, mustart = mustart,
+                                offset = offset, family = family,
+                                control = list(epsilon = control$epsilon,
+                                               maxit = 10000, trace = FALSE),
+                                intercept = intercept)
+            ## Set warn to its original value
+            options(warn = warn)
+            coefs <- coef(temp.fit)
+            names(coefs) <- coefNames
+        }
+        else {
+            if (length(start) == nvarsAll & is.numeric(start)) {
+                coefsAll <- start
+                names(coefsAll) <- coefNamesAll
+                if (!isTRUE(isFullRank)) {
+                    coefsAll[aliased] <- NA
+                    coefs <- coefsAll[-aliased]
+                }
+                else {
+                    coefs <- coefsAll
+                }
+            }
+            else {
+                stop(gettextf("length of 'start' should equal %d and correspond to initial coefs for %s",
+                              nvarsAll, paste(deparse(coefNamesAll), collapse = ", ")),
+                     domain = NA)
+            }
+        }
+
+        ## Estimate the ML of the dispersion parameter for gaussian, gamma and inverse Gaussian
+        ## Set the dispersion to 1 if poisson or binomial
+        if (family$family %in% c("poisson", "binomial")) {
+            disp <- 1
+            dispML <- 1
+            transdisp <- eval(control$Trans)
+        }
+        else {
+            ## if (df.r > 0) {
+            ##     dispFit <- try(uniroot(f = function(phi) {
+            ##         gradFun(c(coefs, phi), what = "dispersion")
+            ##     }, lower = .Machine$double.eps, upper =10000, tol = sqrt(.Machine$double.eps)), silent = TRUE)
+            ##     if (inherits(dispFit, "try-error")) {
+            ##         warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
+            ##         dispML <- NA
+            ##     }
+            ##     else {
+            ##         disp <- dispML <- dispFit$root
+            ##     }
+            ## }
+            ## else {
+            ##     disp <- 1 ## A convenient value
+            ##     dispML <- NA
+            ## }
+            ## transdisp <- eval(control$Trans)
+            if (dfResidual > 0) {
+                dispFit <- try(uniroot(f = function(phi) {
+                    gradFun(c(coefs, phi), what = "dispersion")
+                }, lower = .Machine$double.eps, upper = 10000, tol = control$epsilon), silent = TRUE)
+                if (inherits(dispFit, "try-error")) {
+                    warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
+                    dispML <- NA
+                    disp <- var(y)/variance(sum(weights * y)/sum(weights))
+                }
+                else {
+                    disp <- dispML <- dispFit$root
+                }
+                ## disp <- with(temp.fit, sum((weights * residuals^2)[weights > 0])/df.residual)
+                ## ## TODO: Add maxit and epsilon for dipersion estimation inbrglmControl
+                ## for (i in seq.int(control$maxit)) {
+                ##     allParameters <- c(coefs, disp)
+                ##     fitObject <- fitFun(allParameters, what = "dispersion")
+                ##     gradDispersion <-  gradFun(allParameters, fit = fitObject, what = "dispersion")
+                ##     inverseInfoDispersion <- infoFun(allParameters, inverse = TRUE, fit = fitObject, what = "dispersion")
+                ##     stepDispersion <- as.vector(gradDispersion * inverseInfoDispersion)
+                ##     disp <- disp + stepDispersion
+                ##     if (testDisp <- abs(stepDispersion) < 1e-05) {
+                ##         dispML <- disp
+                ##         break
+                ##     }
+                ## }
+                ## if (!testDisp) {
+                ##     warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
+                ##     dispML <- NA
+                ## }
+            }
+            else { ## if the model is saturated dispML is NA
+                disp <- 1 ## A convenient value
+                dispML <- NA
+            }
+            ## Apply transformation only after convergence. Equivariance of ML estimator is used here
+            transdisp <- eval(control$Trans)
+        }
+
+        adjustedGradAll <- rep(NA, nvarsAll + 1)
+        names(adjustedGradAll) <- c(coefNamesAll, "Transformed dispersion")
+        if (control$type == "correction") {
+            control$maxit <- 1
+            control$slowit <- 1
+        }
+        objCur <- .Machine$integer.max
+
+        ## Main iterations
+        for (iter in seq.int(control$maxit)) {
+            stepFactor <- 0
+            testhalf <- TRUE
+            coefsPrev <- coefs
+            objPrev <- objCur
+            ## Bias-reduced estimation of mean effects
+
+            while (testhalf & stepFactor < 15) {
+                allParameters <- c(coefs, disp)
+                fitBeta <- fitFun(allParameters, what = "mean")
+                gradBeta <-  gradFun(allParameters, fit = fitBeta, what = "mean")
+                cInverseInfoBeta <- try(infoFun(allParameters, inverse = TRUE, fit = fitBeta, what = "mean"))
+                if (failedInv <- inherits(cInverseInfoBeta, "try-error")) {
+                    warning("failed to invert the information matrix: iteration stopped prematurely")
+                    break
+                }
+                else {
+                    inverseInfoBeta <- cInverseInfoBeta
+                }
+
+                adjustmentBeta <- adjustmentFun(allParameters, fit = fitBeta, what = "mean")
+                if (failedAdj <- any(is.na(adjustmentBeta))) {
+                    warning("failed to calculate the bias-reducing score adjustment: iteration stopped prematurely")
+                    break
+                }
+                adjustedGradBeta <- gradBeta + adjustmentBeta
+                stepBeta <- drop(inverseInfoBeta %*% adjustedGradBeta)
+                coefs <- coefsPrev + 2^(-stepFactor) * stepBeta
+                objCur <- crossprod(stepBeta)
+                stepFactor <- stepFactor + 1
+                testhalf <- objCur > objPrev
+            }
+
+            ## Bias-reduced estimation of (transformed) dispersion
+            if (family$family %in% c("poisson", "binomial")) {
+                disp <- 1
+                transdisp <- eval(control$Trans)
+                adjustedGradZeta <- NA
+                adjustmentZeta <- NA
+                infoDispersion <- NA
+                d1zeta <- NA
+                stepZeta <- 0
+            }
+            else {
+                if (dfResidual > 0) {
+                    allParameters <- c(coefs, disp)
+                    fitDispersion <- fitFun(allParameters, what = "dispersion")
+                    gradDispersion <-  gradFun(allParameters, fit = fitDispersion, what = "dispersion")
+                    infoDispersion <- infoFun(allParameters, inverse = FALSE, fit = fitDispersion, what = "dispersion")
+                    adjustmentDispersion <- adjustmentFun(allParameters, fit = fitDispersion, what = "dispersion")
+                    ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
+                    d1zeta <- eval(d1TransDisp)
+                    ## FIX: some redundancy below...
+                    adjustmentZeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2TransDisp) / d1zeta^2
+                    adjustedGradZeta <- gradDispersion/d1zeta + adjustmentZeta
+                    stepZeta <- as.vector(d1zeta^2 * adjustedGradZeta/infoDispersion)
+                    transdisp <- transdisp + control$slowit * stepZeta
+                    disp <- eval(control$inverseTrans)
+                }
+                else {
+                    disp <- 1 # No effect to the adjusted scores
+                    transdisp <- eval(control$Trans)
+                    adjustedGradZeta <- NA
+                    stepZeta <- 0
+                }
+            }
+
+            if (control$trace) {
+                traceFun()
+            }
+
+            if (failedAdj | failedInv | sum(abs(stepBeta), na.rm = TRUE) + abs(stepZeta) < control$epsilon) {
+                break
+            }
+
+        }
+
+        adjustedGradAll[coefNames] <- adjustedGradBeta
+        adjustedGradAll["Transformed dispersion"] <- adjustedGradZeta
+
+        coefsAll[coefNames] <- coefs
+
+        ## Convergence analysis
+
+        if ((failedInv | failedAdj | iter >= control$maxit) & !(control$type == "correction")) {
+            warning("brglmFit: algorithm did not converge", call. = FALSE)
+            converged <- FALSE
+        }
+        else {
+            converged <- TRUE
+        }
+
+        if (boundary) {
+            warning("brglmFit: algorithm stopped at boundary value", call. = FALSE)
+        }
+
+        ## QR decomposition for cov.unscaled
+        if (!isTRUE(isFullRank)) {
+            x <- Xall
+            coefs <- coefsAll
+            coefs[is.na(coefs)] <- 0
+            nvars <- nvarsAll
+        }
+        fitBeta <- fitFun(c(coefs, disp), what = "mean")
+        qr.Wx <- fitBeta$qrDecomposition
+
+        mus <- fitBeta$mus
+        etas <- fitBeta$etas
+        ## Residuals
+        residuals <- with(fitBeta, (y - mus)/d1mus)
+        workingWeights <- fitBeta$workingWeights
+
+        biasBeta <- -drop(inverseInfoBeta %*% adjustmentBeta)
+        biasZeta <- -adjustmentZeta/infoDispersion/d1zeta^2
+
+        eps <- 10 * .Machine$double.eps
+        if (family$family == "binomial") {
+            if (any(mus > 1 - eps) || any(mus < eps)) {
+                warning("brglmFit: fitted probabilities numerically 0 or 1 occurred", call. = FALSE)
+                boundary <- TRUE
+            }
+        }
+        if (family$family == "poisson") {
+            if (any(mus < eps)) {
+                warning("brglmFit: fitted rates numerically 0 occurred", call. = FALSE)
+                boundary <- TRUE
+            }
+        }
+        if (dfResidual == 0) disp <- NaN
+
+
+    }
+
+    ## Working weights
+    wt <- rep.int(0, nobs)
+    wt[keep] <- workingWeights[keep]
+    names(wt) <- names(residuals) <- names(mus) <- names(etas) <- names(weights) <- names(y) <- ynames
+    ## For the null deviance:
+    ##
+    ##
+    ## If there is an intercept but not an offset then the ML fitted
+    ## value is the weighted average and is calculated easily below if
+    ## ML is used
+    ##
+    if (intercept & missingOffset) {
+        nullFit <- brglmFit(x = x[, "(Intercept)"], y = y, weights = weights,
+                            offset = rep(0, nobs), family = family, intercept = TRUE,
+                            control = control[c("epsilon", "maxit", "type", "dispTrans", "slowit")])
+        nullmus <- nullFit$fitted
+    }
+    ## If there is an offset but not an intercept then the fitted
+    ## value is the inverse link evaluated at the offset
+    ##
+    ## If there is neither an offset nor an intercept then the fitted
+    ## values is the inverse link at zero (and hence covered by
+    ## linkinv(offset) because offset is zero
+    if (!intercept) {
+        nullmus <- linkinv(offset)
+    }
+    ## If there is an intercept and an offset then, for calculating
+    ## the null deviance glm will make a call to the fitter to fit the
+    ## glm with intercept and the offset
+    if (intercept & !missingOffset) {
+        nullmus <- mus
+        ## it does not really matter what nullmus is set
+        ## to. glm will make a new call to brglmFit and
+        ## use the deviance from that call as null
+    }
+    nulldev <- sum(dev.resids(y, nullmus, weights))
+    nulldf <- nkeep - as.integer(intercept)
+    deviance <- sum(dev.resids(y, mus, weights))
+    aic.model <- aic(y, n, mus, weights, deviance) + 2 * rank
+
+    list(coefficients = coefsAll,
+         residuals = residuals,
+         fitted.values = mus,
+         ## TODO: see effects?
+         ## effects = if (!EMPTY) effects,
+         R = if (!EMPTY) qr.R(qr.Wx),
+         rank = rank,
+         qr = if (!EMPTY) structure(qr.Wx[c("qr", "rank", "qraux", "pivot", "tol")], class = "qr"),
+         family = family,
+         linear.predictors = etas,
+         deviance = deviance,
+         aic = aic.model,
+         null.deviance = nulldev,
+         iter = iter,
+         weights = wt,
+         prior.weights = weights,
+         df.residual = dfResidual,
+         df.null = nulldf,
+         y = y,
+         converged = converged,
+         boundary = boundary,
+         dispersion = disp,
+         dispersionML = dispML,
+         transDispersion = transdisp,
+         biases = if (!EMPTY) c(biasBeta, biasZeta),
+         adjustedGrad =  adjustedGradAll,
+         dispTrans = control$dispTrans,
+         ## cov.unscaled = tcrossprod(Rmat),
+         class = "brglmFit")
+}
+
+#' Summary method for \code{\link{brglmFit}} objects
+#'
+#' @inheritParams stats::summary.glm
+#'
+#' @details The interface of the summary method for
+#'     \code{\link{brglmFit}} objects is identical to that of
+#'     \code{\link{glm}} objects. The summary method for
+#'     \code{\link{brglmFit}} objects computes the p-values of the
+#'     individual Wald statistics based on the standard normal
+#'     distribution, unless the family is Gaussian, in which case a t
+#'     distribution with appropriate degrees of freedom is used.
+#'
+#' @seealso \code{\link{summary.glm}} and \code{\link{glm}}
+#'
+#' @examples
+#' ## For examples see examples(brglmFit)
+summary.brglmFit <- function (object, dispersion = object$dispersion,
+                              correlation = FALSE, symbolic.cor = FALSE,
+                              ...) {
+    if (object$family$family == "Gaussian") {
+        dispersion <- NULL
+    }
+    else {
+        summary.glm(object, dispersion = dispersion,
+                    correlation = correlation,
+                    symbolic.cor = symbolic.cor, ...)
+    }
+}
+
+customTrans <- list(Trans = expression(disp),
+                    inverseTrans = expression(transdisp))
+
+
+DD <- function(expr,name, order = 1) {
+    if(order < 1) stop("'order' must be >= 1")
+    if(order == 1) D(expr,name)
+    else DD(D(expr, name), name, order - 1)
+}
+
+## Suggestion by Kurt Hornik to avoid a warning related to the binding
+## of n which is evaluated by family$initialize
+if(getRversion() >= "2.15.1") globalVariables("n")
+
+
