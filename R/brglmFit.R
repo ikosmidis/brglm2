@@ -89,14 +89,26 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                       control = list(), intercept = TRUE)
 {
 
-    traceFun <- function() {
+    traceFun <- function(what = "coefficient") {
         if (iter %% control$trace == 0) {
-            cat("Iter:", sprintf("%3d", iter), "|",
-                "Max abs step:", format(round(max(c(abs(stepBeta), abs(stepZeta))), 6),
-                                        nsmall = 6, scientific = FALSE), "|",
-                "Max abs score:", format(round(max(abs(c(adjustedGradBeta, adjustedGradZeta)), na.rm = TRUE), 6),
-                                         nsmall = 6, scientific = FALSE), "|",
-                "Step factor:", stepFactor - 1, "\n")
+            if (what == "coefficient") {
+                st <-  max(abs(stepBeta), na.rm = TRUE)
+                gr <- max(abs(adjustedGradBeta), na.rm = TRUE)
+                cat("Coefficients update:\t")
+                cat("Outer/Inner iteration:\t", sprintf("%3d", iter), "   |", sprintf("%3d", stepFactor), "\n")
+            }
+            else {
+                cat("\n")
+                st <- abs(stepZeta)
+                gr <- abs(adjustedGradZeta)
+                cat("Dispersion update:\t")
+                cat("Outer iteration:\t", sprintf("%3d", iter), "\n")
+            }
+            cat("max |step|:", format(round(st, 6), nsmall = 6, scientific = FALSE), "\t",
+                "max |gradient|:", format(round(gr, 6), nsmall = 6, scientific = FALSE), "\n")
+            if (what == "coefficient") {
+
+            }
         }
     }
 
@@ -282,34 +294,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         iter <- 0L
     }
     else {
-        ## ## Get Starting values
-        ## coefold <- NULL
-        ## etas <- if (!is.null(etastart)) {
-        ##             etastart
-        ##         }
-        ##         else {
-        ##             if (!is.null(start)) {
-        ##                 if (length(start) != nvars) {
-        ##                     stop(gettextf("length of 'start' should equal %d and correspond to initial coefs for %s",
-        ##                                   nvars, paste(deparse(xnames), collapse = ", ")),
-        ##                          domain = NA)
-        ##                 }
-        ##                 else {
-        ##                     coefold <- start
-        ##                     offset + as.vector(if (NCOL(x) == 1L)
-        ##                                            x * start
-        ##                                        else x %*% start)
-        ##                 }
-        ##             }
-        ##             else {
-        ##                 family$linkfun(mustart)
-        ##             }
-        ##         }
-        ## mus <- linkinv(etas)
-        ## if (!(validmu(mus) && valideta(etas))) {
-        ##     stop("cannot find valid starting values: please specify some", call. = FALSE)
-        ## }
-
         boundary <- converged <- FALSE
 
         ## Detect aliasing
@@ -395,27 +379,10 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             transdisp <- eval(control$Trans)
         }
         else {
-            ## if (df.r > 0) {
-            ##     dispFit <- try(uniroot(f = function(phi) {
-            ##         gradFun(c(coefs, phi), what = "dispersion")
-            ##     }, lower = .Machine$double.eps, upper =10000, tol = sqrt(.Machine$double.eps)), silent = TRUE)
-            ##     if (inherits(dispFit, "try-error")) {
-            ##         warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
-            ##         dispML <- NA
-            ##     }
-            ##     else {
-            ##         disp <- dispML <- dispFit$root
-            ##     }
-            ## }
-            ## else {
-            ##     disp <- 1 ## A convenient value
-            ##     dispML <- NA
-            ## }
-            ## transdisp <- eval(control$Trans)
             if (dfResidual > 0) {
                 dispFit <- try(uniroot(f = function(phi) {
                     gradFun(c(coefs, phi), what = "dispersion")
-                }, lower = .Machine$double.eps, upper = 10000, tol = control$epsilon), silent = TRUE)
+                }, lower = .Machine$double.eps, upper = 10000, tol = control$epsilon), silent = FALSE)
                 if (inherits(dispFit, "try-error")) {
                     warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
                     dispML <- NA
@@ -424,24 +391,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 else {
                     disp <- dispML <- dispFit$root
                 }
-                ## disp <- with(tempFit, sum((weights * residuals^2)[weights > 0])/df.residual)
-                ## ## TODO: Add maxit and epsilon for dipersion estimation inbrglmControl
-                ## for (i in seq.int(control$maxit)) {
-                ##     allParameters <- c(coefs, disp)
-                ##     fitObject <- fitFun(allParameters, what = "dispersion")
-                ##     gradDispersion <-  gradFun(allParameters, fit = fitObject, what = "dispersion")
-                ##     inverseInfoDispersion <- infoFun(allParameters, inverse = TRUE, fit = fitObject, what = "dispersion")
-                ##     stepDispersion <- as.vector(gradDispersion * inverseInfoDispersion)
-                ##     disp <- disp + stepDispersion
-                ##     if (testDisp <- abs(stepDispersion) < 1e-05) {
-                ##         dispML <- disp
-                ##         break
-                ##     }
-                ## }
-                ## if (!testDisp) {
-                ##     warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
-                ##     dispML <- NA
-                ## }
             }
             else { ## if the model is saturated dispML is NA
                 disp <- 1 ## A convenient value
@@ -491,6 +440,10 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 objCur <- crossprod(stepBeta)
                 stepFactor <- stepFactor + 1
                 testhalf <- objCur > objPrev
+                if (control$trace) {
+                    traceFun(what = "coefficient")
+                }
+
             }
 
             ## Bias-reduced estimation of (transformed) dispersion
@@ -528,7 +481,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
 
             if (control$trace) {
-                traceFun()
+                traceFun(what = "dispersion")
             }
 
             if (failedAdj | failedInv | sum(abs(stepBeta), na.rm = TRUE) + abs(stepZeta) < control$epsilon) {
