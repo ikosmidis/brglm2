@@ -1,6 +1,6 @@
 context("agreement with brglm when estimation binomial resposne models")
 
-data("lizards")
+data("lizards", package = "brglm2")
 
 links <- lapply(c("logit", "probit", "cloglog", "cauchit"), make.link)
 

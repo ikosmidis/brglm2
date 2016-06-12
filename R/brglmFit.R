@@ -34,9 +34,8 @@
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
 #' @references
 #' @examples
-#' \dontrun{
 #' ## The lizards example from ?brglm::brglm
-#' data("lizards", package = "brlgm2")
+#' data("lizards")
 #' # Fit the model using maximum likelihood
 #' lizardsML <- glm(cbind(grahami, opalinus) ~ height + diameter +
 #'                      light + time, family = binomial(logit), data = lizards,
@@ -45,7 +44,8 @@
 #' lizardsBR <- glm(cbind(grahami, opalinus) ~ height + diameter +
 #'                      light + time, family = binomial(logit), data = lizards,
 #'                  method = "brglmFit")
-#' }
+#' summary(lizardsML)
+#' summary(lizardsBR)
 #'
 #'
 #' ## Another example from
@@ -55,7 +55,7 @@
 #' ## no. 3, pp. 846-870.
 #'
 #' \dontrun{
-#' data(coalition, package = "Zelig")
+#' data("coalition", package = "Zelig")
 #' # The maximum likelihood fit with log link
 #' coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
 #' # The bias-reduced fit
@@ -64,13 +64,14 @@
 #' coalitionBC <- update(coalitionML, method = "brglmFit", type = "correction")
 #' }
 #'
+#' \dontrun{
 #' ## An example with offsets from Venables & Ripley (2002, p.189)
 #' data("anorexia", package = "MASS")
 #'
 #' anorexML <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
 #'                 family = gaussian, data = anorexia)
 #' anorexBR <- update(anorexML, method = "brglmFit")
-#' anorexBC <- update(anorexML, method = "brglmFit", correction = TRUE)
+#' anorexBC <- update(anorexML, method = "brglmFit", type = "correction")
 #'
 #' ## The outputs are identical, because the maximum likelihood
 #' ## estimators of the regression parameters are unbiased when family
@@ -80,6 +81,7 @@
 #' summary(anorexML)
 #' summary(anorexBR)
 #' summary(anorexBC, start = coef(anorexML))
+#' }
 #'
 #' @export
 brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
@@ -146,7 +148,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         with(fit, {
             if (what == "mean") {
                 scoreComponents <- weights * d1mus * (y - mus) / varmus * x
-                return(precision * .Internal(colSums(scoreComponents, nobs, nvars, TRUE)))
+                ## return(precision * .Internal(colSums(scoreComponents, nobs, nvars, TRUE)))
+                return(precision * colSums(scoreComponents))
             }
             if (what == "dispersion") {
                 return(1/2 * precision^2 * sum(devianceResiduals - EdevianceResiduals, na.rm = TRUE))
@@ -186,7 +189,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         }
         with(fit, {
             Qmat <- qr.Q(qrDecomposition)
-            .Internal(rowSums(Qmat * Qmat, nobs, nvars, FALSE))
+            ## .Internal(rowSums(Qmat * Qmat, nobs, nvars, FALSE))
+            rowSums(Qmat * Qmat)
         })
     }
 
@@ -198,8 +202,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             if (what == "mean") {
                 hatvalues <- hats(pars, fit = fit)
                 ## User only observations with keep = TRUE to ensure that no division with zero takes place
-                return(.Internal(colSums(0.5 * hatvalues * d2mus/d1mus * x, nobs, nvars, TRUE)))
-                }
+                ## return(.Internal(colSums(0.5 * hatvalues * d2mus/d1mus * x, nobs, nvars, TRUE)))
+                return(colSums(0.5 * hatvalues * d2mus/d1mus * x))
+            }
             if (what == "dispersion") {
                 s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
                 s2 <- sum(weights^2 * d2afuns, na.rm = TRUE)
@@ -352,15 +357,15 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             warn <- getOption("warn")
             ## Get startng values and kill warnings whilst doing that
             options(warn = -1)
-            temp.fit <- glm.fit(x = x, y = y.adj, weights = weights.adj,
-                                etastart = etastart, mustart = mustart,
-                                offset = offset, family = family,
-                                control = list(epsilon = control$epsilon,
-                                               maxit = 10000, trace = FALSE),
-                                intercept = intercept)
+            tempFit <- stats::glm.fit(x = x, y = y.adj, weights = weights.adj,
+                                       etastart = etastart, mustart = mustart,
+                                       offset = offset, family = family,
+                                       control = list(epsilon = control$epsilon,
+                                                      maxit = 10000, trace = FALSE),
+                                       intercept = intercept)
             ## Set warn to its original value
             options(warn = warn)
-            coefs <- coef(temp.fit)
+            coefs <- coef(tempFit)
             names(coefs) <- coefNames
         }
         else {
@@ -419,7 +424,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 else {
                     disp <- dispML <- dispFit$root
                 }
-                ## disp <- with(temp.fit, sum((weights * residuals^2)[weights > 0])/df.residual)
+                ## disp <- with(tempFit, sum((weights * residuals^2)[weights > 0])/df.residual)
                 ## ## TODO: Add maxit and epsilon for dipersion estimation inbrglmControl
                 ## for (i in seq.int(control$maxit)) {
                 ##     allParameters <- c(coefs, disp)
@@ -538,7 +543,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         coefsAll[coefNames] <- coefs
 
         ## Convergence analysis
-
         if ((failedInv | failedAdj | iter >= control$maxit) & !(control$type == "correction")) {
             warning("brglmFit: algorithm did not converge", call. = FALSE)
             converged <- FALSE
@@ -619,9 +623,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## glm with intercept and the offset
     if (intercept & !missingOffset) {
         nullmus <- mus
-        ## it does not really matter what nullmus is set
-        ## to. glm will make a new call to brglmFit and
-        ## use the deviance from that call as null
+        ## doen't really matter what nullmus is set to. glm will make
+        ## a new call to brglmFit and use the deviance from that call
+        ## as null
     }
     nulldev <- sum(dev.resids(y, nullmus, weights))
     nulldf <- nkeep - as.integer(intercept)
@@ -675,6 +679,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 #'
 #' @examples
 #' ## For examples see examples(brglmFit)
+#' @export
 summary.brglmFit <- function (object, dispersion = object$dispersion,
                               correlation = FALSE, symbolic.cor = FALSE,
                               ...) {
@@ -688,18 +693,15 @@ summary.brglmFit <- function (object, dispersion = object$dispersion,
     }
 }
 
-customTrans <- list(Trans = expression(disp),
-                    inverseTrans = expression(transdisp))
-
-
 DD <- function(expr,name, order = 1) {
     if(order < 1) stop("'order' must be >= 1")
     if(order == 1) D(expr,name)
     else DD(D(expr, name), name, order - 1)
 }
 
-## Suggestion by Kurt Hornik to avoid a warning related to the binding
-## of n which is evaluated by family$initialize
-if(getRversion() >= "2.15.1") globalVariables("n")
+
+## customTrans <- list(Trans = expression(disp),
+##                     inverseTrans = expression(transdisp))
+
 
 

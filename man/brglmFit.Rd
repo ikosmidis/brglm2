@@ -22,11 +22,19 @@ brglmFit(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
 \item{weights}{an optional vector of \sQuote{prior weights} to be used
     in the fitting process.  Should be \code{NULL} or a numeric vector.}
 
-\item{start}{starting values for the parameters in the linear predictor.}
+\item{start}{starting values for the parameters in the linear
+predictor. If \code{NULL} (default) then the maximum likelihood
+estimates are caluclated and used as starting values}
 
-\item{etastart}{starting values for the linear predictor.}
+\item{etastart}{applied only when start is not
+\code{NULL}. Starting values for the linear predictor to be
+passed to \code{\link{glm.fit}} when computing starting values
+using maximum likelihood.}
 
-\item{mustart}{starting values for the vector of means.}
+\item{mustart}{applied only when start is not \code{NULL}. Starting
+values for the vector of means to be passed to
+\code{\link{glm.fit}} when computing starting values using
+maximum likelihood.}
 
 \item{offset}{this can be used to specify an \emph{a priori} known
     component to be included in the linear predictor during fitting.
@@ -53,44 +61,71 @@ process. See \code{\link{brglmControl}} for details.}
 (see the description of \code{method} and the \code{Fitting
 functions} section in \code{\link{glm}} that fits generalized
 linear models using implicit and explicit bias reduction
-methods. Estimation is performed using a quasi-Fisher scoring
-iteration based on the iterative correction of the bias of the
-Fisher scoring iterates.
+methods. Currently supported methods include the implicit adjusted
+scores approach in Firth (1993) and Kosmidis \& Firth (2009) and
+the correction of the asymptotic bias in Cordeiro & McCullagh
+(1991).  Estimation is performed using a quasi-Fisher scoring
+iteration based on the iterative correction of the asymptotic bias
+of the Fisher scoring iterates.
 }
 \details{
-\itemize{ \item }
+\itemize{
+
+\item The null deviance is evaluated based on estimates of the
+    expectations using the bias reduction method specified by the
+    \code{type} argument (see \code{\link{brglmControl}}).
+}
 }
 \examples{
-\dontrun{
 ## The lizards example from ?brglm::brglm
-load("../data/lizards.rda")
+data("lizards")
 # Fit the model using maximum likelihood
 lizardsML <- glm(cbind(grahami, opalinus) ~ height + diameter +
-                     light + time, family = binomial(logit), data=lizards,
+                     light + time, family = binomial(logit), data = lizards,
                  method = "glm.fit")
 # Now the bias-reduced fit:
 lizardsBR <- glm(cbind(grahami, opalinus) ~ height + diameter +
-                     light + time, family = binomial(logit), data=lizards,
+                     light + time, family = binomial(logit), data = lizards,
                  method = "brglmFit")
-}
+summary(lizardsML)
+summary(lizardsBR)
 
 
-## An example from
+## Another example from
 ## King, Gary, James E. Alt, Nancy Elizabeth Burns and Michael Laver
 ## (1990).  "A Unified Model of Cabinet Dissolution in Parliamentary
 ## Democracies", _American Journal of Political Science_, vol. 34,
 ## no. 3, pp. 846-870.
 
 \dontrun{
-library(Zelig)
-data(coalition)
+data("coalition", package = "Zelig")
 # The maximum likelihood fit with log link
-fm1 <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
+coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
 # The bias-reduced fit
-fm1br <- update(fm1, method = "brglmFit")
+coalitionBR <- update(coalitionML, method = "brglmFit")
 # The bias-corrected fit
-fm1bc <- update(fm1, method = "brglmFit", correction = TRUE)
+coalitionBC <- update(coalitionML, method = "brglmFit", type = "correction")
 }
+
+\dontrun{
+## An example with offsets from Venables & Ripley (2002, p.189)
+data("anorexia", package = "MASS")
+
+anorexML <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
+                family = gaussian, data = anorexia)
+anorexBR <- update(anorexML, method = "brglmFit")
+anorexBC <- update(anorexML, method = "brglmFit", type = "correction")
+
+## The outputs are identical, because the maximum likelihood
+## estimators of the regression parameters are unbiased when family
+## is Gaussian, and the bias-reduced estimator of the dispersion is
+## the unbiased, by degree of freedom adjustment, estimator of the
+## residual variance.
+summary(anorexML)
+summary(anorexBR)
+summary(anorexBC, start = coef(anorexML))
+}
+
 }
 \seealso{
 \code{\link{glm.fit}} and \code{\link{glm}}

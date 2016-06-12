@@ -40,3 +40,5 @@ brglmControl <- function(epsilon = 1e-07, maxit = 100,
        dispTrans = dispTrans,
        slowit = slowit)
 }
+
+

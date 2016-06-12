@@ -1,4 +1,3 @@
-library(testthat)
-library(brglm)
+library("testthat")
 
-test_check("brglm")
+test_check("brglm2")
