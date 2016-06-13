@@ -86,7 +86,7 @@
 #' @export
 brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
                       mustart = NULL, offset = rep(0, nobs), family = gaussian(),
-                      control = list(), intercept = TRUE)
+                      control = list(), intercept = TRUE, fixedTotals = NULL)
 {
 
     traceFun <- function(what = "coefficient") {
@@ -119,6 +119,12 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         prec <- 1/dispersion
         etas <- drop(x %*% betas + offset)
         mus <- linkinv(etas)
+        if (hasFixedTotals) {
+            ## Rescale mus
+            musTotals <-  as.vector(tapply(mus, fixedTotals, sum))[fixedTotals]
+            mus <- mus * rowTotals / musTotals
+            etas <- linkfun(mus)
+        }
         out <- list(precision = prec,
                     betas = betas,
                     dispersion = dispersion,
@@ -244,6 +250,11 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         offset <- rep.int(0, nobs)
     }
 
+    ## If fixedTotals is specified the compute rowTotals
+    if (hasFixedTotals <- !is.null(fixedTotals)) {
+        rowTotals <-  as.vector(tapply(y, fixedTotals, sum))[fixedTotals]
+    }
+
     ## Enrich the family object with the required derivatives There is
     ## scope for improvement here by adding an argument to enrich*
     ## functions that controls what you get (e.g. only d2mu.deta and
@@ -253,6 +264,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## Extract functions from the enriched family object
     variance <- family$variance
     linkinv <- family$linkinv
+    linkfun <- family$linkfun
     if (!is.function(variance) || !is.function(linkinv))
         stop("'family' argument seems not to be a valid family object",
              call. = FALSE)
