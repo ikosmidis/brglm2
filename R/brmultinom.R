@@ -17,18 +17,23 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     mf <- mf[c(1L, m)]
     mf$drop.unused.levels <- TRUE
     mf[[1L]] <- quote(model.frame)
-    mf <- eval(mf, parent.frame())
-    mt <- attr(mf, "terms")
+    mf <- eval.parent(mf)
+    Terms <- attr(mf, "terms")
+    X <- model.matrix(Terms, mf, contrasts)
+    Xcontrasts <- attr(X, "contrasts")
     Y <- model.response(mf, "any")
 
-    ## Exceptions
-    stopifnot(is.factor(Y))
-
-
-##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@15@"]]));##:ess-bp-end:##
-
-    ## From multinom
+    ## The chunk of code between +BEGIN and +END has been adopted from
+    ## nnet::multinom
+    ##+BEGIN
+    if (!is.matrix(Y))
+        Y <- as.factor(Y)
+    w <- model.weights(mf)
+    if (length(w) == 0L)
+        if (is.matrix(Y))
+            w <- rep(1, dim(Y)[1L])
+        else w <- rep(1, length(Y))
+    lev <- levels(Y)
     if (is.factor(Y)) {
         counts <- table(Y)
         if (any(counts == 0L)) {
@@ -39,37 +44,48 @@ browser(expr=is.null(.ESSBP.[["@15@"]]));##:ess-bp-end:##
             Y <- factor(Y, levels = lev[counts > 0L])
             lev <- lev[counts > 0L]
         }
+        ## Consider removing the below
         if (length(lev) < 2L)
             stop("need two or more classes to fit a multinom model")
         if (length(lev) == 2L)
             Y <- as.integer(Y) - 1
-        else Y <- class.ind(Y)
+        else Y <- nnet::class.ind(Y)
     }
+    ##+END
 
-    if (is.factor(Y))
+    ncat <- length(lev)
+    nvar <- ncol(X)
 
-    if (length(dim(Y)) == 1L) {
-        nm <- rownames(Y)
-        dim(Y) <- NULL
-        if (!is.null(nm))
-            names(Y) <- nm
-    }
-    X <- if (!is.empty.model(mt))
-        model.matrix(mt, mf, contrasts)
-    else matrix(, NROW(Y), 0L)
-    weights <- as.vector(model.weights(mf))
-    if (!is.null(weights) && !is.numeric(weights))
-        stop("'weights' must be a numeric vector")
-    if (!is.null(weights) && any(weights < 0))
-        stop("negative weights not allowed")
-    offset <- as.vector(model.offset(mf))
-    if (!is.null(offset)) {
-        if (length(offset) != NROW(Y))
-            stop(gettextf("number of offsets is %d should equal %d (number of observations)",
-                length(offset), NROW(Y)), domain = NA)
-    }
-    mustart <- model.extract(mf, "mustart")
-    etastart <- model.extract(mf, "etastart")
+    ## Set up the model matrix for the poisson fit
+    Xnuisance <- Matrix::Diagonal(nrow(X))
+    Xextended <- cbind(kronecker(rep(1, ncat), Xnuisance),
+                       kronecker(Matrix::Diagonal(ncat)[, -1], X))
+    int <- seq.int(nrow(X))
+    nd <- paste0("%0", nchar(max(int)), "d")
+    colnames(Xextended) <- c(paste0(".nuisance", sprintf(nd, int)),
+                             ## CHECK: lev[-1] contrasts?
+                             paste(rep(lev[-1], each = nvar),
+                                   rep(colnames(X), ncat - 1), sep = ":"))
+
+    ## Set up the extended response
+    Yextended <- c(Y * w)
+
+    ## TODO:
+    ## + starting values
+    ## + subset
+    ## + na.action
+    ## + control
+    fit <- brglmFit(x = Xextended, y = Yextended, start = NULL,
+            family = poisson("log"))
+
+
+    ##:ess-bp-start::browser@nil:##
+browser(expr=is.null(.ESSBP.[["@3@"]]));##:ess-bp-end:##
+
+    1
+
+
+
 
 }
 

@@ -95,14 +95,14 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 st <-  max(abs(stepBeta), na.rm = TRUE)
                 gr <- max(abs(adjustedGradBeta), na.rm = TRUE)
                 cat("Coefficients update:\t")
-                cat("Outer/Inner iteration:\t", sprintf("%3d", iter), "   |", sprintf("%3d", stepFactor), "\n")
+                cat("Outer/Inner iteration:\t", sprintf("%03d", iter), "   |", sprintf("%03d", stepFactor), "\n")
             }
             else {
                 cat("\n")
                 st <- abs(stepZeta)
                 gr <- abs(adjustedGradZeta)
                 cat("Dispersion update:\t")
-                cat("Outer iteration:\t", sprintf("%3d", iter), "\n")
+                cat("Outer iteration:\t", sprintf("%03d", iter), "\n")
             }
             cat("max |step|:", format(round(st, 6), nsmall = 6, scientific = FALSE), "\t",
                 "max |gradient|:", format(round(gr, 6), nsmall = 6, scientific = FALSE), "\n")
