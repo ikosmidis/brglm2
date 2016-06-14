@@ -353,6 +353,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             warn <- getOption("warn")
             ## Get startng values and kill warnings whilst doing that
             options(warn = -1)
+
             tempFit <- stats::glm.fit(x = x, y = y.adj, weights = weights.adj,
                                        etastart = etastart, mustart = mustart,
                                        offset = offset, family = family,
