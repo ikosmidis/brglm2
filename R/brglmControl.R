@@ -1,6 +1,6 @@
 brglmControl <- function(epsilon = 1e-07, maxit = 100,
                          trace = FALSE,
-                         type = c("adjusted_scores", "correction"),
+                         type = c("adjusted_scores", "correction", "maximum_likelihood"),
                          dispTrans = "identity",
                          slowit = 1) {
     type <- match.arg(type)

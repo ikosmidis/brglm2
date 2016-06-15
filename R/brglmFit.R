@@ -30,6 +30,11 @@
 #' \item The null deviance is evaluated based on estimates of the
 #'     expectations using the bias reduction method specified by the
 #'     \code{type} argument (see \code{\link{brglmControl}}).
+#'
+#' \item If \code{type == "correction"} (see
+#' \code{\link{brglmControl}}) then \code{coefficients} and
+#' \code{transDispersion} have the estimated biases as attributes.
+#'
 #' }
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
 #' @references
@@ -233,6 +238,10 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     control <- do.call("brglmControl", control)
 
+    ## Get tyep
+    isML <- control$type == "maximum_likelihood"
+    isCor <- control$type == "correction"
+
     ## Ensure x is a matrix, extract variable names, observation
     ## names, nobs, nvars, and initialize weights and offsets if
     ## needed
@@ -342,12 +351,12 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         if (is.null(start)) {
             ## Adjust counts if binomial or Poisson in order to avoid infinite estimates
             if (family$family == "binomial") {
-                weights.adj <- weights + (!(control$type == "correction")) * nvars/nobs
-                y.adj <- (weights * y + (!(control$type == "correction")) * 0.5 * nvars/nobs)/weights.adj
+                weights.adj <- weights + (!(isCor)) * nvars/nobs
+                y.adj <- (weights * y + (!(isCor)) * 0.5 * nvars/nobs)/weights.adj
             }
             else {
                 weights.adj <- weights
-                y.adj <- y + if (family$family == "poisson") (!(control$type == "correction")) * 0.5 * nvars/nobs else 0
+                y.adj <- y + if (family$family == "poisson") (!(isCor)) * 0.5 * nvars/nobs else 0
             }
             ## ML fit to get starting values
             warn <- getOption("warn")
@@ -415,7 +424,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
         adjustedGradAll <- rep(NA, nvarsAll + 1)
         names(adjustedGradAll) <- c(coefNamesAll, "Transformed dispersion")
-        if (control$type == "correction") {
+        if (isCor) {
             control$maxit <- 1
             control$slowit <- 1
         }
@@ -431,6 +440,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
             while (testhalf & stepFactor < 15) {
                 theta <- c(coefs, disp)
+
                 ## If fixedTotals is provided (i.e. multinomial
                 ## regression via the Poisson trick) then everything
                 ## except the score function needs to be evaluated at
@@ -447,10 +457,16 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     inverseInfoBeta <- cInverseInfoBeta
                 }
 
-                adjustmentBeta <- adjustmentFun(theta, fit = fitBeta, what = "mean")
-                if (failedAdj <- any(is.na(adjustmentBeta))) {
-                    warning("failed to calculate the bias-reducing score adjustment: iteration stopped prematurely")
-                    break
+                if (isML) {
+                    adjustmentBeta <- 0
+                    failedAdj <- FALSE
+                }
+                else {
+                    adjustmentBeta <- adjustmentFun(theta, fit = fitBeta, what = "mean")
+                    if (failedAdj <- any(is.na(adjustmentBeta))) {
+                        warning("failed to calculate the bias-reducing score adjustment: iteration stopped prematurely")
+                        break
+                    }
                 }
                 adjustedGradBeta <- gradBeta + adjustmentBeta
                 stepBeta <- drop(inverseInfoBeta %*% adjustedGradBeta)
@@ -480,12 +496,17 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     fitDispersion <- fitFun(theta, what = "dispersion")
                     gradDispersion <-  gradFun(theta, fit = fitDispersion, what = "dispersion")
                     infoDispersion <- infoFun(theta, inverse = FALSE, fit = fitDispersion, what = "dispersion")
-                    adjustmentDispersion <- adjustmentFun(theta, fit = fitDispersion, what = "dispersion")
-                    ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
-                    d1zeta <- eval(d1TransDisp)
-                    ## FIX: some redundancy below...
-                    adjustmentZeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2TransDisp) / d1zeta^2
-                    adjustedGradZeta <- gradDispersion/d1zeta + adjustmentZeta
+                    if (isML) {
+                        adjustedGradZeta <- 0
+                    }
+                    else {
+                        adjustmentDispersion <- adjustmentFun(theta, fit = fitDispersion, what = "dispersion")
+                        ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
+                        d1zeta <- eval(d1TransDisp)
+                        ## FIX: some redundancy below...
+                        adjustmentZeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2TransDisp) / d1zeta^2
+                        adjustedGradZeta <- gradDispersion/d1zeta + adjustmentZeta
+                    }
                     stepZeta <- as.vector(d1zeta^2 * adjustedGradZeta/infoDispersion)
                     transdisp <- transdisp + control$slowit * stepZeta
                     disp <- eval(control$inverseTrans)
@@ -514,7 +535,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         coefsAll[coefNames] <- coefs
 
         ## Convergence analysis
-        if ((failedInv | failedAdj | iter >= control$maxit) & !(control$type == "correction")) {
+        if ((failedInv | failedAdj | iter >= control$maxit) & !(isCor)) {
             warning("brglmFit: algorithm did not converge", call. = FALSE)
             converged <- FALSE
         }
@@ -525,11 +546,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         if (boundary) {
             warning("brglmFit: algorithm stopped at boundary value", call. = FALSE)
         }
-
-        ## Estimate of first-order bias FROM the last iteration (so
-        ## not at the final value for the coefficients)
-        biasBeta <- -drop(inverseInfoBeta %*% adjustmentBeta)
-        biasZeta <- -adjustmentZeta/infoDispersion/d1zeta^2
 
         ## QR decomposition and fitted values are AT the final value
         ## for the coefficients
@@ -568,6 +584,24 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
         }
         if (dfResidual == 0) disp <- NaN
+
+        ## Estimate of first-order bias FROM the last iteration (so
+        ## not at the final value for the coefficients)
+        if (isML) {
+            ## For now... To be set to calculate biases at a later version
+            biasBeta <- biasZeta <- NULL
+        }
+        else {
+            biasBeta <- -drop(inverseInfoBeta %*% adjustmentBeta)
+            biasZeta <- -adjustmentZeta/infoDispersion/d1zeta^2
+            biasesCoefsAll <- coefsAll
+            biasesCoefsAll[coefNames] <- biasBeta
+            ## If correction has been requested then add estimated biases an attribute to the coefficients
+            if (isCor) {
+                attr(coefsAll, "biases") <- biasesCoefsAll
+                attr(transdisp, "biases") <- biasZeta
+            }
+        }
 
 
     }
@@ -636,7 +670,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
          dispersion = disp,
          dispersionML = dispML,
          transDispersion = transdisp,
-         biases = if (!EMPTY) c(biasBeta, biasZeta),
          adjustedGrad =  adjustedGradAll,
          dispTrans = control$dispTrans,
          ## cov.unscaled = tcrossprod(Rmat),
