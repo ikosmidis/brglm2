@@ -1,17 +1,17 @@
 #' Fitting function for \code{\link{glm}} that allows reduced-bias estimation and inference
 #'
 #' \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
-#' (see the description of \code{method} and the \code{Fitting
-#' functions} section in \code{\link{glm}} that fits generalized
-#' linear models using implicit and explicit bias reduction
-#' methods. Currently supported methods include the implicit adjusted
-#' scores approach in Firth (1993) and Kosmidis \& Firth (2009) and
-#' the correction of the asymptotic bias in Cordeiro & McCullagh
-#' (1991).  Estimation is performed using a quasi-Fisher scoring
-#' iteration based on the iterative correction of the asymptotic bias
-#' of the Fisher scoring iterates.
+#' that fits generalized linear models using implicit and explicit
+#' bias reduction methods. Currently supported methods include the
+#' implicit adjusted scores approach in Firth (1993) and Kosmidis \&
+#' Firth (2009), the correction of the asymptotic bias in Cordeiro &
+#' McCullagh (1991), and maximum likelihood.  Estimation is performed
+#' using a quasi-Fisher scoring iteration based on the iterative
+#' correction of the asymptotic bias of the Fisher scoring iterates.
 #'
 #' @inheritParams stats::glm.fit
+#' @param x \code{x} is a design matrix of dimension \code{n * p},
+#' @param y \code{y} is a vector of observations of length \code{n}.
 #' @param control a list of parameters controlling the fitting
 #'     process. See \code{\link{brglmControl}} for details.
 #' @param start starting values for the parameters in the linear
@@ -25,15 +25,22 @@
 #'     \code{NULL}. Starting values for the linear predictor to be
 #'     passed to \code{\link{glm.fit}} when computing starting values
 #'     using maximum likelihood.
+#' @param fixedTotals Effective only when \code{family} is
+#'     \code{poisson}. Either \code{NULL} (no effect) or a vector that
+#'     indicates which counts must be treated as a group. See
+#'     "Details" for more information and \code{\link{brmultinom}}.
 #' @details \itemize{
 #'
 #' \item The null deviance is evaluated based on estimates of the
 #'     expectations using the bias reduction method specified by the
 #'     \code{type} argument (see \code{\link{brglmControl}}).
 #'
+#' \item See the description of \code{method} and the \code{Fitting
+#' functions} section in \code{\link{glm}}
+#' #'
 #' \item If \code{type == "correction"} (see
-#' \code{\link{brglmControl}}) then \code{coefficients} and
-#' \code{transDispersion} have the estimated biases as attributes.
+#' \code{\link{brglmControl}}), then \code{coefficients} and
+#' \code{transDispersion} carry the estimated biases as attributes.
 #'
 #' }
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
@@ -236,6 +243,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
+
     control <- do.call("brglmControl", control)
 
     ## Get tyep
@@ -260,8 +268,14 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     }
 
     ## If fixedTotals is specified the compute rowTotals
-    if (hasFixedTotals <- !is.null(fixedTotals)) {
-        rowTotals <-  as.vector(tapply(y, fixedTotals, sum))[fixedTotals]
+    if (!is.null(fixedTotals)) {
+        if (family$family == "poisson") {
+            hasFixedTotals <- TRUE
+            rowTotals <-  as.vector(tapply(y, fixedTotals, sum))[fixedTotals]
+        }
+        else {
+            hasFixedTotals <- FALSE
+        }
     }
 
     ## Enrich the family object with the required derivatives There is

@@ -173,7 +173,6 @@ logLik.brmultinom <- function(object, ...) {
               class = "logLik")
 }
 
-
 #' @method summary brmultinom
 #' @export
 summary.brmultinom <- function (object, correlation = FALSE, digits = options()$digits,

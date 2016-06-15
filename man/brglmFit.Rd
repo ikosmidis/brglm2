@@ -9,15 +9,9 @@ brglmFit(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
   control = list(), intercept = TRUE, fixedTotals = NULL)
 }
 \arguments{
-\item{x}{For \code{glm}:
-    logical values indicating whether the response vector and model
-    matrix used in the fitting process should be returned as components
-    of the returned value.
+\item{x}{\code{x} is a design matrix of dimension \code{n * p},}
 
-    For \code{glm.fit}: \code{x} is a design matrix of dimension
-    \code{n * p}, and \code{y} is a vector of observations of length
-    \code{n}.
-  }
+\item{y}{\code{y} is a vector of observations of length \code{n}.}
 
 \item{weights}{an optional vector of \sQuote{prior weights} to be used
     in the fitting process.  Should be \code{NULL} or a numeric vector.}
@@ -55,6 +49,11 @@ process. See \code{\link{brglmControl}} for details.}
 
 \item{intercept}{logical. Should an intercept be included in the
     \emph{null} model?}
+
+\item{fixedTotals}{Effective only when \code{family} is
+\code{poisson}. Either \code{NULL} (no effect) or a vector that
+indicates which counts must be treated as a group. See
+"Details" for more information and \code{\link{brmultinom}}.}
 }
 \description{
 \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
