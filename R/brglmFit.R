@@ -692,6 +692,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 #'
 #' @examples
 #' ## For examples see examples(brglmFit)
+#'
+#' @method summary brglmFit
 #' @export
 summary.brglmFit <- function(object, dispersion = NULL,
                              correlation = FALSE, symbolic.cor = FALSE,
@@ -715,6 +717,7 @@ summary.brglmFit <- function(object, dispersion = NULL,
 #'
 #' @inheritParams stats::confint
 #'
+#' @method confint brglmFit
 #' @export
 confint.brglmFit <- function(object, parm, level = 0.95, ...) {
     confint.default(object, parm, level, ...)
@@ -725,6 +728,7 @@ confint.brglmFit <- function(object, parm, level = 0.95, ...) {
 #'
 #' @inheritParams stats::vcov
 #'
+#' @method vcov brglmFit
 #' @export
 vcov.brglmFit <- function(object, ...) {
     summary.brglmFit(object, ...)$cov.scaled

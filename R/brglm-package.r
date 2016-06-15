@@ -20,7 +20,12 @@
 #'
 #' @docType package
 #' @name brglm2
-#' @import stats graphics
+#' @import MASS
+#' @import stats
+#' @import Matrix
+#' @importFrom graphics plot
+#' @importFrom nnet class.ind
+#'
 #'
 NULL
 #> NULL

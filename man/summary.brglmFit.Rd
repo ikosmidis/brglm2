@@ -37,6 +37,7 @@ The interface of the summary method for
 }
 \examples{
 ## For examples see examples(brglmFit)
+
 }
 \seealso{
 \code{\link{summary.glm}} and \code{\link{glm}}

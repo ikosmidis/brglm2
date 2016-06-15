@@ -6,7 +6,7 @@
 \usage{
 brglmFit(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
   mustart = NULL, offset = rep(0, nobs), family = gaussian(),
-  control = list(), intercept = TRUE)
+  control = list(), intercept = TRUE, fixedTotals = NULL)
 }
 \arguments{
 \item{x}{For \code{glm}:
@@ -74,6 +74,11 @@ of the Fisher scoring iterates.
 \item The null deviance is evaluated based on estimates of the
     expectations using the bias reduction method specified by the
     \code{type} argument (see \code{\link{brglmControl}}).
+
+\item If \code{type == "correction"} (see
+\code{\link{brglmControl}}) then \code{coefficients} and
+\code{transDispersion} have the estimated biases as attributes.
+
 }
 }
 \examples{

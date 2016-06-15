@@ -1,5 +1,6 @@
 context("agreement with brglm when estimation binomial resposne models")
 
+## source(system.file("inst", "brglm0/brglm0.R", package = "brglm2"))
 data("lizards", package = "brglm2")
 
 links <- lapply(c("logit", "probit", "cloglog", "cauchit"), make.link)
@@ -7,7 +8,7 @@ links <- lapply(c("logit", "probit", "cloglog", "cauchit"), make.link)
 
 tol <- 1e-10
 for (l in seq_along(links)) {
-    lizardsBRlegacy <- brglm0(cbind(grahami, opalinus) ~ height + diameter +
+    lizardsBRlegacy <- brglm::brglm(cbind(grahami, opalinus) ~ height + diameter +
                                         light + time, family = binomial(links[[l]]), data=lizards,
                                     method = "brglm.fit", br.epsilon = 1e-10, br.maxit = 1000)
 

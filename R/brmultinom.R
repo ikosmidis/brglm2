@@ -56,7 +56,6 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
             Y <- factor(Y, levels = lev[counts > 0L])
             lev <- lev[counts > 0L]
         }
-        ## Consider removing the below
         if (length(lev) < 2L)
             stop("need two or more classes to fit a multinomial logit model")
         if (length(lev) == 2L)
@@ -133,6 +132,8 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     fit
 }
 
+#' @method coef brmultinom
+#' @export
 coef.brmultinom <- function(object, ...) {
     coefs <- with(object, matrix(coefficients[ofInterest], nrow = ncat - 1, byrow = TRUE))
     dimnames(coefs) <- with(object, list(lev[-1], coefNames))
@@ -140,6 +141,8 @@ coef.brmultinom <- function(object, ...) {
 
 }
 
+#' @method print brmultinom
+#' @export
 print.brmultinom <- function(x, digits = max(5L, getOption("digits") - 3L), ...) {
      if (!is.null(cl <- x$call)) {
         cat("Call:\n")
@@ -150,6 +153,8 @@ print.brmultinom <- function(x, digits = max(5L, getOption("digits") - 3L), ...)
     cat("\nResidual Deviance:", format(x$deviance, digits = digits), "\n")
 }
 
+#' @method logLik brmultinom
+#' @export
 logLik.brmultinom <- function(object, ...) {
     structure(-object$deviance/2,
               df = sum(!is.na(coef(object))),
