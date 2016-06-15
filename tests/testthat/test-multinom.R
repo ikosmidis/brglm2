@@ -72,7 +72,7 @@ test_that("brmultinom returns the same maximized loglikelihood as nnet::multinom
 })
 
 test_that("brmultinom returns the same standard errors as nnet::multinom if type = 'maximum_likelihood'", {
-
+    expect_equal(summary(enzbrmultinom_ml)$standard.errors, summary(enzmultinom)$standard.errors, tolerance = 1e-04)
 })
 
 

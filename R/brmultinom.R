@@ -135,10 +135,16 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
 #' @method coef brmultinom
 #' @export
 coef.brmultinom <- function(object, ...) {
-    coefs <- with(object, matrix(coefficients[ofInterest], nrow = ncat - 1, byrow = TRUE))
-    dimnames(coefs) <- with(object, list(lev[-1], coefNames))
+    ncat <- object$ncat
+    if (length(object$ofInterest)) {
+        coefficients <- object$coefficients[object$ofInterest]
+        coefs <- matrix(coefficients, nrow = ncat - 1, byrow = TRUE)
+        dimnames(coefs) <- with(object, list(lev[-1], coefNames))
+    }
+    else {
+        coefs <- NULL
+    }
     coefs
-
 }
 
 #' @method print brmultinom
@@ -147,10 +153,15 @@ print.brmultinom <- function(x, digits = max(5L, getOption("digits") - 3L), ...)
      if (!is.null(cl <- x$call)) {
         cat("Call:\n")
         dput(cl, control = NULL)
-    }
-    cat("\nCoefficients:\n")
-    print(format(coef(x), digits = digits), print.gap = 2, quote = FALSE)
-    cat("\nResidual Deviance:", format(x$deviance, digits = digits), "\n")
+     }
+     cat("\nCoefficients:\n")
+     if (is.null(coef(x))) {
+         print("No coefficients")
+     }
+     else {
+         print(format(coef(x), digits = digits), print.gap = 2, quote = FALSE)
+     }
+     cat("\nResidual Deviance:", format(x$deviance, digits = digits), "\n")
 }
 
 #' @method logLik brmultinom
@@ -160,4 +171,76 @@ logLik.brmultinom <- function(object, ...) {
               df = sum(!is.na(coef(object))),
               nobs = sum(object$weights),
               class = "logLik")
+}
+
+
+#' @method summary brmultinom
+#' @export
+summary.brmultinom <- function (object, correlation = FALSE, digits = options()$digits,
+                                Wald.ratios = FALSE, ...) {
+    ncat <- object$ncat
+    coefficients <- coef.brmultinom(object)
+    object$digits <- digits
+    object$AIC <- AIC(object)
+    if (is.null(coefficients)) {
+        object$coefficients <- NULL
+        object$standard.errors <- NULL
+        if (Wald.ratios)
+            object$Wald.ratios <- NULL
+        if (correlation)
+            object$correlation <- NULL
+    }
+    else {
+        vc <- vcov.brglmFit(object)
+        vc <- vc[object$ofInterest, object$ofInterest]
+        se <- sqrt(diag(vc))
+        ses <- matrix(se, nrow = ncat - 1, byrow = TRUE, dimnames = dimnames(coefficients))
+        object$coefficients <- coefficients
+        object$standard.errors <- ses
+        object$AIC <- AIC(object)
+        if (Wald.ratios)
+            object$Wald.ratios <- coef/ses
+        if (correlation)
+            object$correlation <- vc/outer(se, se)
+    }
+    class(object) <- "summary.brmultinom"
+    object
+}
+
+#'
+#' @section Notes
+#' Code adopted from \code{nnet:::print.summary.brmultinom}
+#' @method print summary.brmultinom
+#' @export
+print.summary.brmultinom <- function (x, digits = x$digits, ...)
+{
+    if (!is.null(cl <- x$call)) {
+        cat("Call:\n")
+        dput(cl, control = NULL)
+    }
+    cat("\nCoefficients:\n")
+    ## if (x$is.binomial) {
+    ##     print(cbind(Values = x$coefficients, `Std. Err.` = x$standard.errors,
+    ##         `Value/SE` = x$Wald.ratios), digits = digits)
+    ## }
+    print(x$coefficients, digits = digits)
+    cat("\nStd. Errors:\n")
+    print(x$standard.errors, digits = digits)
+    if (!is.null(x$Wald.ratios)) {
+        cat("\nValue/SE (Wald statistics):\n")
+        print(x$coefficients/x$standard.errors, digits = digits)
+    }
+    cat("\nResidual Deviance:", format(x$deviance), "\n")
+    cat("AIC:", format(x$AIC), "\n")
+    if (!is.null(correl <- x$correlation)) {
+        p <- dim(correl)[2L]
+        if (p > 1) {
+            cat("\nCorrelation of Coefficients:\n")
+            ll <- lower.tri(correl)
+            correl[ll] <- format(round(correl[ll], digits))
+            correl[!ll] <- ""
+            print(correl[-1L, -p], quote = FALSE, ...)
+        }
+    }
+    invisible(x)
 }

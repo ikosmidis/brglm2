@@ -2,7 +2,9 @@
 ##  model by penalized (reduced-bias) maximum likelihood.
 ##
 ##  Examples prepared by I. Kosmidis, University College London
-source("brpr.R")
+
+source(system.file("inst", "brpr/brpr.R", package = "brglm2"))
+
 library(pmlr)
 library(MASS) # for data(housing)
 library(brglm) # for the penalizedDeviance profileModel objective
@@ -96,7 +98,7 @@ hepbrprCIs <- confintModel(hepbrpr, objective = "penalizedDeviance",
                            X = model.matrix(hepbrpr),
                            which = coefinds(hepbrpr),
                            method = "zoom",
-                           endpoint.tolerance = 1e-04)                          
+                           endpoint.tolerance = 1e-04)
 heppmlr <- pmlr(type ~ group + time + group:time,
                 data = hepatnew, weights = counts,
                 method = "likelihood", penalized = TRUE)
