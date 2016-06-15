@@ -57,15 +57,13 @@ indicates which counts must be treated as a group. See
 }
 \description{
 \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
-(see the description of \code{method} and the \code{Fitting
-functions} section in \code{\link{glm}} that fits generalized
-linear models using implicit and explicit bias reduction
-methods. Currently supported methods include the implicit adjusted
-scores approach in Firth (1993) and Kosmidis \& Firth (2009) and
-the correction of the asymptotic bias in Cordeiro & McCullagh
-(1991).  Estimation is performed using a quasi-Fisher scoring
-iteration based on the iterative correction of the asymptotic bias
-of the Fisher scoring iterates.
+that fits generalized linear models using implicit and explicit
+bias reduction methods. Currently supported methods include the
+implicit adjusted scores approach in Firth (1993) and Kosmidis \&
+Firth (2009), the correction of the asymptotic bias in Cordeiro &
+McCullagh (1991), and maximum likelihood.  Estimation is performed
+using a quasi-Fisher scoring iteration based on the iterative
+correction of the asymptotic bias of the Fisher scoring iterates.
 }
 \details{
 \itemize{
@@ -74,9 +72,12 @@ of the Fisher scoring iterates.
     expectations using the bias reduction method specified by the
     \code{type} argument (see \code{\link{brglmControl}}).
 
+\item See the description of \code{method} and the \code{Fitting
+functions} section in \code{\link{glm}}
+#'
 \item If \code{type == "correction"} (see
-\code{\link{brglmControl}}) then \code{coefficients} and
-\code{transDispersion} have the estimated biases as attributes.
+\code{\link{brglmControl}}), then \code{coefficients} and
+\code{transDispersion} carry the estimated biases as attributes.
 
 }
 }

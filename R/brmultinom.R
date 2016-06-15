@@ -1,17 +1,33 @@
 #' Bias reduction for multinomial response models using the
-#' "Poisson trick". See Kosmidis & Firth (2011) for details
+#' "Poisson trick". See Kosmidis & Firth (2011) for details.
+#'
+#' \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
+#' multinomial regression models using implicit and explicit bias
+#' reduction methods.
 #'
 #' @details
 #'
-#' This function is a wrapper for brglmFit.R that can be used to get
-#' bias reduced estimates for the parameters of multinomial regression
-#' models. The implementation is based on constructing an appropriate
-#' model matrix by taking a Kronecker product
+#' \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
+#' multinomial regression models through the "Poisson trick" (see, for
+#' example, Palmgren, 1981 and Kosmidis & Firth, 2009). The
+#' implementation relies on the construction of an "extended" model
+#' matrix for the log-linear model and constraints on the sums of the
+#' Poisson means. Specifically, a log-linear model is fitted on a
+#' Kronecker product
 #' (\url{https://en.wikipedia.org/wiki/Kronecker_product}) of the
-#' model matrix X implied by the formula and augmenting it with
-#' \code{nrow(X)} dummy variables, to indi
+#' original model matrix \code{X} implied by the formula, augmented by
+#' \code{nrow(X)} dummy variables.
 #'
-#' uses the \pkg{Matrix} package to
+#' The extended model matrix is sparse, and the \pkg{Matrix} package
+#' is used for its effective storage.
+#'
+#' While \code{\link{brmultinom}} can be used for analyses using
+#' multinomial regression models, the current implementation is more
+#' of a "proof of concept" and is not expected to scale well with
+#' either of \code{nrow(X)}, \code{ncol(X)} or the number of levels in
+#' the cateogrical response.
+#'
+#' @seealso \code{\link{nnet::multinom}}
 #'
 #'
 #' @export
