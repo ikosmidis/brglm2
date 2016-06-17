@@ -12,7 +12,7 @@ tol <- 0.00001 # sqrt(.Machine$double.eps)
 for (link in links) {
     etas <- if (link == "1/mu^2") seq(0.1, 8, length = 100) else seq(-8, 8, length = 100)
 
-    clink <- enrichLink(make.link(link))
+    clink <- enrich.linkglm(make.link(link))
 
     test_that(paste("mu.eta is correctly implemented for", link), {
         expect_equal(grad(clink$linkinv, etas), clink$mu.eta(etas), tolerance = tol)
@@ -32,7 +32,7 @@ for (link in links) {
 etas <- seq(0.1, 8, length = 100)
 tol <- 0.0001
 for (lambda in c(0, 1, 0.2, 0.4, 0.553, 0.98) ) {
-    clink <- enrichLink(power(lambda = lambda))
+    clink <- enrich.linkglm(power(lambda = lambda))
 
     test_that(paste("mu.eta is correctly implemented for power with lambda", lambda), {
         expect_equal(grad(clink$linkinv, etas), clink$mu.eta(etas), tolerance = tol)
