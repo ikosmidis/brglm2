@@ -3,15 +3,57 @@
 \name{brmultinom}
 \alias{brmultinom}
 \title{Bias reduction for multinomial response models using the
-"Poisson trick". See Kosmidis & Firth (2011) for details.}
+"Poisson trick".}
 \usage{
 brmultinom(formula, data, weights, subset, na.action, contrasts = NULL,
   control = list(...), ...)
 }
+\arguments{
+\item{formula}{
+a formula expression as for regression models, of the form
+\code{response ~ predictors}. The response should be a factor or a
+matrix with K columns, which will be interpreted as counts for each of
+K classes.
+A log-linear model is fitted, with coefficients zero for the first
+class. An offset can be included: it should be a numeric matrix with K columns
+if the response is either a matrix with K columns or a factor with K >= 2
+classes, or a numeric vector for a response factor with 2 levels.
+See the documentation of \code{\link{formula}()} for other details.
+}
+
+\item{data}{
+an optional data frame in which to interpret the variables occurring
+in \code{formula}.
+}
+
+\item{weights}{
+optional case weights in fitting.
+}
+
+\item{subset}{
+expression saying which subset of the rows of the data should  be used
+in the fit. All observations are included by default.
+}
+
+\item{na.action}{
+a function to filter missing data.
+}
+
+\item{contrasts}{
+a list of contrasts to be used for some or all of
+the factors appearing as variables in the model formula.
+}
+
+\item{control}{a list of parameters for controlling the fitting
+process. See \code{\link{brglmControl}} for details.}
+
+\item{...}{arguments to be used to form the default 'control'
+argument if it is not supplied directly.}
+}
 \description{
 \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
 multinomial regression models using implicit and explicit bias
-reduction methods.
+reduction methods. See Kosmidis & Firth (2011) for details.
 }
 \details{
 \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
@@ -35,6 +77,6 @@ either of \code{nrow(X)}, \code{ncol(X)} or the number of levels in
 the cateogrical response.
 }
 \seealso{
-\code{\link{nnet::multinom}}
+\code{\link[nnet]{multinom}}
 }
 

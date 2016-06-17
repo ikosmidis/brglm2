@@ -1,6 +1,6 @@
 
 ## quasi, quasibinomial and quasipoisson are not currently supported
-enrichLink <- function(linkObject) {
+enrich.linkglm <- function(linkObject) {
     mu.eta <- linkObject$mu.eta
     linkinv <- linkObject$linkinv
     link <- linkObject$name
@@ -85,14 +85,29 @@ enrichLink <- function(linkObject) {
     linkObject
 }
 
-enrichFamily <- function(familyObject) {
-    family <- familyObject$family
-    link <- familyObject$link
-    stats <- enrichLink(make.link(link))
-    familyObject$d2mu.deta <- stats$d2mu.deta
-    familyObject$d3mu.deta <- stats$d3mu.deta
+#' Enrich family object with family- and link-specfic mathematical functions useful to higher-order
+#' asymptotic methods for generalized linear models
+#'
+#'
+#' @param object an object of class \link{class{family}}.
+#' @details
+#' Enriches the family object with the second and third derivatives of
+#' the inverse link function with respect to \code{eta}
+#' (\code{d2mu.eta} and \code{d3mu.eta}; the first is \code{mu.eta}),
+#' the first and second derivative of the variance function with
+#' respect to \code{mu} (\code{d1variance}, \code{d2variance}), and
+#' the first three derivatives of
+#'
+#' @details
+#'
+enrich.family <- function(object) {
+    family <- object$family
+    link <- object$link
+    stats <- enrich.linkglm(make.link(link))
+    object$d2mu.deta <- stats$d2mu.deta
+    object$d3mu.deta <- stats$d3mu.deta
     ## Derivatives of the variance function
-    familyObject$d1variance <- switch(family,
+    object$d1variance <- switch(family,
                                      "poisson" = function(mu) {
                                          1
                                      },
@@ -109,7 +124,7 @@ enrichFamily <- function(familyObject) {
                                          3 * mu^2
                                      },
                                      stop(sQuote(family), " family not supported"))
-    familyObject$d2variance <- switch(family,
+    object$d2variance <- switch(family,
                                       "poisson" = function(mu) {
                                           0
                                       },
@@ -127,7 +142,7 @@ enrichFamily <- function(familyObject) {
                                       },
                                       stop(sQuote(family), " family not supported"))
     ## Derivatives of the afunction
-    familyObject$d1afun <- switch(family,
+    object$d1afun <- switch(family,
                                   "gaussian" = function(zeta) {
                                       -1/zeta
                                   },
@@ -138,7 +153,7 @@ enrichFamily <- function(familyObject) {
                                       -1/zeta
                                   })
 
-    familyObject$d2afun <- switch(family,
+    object$d2afun <- switch(family,
                                   "gaussian" = function(zeta) {
                                       1/zeta^2
                                   },
@@ -149,7 +164,7 @@ enrichFamily <- function(familyObject) {
                                       1/zeta^2
                                   })
 
-    familyObject$d3afun <- switch(family,
+    object$d3afun <- switch(family,
                                   "gaussian" = function(zeta) {
                                       -2/zeta^3
                                   },
@@ -159,7 +174,7 @@ enrichFamily <- function(familyObject) {
                                   "inverse.gaussian" = function(zeta) {
                                       -2/zeta^3
                                   })
-    familyObject
+    object
 }
 
 

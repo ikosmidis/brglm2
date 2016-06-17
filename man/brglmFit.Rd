@@ -2,7 +2,8 @@
 % Please edit documentation in R/brglmFit.R
 \name{brglmFit}
 \alias{brglmFit}
-\title{Fitting function for \code{\link{glm}} that allows reduced-bias estimation and inference}
+\title{Fitting function for \code{\link{glm}} for reduced-bias
+estimation and inference}
 \usage{
 brglmFit(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
   mustart = NULL, offset = rep(0, nobs), family = gaussian(),
@@ -54,6 +55,9 @@ process. See \code{\link{brglmControl}} for details.}
 \code{poisson}. Either \code{NULL} (no effect) or a vector that
 indicates which counts must be treated as a group. See
 "Details" for more information and \code{\link{brmultinom}}.}
+
+\item{...}{arguments to be used to form the default 'control'
+argument if it is not supplied directly.}
 }
 \description{
 \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}

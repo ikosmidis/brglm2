@@ -1,9 +1,15 @@
 #' Bias reduction for multinomial response models using the
-#' "Poisson trick". See Kosmidis & Firth (2011) for details.
+#' "Poisson trick".
 #'
 #' \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
 #' multinomial regression models using implicit and explicit bias
-#' reduction methods.
+#' reduction methods. See Kosmidis & Firth (2011) for details.
+#'
+#' @inheritParams nnet::multinom
+#' @param control a list of parameters for controlling the fitting
+#'     process. See \code{\link{brglmControl}} for details.
+#' @param ... arguments to be used to form the default 'control'
+#'     argument if it is not supplied directly.
 #'
 #' @details
 #'
@@ -27,7 +33,7 @@
 #' either of \code{nrow(X)}, \code{ncol(X)} or the number of levels in
 #' the cateogrical response.
 #'
-#' @seealso \code{\link{nnet::multinom}}
+#' @seealso \code{\link[nnet]{multinom}}
 #'
 #'
 #' @export

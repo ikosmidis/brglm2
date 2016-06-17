@@ -2,7 +2,7 @@ context("dispersion parameter estimation")
 
 data("anorexia", package = "MASS")
 
-anorexML <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
+anorexML <- glm(Postwt ~ Prewt + Treat+ offset(Prewt),
                 family = gaussian, data = anorexia)
 anorexBR <- update(anorexML, method = "brglmFit")
 

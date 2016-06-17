@@ -20,8 +20,8 @@
 #'
 #' @docType package
 #' @name brglm2
-#' @import MASS
 #' @import stats
+#' @import MASS
 #' @import Matrix
 #' @importFrom graphics plot
 #' @importFrom nnet class.ind
@@ -31,7 +31,13 @@ NULL
 #> NULL
 
 ## register S3 methods
-
+#' Generic method for enriching objects
+#'
+#' @param object the object to be enriched
+#' @param ... Arguments to be passed to other methods
+#'
+#' @export
+enrich <- function(object, ...) UseMethod("enrich")
 
 
 ## Suggestion by Kurt Hornik to avoid a warning related to the binding

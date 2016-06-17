@@ -38,7 +38,7 @@ test_that("brmultinom returns the same estimates if counts are supplied as a mat
 #####################################################################
 ## Analysis of the enzymes data set in ?pmlr
 #####################################################################
-data(enzymes)
+data("enzymes", package = "pmlr")
 ## Exclude patients in Group 4 (post-necrotic cirrhosis)
 enzymes <- subset(enzymes, Group != 4)
 ## Center and scale covariates
@@ -208,3 +208,8 @@ test_that("brmultinom returns the same standard errors as nnet::multinom if type
 ## source("~/Repositories/cglm/cglmContrastMatrix.R")
 ## source("~/Repositories/cglm/deviance.R")
 ## cglm(counts*nnet::class.ind(resp) ~ x1 + x2, data = artificialData1, method = "multinom.fit")
+
+
+
+## Timings
+##

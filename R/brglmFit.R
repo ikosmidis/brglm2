@@ -1,4 +1,5 @@
-#' Fitting function for \code{\link{glm}} that allows reduced-bias estimation and inference
+#' Fitting function for \code{\link{glm}} for reduced-bias
+#' estimation and inference
 #'
 #' \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
 #' that fits generalized linear models using implicit and explicit
@@ -29,6 +30,8 @@
 #'     \code{poisson}. Either \code{NULL} (no effect) or a vector that
 #'     indicates which counts must be treated as a group. See
 #'     "Details" for more information and \code{\link{brmultinom}}.
+#' @param ... arguments to be used to form the default 'control'
+#'     argument if it is not supplied directly.
 #' @details \itemize{
 #'
 #' \item The null deviance is evaluated based on estimates of the
@@ -141,7 +144,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     betas = betas,
                     dispersion = dispersion,
                     etas = etas,
-                    mus = mus)
+                    mus = mus,
+                    scaleTotals = scaleTotals)
         if (what == "mean") {
                 d1mus <- mu.eta(etas)
                 d2mus <- d2mu.deta(etas)
@@ -268,10 +272,13 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     }
 
     ## If fixedTotals is specified the compute rowTotals
-    if (!is.null(fixedTotals)) {
+    if (is.null(fixedTotals)) {
+        hasFixedTotals <- FALSE
+    }
+    else {
         if (family$family == "poisson") {
-            hasFixedTotals <- TRUE
             rowTotals <-  as.vector(tapply(y, fixedTotals, sum))[fixedTotals]
+            hasFixedTotals <- TRUE
         }
         else {
             hasFixedTotals <- FALSE
@@ -282,7 +289,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## scope for improvement here by adding an argument to enrich*
     ## functions that controls what you get (e.g. only d2mu.deta and
     ## d1afun-d3afun are needed for bias reduction)
-    family <- enrichFamily(family)
+    family <- enrich.family(family)
 
     ## Extract functions from the enriched family object
     variance <- family$variance
@@ -377,12 +384,12 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             ## Get startng values and kill warnings whilst doing that
             options(warn = -1)
 
-            tempFit <- stats::glm.fit(x = x, y = y.adj, weights = weights.adj,
-                                       etastart = etastart, mustart = mustart,
-                                       offset = offset, family = family,
-                                       control = list(epsilon = control$epsilon,
-                                                      maxit = 10000, trace = FALSE),
-                                       intercept = intercept)
+            tempFit <- glm.fit(x = x, y = y.adj, weights = weights.adj,
+                               etastart = etastart, mustart = mustart,
+                               offset = offset, family = family,
+                               control = list(epsilon = control$epsilon,
+                                              maxit = 10000, trace = FALSE),
+                               intercept = intercept)
             ## Set warn to its original value
             options(warn = warn)
             coefs <- coef(tempFit)
