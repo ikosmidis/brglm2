@@ -85,11 +85,12 @@ enrich.linkglm <- function(linkObject) {
     linkObject
 }
 
-#' Enrich family object with family- and link-specfic mathematical functions useful to higher-order
-#' asymptotic methods for generalized linear models
+#' Enrich family objects
 #'
+#' Enrich family objects with family- and link-specfic mathematical functions useful for the implementation
+#' of higher-order asymptotic methods for generalized linear models
 #'
-#' @param object an object of class \link{class{family}}.
+#' @param object an object of class \code{\link{family}}.
 #' @details
 #' Enriches the family object with the second and third derivatives of
 #' the inverse link function with respect to \code{eta}

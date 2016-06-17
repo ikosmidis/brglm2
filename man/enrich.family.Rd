@@ -2,17 +2,16 @@
 % Please edit documentation in R/enrich.R
 \name{enrich.family}
 \alias{enrich.family}
-\title{Enrich family object with family- and link-specfic mathematical functions useful to higher-order
-asymptotic methods for generalized linear models}
+\title{Enrich family objects}
 \usage{
 \method{enrich}{family}(object)
 }
 \arguments{
-\item{object}{an object of class \link{class{family}}.}
+\item{object}{an object of class \code{\link{family}}.}
 }
 \description{
-Enrich family object with family- and link-specfic mathematical functions useful to higher-order
-asymptotic methods for generalized linear models
+Enrich family objects with family- and link-specfic mathematical functions useful for the implementation
+of higher-order asymptotic methods for generalized linear models
 }
 \details{
 Enriches the family object with the second and third derivatives of

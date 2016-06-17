@@ -47,7 +47,7 @@
 #'
 #' }
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
-#' @references
+#' @references A
 #' @examples
 #' ## The lizards example from ?brglm::brglm
 #' data("lizards")

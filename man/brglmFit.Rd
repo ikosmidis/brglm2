@@ -136,6 +136,9 @@ summary(anorexBC, start = coef(anorexML))
 }
 
 }
+\references{
+A
+}
 \seealso{
 \code{\link{glm.fit}} and \code{\link{glm}}
 }

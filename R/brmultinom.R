@@ -12,7 +12,6 @@
 #'     argument if it is not supplied directly.
 #'
 #' @details
-#'
 #' \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
 #' multinomial regression models through the "Poisson trick" (see, for
 #' example, Palmgren, 1981 and Kosmidis & Firth, 2009). The
@@ -228,8 +227,8 @@ summary.brmultinom <- function (object, correlation = FALSE, digits = options()$
     object
 }
 
-#'
-#' @section Notes
+#' Print method for \code{\link{summary.brmultinom}} objects
+#' @section Note:
 #' Code adopted from \code{nnet:::print.summary.brmultinom}
 #' @method print summary.brmultinom
 #' @export
