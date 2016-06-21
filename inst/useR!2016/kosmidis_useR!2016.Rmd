@@ -1,0 +1,43 @@
+---
+title: "**brglm2**: Reduced-bias inference in generalized linear models"
+author:  |
+  | Dr Ioannis Kosmidis
+  | Department of Statistical Science
+  | University College London
+date: 29 June 2016
+output:
+  revealjs::revealjs_presentation:
+    theme: default
+    reveal_options:
+      slideNumber: true
+      previewLinks: true
+    transition: default
+    background_transition: default
+---
+
+# **brglm** (without 2)
+
+# Implicit and explicit methods for reducing estimation bias
+
+## Models handled by <tt>glm.fit</tt>
++ Observations on independent random variables $Y_1, \ldots, Y_n$ each
+with density/mass function of the form
+$f_{Y_i}(y) = \exp\left\{\frac{y \theta_i - b(\theta_i)-c(y)}{\phi/r_i} - a\left(-\frac{r_i}{\phi}\right) + m(y) \right\}$
+
+
+## Generalized linear models
+
+# <tt>brglmFit</tt> method for <tt>glm</tt>
+
+# Multinomial logistic regression
+
+## Poisson trick and maximum likelihood
+## Poisson trick and bias reduction
+
+# Adjusted $z$-tests
+
+``` {r, echo=FALSE, eval=FALSE}
+## browseURL(rmarkdown::render("presentation.Rmd"))
+```
+
+<!-- "fade", "default" "slide", "convex", "concave", "zoom" or "none" -->
