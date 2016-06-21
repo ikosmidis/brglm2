@@ -182,8 +182,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         with(fit, {
             if (what == "mean") {
                 scoreComponents <- weights * d1mus * (y - mus) / varmus * x
-                ## return(precision * .Internal(colSums(scoreComponents, nobs, nvars, TRUE)))
-                return(precision * colSums(scoreComponents))
+
+                return(precision * .colSums(scoreComponents, nobs, nvars, TRUE))
+                ## return(precision * colSums(scoreComponents))
             }
             if (what == "dispersion") {
                 return(1/2 * precision^2 * sum(devianceResiduals - EdevianceResiduals, na.rm = TRUE))
@@ -193,7 +194,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     infoFun <- function(pars, what = "mean", fit = NULL, inverse = FALSE) {
         if (is.null(fit)) {
-            fit <- fitFun(pars, what = what)
+            fit <- fitFun(pars, what = what, qr = TRUE)
         }
         with(fit, {
             if (what == "mean") {
@@ -219,25 +220,25 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     hats <- function(pars, fit = NULL) {
         if (is.null(fit)) {
-            fit <- fitFun(pars, what = "mean")
+            fit <- fitFun(pars, what = "mean", qr = TRUE)
         }
         with(fit, {
             Qmat <- qr.Q(qrDecomposition)
             ## .Internal(rowSums(Qmat * Qmat, nobs, nvars, FALSE))
-            rowSums(Qmat * Qmat)
+            .rowSums(Qmat * Qmat, nobs, nvars, TRUE)
         })
     }
 
     adjustmentFun <- function(pars, what = "mean", fit = NULL) {
         if (is.null(fit)) {
-            fit <- fitFun(pars, what = what)
+            fit <- fitFun(pars, what = what, qr = TRUE)
         }
         with(fit, {
             if (what == "mean") {
                 hatvalues <- hats(pars, fit = fit)
                 ## User only observations with keep = TRUE to ensure that no division with zero takes place
-                ## return(.Internal(colSums(0.5 * hatvalues * d2mus/d1mus * x, nobs, nvars, TRUE)))
-                return(colSums(0.5 * hatvalues * d2mus/d1mus * x))
+                return(.colSums(0.5 * hatvalues * d2mus/d1mus * x, nobs, nvars, TRUE))
+                ## return(colSums(0.5 * hatvalues * d2mus/d1mus * x))
             }
             if (what == "dispersion") {
                 s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
@@ -459,14 +460,17 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             objPrev <- objCur
             ## Bias-reduced estimation of mean effects
 
-            while (testhalf & stepFactor < 15) {
+            while (testhalf & stepFactor < control$maxStepFactor) {
                 theta <- c(coefs, disp)
 
                 ## If fixedTotals is provided (i.e. multinomial
                 ## regression via the Poisson trick) then everything
                 ## except the score function needs to be evaluated at
                 ## the scaled fitted means
-                fitBeta <- fitFun(theta, what = "mean", scaleTotals = hasFixedTotals)
+                fitBeta <- fitFun(theta, what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
+
+
+
                 gradBeta <-  gradFun(theta, fit = if (hasFixedTotals) NULL else fitBeta, what = "mean")
 
                 cInverseInfoBeta <- try(infoFun(theta, inverse = TRUE, fit = fitBeta, what = "mean"))
@@ -492,7 +496,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 adjustedGradBeta <- gradBeta + adjustmentBeta
                 stepBeta <- drop(inverseInfoBeta %*% adjustedGradBeta)
                 coefs <- coefsPrev + 2^(-stepFactor) * stepBeta
-                objCur <- crossprod(stepBeta)
+                objCur <- sum(stepBeta^2)
                 stepFactor <- stepFactor + 1
                 testhalf <- objCur > objPrev
                 if (control$trace) {
@@ -514,7 +518,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             else {
                 if (dfResidual > 0) {
                     theta <- c(coefs, disp)
-                    fitDispersion <- fitFun(theta, what = "dispersion")
+                    fitDispersion <- fitFun(theta, what = "dispersion", qr = TRUE)
                     gradDispersion <-  gradFun(theta, fit = fitDispersion, what = "dispersion")
                     infoDispersion <- infoFun(theta, inverse = FALSE, fit = fitDispersion, what = "dispersion")
                     if (isML) {
@@ -582,7 +586,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## If hasFixedTotals = TRUE, then scale fitted values before
         ## calculating QR decompositions, fitted values, etas,
         ## residuals and workingWeights
-        fitBeta <- fitFun(c(coefs, disp), what = "mean", scaleTotals = hasFixedTotals)
+        fitBeta <- fitFun(c(coefs, disp), what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
         qr.Wx <- fitBeta$qrDecomposition
 
         mus <- fitBeta$mus

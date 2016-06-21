@@ -34,9 +34,8 @@
 #'
 #' @seealso \code{\link[nnet]{multinom}}
 #'
-#'
 #' @export
-brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NULL, control = list(...), ...) {
+brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NULL, ref = 1, control = list(...), ...) {
     call <- match.call()
     if (missing(data)) {
         data <- environment(formula)
@@ -90,15 +89,15 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
 
     keep <- w > 0
 
-    if (any(!keep)) {
-        warning("Observations with non-positive weights have been omited from the computations")
-    }
+    ## if (any(!keep)) {
+    ##     warning("Observations with non-positive weights have been omited from the computations")
+    ## }
 
     nkeep <- sum(keep)
     ## Set up the model matrix for the poisson fit
-    Xnuisance <- Matrix::Diagonal(nkeep)
+    Xnuisance <- Diagonal(nkeep)
     Xextended <- cbind(kronecker(rep(1, ncat), Xnuisance),
-                       kronecker(Matrix::Diagonal(ncat)[, -1], X[keep, ]))
+                       kronecker(Diagonal(ncat)[, -ref], X[keep, ]))
     int <- seq.int(nkeep)
     ## Set up the extended response
     Yextended <- c(Y[keep] * w[keep])
@@ -106,7 +105,7 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     nd <- paste0("%0", nchar(max(int)), "d")
     colnames(Xextended) <- c(paste0(".nuisance", sprintf(nd, int)),
                              ## CHECK: lev[-1] contrasts?
-                             ofInterest <- paste(rep(lev[-1], each = nvar),
+                             ofInterest <- paste(rep(lev[-ref], each = nvar),
                                                  rep(colnames(X), ncat - 1), sep = ":"))
 
 
@@ -149,6 +148,7 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     fit$ofInterest <- ofInterest
     fit$ncat <- ncat
     fit$lev <- lev
+    fit$ref <- ref
     fit$coefNames <- colnames(X)
     fit
 }
@@ -160,7 +160,7 @@ coef.brmultinom <- function(object, ...) {
     if (length(object$ofInterest)) {
         coefficients <- object$coefficients[object$ofInterest]
         coefs <- matrix(coefficients, nrow = ncat - 1, byrow = TRUE)
-        dimnames(coefs) <- with(object, list(lev[-1], coefNames))
+        dimnames(coefs) <- with(object, list(lev[-object$ref], coefNames))
     }
     else {
         coefs <- NULL

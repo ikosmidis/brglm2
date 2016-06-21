@@ -1,8 +1,10 @@
 brglmControl <- function(epsilon = 1e-07, maxit = 100,
                          trace = FALSE,
+                         qr = TRUE,
                          type = c("adjusted_scores", "correction", "maximum_likelihood"),
                          dispTrans = "identity",
-                         slowit = 1) {
+                         slowit = 1,
+                         maxStepFactor = 1) {
     type <- match.arg(type)
     Trans <- switch(dispTrans,
                     identity = expression(disp),
@@ -38,7 +40,9 @@ brglmControl <- function(epsilon = 1e-07, maxit = 100,
        Trans = Trans,
        inverseTrans = inverseTrans,
        dispTrans = dispTrans,
-       slowit = slowit)
+       slowit = slowit,
+       maxStepFactor = maxStepFactor,
+       qr = qr)
 }
 
 

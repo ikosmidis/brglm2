@@ -111,3 +111,8 @@ timing(enzbrmultinom <- brmultinom(Group ~ AST + GLDH, weights = counts,
                                    data = enz,
                                    epsilon = 1e-14), R = 10)
 ## max(abs(matrix(enzbrpr$fitted.values, ncol = 3, byrow = TRUE) - enzbrmultinom$fitted.values))
+
+
+timing <- function(..., R = 10) {
+    system.time(replicate(R, ...))
+}
