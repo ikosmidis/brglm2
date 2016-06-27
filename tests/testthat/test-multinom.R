@@ -76,6 +76,22 @@ test_that("brmultinom returns the same standard errors as nnet::multinom if type
 })
 
 
+hepbr1 <- brmultinom(type ~ group * time,
+                    data = hepat, weights = counts, ref = 1)
+hepbr2 <- brmultinom(type ~ group * time,
+                    data = hepat, weights = counts, ref = 2)
+hepbr3 <- brmultinom(type ~ group * time,
+                     data = hepat, weights = counts, ref = 3)
+test_that("brmultinom fits are invariant to the value of ref (ref1 vs ref2)'", {
+    expect_equal(hepbr1$fitted.values, hepbr2$fitted.values, tolerance = 1e-04)
+})
+
+test_that("brmultinom fits are invariant to the value of ref  (ref1 vs ref3)'", {
+    expect_equal(hepbr1$fitted.values, hepbr3$fitted.values, tolerance = 1e-04)
+})
+
+
+
 ## Artificial example to check the effect of ignoring to explicitly
 ## pass the covariate classes with zero counts, when a category is not
 ## observed.

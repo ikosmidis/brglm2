@@ -50,7 +50,7 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     X <- model.matrix(Terms, mf, contrasts)
     Xcontrasts <- attr(X, "contrasts")
     Y <- model.response(mf, "any")
-
+    print(levels(Y))
     ## The chunk of code between +BEGIN and +END has been adopted from
     ## nnet::multinom
     ##+BEGIN
@@ -141,6 +141,7 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     ##                 start = NULL,
     ##                 family = poisson("log"), control = control, intercept = TRUE, fixedTotals = fixed[keep])
 
+    fit$call <- call
     fit$fitted.values <- matrix(fit$fitted.values, ncol = ncat)/w[keep]
     rownames(fit$fitted.values) <- rownames(X)[keep]
     colnames(fit$fitted.values) <- lev
@@ -176,11 +177,11 @@ print.brmultinom <- function(x, digits = max(5L, getOption("digits") - 3L), ...)
         dput(cl, control = NULL)
      }
      cat("\nCoefficients:\n")
-     if (is.null(coef(x))) {
+     if (is.null(coef.brmultinom(x))) {
          print("No coefficients")
      }
      else {
-         print(format(coef(x), digits = digits), print.gap = 2, quote = FALSE)
+         print(format(coef.brmultinom(x), digits = digits), print.gap = 2, quote = FALSE)
      }
      cat("\nResidual Deviance:", format(x$deviance, digits = digits), "\n")
 }
@@ -189,7 +190,7 @@ print.brmultinom <- function(x, digits = max(5L, getOption("digits") - 3L), ...)
 #' @export
 logLik.brmultinom <- function(object, ...) {
     structure(-object$deviance/2,
-              df = sum(!is.na(coef(object))),
+              df = sum(!is.na(coef.brmultinom(object))),
               nobs = sum(object$weights),
               class = "logLik")
 }
@@ -226,6 +227,15 @@ summary.brmultinom <- function (object, correlation = FALSE, digits = options()$
     class(object) <- "summary.brmultinom"
     object
 }
+
+#' @method vcov brmultinom
+#' @export
+vcov.brmultinom <- function(object, ...) {
+    vc <- vcov.brglmFit(object, ...)
+    vc <- vc[object$ofInterest, object$ofInterest]
+    vc
+}
+
 
 #' Print method for \code{\link{summary.brmultinom}} objects
 #' @section Note:

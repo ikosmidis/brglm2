@@ -182,7 +182,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         with(fit, {
             if (what == "mean") {
                 scoreComponents <- weights * d1mus * (y - mus) / varmus * x
-
                 return(precision * .colSums(scoreComponents, nobs, nvars, TRUE))
                 ## return(precision * colSums(scoreComponents))
             }
@@ -248,10 +247,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
-
     control <- do.call("brglmControl", control)
 
-    ## Get tyep
+    ## Get type
     isML <- control$type == "maximum_likelihood"
     isCor <- control$type == "correction"
 
@@ -362,9 +360,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         keep <- weights > 0
 
         ## Check for zero weights
-        if (any(!keep)) {
-            warning("Observations with non-positive weights have been omited from the computations")
-        }
+        ## if (any(!keep)) {
+        ##     warning("Observations with non-positive weights have been omited from the computations")
+        ## }
         nkeep <- sum(keep)
         dfResidual <- nkeep - rank
 
@@ -521,13 +519,13 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     fitDispersion <- fitFun(theta, what = "dispersion", qr = TRUE)
                     gradDispersion <-  gradFun(theta, fit = fitDispersion, what = "dispersion")
                     infoDispersion <- infoFun(theta, inverse = FALSE, fit = fitDispersion, what = "dispersion")
+                    d1zeta <- eval(d1TransDisp)
                     if (isML) {
                         adjustedGradZeta <- 0
                     }
                     else {
                         adjustmentDispersion <- adjustmentFun(theta, fit = fitDispersion, what = "dispersion")
                         ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
-                        d1zeta <- eval(d1TransDisp)
                         ## FIX: some redundancy below...
                         adjustmentZeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2TransDisp) / d1zeta^2
                         adjustedGradZeta <- gradDispersion/d1zeta + adjustmentZeta
@@ -594,6 +592,12 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## Residuals
         residuals <- with(fitBeta, (y - mus)/d1mus)
         workingWeights <- fitBeta$workingWeights
+
+        ## Fisher information for the transformed dispersion
+        d1zeta <- eval(d1TransDisp)
+        fitDispersion <- fitFun(c(coefs, disp), what = "dispersion", qr = TRUE)
+        infoTransDisp <- infoFun(c(coefs, disp), inverse = FALSE, fit = fitDispersion, what = "dispersion")/d1zeta^2
+
 
         eps <- 10 * .Machine$double.eps
         if (family$family == "binomial") {
@@ -695,13 +699,51 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
          dispersion = disp,
          dispersionML = dispML,
          transDispersion = transdisp,
+         infoTransDispersion = infoTransDisp,
          adjustedGrad =  adjustedGradAll,
          dispTrans = control$dispTrans,
          ## cov.unscaled = tcrossprod(Rmat),
+         type = control$type,
          class = "brglmFit")
 }
 
-#' Summary method for \code{\link{brglmFit}} objects
+#' \code{coef} method for \code{\link{brglmFit}} objects
+#'
+#' @inheritParams coef
+#' @param model character specyfying for which component of the model coefficients shoould be extracted
+#'
+#' @details
+#' @method coef brglmFit
+coef.brglmFit <- function(object, model = c("mean", "full", "dispersion")) {
+    model <- match.arg(model)
+    switch(model,
+           mean = {
+               object$coefficients
+           },
+           dispersion = {
+               transDisp <- object$transDispersion
+               names(transDisp) <- paste0(object$dispTrans, "(dispersion)")
+               transDisp
+               ## This will ALWAYS be on the scale of the TRANSFORMED dispersion
+           },
+           full = {
+               transDisp <- object$transDispersion
+               ntd <- paste0(object$dispTrans, "(dispersion)")
+               names(transDisp) <- ntd
+               coefs <- object$coefficients
+               coefsAll <- c(coefs, transDisp)
+               if (object$type == "correction") {
+                   bcf <- attr(coefs, "biases")
+                   btd <- attr(transDisp, "biases")
+                   names(btd) <- ntd
+                   attr(coefsAll, "biases") <- c(bcf, btd)
+               }
+               coefsAll
+           })
+}
+
+
+#' \code{summary} method for \code{\link{brglmFit}} objects
 #'
 #' @inheritParams stats::summary.glm
 #'
@@ -736,7 +778,6 @@ summary.brglmFit <- function(object, dispersion = NULL,
                 symbolic.cor = symbolic.cor, ...)
 }
 
-
 #' Method for computing confidence intervals for one or more
 #' regression parameters in a \code{\link{brglmFit}} object
 #'
@@ -752,12 +793,35 @@ confint.brglmFit <- function(object, parm, level = 0.95, ...) {
 #' in a \code{\link{brglmFit}} object
 #'
 #' @inheritParams stats::vcov
+#' @param model character specyfying for which component of the model coefficients shoould be extracted
 #'
 #' @method vcov brglmFit
 #' @export
-vcov.brglmFit <- function(object, ...) {
-    summary.brglmFit(object, ...)$cov.scaled
+vcov.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) {
+    model <- match.arg(model)
+    switch(model,
+           mean = {
+               summary.brglmFit(object, ...)$cov.scaled
+           },
+           dispersion = {
+               vtd <- 1/object$infoTransDispersion
+               ntd <- paste0(object$dispTrans, "(dispersion)")
+               names(vtd) <- ntd
+               vtd
+           },
+           full = {
+               vcoefs <- summary.brglmFit(object, ...)$cov.scaled
+               vtd <- 1/object$infoTransDispersion
+               nCoefsAll <- c(rownames(vcoefs), paste0(object$dispTrans, "(dispersion)"))
+               vCoefsAll <- cbind(rbind(vcoefs, 0),
+                                  c(rep(0, length(object$coefficients)), vtd))
+               dimnames(vCoefsAll) <- list(nCoefsAll, nCoefsAll)
+               vCoefsAll
+           })
 }
+
+
+
 
 DD <- function(expr,name, order = 1) {
     if(order < 1) stop("'order' must be >= 1")

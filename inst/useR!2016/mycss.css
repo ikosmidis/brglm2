@@ -1,0 +1,21 @@
+.reveal section p {
+  color: blue;
+}
+
+.reveal subsection p {
+  color: blue;
+}
+
+
+<style type="text/css">
+
+body, td {
+   font-size: 14px;
+}
+code.r {
+  font-size: 20px;
+}
+pre {
+  font-size: 20px
+}
+</style>
