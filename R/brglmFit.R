@@ -252,6 +252,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## Get type
     isML <- control$type == "maximum_likelihood"
     isCor <- control$type == "correction"
+    noDispersion <- family$family %in% c("poisson", "binomial")
 
     ## Ensure x is a matrix, extract variable names, observation
     ## names, nobs, nvars, and initialize weights and offsets if
@@ -415,7 +416,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
         ## Estimate the ML of the dispersion parameter for gaussian, gamma and inverse Gaussian
         ## Set the dispersion to 1 if poisson or binomial
-        if (family$family %in% c("poisson", "binomial")) {
+        if (noDispersion) {
             disp <- 1
             dispML <- 1
             transdisp <- eval(control$Trans)
@@ -504,7 +505,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
 
             ## Bias-reduced estimation of (transformed) dispersion
-            if (family$family %in% c("poisson", "binomial")) {
+            if (noDispersion) {
                 disp <- 1
                 transdisp <- eval(control$Trans)
                 adjustedGradZeta <- NA
@@ -595,8 +596,10 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
         ## Fisher information for the transformed dispersion
         d1zeta <- eval(d1TransDisp)
-        fitDispersion <- fitFun(c(coefs, disp), what = "dispersion", qr = TRUE)
-        infoTransDisp <- infoFun(c(coefs, disp), inverse = FALSE, fit = fitDispersion, what = "dispersion")/d1zeta^2
+        if (!noDispersion) {
+            fitDispersion <- fitFun(c(coefs, disp), what = "dispersion", qr = TRUE)
+            infoTransDisp <- infoFun(c(coefs, disp), inverse = FALSE, fit = fitDispersion, what = "dispersion")/d1zeta^2
+        }
 
 
         eps <- 10 * .Machine$double.eps
@@ -699,7 +702,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
          dispersion = disp,
          dispersionML = dispML,
          transDispersion = transdisp,
-         infoTransDispersion = infoTransDisp,
+         infoTransDispersion = if (noDispersion) NA else infoTransDisp,
          adjustedGrad =  adjustedGradAll,
          dispTrans = control$dispTrans,
          ## cov.unscaled = tcrossprod(Rmat),
