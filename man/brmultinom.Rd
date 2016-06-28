@@ -6,7 +6,7 @@
 "Poisson trick".}
 \usage{
 brmultinom(formula, data, weights, subset, na.action, contrasts = NULL,
-  control = list(...), ...)
+  ref = 1, control = list(...), ...)
 }
 \arguments{
 \item{formula}{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/brglmFit.R
 \name{summary.brglmFit}
 \alias{summary.brglmFit}
-\title{Summary method for \code{\link{brglmFit}} objects}
+\title{\code{summary} method for \code{\link{brglmFit}} objects}
 \usage{
 \method{summary}{brglmFit}(object, dispersion = NULL, correlation = FALSE,
   symbolic.cor = FALSE, ...)
@@ -24,7 +24,7 @@
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-Summary method for \code{\link{brglmFit}} objects
+\code{summary} method for \code{\link{brglmFit}} objects
 }
 \details{
 The interface of the summary method for
