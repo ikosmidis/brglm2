@@ -817,7 +817,7 @@ vcov.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) 
                vtd <- 1/object$infoTransDispersion
                nCoefsAll <- c(rownames(vcoefs), paste0(object$dispTrans, "(dispersion)"))
                vCoefsAll <- cbind(rbind(vcoefs, 0),
-                                  c(rep(0, length(object$coefficients)), vtd))
+                                  c(numeric(nrow(vcoefs)), vtd))
                dimnames(vCoefsAll) <- list(nCoefsAll, nCoefsAll)
                vCoefsAll
            })
