@@ -50,7 +50,6 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     X <- model.matrix(Terms, mf, contrasts)
     Xcontrasts <- attr(X, "contrasts")
     Y <- model.response(mf, "any")
-    print(levels(Y))
     ## The chunk of code between +BEGIN and +END has been adopted from
     ## nnet::multinom
     ##+BEGIN
