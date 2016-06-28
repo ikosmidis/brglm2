@@ -712,9 +712,10 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
 #' \code{coef} method for \code{\link{brglmFit}} objects
 #'
-#' @inheritParams stats::coef
+#' @inheritParams coef
 #' @param model character specyfying for which component of the model coefficients shoould be extracted
 #'
+#' @details
 #' @method coef brglmFit
 coef.brglmFit <- function(object, model = c("mean", "full", "dispersion")) {
     model <- match.arg(model)

@@ -56,7 +56,7 @@ enzymes$counts <- rep(1, nrow(enzymes))
 ## enzpmlr <- pmlr(Group ~ AST + GLDH, weights = counts, data = enzymes, method = "wald")
 ## enzbrmultinom <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes)
 enzbrmultinom_ml <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes, type = "maximum_likelihood")
-enzmultinom <- nnet::multinom(Group ~ AST + GLDH, weights = counts, data = enzymes)
+enzmultinom <- nnet::multinom(Group ~ AST + GLDH, weights = counts, data = enzymes, trace = FALSE)
 
 ###############
 test_that("brmultinom returns the same estimates as nnet::multinom if type = 'maximum_likelihood'", {
