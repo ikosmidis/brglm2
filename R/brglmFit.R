@@ -128,7 +128,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     }
 
     ## fitFun, grad, info and bias are ALWAYS in beta, dispersion parameterization
-    fitFun <- function(pars, what = "mean", scaleTotals = FALSE, qr = TRUE) {
+    fitFun <- function(pars, y, what = "mean", scaleTotals = FALSE, qr = TRUE) {
         betas <- pars[seq.int(nvars)]
         dispersion <- pars[nvars + 1]
         prec <- 1/dispersion
@@ -177,7 +177,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     gradFun <- function(pars, what = "mean", fit = NULL) {
         if (is.null(fit)) {
-            fit <- fitFun(pars, what = what, qr = FALSE)
+            fit <- fitFun(pars, y = y, what = what, qr = FALSE)
         }
         with(fit, {
             if (what == "mean") {
@@ -193,7 +193,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     infoFun <- function(pars, what = "mean", fit = NULL, inverse = FALSE) {
         if (is.null(fit)) {
-            fit <- fitFun(pars, what = what, qr = TRUE)
+            fit <- fitFun(pars, y = y, what = what, qr = TRUE)
         }
         with(fit, {
             if (what == "mean") {
@@ -219,7 +219,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     hats <- function(pars, fit = NULL) {
         if (is.null(fit)) {
-            fit <- fitFun(pars, what = "mean", qr = TRUE)
+            fit <- fitFun(pars, y = y, what = "mean", qr = TRUE)
         }
         with(fit, {
             Qmat <- qr.Q(qrDecomposition)
@@ -230,7 +230,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     adjustmentFun <- function(pars, what = "mean", fit = NULL) {
         if (is.null(fit)) {
-            fit <- fitFun(pars, what = what, qr = TRUE)
+            fit <- fitFun(pars, y = y, what = what, qr = TRUE)
         }
         with(fit, {
             if (what == "mean") {
@@ -246,6 +246,56 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
         })
     }
+
+    ## Estimate the ML of the dispersion parameter for gaussian, gamma and inverse Gaussian
+    ## Set the dispersion to 1 if poisson or binomial
+    estimateDispersion <- function(coefs, y) {
+        if (noDispersion) {
+            disp <- 1
+            dispML <- 1
+        }
+        else {
+            if (dfResidual > 0) {
+                dispFit <- try(uniroot(f = function(phi) {
+                    theta <- c(coefs, phi)
+                    cfit <- fitFun(theta, y = y, what = "dispersion", qr = FALSE)
+                    gradFun(theta, what = "dispersion", fit = cfit)
+                }, lower = .Machine$double.eps, upper = 10000, tol = control$epsilon), silent = FALSE)
+                if (inherits(dispFit, "try-error")) {
+                    warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
+                    dispML <- NA
+                    disp <- NA
+                }
+                else {
+                    disp <- dispML <- dispFit$root
+                }
+            }
+            else { ## if the model is saturated dispML is NA
+                disp <- 1 ## A convenient value
+                    dispML <- NA
+            }
+        }
+        list(disp = disp, dispML = dispML)
+    }
+
+
+    refit <- function(y, start) {
+        ## Estimate Beta
+        coefs <- coef(glm.fit(x = x, y = y, weights = weights,
+                              start = start,
+                              offset = offset,
+                              family = family,
+                              control = list(epsilon = control$epsilon,
+                                             maxit = 10000, trace = FALSE),
+                              intercept = intercept))
+        dispList <- estimateDispersion(coefs, y)
+        disp <- dispList$disp
+        dispML <- dispList$dispML
+        transdisp <- eval(control$Trans)
+        c(coefs, transdisp)
+    }
+
+    ## TODO: implement adjustment for IBLA
 
     control <- do.call("brglmControl", control)
 
@@ -305,6 +355,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     d1afun <- family$d1afun
     d2afun <- family$d2afun
     d3afun <- family$d3afun
+    simulate <- family$simulate
     d1TransDisp <- DD(control$Trans, "disp", order = 1)
     d2TransDisp <- DD(control$Trans, "disp", order = 2)
 
@@ -414,35 +465,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
         }
 
-        ## Estimate the ML of the dispersion parameter for gaussian, gamma and inverse Gaussian
-        ## Set the dispersion to 1 if poisson or binomial
-        if (noDispersion) {
-            disp <- 1
-            dispML <- 1
-            transdisp <- eval(control$Trans)
-        }
-        else {
-            if (dfResidual > 0) {
-                dispFit <- try(uniroot(f = function(phi) {
-                    gradFun(c(coefs, phi), what = "dispersion")
-                }, lower = .Machine$double.eps, upper = 10000, tol = control$epsilon), silent = FALSE)
-                if (inherits(dispFit, "try-error")) {
-                    warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
-                    dispML <- NA
-                    disp <- var(y)/variance(sum(weights * y)/sum(weights))
-                }
-                else {
-                    disp <- dispML <- dispFit$root
-                }
-            }
-            else { ## if the model is saturated dispML is NA
-                disp <- 1 ## A convenient value
-                dispML <- NA
-            }
-            ## Apply transformation only after convergence. Equivariance of ML estimator is used here
-            transdisp <- eval(control$Trans)
-        }
-
         adjustedGradAll <- rep(NA, nvarsAll + 1)
         names(adjustedGradAll) <- c(coefNamesAll, "Transformed dispersion")
         if (isCor) {
@@ -450,6 +472,14 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             control$slowit <- 1
         }
         objCur <- .Machine$integer.max
+
+        ## Estimate dispersion based on current value for coefs
+        dispList <- estimateDispersion(coefs, y = y)
+        disp <- dispList$disp
+        if (is.na(disp)) disp <- var(y)/variance(sum(weights * y)/sum(weights))
+        dispML <- dispList$dispML
+        transdisp <- eval(control$Trans)
+
 
         ## Main iterations
         for (iter in seq.int(control$maxit)) {
@@ -466,9 +496,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 ## regression via the Poisson trick) then everything
                 ## except the score function needs to be evaluated at
                 ## the scaled fitted means
-                fitBeta <- fitFun(theta, what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
-
-
+                fitBeta <- fitFun(theta, y = y, what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
 
                 gradBeta <-  gradFun(theta, fit = if (hasFixedTotals) NULL else fitBeta, what = "mean")
 
@@ -501,7 +529,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 if (control$trace) {
                     traceFun(what = "coefficient")
                 }
-
             }
 
             ## Bias-reduced estimation of (transformed) dispersion
@@ -517,7 +544,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             else {
                 if (dfResidual > 0) {
                     theta <- c(coefs, disp)
-                    fitDispersion <- fitFun(theta, what = "dispersion", qr = TRUE)
+                    fitDispersion <- fitFun(theta, y = y, what = "dispersion", qr = TRUE)
                     gradDispersion <-  gradFun(theta, fit = fitDispersion, what = "dispersion")
                     infoDispersion <- infoFun(theta, inverse = FALSE, fit = fitDispersion, what = "dispersion")
                     d1zeta <- eval(d1TransDisp)
@@ -585,7 +612,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## If hasFixedTotals = TRUE, then scale fitted values before
         ## calculating QR decompositions, fitted values, etas,
         ## residuals and workingWeights
-        fitBeta <- fitFun(c(coefs, disp), what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
+        fitBeta <- fitFun(c(coefs, disp), y = y, what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
         qr.Wx <- fitBeta$qrDecomposition
 
         mus <- fitBeta$mus
@@ -597,7 +624,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## Fisher information for the transformed dispersion
         d1zeta <- eval(d1TransDisp)
         if (!noDispersion) {
-            fitDispersion <- fitFun(c(coefs, disp), what = "dispersion", qr = TRUE)
+            fitDispersion <- fitFun(c(coefs, disp), y = y, what = "dispersion", qr = TRUE)
             infoTransDisp <- infoFun(c(coefs, disp), inverse = FALSE, fit = fitDispersion, what = "dispersion")/d1zeta^2
         }
 
