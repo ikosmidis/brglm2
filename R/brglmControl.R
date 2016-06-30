@@ -1,4 +1,4 @@
-brglmControl <- function(epsilon = 1e-07, maxit = 100,
+brglmControl <- function(epsilon = 1e-10, maxit = 100,
                          trace = FALSE,
                          qr = TRUE,
                          type = c("adjusted_scores", "correction", "maximum_likelihood"),

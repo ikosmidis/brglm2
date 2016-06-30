@@ -739,7 +739,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
 #' \code{coef} method for \code{\link{brglmFit}} objects
 #'
-#' @inheritParams coef
+#' @inheritParams stats::coef
 #' @param model character specyfying for which component of the model coefficients shoould be extracted
 #'
 #' @details
