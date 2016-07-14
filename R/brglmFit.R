@@ -101,7 +101,9 @@
 #' @export
 brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
                       mustart = NULL, offset = rep(0, nobs), family = gaussian(),
-                      control = list(), intercept = TRUE, fixedTotals = NULL)
+                      control = list(), intercept = TRUE,
+                      ## Arguments that glm will not use in its call to brglmFit (be wise with defaults!)
+                      fixedTotals = NULL)
 {
 
     traceFun <- function(what = "coefficient") {
@@ -181,7 +183,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         }
         with(fit, {
             if (what == "mean") {
-                scoreComponents <- weights * d1mus * (y - mus) / varmus * x
+                scoreComponents <- weights * d1mus  * (y - mus) / varmus * x
                 return(precision * .colSums(scoreComponents, nobs, nvars, TRUE))
                 ## return(precision * colSums(scoreComponents))
             }
@@ -272,14 +274,14 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
             else { ## if the model is saturated dispML is NA
                 disp <- 1 ## A convenient value
-                    dispML <- NA
+                dispML <- NA
             }
         }
         list(disp = disp, dispML = dispML)
     }
 
 
-    refit <- function(y, start) {
+    refit <- function(y, start = NULL) {
         ## Estimate Beta
         coefs <- coef(glm.fit(x = x, y = y, weights = weights,
                               start = start,
@@ -303,6 +305,22 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     isML <- control$type == "maximum_likelihood"
     isCor <- control$type == "correction"
     noDispersion <- family$family %in% c("poisson", "binomial")
+    justEvaluate <- control$maxit == 0
+
+    ## If fixedTotals is specified the compute rowTotals
+    if (is.null(fixedTotals)) {
+        hasFixedTotals <- FALSE
+    }
+    else {
+        if (family$family == "poisson") {
+            rowTotals <-  as.vector(tapply(y, fixedTotals, sum))[fixedTotals]
+            hasFixedTotals <- TRUE
+        }
+        else {
+            hasFixedTotals <- FALSE
+        }
+    }
+
 
     ## Ensure x is a matrix, extract variable names, observation
     ## names, nobs, nvars, and initialize weights and offsets if
@@ -319,20 +337,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     }
     if (missingOffset <- is.null(offset)) {
         offset <- rep.int(0, nobs)
-    }
-
-    ## If fixedTotals is specified the compute rowTotals
-    if (is.null(fixedTotals)) {
-        hasFixedTotals <- FALSE
-    }
-    else {
-        if (family$family == "poisson") {
-            rowTotals <-  as.vector(tapply(y, fixedTotals, sum))[fixedTotals]
-            hasFixedTotals <- TRUE
-        }
-        else {
-            hasFixedTotals <- FALSE
-        }
     }
 
     ## Enrich the family object with the required derivatives There is
@@ -419,6 +423,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         dfResidual <- nkeep - rank
 
         ## Handle starting values
+
         ## If start is NULL then start at the ML estimator else use start
         if (is.null(start)) {
             ## Adjust counts if binomial or Poisson in order to avoid infinite estimates
@@ -445,9 +450,14 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             options(warn = warn)
             coefs <- coef(tempFit)
             names(coefs) <- coefNames
+            dispList <- estimateDispersion(coefs, y = y)
+            disp <- dispList$disp
+            if (is.na(disp)) disp <- var(y)/variance(sum(weights * y)/sum(weights))
+            dispML <- dispList$dispML
+            transdisp <- eval(control$Trans)
         }
         else {
-            if (length(start) == nvarsAll & is.numeric(start)) {
+            if ((length(start) == nvarsAll) & is.numeric(start)) {
                 coefsAll <- start
                 names(coefsAll) <- coefNamesAll
                 if (!isTRUE(isFullRank)) {
@@ -457,11 +467,32 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 else {
                     coefs <- coefsAll
                 }
+
+                ## Estimate dispersion based on current value for coefs
+                dispList <- estimateDispersion(coefs, y = y)
+                disp <- dispList$disp
+                if (is.na(disp)) disp <- var(y)/variance(sum(weights * y)/sum(weights))
+                dispML <- dispList$dispML
+                transdisp <- eval(control$Trans)
             }
-            else {
-                stop(gettextf("length of 'start' should equal %d and correspond to initial coefs for %s",
-                              nvarsAll, paste(deparse(coefNamesAll), collapse = ", ")),
-                     domain = NA)
+
+            if ((length(start) == nvarsAll + 1) & is.numeric(start)) {
+                coefsAll <- start[seq.int(nvarsAll)]
+                names(coefsAll) <- coefNamesAll
+                if (!isTRUE(isFullRank)) {
+                    coefsAll[aliased] <- NA
+                    coefs <- coefsAll[-aliased]
+                }
+                else {
+                    coefs <- coefsAll
+                }
+                transDisp <- start[nvarsAll + 1]
+                dispML <- NA
+                disp <- eval(control$inverseTrans)
+            }
+
+            if (length(start) > nvarsAll + 1 | length(start) < nvarsAll) {
+                stop(paste(paste(gettextf("length of 'start' should be equal to %d and correspond to initial coefs for %s", nvarsAll, paste(deparse(coefNamesAll), collapse = ", "), "or", gettextf("to %d and also include a starting value for the transformed dispersion", nvarsAll + 1)))), domain = NA)
             }
         }
 
@@ -473,111 +504,142 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         }
         objCur <- .Machine$integer.max
 
-        ## Estimate dispersion based on current value for coefs
-        dispList <- estimateDispersion(coefs, y = y)
-        disp <- dispList$disp
-        if (is.na(disp)) disp <- var(y)/variance(sum(weights * y)/sum(weights))
-        dispML <- dispList$dispML
-        transdisp <- eval(control$Trans)
-
 
         ## Main iterations
-        for (iter in seq.int(control$maxit)) {
-            stepFactor <- 0
-            testhalf <- TRUE
-            coefsPrev <- coefs
-            objPrev <- objCur
-            ## Bias-reduced estimation of mean effects
 
-            while (testhalf & stepFactor < control$maxStepFactor) {
-                theta <- c(coefs, disp)
-
-                ## If fixedTotals is provided (i.e. multinomial
-                ## regression via the Poisson trick) then everything
-                ## except the score function needs to be evaluated at
-                ## the scaled fitted means
-                fitBeta <- fitFun(theta, y = y, what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
-
-                gradBeta <-  gradFun(theta, fit = if (hasFixedTotals) NULL else fitBeta, what = "mean")
-
-                cInverseInfoBeta <- try(infoFun(theta, inverse = TRUE, fit = fitBeta, what = "mean"))
-                if (failedInv <- inherits(cInverseInfoBeta, "try-error")) {
-                    warning("failed to invert the information matrix: iteration stopped prematurely")
-                    break
-                }
-                else {
-                    inverseInfoBeta <- cInverseInfoBeta
-                }
-
-                if (isML) {
-                    adjustmentBeta <- 0
-                    failedAdj <- FALSE
-                }
-                else {
-                    adjustmentBeta <- adjustmentFun(theta, fit = fitBeta, what = "mean")
-                    if (failedAdj <- any(is.na(adjustmentBeta))) {
-                        warning("failed to calculate the bias-reducing score adjustment: iteration stopped prematurely")
-                        break
-                    }
-                }
-                adjustedGradBeta <- gradBeta + adjustmentBeta
-                stepBeta <- drop(inverseInfoBeta %*% adjustedGradBeta)
-                coefs <- coefsPrev + 2^(-stepFactor) * stepBeta
-                objCur <- sum(stepBeta^2)
-                stepFactor <- stepFactor + 1
-                testhalf <- objCur > objPrev
-                if (control$trace) {
-                    traceFun(what = "coefficient")
-                }
-            }
-
-            ## Bias-reduced estimation of (transformed) dispersion
-            if (noDispersion) {
-                disp <- 1
-                transdisp <- eval(control$Trans)
-                adjustedGradZeta <- NA
-                adjustmentZeta <- NA
-                infoDispersion <- NA
-                d1zeta <- NA
-                stepZeta <- 0
-            }
-            else {
-                if (dfResidual > 0) {
-                    theta <- c(coefs, disp)
-                    fitDispersion <- fitFun(theta, y = y, what = "dispersion", qr = TRUE)
-                    gradDispersion <-  gradFun(theta, fit = fitDispersion, what = "dispersion")
-                    infoDispersion <- infoFun(theta, inverse = FALSE, fit = fitDispersion, what = "dispersion")
-                    d1zeta <- eval(d1TransDisp)
-                    if (isML) {
-                        adjustedGradZeta <- 0
-                    }
-                    else {
-                        adjustmentDispersion <- adjustmentFun(theta, fit = fitDispersion, what = "dispersion")
-                        ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
-                        ## FIX: some redundancy below...
-                        adjustmentZeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2TransDisp) / d1zeta^2
-                        adjustedGradZeta <- gradDispersion/d1zeta + adjustmentZeta
-                    }
-                    stepZeta <- as.vector(d1zeta^2 * adjustedGradZeta/infoDispersion)
-                    transdisp <- transdisp + control$slowit * stepZeta
-                    disp <- eval(control$inverseTrans)
-                }
-                else {
-                    disp <- 1 # No effect to the adjusted scores
-                    transdisp <- eval(control$Trans)
-                    adjustedGradZeta <- NA
-                    stepZeta <- 0
-                }
-            }
-
-            if (control$trace) {
-                traceFun(what = "dispersion")
-            }
-
-            if (failedAdj | failedInv | all(abs(c(abs(stepBeta), abs(stepZeta))) < control$epsilon, na.rm = TRUE)) {
+        if (justEvaluate) {
+            theta <- c(coefs, disp)
+            ## If fixedTotals is provided (i.e. multinomial
+            ## regression via the Poisson trick) then everything
+            ## except the score function needs to be evaluated at
+            ## the scaled fitted means
+            fitBeta <- fitFun(theta, y = y, what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
+            gradBeta <-  gradFun(theta, fit = if (hasFixedTotals) NULL else fitBeta, what = "mean")
+                                cInverseInfoBeta <- try(infoFun(theta, inverse = TRUE, fit = fitBeta, what = "mean"))
+            if (failedInv <- inherits(cInverseInfoBeta, "try-error")) {
+                warning("failed to invert the information matrix: iteration stopped prematurely")
                 break
             }
+            else {
+                inverseInfoBeta <- cInverseInfoBeta
+            }
+            if (isML) {
+                adjustmentBeta <- 0
+                failedAdj <- FALSE
+            }
+            else {
+                adjustmentBeta <- adjustmentFun(theta, fit = fitBeta, what = "mean")
+                if (failedAdj <- any(is.na(adjustmentBeta))) {
+                    warning("failed to calculate the bias-reducing score adjustment: iteration stopped prematurely")
+                    break
+                }
+            }
+            adjustedGradBeta <- gradBeta + adjustmentBeta
 
+### ADD dispersion + dispersion starting values
+
+
+        }
+        else {
+            for (iter in seq.int(control$maxit)) {
+                stepFactor <- 0
+                testhalf <- TRUE
+                coefsPrev <- coefs
+                objPrev <- objCur
+                ## Bias-reduced estimation of mean effects
+
+                while (testhalf & stepFactor < control$maxStepFactor) {
+                    theta <- c(coefs, disp)
+
+                    ## If fixedTotals is provided (i.e. multinomial
+                    ## regression via the Poisson trick) then everything
+                    ## except the score function needs to be evaluated at
+                    ## the scaled fitted means
+                    fitBeta <- fitFun(theta, y = y, what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
+
+                    gradBeta <-  gradFun(theta, fit = if (hasFixedTotals) NULL else fitBeta, what = "mean")
+
+                    cInverseInfoBeta <- try(infoFun(theta, inverse = TRUE, fit = fitBeta, what = "mean"))
+
+
+                    if (failedInv <- inherits(cInverseInfoBeta, "try-error")) {
+                        warning("failed to invert the information matrix: iteration stopped prematurely")
+                        break
+                    }
+                    else {
+                        inverseInfoBeta <- cInverseInfoBeta
+                    }
+
+                    if (isML) {
+                        adjustmentBeta <- 0
+                        failedAdj <- FALSE
+                    }
+                    else {
+                        adjustmentBeta <- adjustmentFun(theta, fit = fitBeta, what = "mean")
+                        if (failedAdj <- any(is.na(adjustmentBeta))) {
+                            warning("failed to calculate the bias-reducing score adjustment: iteration stopped prematurely")
+                            break
+                        }
+                    }
+
+                    adjustedGradBeta <- gradBeta + adjustmentBeta
+                    stepBeta <- drop(inverseInfoBeta %*% adjustedGradBeta)
+                    coefs <- coefsPrev + 2^(-stepFactor) * stepBeta
+                    objCur <- sum(stepBeta^2)
+                    stepFactor <- stepFactor + 1
+                    testhalf <- objCur > objPrev
+                    if (control$trace) {
+                        traceFun(what = "coefficient")
+                    }
+                }
+
+                ## Bias-reduced estimation of (transformed) dispersion
+                if (noDispersion) {
+                    disp <- 1
+                    transdisp <- eval(control$Trans)
+                    adjustedGradZeta <- NA
+                    adjustmentZeta <- NA
+                    infoDispersion <- NA
+                    d1zeta <- NA
+                    stepZeta <- 0
+                }
+                else {
+                    if (dfResidual > 0) {
+                        theta <- c(coefs, disp)
+                        fitDispersion <- fitFun(theta, y = y, what = "dispersion", qr = TRUE)
+                        gradDispersion <-  gradFun(theta, fit = fitDispersion, what = "dispersion")
+                        infoDispersion <- infoFun(theta, inverse = FALSE, fit = fitDispersion, what = "dispersion")
+                        d1zeta <- eval(d1TransDisp)
+                        if (isML) {
+                            adjustedGradZeta <- 0
+                        }
+                        else {
+                            adjustmentDispersion <- adjustmentFun(theta, fit = fitDispersion, what = "dispersion")
+                            ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
+                        ## FIX: some redundancy below...
+                            adjustmentZeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2TransDisp) / d1zeta^2
+                            adjustedGradZeta <- gradDispersion/d1zeta + adjustmentZeta
+                        }
+                        stepZeta <- as.vector(d1zeta^2 * adjustedGradZeta/infoDispersion)
+                        transdisp <- transdisp + control$slowit * stepZeta
+                        disp <- eval(control$inverseTrans)
+                    }
+                    else {
+                        disp <- 1 # No effect to the adjusted scores
+                        transdisp <- eval(control$Trans)
+                        adjustedGradZeta <- NA
+                        stepZeta <- 0
+                    }
+                }
+
+                if (control$trace) {
+                    traceFun(what = "dispersion")
+                }
+
+                if (failedAdj | failedInv | all(abs(c(abs(stepBeta), abs(stepZeta))) < control$epsilon, na.rm = TRUE)) {
+                    break
+                }
+            }
         }
 
         adjustedGradAll[coefNames] <- adjustedGradBeta
@@ -761,14 +823,14 @@ coef.brglmFit <- function(object, model = c("mean", "full", "dispersion")) {
                ntd <- paste0(object$dispTrans, "(dispersion)")
                names(transDisp) <- ntd
                coefs <- object$coefficients
-               coefsAll <- c(coefs, transDisp)
+               thetaTrans <- c(coefs, transDisp)
                if (object$type == "correction") {
                    bcf <- attr(coefs, "biases")
                    btd <- attr(transDisp, "biases")
                    names(btd) <- ntd
-                   attr(coefsAll, "biases") <- c(bcf, btd)
+                   attr(thetaTrans, "biases") <- c(bcf, btd)
                }
-               coefsAll
+               thetaTrans
            })
 }
 
