@@ -1,6 +1,6 @@
 context("comparison for Poisson with brpr from the supplementary material of Kosmidis & Firth (2010)")
 
-source(system.file("inst", "brpr/brpr.R", package = "brglm2"))
+source(system.file("brpr", "brpr.R", package = "brglm2"))
 
 ## Dobson (1990) Page 93: Randomized Controlled Trial :
 counts <- c(18,17,15,20,10,20,25,13,12)

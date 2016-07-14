@@ -29,11 +29,11 @@
 #' @param fixedTotals Effective only when \code{family} is
 #'     \code{poisson}. Either \code{NULL} (no effect) or a vector that
 #'     indicates which counts must be treated as a group. See
-#'     "Details" for more information and \code{\link{brmultinom}}.
+#'     Details for more information and \code{\link{brmultinom}}.
 #' @param ... arguments to be used to form the default 'control'
 #'     argument if it is not supplied directly.
-#' @details \itemize{
-#'
+#' @details Below
+#' \itemize{
 #' \item The null deviance is evaluated based on estimates of the
 #'     expectations using the bias reduction method specified by the
 #'     \code{type} argument (see \code{\link{brglmControl}}).
@@ -44,7 +44,6 @@
 #' \item If \code{type == "correction"} (see
 #' \code{\link{brglmControl}}), then \code{coefficients} and
 #' \code{transDispersion} carry the estimated biases as attributes.
-#'
 #' }
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
 #' @references A
@@ -280,7 +279,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         list(disp = disp, dispML = dispML)
     }
 
-
     refit <- function(y, start = NULL) {
         ## Estimate Beta
         coefs <- coef(glm.fit(x = x, y = y, weights = weights,
@@ -321,7 +319,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         }
     }
 
-
     ## Ensure x is a matrix, extract variable names, observation
     ## names, nobs, nvars, and initialize weights and offsets if
     ## needed
@@ -343,19 +340,21 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## scope for improvement here by adding an argument to enrich*
     ## functions that controls what you get (e.g. only d2mu.deta and
     ## d1afun-d3afun are needed for bias reduction)
-    family <- enrich.family(family)
+    linkglm <- make.link(family$link)
+    family <- enrichwith::enrich(family, with = "function a derivatives")
+    linkglm <- enrichwith::enrich(linkglm, with = "d2mu.deta")
 
     ## Extract functions from the enriched family object
     variance <- family$variance
-    linkinv <- family$linkinv
-    linkfun <- family$linkfun
+    linkinv <- linkglm$linkinv
+    linkfun <- linkglm$linkfun
     if (!is.function(variance) || !is.function(linkinv))
         stop("'family' argument seems not to be a valid family object",
              call. = FALSE)
     dev.resids <- family$dev.resids
     aic <- family$aic
-    mu.eta <- family$mu.eta
-    d2mu.deta <- family$d2mu.deta
+    mu.eta <- linkglm$mu.eta
+    d2mu.deta <- linkglm$d2mu.deta
     d1afun <- family$d1afun
     d2afun <- family$d2afun
     d3afun <- family$d3afun
@@ -486,7 +485,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 else {
                     coefs <- coefsAll
                 }
-                transDisp <- start[nvarsAll + 1]
+                transdisp <- start[nvarsAll + 1]
                 dispML <- NA
                 disp <- eval(control$inverseTrans)
             }
@@ -507,7 +506,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
         ## Main iterations
 
+        ## If maxit == 0
         if (justEvaluate) {
+            iter <- 0
             theta <- c(coefs, disp)
             ## If fixedTotals is provided (i.e. multinomial
             ## regression via the Poisson trick) then everything
@@ -534,11 +535,43 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     break
                 }
             }
+
             adjustedGradBeta <- gradBeta + adjustmentBeta
 
-### ADD dispersion + dispersion starting values
+            ## ADD dispersion + dispersion starting values
 
-
+            if (noDispersion) {
+                    disp <- 1
+                    transdisp <- eval(control$Trans)
+                    adjustedGradZeta <- NA
+                    adjustmentZeta <- NA
+                    infoDispersion <- NA
+                    d1zeta <- NA
+            }
+            else {
+                if (dfResidual > 0) {
+                    theta <- c(coefs, disp)
+                    fitDispersion <- fitFun(theta, y = y, what = "dispersion", qr = TRUE)
+                    gradDispersion <-  gradFun(theta, fit = fitDispersion, what = "dispersion")
+                    infoDispersion <- infoFun(theta, inverse = FALSE, fit = fitDispersion, what = "dispersion")
+                    d1zeta <- eval(d1TransDisp)
+                    if (isML) {
+                        adjustedGradZeta <- 0
+                    }
+                    else {
+                        adjustmentDispersion <- adjustmentFun(theta, fit = fitDispersion, what = "dispersion")
+                        ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
+                        ## FIX: some redundancy below...
+                        adjustmentZeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2TransDisp) / d1zeta^2
+                        adjustedGradZeta <- gradDispersion/d1zeta + adjustmentZeta
+                    }
+                }
+                else {
+                    disp <- 1 # No effect to the adjusted scores
+                    transdisp <- eval(control$Trans)
+                    adjustedGradZeta <- NA
+                }
+            }
         }
         else {
             for (iter in seq.int(control$maxit)) {
@@ -616,7 +649,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                         else {
                             adjustmentDispersion <- adjustmentFun(theta, fit = fitDispersion, what = "dispersion")
                             ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
-                        ## FIX: some redundancy below...
+                            ## FIX: some redundancy below...
                             adjustmentZeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2TransDisp) / d1zeta^2
                             adjustedGradZeta <- gradDispersion/d1zeta + adjustmentZeta
                         }
@@ -641,6 +674,13 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 }
             }
         }
+
+        ## Objects used from above iteration
+        ## adjustedGradBeta
+        ## adjustedGradZeta
+        ## coefs
+        ## disp
+        ##
 
         adjustedGradAll[coefNames] <- adjustedGradBeta
         adjustedGradAll["Transformed dispersion"] <- adjustedGradZeta
@@ -792,21 +832,15 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
          dispersionML = dispML,
          transDispersion = transdisp,
          infoTransDispersion = if (noDispersion) NA else infoTransDisp,
-         adjustedGrad =  adjustedGradAll,
+         grad =  adjustedGradAll,
          dispTrans = control$dispTrans,
          ## cov.unscaled = tcrossprod(Rmat),
          type = control$type,
          class = "brglmFit")
 }
 
-#' \code{coef} method for \code{\link{brglmFit}} objects
-#'
-#' @inheritParams stats::coef
-#' @param model character specyfying for which component of the model coefficients shoould be extracted
-#'
-#' @details
-#' @method coef brglmFit
-coef.brglmFit <- function(object, model = c("mean", "full", "dispersion")) {
+#' @export
+coef.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) {
     model <- match.arg(model)
     switch(model,
            mean = {
@@ -833,7 +867,6 @@ coef.brglmFit <- function(object, model = c("mean", "full", "dispersion")) {
                thetaTrans
            })
 }
-
 
 #' \code{summary} method for \code{\link{brglmFit}} objects
 #'
@@ -913,17 +946,12 @@ vcov.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) 
 }
 
 
-
-
 DD <- function(expr,name, order = 1) {
     if(order < 1) stop("'order' must be >= 1")
     if(order == 1) D(expr,name)
     else DD(D(expr, name), name, order - 1)
 }
 
-
-## customTrans <- list(Trans = expression(disp),
-##                     inverseTrans = expression(transdisp))
 
 
 

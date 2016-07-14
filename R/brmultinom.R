@@ -10,6 +10,7 @@
 #'     process. See \code{\link{brglmControl}} for details.
 #' @param ... arguments to be used to form the default 'control'
 #'     argument if it is not supplied directly.
+#' @param ref the reference category to use for multinomial regression
 #'
 #' @details
 #' \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
@@ -236,9 +237,6 @@ vcov.brmultinom <- function(object, ...) {
 }
 
 
-#' Print method for \code{\link{summary.brmultinom}} objects
-#' @section Note:
-#' Code adopted from \code{nnet:::print.summary.brmultinom}
 #' @method print summary.brmultinom
 #' @export
 print.summary.brmultinom <- function (x, digits = x$digits, ...)

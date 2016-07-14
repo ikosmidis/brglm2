@@ -44,6 +44,8 @@ a list of contrasts to be used for some or all of
 the factors appearing as variables in the model formula.
 }
 
+\item{ref}{the reference category to use for multinomial regression}
+
 \item{control}{a list of parameters for controlling the fitting
 process. See \code{\link{brglmControl}} for details.}
 

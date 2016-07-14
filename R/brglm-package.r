@@ -21,11 +21,11 @@
 #' @docType package
 #' @name brglm2
 #' @import stats
-#' @import MASS
 #' @import Matrix
+#' @import MASS
+#' @import enrichwith
 #' @importFrom graphics plot
 #' @importFrom nnet class.ind
-#'
 #'
 NULL
 #> NULL

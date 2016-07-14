@@ -54,7 +54,7 @@ process. See \code{\link{brglmControl}} for details.}
 \item{fixedTotals}{Effective only when \code{family} is
 \code{poisson}. Either \code{NULL} (no effect) or a vector that
 indicates which counts must be treated as a group. See
-"Details" for more information and \code{\link{brmultinom}}.}
+Details for more information and \code{\link{brmultinom}}.}
 
 \item{...}{arguments to be used to form the default 'control'
 argument if it is not supplied directly.}
@@ -70,8 +70,8 @@ using a quasi-Fisher scoring iteration based on the iterative
 correction of the asymptotic bias of the Fisher scoring iterates.
 }
 \details{
+Below
 \itemize{
-
 \item The null deviance is evaluated based on estimates of the
     expectations using the bias reduction method specified by the
     \code{type} argument (see \code{\link{brglmControl}}).
@@ -82,7 +82,6 @@ functions} section in \code{\link{glm}}
 \item If \code{type == "correction"} (see
 \code{\link{brglmControl}}), then \code{coefficients} and
 \code{transDispersion} carry the estimated biases as attributes.
-
 }
 }
 \examples{
