@@ -250,6 +250,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     ## Estimate the ML of the dispersion parameter for gaussian, gamma and inverse Gaussian
     ## Set the dispersion to 1 if poisson or binomial
+    ## coefs is only the regression parameters
     estimateDispersion <- function(coefs, y) {
         if (noDispersion) {
             disp <- 1
@@ -279,10 +280,10 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         list(disp = disp, dispML = dispML)
     }
 
-    refit <- function(y, start = NULL) {
+    refit <- function(y, coefs_start = NULL) {
         ## Estimate Beta
         coefs <- coef(glm.fit(x = x, y = y, weights = weights,
-                              start = start,
+                              start = coefs_start,
                               offset = offset,
                               family = family,
                               control = list(epsilon = control$epsilon,

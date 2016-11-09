@@ -30,16 +30,6 @@
 NULL
 #> NULL
 
-## register S3 methods
-#' Generic method for enriching objects
-#'
-#' @param object the object to be enriched
-#' @param ... Arguments to be passed to other methods
-#'
-#' @export
-enrich <- function(object, ...) UseMethod("enrich")
-
-
 ## Suggestion by Kurt Hornik to avoid a warning related to the binding
 ## of n which is evaluated by family$initialize
 if (getRversion() >= "2.15.1") globalVariables(c("n", "customTrans", "lambda"))
