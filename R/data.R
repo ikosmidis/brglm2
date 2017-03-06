@@ -50,12 +50,12 @@
 #'     Schemper (2002), and was originally provided by Dr
 #'     E. Asseryanis from the Medical University of Vienna.
 #'
+#' @references
 #'
-#' Agresti, A. 2015. *Foundations of Linear and Generalized Linear
-#' Models*.  Wiley Series in Probability and Statistics. Wiley.
+#' Agresti, A. (2015). *Foundations of Linear and Generalized Linear
+#' Models*.  Wiley Series in Probability and Statistics. Wiley
 #'
-#' Heinze, G., and M. Schemper. 2002. “A Solution to the Problem of
-#' Separation in Logistic Regression.” *Statistics in Medicine*
-#' 21:2409–19.
+#' Heinze, G., & Schemper, M. (2002). A Solution to the Problem of
+#' Separation in Logistic Regression. *Statistics in Medicine*, **21**, 2409–2419
 #'
 "endometrial"

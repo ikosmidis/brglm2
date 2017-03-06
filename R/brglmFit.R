@@ -12,7 +12,7 @@
 #'
 #' @inheritParams stats::glm.fit
 #' @param x \code{x} is a design matrix of dimension \code{n * p},
-#' @param y \code{y} is a vector of observations of length \code{n}.
+#' @param y \code{y} is a vector of observations of length \code{n}
 #' @param control a list of parameters controlling the fitting
 #'     process. See \code{\link{brglmControl}} for details.
 #' @param start starting values for the parameters in the linear
@@ -32,21 +32,57 @@
 #'     Details for more information and \code{\link{brmultinom}}.
 #' @param ... arguments to be used to form the default 'control'
 #'     argument if it is not supplied directly.
-#' @details Below
-#' \itemize{
-#' \item The null deviance is evaluated based on estimates of the
-#'     expectations using the bias reduction method specified by the
-#'     \code{type} argument (see \code{\link{brglmControl}}).
 #'
-#' \item See the description of \code{method} and the \code{Fitting
-#' functions} section in \code{\link{glm}}
-#' #'
-#' \item If \code{type == "correction"} (see
-#' \code{\link{brglmControl}}), then \code{coefficients} and
-#' \code{transDispersion} carry the estimated biases as attributes.
-#' }
+#' @details
+#'
+#' Implicit and explicit bias reduction methods are described in
+#' detail in Kosmidis (2014). The quasi (or modified) Fisher scoring
+#' iteration is described in Kosmidis (2010) and is based on the
+#' iterative correction of the asymptotic bias of the Fisher scoring
+#' iterates. A quick description of the quasi Fisher scoring iteration
+#' is also given in one of the vignettes of the *enrichwith* R package
+#' (see,
+#' \url{https://cran.r-project.org/web/packages/enrichwith/vignettes/bias.html}).
+#'
+#'
+#' The null deviance is evaluated based on the fitted values using the
+#'     bias reduction method specified by the \code{type} argument
+#'     (see \code{\link{brglmControl}}).
+#'
+#' The description of \code{method} argument nd the \code{Fitting
+#' functions} section in \code{\link{glm}} gives information on
+#' supplying fitting methods to \code{\link{glm}}.
+#'
+#' If \code{type == "correction"} (see \code{\link{brglmControl}}),
+#' then \code{coefficients} and \code{transDispersion} carry the
+#' estimated biases as attributes.
+#'
+#'
+#'
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
-#' @references A
+#'
+#' @references
+#'
+#' Cordeiro G. M. & McCullagh, P. (1991). Bias correction in generalized
+#' linear models. *Journal of the Royal Statistical Society. Series B
+#' (Methodological)*, **53**, 629-643
+#'
+#' Firth D. (1993). Bias reduction of maximum likelihood estimates,
+#' Biometrika, **80**, 27-38
+#'
+#' Kosmidis I and Firth D (2009). Bias reduction in exponential family
+#' nonlinear models. *Biometrika*, **96**, 793-804
+#'
+#' Kosmidis I and Firth D (2010). A generic algorithm for reducing
+#' bias in parametric estimation. *Electronic Journal of Statistics*,
+#' **4**, 1097-1112
+#'
+#' Kosmidis I (2014). Bias in parametric estimation: reduction and
+#' useful side-effects. *WIRE Computational Statistics*, **6**,
+#' 185-196
+#'
+#'
+#'
 #' @examples
 #' ## The lizards example from ?brglm::brglm
 #' data("lizards")
@@ -97,10 +133,14 @@
 #' summary(anorexBC, start = coef(anorexML))
 #' }
 #'
+#' ## endometrial data from Heinze \& Schemper (2002) (see ?endometrial)
 #' data("endometrial", package = "brglm2")
-#' endometrialML <- glm(HG ~ NV + PI + EH, family = binomial("probit"), data = endometrial)
-#' endometrialBR <- update(endometrialML, method = "brglmFit", type = "adjusted_scores")
-#' endometrialBC <- update(endometrialML, method = "brglmFit", type = "correction")
+#' endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
+#'                      family = binomial("probit"))
+#' endometrialBR <- update(endometrialML, method = "brglmFit",
+#'                         type = "adjusted_scores")
+#' endometrialBC <- update(endometrialML, method = "brglmFit",
+#'                         type = "correction")
 #' summary(endometrialML)
 #' summary(endometrialBC)
 #' summary(endometrialBR)
@@ -305,6 +345,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     ## TODO: implement adjustment for IBLA
 
+    control0 <- control
     control <- do.call("brglmControl", control)
 
     ## Get type
@@ -785,10 +826,15 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## value is the weighted average and is calculated easily below if
     ## ML is used
     ##
+
+    control0$epsilon <- control$epsilon
+    control0$maxit <- control$maxit
+    control0$type <- control$type
+    control0$slowit <- control$slowit
     if (intercept & missingOffset) {
         nullFit <- brglmFit(x = x[, "(Intercept)"], y = y, weights = weights,
                             offset = rep(0, nobs), family = family, intercept = TRUE,
-                            control = control[c("epsilon", "maxit", "type", "dispTrans", "slowit")])
+                            control = control0[c("epsilon", "maxit", "type", "dispTrans", "slowit")])
         nullmus <- nullFit$fitted
     }
     ## If there is an offset but not an intercept then the fitted

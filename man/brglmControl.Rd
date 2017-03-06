@@ -3,9 +3,7 @@
 \name{brglmControl}
 \alias{brglmControl}
 \title{Auxiliary function for \code{\link{glm}} fitting using the
-\code{\link{brglmFit}} method.  Typically only used internally by
-\code{\link{brglmFit}}, but may be used to construct a
-\code{control} argument to either function.}
+\code{\link{brglmFit}} method.}
 \usage{
 brglmControl(epsilon = 1e-10, maxit = 100, trace = FALSE,
   type = c("adjusted_scores", "correction", "maximum_likelihood"),
@@ -39,10 +37,8 @@ a list with components named as the arguments, including
     (\code{Trans}) and its inverse (\code{inverseTrans})
 }
 \description{
-Auxiliary function for \code{\link{glm}} fitting using the
-\code{\link{brglmFit}} method.  Typically only used internally by
-\code{\link{brglmFit}}, but may be used to construct a
-\code{control} argument to either function.
+Typically only used internally by \code{\link{brglmFit}}, but may
+be used to construct a \code{control} argument to either function.
 }
 \details{
 \code{\link{brglmControl}} provides default values and

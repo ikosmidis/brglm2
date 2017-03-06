@@ -12,7 +12,7 @@ brglmFit(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
 \arguments{
 \item{x}{\code{x} is a design matrix of dimension \code{n * p},}
 
-\item{y}{\code{y} is a vector of observations of length \code{n}.}
+\item{y}{\code{y} is a vector of observations of length \code{n}}
 
 \item{weights}{an optional vector of \sQuote{prior weights} to be used
     in the fitting process.  Should be \code{NULL} or a numeric vector.}
@@ -70,19 +70,27 @@ using a quasi-Fisher scoring iteration based on the iterative
 correction of the asymptotic bias of the Fisher scoring iterates.
 }
 \details{
-Below
-\itemize{
-\item The null deviance is evaluated based on estimates of the
-    expectations using the bias reduction method specified by the
-    \code{type} argument (see \code{\link{brglmControl}}).
+Implicit and explicit bias reduction methods are described in
+detail in Kosmidis (2014). The quasi (or modified) Fisher scoring
+iteration is described in Kosmidis (2010) and is based on the
+iterative correction of the asymptotic bias of the Fisher scoring
+iterates. A quick description of the quasi Fisher scoring iteration
+is also given in one of the vignettes of the *enrichwith* R package
+(see,
+\url{https://cran.r-project.org/web/packages/enrichwith/vignettes/bias.html}).
 
-\item See the description of \code{method} and the \code{Fitting
-functions} section in \code{\link{glm}}
-#'
-\item If \code{type == "correction"} (see
-\code{\link{brglmControl}}), then \code{coefficients} and
-\code{transDispersion} carry the estimated biases as attributes.
-}
+
+The null deviance is evaluated based on the fitted values using the
+    bias reduction method specified by the \code{type} argument
+    (see \code{\link{brglmControl}}).
+
+The description of \code{method} argument nd the \code{Fitting
+functions} section in \code{\link{glm}} gives information on
+supplying fitting methods to \code{\link{glm}}.
+
+If \code{type == "correction"} (see \code{\link{brglmControl}}),
+then \code{coefficients} and \code{transDispersion} carry the
+estimated biases as attributes.
 }
 \examples{
 ## The lizards example from ?brglm::brglm
@@ -134,17 +142,37 @@ summary(anorexBR)
 summary(anorexBC, start = coef(anorexML))
 }
 
+## endometrial data from Heinze \\& Schemper (2002) (see ?endometrial)
 data("endometrial", package = "brglm2")
-endometrialML <- glm(HG ~ NV + PI + EH, family = binomial("probit"), data = endometrial)
-endometrialBR <- update(endometrialML, method = "brglmFit", type = "adjusted_scores")
-endometrialBC <- update(endometrialML, method = "brglmFit", type = "correction")
+endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
+                     family = binomial("probit"))
+endometrialBR <- update(endometrialML, method = "brglmFit",
+                        type = "adjusted_scores")
+endometrialBC <- update(endometrialML, method = "brglmFit",
+                        type = "correction")
 summary(endometrialML)
 summary(endometrialBC)
 summary(endometrialBR)
 
 }
 \references{
-A
+Cordeiro G. M. & McCullagh, P. (1991). Bias correction in generalized
+linear models. *Journal of the Royal Statistical Society. Series B
+(Methodological)*, **53**, 629-643
+
+Firth D. (1993). Bias reduction of maximum likelihood estimates,
+Biometrika, **80**, 27-38
+
+Kosmidis I and Firth D (2009). Bias reduction in exponential family
+nonlinear models. *Biometrika*, **96**, 793-804
+
+Kosmidis I and Firth D (2010). A generic algorithm for reducing
+bias in parametric estimation. *Electronic Journal of Statistics*,
+**4**, 1097-1112
+
+Kosmidis I (2014). Bias in parametric estimation: reduction and
+useful side-effects. *WIRE Computational Statistics*, **6**,
+185-196
 }
 \seealso{
 \code{\link{glm.fit}} and \code{\link{glm}}

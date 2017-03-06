@@ -24,20 +24,19 @@ The packaged data set was downloaded in \code{.dat} format
     The endometrial data set was first analysed in Heinze and
     Schemper (2002), and was originally provided by Dr
     E. Asseryanis from the Medical University of Vienna.
-
-
-Agresti, A. 2015. *Foundations of Linear and Generalized Linear
-Models*.  Wiley Series in Probability and Statistics. Wiley.
-
-Heinze, G., and M. Schemper. 2002. “A Solution to the Problem of
-Separation in Logistic Regression.” *Statistics in Medicine*
-21:2409–19.
 }
 \usage{
 endometrial
 }
 \description{
 Histology grade and risk factors for 79 cases of endometrial cancer
+}
+\references{
+Agresti, A. (2015). *Foundations of Linear and Generalized Linear
+Models*.  Wiley Series in Probability and Statistics. Wiley
+
+Heinze, G., & Schemper, M. (2002). A Solution to the Problem of
+Separation in Logistic Regression. *Statistics in Medicine*, **21**, 2409–2419
 }
 \keyword{datasets}
 

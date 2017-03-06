@@ -3,7 +3,7 @@
 \name{brmultinom}
 \alias{brmultinom}
 \title{Bias reduction for multinomial response models using the
-"Poisson trick".}
+Poisson trick.}
 \usage{
 brmultinom(formula, data, weights, subset, na.action, contrasts = NULL,
   ref = 1, control = list(...), ...)
@@ -77,6 +77,14 @@ multinomial regression models, the current implementation is more
 of a "proof of concept" and is not expected to scale well with
 either of \code{nrow(X)}, \code{ncol(X)} or the number of levels in
 the cateogrical response.
+}
+\references{
+Kosmidis I and Firth D (2011). Multinomial logit bias reduction via
+the Poisson log-linear model. *Biometrika*, **98**, 755-759.
+
+Palmgren, J. (1981). The Fisher Information Matrix for Log Linear
+Models Arguing Conditionally on Observed Explanatory
+Variables. *Biometrika*, **68**, 563-566.
 }
 \seealso{
 \code{\link[nnet]{multinom}}

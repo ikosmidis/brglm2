@@ -1,5 +1,5 @@
 #' Bias reduction for multinomial response models using the
-#' "Poisson trick".
+#' Poisson trick.
 #'
 #' \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
 #' multinomial regression models using implicit and explicit bias
@@ -32,6 +32,15 @@
 #' of a "proof of concept" and is not expected to scale well with
 #' either of \code{nrow(X)}, \code{ncol(X)} or the number of levels in
 #' the cateogrical response.
+#'
+#' @references
+#'
+#' Kosmidis I and Firth D (2011). Multinomial logit bias reduction via
+#' the Poisson log-linear model. *Biometrika*, **98**, 755-759.
+#'
+#' Palmgren, J. (1981). The Fisher Information Matrix for Log Linear
+#' Models Arguing Conditionally on Observed Explanatory
+#' Variables. *Biometrika*, **68**, 563-566.
 #'
 #' @seealso \code{\link[nnet]{multinom}}
 #'
@@ -112,11 +121,11 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
                     start = NULL,
                     family = poisson("log"), control = control, intercept = TRUE, fixedTotals = rep(seq.int(nkeep), ncat))
 
-    ## ## TODO:
-    ## ## + starting values
-    ## ## + subset
-    ## ## + na.action
-    ## ## + control
+    ## TODO:
+    ## + starting values
+    ## + subset
+    ## + na.action
+    ## + control
 
     fit$call <- call
     fit$fitted.values <- matrix(fit$fitted.values, ncol = ncat)/w[keep]
