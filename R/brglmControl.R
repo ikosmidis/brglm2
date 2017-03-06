@@ -49,15 +49,15 @@
 #' ## The maximum likelihood fit with log link
 #' coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
 #'
-#' ## Bias-reduced estimation of the dispersion parameter
+#' ## Bias reduced estimation of the dispersion parameter
 #' coalitionBRi <- update(coalitionML, method = "brglmFit")
 #' coef(coalitionBRi, model = "dispersion")
 #'
-#' ## Bias-reduced estimation of log(dispersion)
+#' ## Bias reduced estimation of log(dispersion)
 #' coalitionBRl <- update(coalitionML, method = "brglmFit",  dispTrans = "log")
 #' coef(coalitionBRl, model = "dispersion")
 #'
-#' ## Just for illustration: Bias-reduced estimation of dispersion^0.25
+#' ## Just for illustration: Bias reduced estimation of dispersion^0.25
 #' coalitionBRc <- update(coalitionML, method = "brglmFit",
 #'                        dispTrans = list(expression(disp^0.25), expression(transdisp^4)))
 #' coef(coalitionBRc, model = "dispersion")

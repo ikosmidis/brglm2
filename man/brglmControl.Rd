@@ -38,7 +38,7 @@ a list with components named as the arguments, including
 }
 \description{
 Typically only used internally by \code{\link{brglmFit}}, but may
-be used to construct a \code{control} argument to either function.
+be used to construct a \code{control} argument.
 }
 \details{
 \code{\link{brglmControl}} provides default values and
@@ -49,6 +49,33 @@ be used to construct a \code{control} argument to either function.
      When \code{trace} is true, calls to \code{cat} produce the
      output for each iteration.  Hence, \code{options(digits = *)}
      can be used to increase the precision.
+
+     dispTrans sets the transformation of the dispersion parameter
+     for which the bias reduced estimates are computed. Can be one
+     of "identity", "sqrt", "inverse", "log" and
+     "inverseSqrt". Custom transformations are accommodated by
+     supplying a list of two expressions (transformation and
+     inverse transformation). See the examples for more details.
+}
+\examples{
+
+data("coalition", package = "Zelig")
+## The maximum likelihood fit with log link
+coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
+
+## Bias reduced estimation of the dispersion parameter
+coalitionBRi <- update(coalitionML, method = "brglmFit")
+coef(coalitionBRi, model = "dispersion")
+
+## Bias reduced estimation of log(dispersion)
+coalitionBRl <- update(coalitionML, method = "brglmFit",  dispTrans = "log")
+coef(coalitionBRl, model = "dispersion")
+
+## Just for illustration: Bias reduced estimation of dispersion^0.25
+coalitionBRc <- update(coalitionML, method = "brglmFit",
+                       dispTrans = list(expression(disp^0.25), expression(transdisp^4)))
+coef(coalitionBRc, model = "dispersion")
+
 }
 \seealso{
 \code{\link{brglmFit}} and \code{\link{glm.fit}}

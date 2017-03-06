@@ -7,7 +7,7 @@
 #' implicit adjusted scores approach in Firth (1993) and Kosmidis \&
 #' Firth (2009), the correction of the asymptotic bias in Cordeiro &
 #' McCullagh (1991), and maximum likelihood.  Estimation is performed
-#' using a quasi-Fisher scoring iteration based on the iterative
+#' using a quasi Fisher scoring iteration based on the iterative
 #' correction of the asymptotic bias of the Fisher scoring iterates.
 #'
 #' @inheritParams stats::glm.fit
@@ -46,10 +46,10 @@
 #'
 #'
 #' The null deviance is evaluated based on the fitted values using the
-#'     bias reduction method specified by the \code{type} argument
-#'     (see \code{\link{brglmControl}}).
+#'     method specified by the \code{type} argument (see
+#'     \code{\link{brglmControl}}).
 #'
-#' The description of \code{method} argument nd the \code{Fitting
+#' The description of \code{method} argument and the \code{Fitting
 #' functions} section in \code{\link{glm}} gives information on
 #' supplying fitting methods to \code{\link{glm}}.
 #'
@@ -101,8 +101,7 @@
 #' ## Another example from
 #' ## King, Gary, James E. Alt, Nancy Elizabeth Burns and Michael Laver
 #' ## (1990).  "A Unified Model of Cabinet Dissolution in Parliamentary
-#' ## Democracies", _American Journal of Political Science_, vol. 34,
-#' ## no. 3, pp. 846-870.
+#' ## Democracies", _American Journal of Political Science_, **34**, 846-870
 #'
 #' \dontrun{
 #' data("coalition", package = "Zelig")
@@ -344,8 +343,10 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     }
 
     ## TODO: implement adjustment for IBLA
-
-    control0 <- control
+    customTransformation <- is.list(control$dispTrans) & length(control$dispTrans == 2)
+    if (customTransformation) {
+        dispTrans0 <- control$dispTrans
+    }
     control <- do.call("brglmControl", control)
 
     ## Get type
@@ -826,11 +827,10 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## value is the weighted average and is calculated easily below if
     ## ML is used
     ##
-
-    control0$epsilon <- control$epsilon
-    control0$maxit <- control$maxit
-    control0$type <- control$type
-    control0$slowit <- control$slowit
+    control0 <- control
+    if (customTransformation) {
+        control0$dispTrans <- dispTrans0
+    }
     if (intercept & missingOffset) {
         nullFit <- brglmFit(x = x[, "(Intercept)"], y = y, weights = weights,
                             offset = rep(0, nobs), family = family, intercept = TRUE,
