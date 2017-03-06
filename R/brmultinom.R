@@ -78,8 +78,8 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
         }
         if (length(lev) < 2L)
             stop("need two or more classes to fit a multinomial logit model")
-        if (length(lev) == 2L)
-            Y <- as.integer(Y) - 1
+        ## if (length(lev) == 2L)
+        ##     Y <- as.integer(Y) - 1
         else Y <- nnet::class.ind(Y)
     }
     ##+END
@@ -89,15 +89,15 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
 
     keep <- w > 0
 
-    ## if (any(!keep)) {
-    ##     warning("Observations with non-positive weights have been omited from the computations")
-    ## }
+    if (any(!keep)) {
+        warning("Observations with non-positive weights have been omited from the computations")
+    }
 
     nkeep <- sum(keep)
     ## Set up the model matrix for the poisson fit
-    Xnuisance <- Diagonal(nkeep)
-    Xextended <- cbind(kronecker(rep(1, ncat), Xnuisance),
-                       kronecker(Diagonal(ncat)[, -ref], X[keep, ]))
+    Xnuisance <- Matrix::Diagonal(nkeep)
+    Xextended <- cbind(Matrix::kronecker(rep(1, ncat), Xnuisance),
+                       Matrix::kronecker(Matrix::Diagonal(ncat)[, -ref, drop = FALSE], X[keep, ]))
     int <- seq.int(nkeep)
     ## Set up the extended response
     Yextended <- c(Y[keep] * w[keep])
@@ -108,38 +108,15 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
                              ofInterest <- paste(rep(lev[-ref], each = nvar),
                                                  rep(colnames(X), ncat - 1), sep = ":"))
 
-
     fit <- brglmFit(x = Xextended, y = Yextended,
                     start = NULL,
                     family = poisson("log"), control = control, intercept = TRUE, fixedTotals = rep(seq.int(nkeep), ncat))
-
-
-    ## ## Set up the model matrix for the poisson fit
-    ## Xnuisance <- Matrix::Diagonal(nrow(X))
-    ## Xextended <- cbind(kronecker(rep(1, ncat), Xnuisance),
-    ##                    kronecker(Matrix::Diagonal(ncat)[, -1], X))
-    ## int <- seq.int(nrow(X))
-    ## ## Set up the extended response
-    ## Yextended <- c(Y * w)
-
-    ## nd <- paste0("%0", nchar(max(int)), "d")
-    ## colnames(Xextended) <- c(paste0(".nuisance", sprintf(nd, int)),
-    ##                          ## CHECK: lev[-1] contrasts?
-    ##                          paste(rep(lev[-1], each = nvar),
-    ##                                rep(colnames(X), ncat - 1), sep = ":"))
-
-    ## fixed <- rep(int, ncat)
-    ## keep <- rep(w > 0, ncat)
-
 
     ## ## TODO:
     ## ## + starting values
     ## ## + subset
     ## ## + na.action
     ## ## + control
-    ## fit <- brglmFit(x = Xextended[keep, ], y = Yextended[keep],
-    ##                 start = NULL,
-    ##                 family = poisson("log"), control = control, intercept = TRUE, fixedTotals = fixed[keep])
 
     fit$call <- call
     fit$fitted.values <- matrix(fit$fitted.values, ncol = ncat)/w[keep]
