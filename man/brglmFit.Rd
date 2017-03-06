@@ -134,6 +134,14 @@ summary(anorexBR)
 summary(anorexBC, start = coef(anorexML))
 }
 
+data("endometrial", package = "brglm2")
+endometrialML <- glm(HG ~ NV + PI + EH, family = binomial("probit"), data = endometrial)
+endometrialBR <- update(endometrialML, method = "brglmFit", type = "adjusted_scores")
+endometrialBC <- update(endometrialML, method = "brglmFit", type = "correction")
+summary(endometrialML)
+summary(endometrialBC)
+summary(endometrialBR)
+
 }
 \references{
 A

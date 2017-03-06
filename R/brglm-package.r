@@ -15,17 +15,17 @@
 #' maximum likelihood estimates are infinite (e.g. complete and
 #' quasi-complete separation). Estimation in all cases takes place via
 #' a modified Fisher scoring algorithm, and S3 methods for the
-#' construction of of confidence intervals for the reduced-bias
-#' estimates are provided.
+#' construction of confidence intervals for the reduced-bias estimates
+#' are provided.
 #'
 #' @docType package
 #' @name brglm2
 #' @import stats
-#' @import Matrix
 #' @import MASS
 #' @import enrichwith
 #' @importFrom graphics plot
 #' @importFrom nnet class.ind
+#' @import Matrix
 #'
 NULL
 #> NULL

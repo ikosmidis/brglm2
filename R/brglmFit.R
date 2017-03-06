@@ -97,6 +97,14 @@
 #' summary(anorexBC, start = coef(anorexML))
 #' }
 #'
+#' data("endometrial", package = "brglm2")
+#' endometrialML <- glm(HG ~ NV + PI + EH, family = binomial("probit"), data = endometrial)
+#' endometrialBR <- update(endometrialML, method = "brglmFit", type = "adjusted_scores")
+#' endometrialBC <- update(endometrialML, method = "brglmFit", type = "correction")
+#' summary(endometrialML)
+#' summary(endometrialBC)
+#' summary(endometrialBR)
+#'
 #' @export
 brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
                       mustart = NULL, offset = rep(0, nobs), family = gaussian(),
@@ -224,7 +232,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         }
         with(fit, {
             Qmat <- qr.Q(qrDecomposition)
-            ## .Internal(rowSums(Qmat * Qmat, nobs, nvars, FALSE))
             .rowSums(Qmat * Qmat, nobs, nvars, TRUE)
         })
     }
@@ -730,7 +737,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             fitDispersion <- fitFun(c(coefs, disp), y = y, what = "dispersion", qr = TRUE)
             infoTransDisp <- infoFun(c(coefs, disp), inverse = FALSE, fit = fitDispersion, what = "dispersion")/d1zeta^2
         }
-
 
         eps <- 10 * .Machine$double.eps
         if (family$family == "binomial") {
