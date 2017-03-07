@@ -104,7 +104,7 @@
 #' ## Democracies", _American Journal of Political Science_, **34**, 846-870
 #'
 #' \dontrun{
-#' data("coalition", package = "Zelig")
+#' data("coalition", package = "brglm2")
 #' # The maximum likelihood fit with log link
 #' coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
 #' # The bias-reduced fit
