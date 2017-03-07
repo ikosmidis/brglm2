@@ -560,10 +560,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         if (justEvaluate) {
             iter <- 0
             theta <- c(coefs, disp)
-            ## If fixedTotals is provided (i.e. multinomial
-            ## regression via the Poisson trick) then everything
-            ## except the score function needs to be evaluated at
-            ## the scaled fitted means
+            ## If fixedTotals is provided (i.e. multinomial regression
+            ## via the Poisson trick) then evaluate everything expect
+            ## the score function at the scaled fitted means
             fitBeta <- fitFun(theta, y = y, what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
             gradBeta <-  gradFun(theta, fit = if (hasFixedTotals) NULL else fitBeta, what = "mean")
                                 cInverseInfoBeta <- try(infoFun(theta, inverse = TRUE, fit = fitBeta, what = "mean"))
@@ -587,8 +586,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
 
             adjustedGradBeta <- gradBeta + adjustmentBeta
-
-            ## ADD dispersion + dispersion starting values
 
             if (noDispersion) {
                     disp <- 1
@@ -630,14 +627,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 coefsPrev <- coefs
                 objPrev <- objCur
                 ## Bias-reduced estimation of mean effects
-
                 while (testhalf & stepFactor < control$maxStepFactor) {
                     theta <- c(coefs, disp)
 
-                    ## If fixedTotals is provided (i.e. multinomial
-                    ## regression via the Poisson trick) then everything
-                    ## except the score function needs to be evaluated at
-                    ## the scaled fitted means
                     fitBeta <- fitFun(theta, y = y, what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
 
                     gradBeta <-  gradFun(theta, fit = if (hasFixedTotals) NULL else fitBeta, what = "mean")
@@ -730,7 +722,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## adjustedGradZeta
         ## coefs
         ## disp
-        ##
 
         adjustedGradAll[coefNames] <- adjustedGradBeta
         adjustedGradAll["Transformed dispersion"] <- adjustedGradZeta
@@ -750,7 +741,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             warning("brglmFit: algorithm stopped at boundary value", call. = FALSE)
         }
 
-        ## QR decomposition and fitted values are AT the final value
+        ## QR decomposition and fitted values are at the final value
         ## for the coefficients
 
         ## QR decomposition for cov.unscaled
@@ -795,7 +786,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         }
         if (dfResidual == 0) disp <- NaN
 
-        ## Estimate of first-order bias FROM the last iteration (so
+        ## Estimate of first-order bias from the last iteration (so
         ## not at the final value for the coefficients)
         if (isML) {
             ## For now... To be set to calculate biases at a later version
@@ -812,8 +803,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 attr(transdisp, "biases") <- biasZeta
             }
         }
-
-
     }
 
     ## Working weights
@@ -821,7 +810,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     wt[keep] <- workingWeights[keep]
     names(wt) <- names(residuals) <- names(mus) <- names(etas) <- names(weights) <- names(y) <- ynames
     ## For the null deviance:
-    ##
     ##
     ## If there is an intercept but not an offset then the ML fitted
     ## value is the weighted average and is calculated easily below if
