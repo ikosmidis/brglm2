@@ -59,3 +59,22 @@
 #' Separation in Logistic Regression. *Statistics in Medicine*, **21**, 2409–2419
 #'
 "endometrial"
+
+
+#' Coalition data
+#'
+#' @note
+#'
+#' Data is as provided in the Zeilig R package (\url{https://cran.r-project.org/package=Zelig})
+#'
+#' @references
+#'
+#'  King, G., Alt, J. E., Burns, N. E. and Laver, M. (1990). A Unified
+#'  Model of Cabinet Dissolution in Parliamentary
+#'  Democracies. *American Journal of Political Science*, **34**,
+#'  846-870.
+#'
+#'  King, G., Alt, J. E., Burns, N. E. and Laver, M. ICPSR
+#'  Publication Related Archive, 1115.
+#'
+"coalition"

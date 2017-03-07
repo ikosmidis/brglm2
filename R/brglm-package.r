@@ -35,7 +35,8 @@ NULL
 if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 
 #' Generic method for detecting infinite estimates
-#' @param object the object to be enriched or the enriched object
+#' @param object a fitted model object (e.g. the result of a
+#'     \code{\link{glm}} call)
 #' @param ... other options to be passed to the method
 #' @export
 detect_infinite_estimates <- function(object, ...) {

@@ -4,10 +4,10 @@
 \alias{detect_infinite_estimates.glm}
 \title{A simple check of whether the maximum likelihood estimates are infinite}
 \usage{
-\method{detect_infinite_estimates}{glm}(fit, nsteps = 30)
+\method{detect_infinite_estimates}{glm}(object, nsteps = 30, ...)
 }
 \arguments{
-\item{fit}{the result of a \code{\link{glm}} call}
+\item{object}{the result of a \code{\link{glm}} call}
 
 \item{nsteps}{starting from \code{maxit = 1}, the GLM is refitted
 for \code{maxit = 2}, \code{maxit = 3}, \ldots, \code{maxit =

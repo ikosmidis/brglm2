@@ -1,7 +1,7 @@
 #' A simple check of whether the maximum likelihood estimates are infinite
 #'
 #'
-#' @param fit the result of a \code{\link{glm}} call
+#' @param object the result of a \code{\link{glm}} call
 #' @param nsteps starting from \code{maxit = 1}, the GLM is refitted
 #'     for \code{maxit = 2}, \code{maxit = 3}, \ldots, \code{maxit =
 #'     nsteps}. Default value is 30.
@@ -42,25 +42,25 @@
 #' detect_infinite_estimates(endometrialML)
 #'
 #' @export
-detect_infinite_estimates.glm <- function (fit, nsteps = 30)
+detect_infinite_estimates.glm <- function (object, nsteps = 30, ...)
 {
-    if (class(fit)[1] != "glm") {
+    if (class(object)[1] != "glm") {
         warning("detect_infinite_estimates has been designed for objects of class 'glm'")
     }
-    if (fit$family$family != "binomial") {
+    if (object$family$family != "binomial") {
         warning("detect_infinite_estimates has been designed for binomial-response models")
     }
     eps <- .Machine$double.eps
-    betasNames <- names(betas <- coef(fit))
+    betasNames <- names(betas <- coef(object))
     noNA <- !is.na(betas)
     stdErrors <- matrix(0, nsteps, length(betas))
     for (i in 1:nsteps) {
-        suppressWarnings(temp.fit <- update(fit, control = glm.control(maxit = i,
+        suppressWarnings(temp.object <- update(object, control = glm.control(maxit = i,
             epsilon = eps)))
-        stdErrors[i, noNA] <- summary(temp.fit)$coef[betasNames[noNA], "Std. Error"]
+        stdErrors[i, noNA] <- summary(temp.object)$coef[betasNames[noNA], "Std. Error"]
     }
     res <- sweep(stdErrors, 2, stdErrors[1, ], "/")
-    colnames(res) <- names(coef(fit))
+    colnames(res) <- names(coef(object))
     res
 }
 

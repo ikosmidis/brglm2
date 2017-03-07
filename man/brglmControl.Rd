@@ -59,7 +59,7 @@ be used to construct a \code{control} argument.
 }
 \examples{
 
-data("coalition", package = "Zelig")
+data("coalition", package = "brglm2")
 ## The maximum likelihood fit with log link
 coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
 

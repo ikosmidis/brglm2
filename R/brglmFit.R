@@ -42,7 +42,7 @@
 #' iterates. A quick description of the quasi Fisher scoring iteration
 #' is also given in one of the vignettes of the *enrichwith* R package
 #' (see,
-#' \url{https://cran.r-project.org/web/packages/enrichwith/vignettes/bias.html}).
+#' \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
 #'
 #'
 #' The null deviance is evaluated based on the fitted values using the

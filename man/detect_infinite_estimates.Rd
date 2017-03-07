@@ -7,7 +7,8 @@
 detect_infinite_estimates(object, ...)
 }
 \arguments{
-\item{object}{the object to be enriched or the enriched object}
+\item{object}{a fitted model object (e.g. the result of a
+\code{\link{glm}} call)}
 
 \item{...}{other options to be passed to the method}
 }
