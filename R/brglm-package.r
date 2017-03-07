@@ -33,3 +33,11 @@ NULL
 ## Suggestion by Kurt Hornik to avoid a warning related to the binding
 ## of n which is evaluated by family$initialize
 if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
+
+#' Generic method for detecting infinite estimates
+#' @param object the object to be enriched or the enriched object
+#' @param ... other options to be passed to the method
+#' @export
+detect_infinite_estimates <- function(object, ...) {
+    UseMethod("detect_infinite_estimates")
+}

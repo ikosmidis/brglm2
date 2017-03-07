@@ -5,7 +5,7 @@
 #' @param nsteps starting from \code{maxit = 1}, the GLM is refitted
 #'     for \code{maxit = 2}, \code{maxit = 3}, \ldots, \code{maxit =
 #'     nsteps}. Default value is 30.
-#'
+#' @param ... currently not used#'
 #'
 #'
 #' @details
@@ -41,7 +41,8 @@
 #' ## NV is infinite
 #' detect_infinite_estimates(endometrialML)
 #'
-detect_infinite_estimates <- function (fit, nsteps = 30)
+#' @export
+detect_infinite_estimates.glm <- function (fit, nsteps = 30)
 {
     if (class(fit)[1] != "glm") {
         warning("detect_infinite_estimates has been designed for objects of class 'glm'")
@@ -62,3 +63,5 @@ detect_infinite_estimates <- function (fit, nsteps = 30)
     colnames(res) <- names(coef(fit))
     res
 }
+
+
