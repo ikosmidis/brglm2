@@ -26,10 +26,10 @@
 #'     \code{NULL}. Starting values for the linear predictor to be
 #'     passed to \code{\link{glm.fit}} when computing starting values
 #'     using maximum likelihood.
-#' @param fixedTotals Effective only when \code{family} is
+#' @param fixedTotals effective only when \code{family} is
 #'     \code{poisson}. Either \code{NULL} (no effect) or a vector that
-#'     indicates which counts must be treated as a group. See
-#'     Details for more information and \code{\link{brmultinom}}.
+#'     indicates which counts must be treated as a group. See Details
+#'     for more information and \code{\link{brmultinom}}.
 #' @param ... arguments to be used to form the default 'control'
 #'     argument if it is not supplied directly.
 #'
@@ -137,7 +137,7 @@
 #' endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
 #'                      family = binomial("probit"))
 #' endometrialBR <- update(endometrialML, method = "brglmFit",
-#'                         type = "adjusted_scores")
+#'                         type = "AS-mean")
 #' endometrialBC <- update(endometrialML, method = "brglmFit",
 #'                         type = "correction")
 #' summary(endometrialML)
@@ -350,7 +350,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     control <- do.call("brglmControl", control)
 
     ## Get type
-    isML <- control$type == "maximum_likelihood"
+    isML <- control$type == "ML"
     isCor <- control$type == "correction"
     noDispersion <- family$family %in% c("poisson", "binomial")
     justEvaluate <- control$maxit == 0
@@ -386,10 +386,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         offset <- rep.int(0, nobs)
     }
 
-    ## Enrich the family object with the required derivatives There is
-    ## scope for improvement here by adding an argument to enrich*
-    ## functions that controls what you get (e.g. only d2mu.deta and
-    ## d1afun-d3afun are needed for bias reduction)
+    ## Enrich the family object with the required derivatives
     linkglm <- make.link(family$link)
     family <- enrichwith::enrich(family, with = "function a derivatives")
     linkglm <- enrichwith::enrich(linkglm, with = "d2mu.deta")

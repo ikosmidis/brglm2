@@ -10,9 +10,10 @@
 #'     allowed
 #' @param trace logical indicating if output should be produced for
 #'     each iteration
-#' @param type type of estimation method. Supported methods include
-#'     \code{adjusted_scores}, \code{correction} and
-#'     \code{maximum_likelihood}
+#' @param type the type of fitting methodo to be used. The options are
+#'     \code{AS-mean} (mean-bias reducing adjusted scores; default),
+#'     \code{correction} (asymptotic bias correction) and
+#'     \code{ML} (maximum likelihood).
 #' @param dispTrans the transformation of the dispersion to be
 #'     estimated. Default is \code{identity}. See Details.
 #' @param slowit a positive real used as a multiplier for the
@@ -64,7 +65,7 @@
 #'
 brglmControl <- function(epsilon = 1e-10, maxit = 100,
                          trace = FALSE,
-                         type = c("adjusted_scores", "correction", "maximum_likelihood"),
+                         type = c("AS-mean", "correction", "ML"),
                          dispTrans = "identity",
                          slowit = 1,
                          maxStepFactor = 1) {

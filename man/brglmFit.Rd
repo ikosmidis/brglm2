@@ -51,10 +51,10 @@ process. See \code{\link{brglmControl}} for details.}
 \item{intercept}{logical. Should an intercept be included in the
     \emph{null} model?}
 
-\item{fixedTotals}{Effective only when \code{family} is
+\item{fixedTotals}{effective only when \code{family} is
 \code{poisson}. Either \code{NULL} (no effect) or a vector that
-indicates which counts must be treated as a group. See
-Details for more information and \code{\link{brmultinom}}.}
+indicates which counts must be treated as a group. See Details
+for more information and \code{\link{brmultinom}}.}
 
 \item{...}{arguments to be used to form the default 'control'
 argument if it is not supplied directly.}
@@ -77,7 +77,7 @@ iterative correction of the asymptotic bias of the Fisher scoring
 iterates. A quick description of the quasi Fisher scoring iteration
 is also given in one of the vignettes of the *enrichwith* R package
 (see,
-\url{https://cran.r-project.org/web/packages/enrichwith/vignettes/bias.html}).
+\url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
 
 
 The null deviance is evaluated based on the fitted values using the
@@ -146,7 +146,7 @@ data("endometrial", package = "brglm2")
 endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
                      family = binomial("probit"))
 endometrialBR <- update(endometrialML, method = "brglmFit",
-                        type = "adjusted_scores")
+                        type = "AS-mean")
 endometrialBC <- update(endometrialML, method = "brglmFit",
                         type = "correction")
 summary(endometrialML)
