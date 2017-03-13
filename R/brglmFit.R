@@ -223,7 +223,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         out
     }
 
-    gradFun <- function(pars, what = "mean", fit = NULL) {
+    grad_function <- function(pars, what = "mean", fit = NULL) {
         if (is.null(fit)) {
             fit <- fitFun(pars, y = y, what = what, qr = FALSE)
         }
@@ -239,7 +239,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
-    infoFun <- function(pars, what = "mean", fit = NULL, inverse = FALSE) {
+    info_function <- function(pars, what = "mean", fit = NULL, inverse = FALSE) {
         if (is.null(fit)) {
             fit <- fitFun(pars, y = y, what = what, qr = TRUE)
         }
@@ -275,7 +275,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
-    adjustmentFun <- function(pars, what = "mean", fit = NULL) {
+    ASmean_adjustment <- function(pars, what = "mean", fit = NULL) {
         if (is.null(fit)) {
             fit <- fitFun(pars, y = y, what = what, qr = TRUE)
         }
@@ -292,38 +292,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 return((nvars - 2)/(2 * dispersion) + s1/(2 * dispersion^2 * s2))
             }
         })
-    }
-
-    ## Estimate the ML of the dispersion parameter for gaussian, gamma and inverse Gaussian
-    ## Set the dispersion to 1 if poisson or binomial
-    ## coefs is only the regression parameters
-    estimateDispersion <- function(coefs, y) {
-        if (noDispersion) {
-            disp <- 1
-            dispML <- 1
-        }
-        else {
-            if (dfResidual > 0) {
-                dispFit <- try(uniroot(f = function(phi) {
-                    theta <- c(coefs, phi)
-                    cfit <- fitFun(theta, y = y, what = "dispersion", qr = FALSE)
-                    gradFun(theta, what = "dispersion", fit = cfit)
-                }, lower = .Machine$double.eps, upper = 10000, tol = control$epsilon), silent = FALSE)
-                if (inherits(dispFit, "try-error")) {
-                    warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
-                    dispML <- NA
-                    disp <- NA
-                }
-                else {
-                    disp <- dispML <- dispFit$root
-                }
-            }
-            else { ## if the model is saturated dispML is NA
-                disp <- 1 ## A convenient value
-                dispML <- NA
-            }
-        }
-        list(disp = disp, dispML = dispML)
     }
 
     refit <- function(y, coefs_start = NULL) {
@@ -343,11 +311,52 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     }
 
     ## TODO: implement adjustment for IBLA
+    IBLA_adjustment <- function(pars, what = "mean", fit = NULL) {
+
+    }
+
+    ## Estimate the ML of the dispersion parameter for gaussian, gamma and inverse Gaussian
+    ## Set the dispersion to 1 if poisson or binomial
+    ## coefs is only the regression parameters
+    estimateDispersion <- function(coefs, y) {
+        if (noDispersion) {
+            disp <- 1
+            dispML <- 1
+        }
+        else {
+            if (dfResidual > 0) {
+                dispFit <- try(uniroot(f = function(phi) {
+                    theta <- c(coefs, phi)
+                    cfit <- fitFun(theta, y = y, what = "dispersion", qr = FALSE)
+                    grad_function(theta, what = "dispersion", fit = cfit)
+                }, lower = .Machine$double.eps, upper = 10000, tol = control$epsilon), silent = FALSE)
+                if (inherits(dispFit, "try-error")) {
+                    warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
+                    dispML <- NA
+                    disp <- NA
+                }
+                else {
+                    disp <- dispML <- dispFit$root
+                }
+            }
+            else { ## if the model is saturated dispML is NA
+                disp <- 1 ## A convenient value
+                dispML <- NA
+            }
+        }
+        list(disp = disp, dispML = dispML)
+    }
+
     customTransformation <- is.list(control$dispTrans) & length(control$dispTrans == 2)
     if (customTransformation) {
         dispTrans0 <- control$dispTrans
     }
     control <- do.call("brglmControl", control)
+
+    adjustment_function <- switch(control$type,
+                            "correction" = ASmean_adjustment,
+                            "AS-mean" = ASmean_adjustment,
+                            "IBLA" = IBLA_adjustment)
 
     ## Get type
     isML <- control$type == "ML"
@@ -561,8 +570,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             ## via the Poisson trick) then evaluate everything expect
             ## the score function at the scaled fitted means
             fitBeta <- fitFun(theta, y = y, what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
-            gradBeta <-  gradFun(theta, fit = if (hasFixedTotals) NULL else fitBeta, what = "mean")
-                                cInverseInfoBeta <- try(infoFun(theta, inverse = TRUE, fit = fitBeta, what = "mean"))
+            gradBeta <-  grad_function(theta, fit = if (hasFixedTotals) NULL else fitBeta, what = "mean")
+                                cInverseInfoBeta <- try(info_function(theta, inverse = TRUE, fit = fitBeta, what = "mean"))
             if (failedInv <- inherits(cInverseInfoBeta, "try-error")) {
                 warning("failed to invert the information matrix: iteration stopped prematurely")
                 break
@@ -575,7 +584,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 failedAdj <- FALSE
             }
             else {
-                adjustmentBeta <- adjustmentFun(theta, fit = fitBeta, what = "mean")
+                adjustmentBeta <- adjustment_function(theta, fit = fitBeta, what = "mean")
                 if (failedAdj <- any(is.na(adjustmentBeta))) {
                     warning("failed to calculate the bias-reducing score adjustment: iteration stopped prematurely")
                     break
@@ -596,14 +605,14 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 if (dfResidual > 0) {
                     theta <- c(coefs, disp)
                     fitDispersion <- fitFun(theta, y = y, what = "dispersion", qr = TRUE)
-                    gradDispersion <-  gradFun(theta, fit = fitDispersion, what = "dispersion")
-                    infoDispersion <- infoFun(theta, inverse = FALSE, fit = fitDispersion, what = "dispersion")
+                    gradDispersion <-  grad_function(theta, fit = fitDispersion, what = "dispersion")
+                    infoDispersion <- info_function(theta, inverse = FALSE, fit = fitDispersion, what = "dispersion")
                     d1zeta <- eval(d1TransDisp)
                     if (isML) {
                         adjustedGradZeta <- 0
                     }
                     else {
-                        adjustmentDispersion <- adjustmentFun(theta, fit = fitDispersion, what = "dispersion")
+                        adjustmentDispersion <- adjustment_function(theta, fit = fitDispersion, what = "dispersion")
                         ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
                         ## FIX: some redundancy below...
                         adjustmentZeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2TransDisp) / d1zeta^2
@@ -629,9 +638,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
                     fitBeta <- fitFun(theta, y = y, what = "mean", scaleTotals = hasFixedTotals, qr = TRUE)
 
-                    gradBeta <-  gradFun(theta, fit = if (hasFixedTotals) NULL else fitBeta, what = "mean")
+                    gradBeta <-  grad_function(theta, fit = if (hasFixedTotals) NULL else fitBeta, what = "mean")
 
-                    cInverseInfoBeta <- try(infoFun(theta, inverse = TRUE, fit = fitBeta, what = "mean"))
+                    cInverseInfoBeta <- try(info_function(theta, inverse = TRUE, fit = fitBeta, what = "mean"))
 
 
                     if (failedInv <- inherits(cInverseInfoBeta, "try-error")) {
@@ -647,7 +656,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                         failedAdj <- FALSE
                     }
                     else {
-                        adjustmentBeta <- adjustmentFun(theta, fit = fitBeta, what = "mean")
+                        adjustmentBeta <- adjustment_function(theta, fit = fitBeta, what = "mean")
                         if (failedAdj <- any(is.na(adjustmentBeta))) {
                             warning("failed to calculate the bias-reducing score adjustment: iteration stopped prematurely")
                             break
@@ -679,14 +688,14 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     if (dfResidual > 0) {
                         theta <- c(coefs, disp)
                         fitDispersion <- fitFun(theta, y = y, what = "dispersion", qr = TRUE)
-                        gradDispersion <-  gradFun(theta, fit = fitDispersion, what = "dispersion")
-                        infoDispersion <- infoFun(theta, inverse = FALSE, fit = fitDispersion, what = "dispersion")
+                        gradDispersion <-  grad_function(theta, fit = fitDispersion, what = "dispersion")
+                        infoDispersion <- info_function(theta, inverse = FALSE, fit = fitDispersion, what = "dispersion")
                         d1zeta <- eval(d1TransDisp)
                         if (isML) {
                             adjustedGradZeta <- 0
                         }
                         else {
-                            adjustmentDispersion <- adjustmentFun(theta, fit = fitDispersion, what = "dispersion")
+                            adjustmentDispersion <- adjustment_function(theta, fit = fitDispersion, what = "dispersion")
                             ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
                             ## FIX: some redundancy below...
                             adjustmentZeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2TransDisp) / d1zeta^2
@@ -765,7 +774,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         d1zeta <- eval(d1TransDisp)
         if (!noDispersion) {
             fitDispersion <- fitFun(c(coefs, disp), y = y, what = "dispersion", qr = TRUE)
-            infoTransDisp <- infoFun(c(coefs, disp), inverse = FALSE, fit = fitDispersion, what = "dispersion")/d1zeta^2
+            infoTransDisp <- info_function(c(coefs, disp), inverse = FALSE, fit = fitDispersion, what = "dispersion")/d1zeta^2
         }
 
         eps <- 10 * .Machine$double.eps
