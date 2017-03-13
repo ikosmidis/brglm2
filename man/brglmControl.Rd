@@ -6,7 +6,7 @@
 \code{\link{brglmFit}} method.}
 \usage{
 brglmControl(epsilon = 1e-10, maxit = 100, trace = FALSE,
-  type = c("AS-mean", "correction", "ML"), dispTrans = "identity",
+  type = c("AS-mean", "correction", "ML"), transformation = "identity",
   slowit = 1, maxStepFactor = 1)
 }
 \arguments{
@@ -23,7 +23,7 @@ each iteration}
 \code{correction} (asymptotic bias correction) and
 \code{ML} (maximum likelihood).}
 
-\item{dispTrans}{the transformation of the dispersion to be
+\item{transformation}{the transformation of the dispersion to be
 estimated. Default is \code{identity}. See Details.}
 
 \item{slowit}{a positive real used as a multiplier for the
@@ -51,10 +51,10 @@ be used to construct a \code{control} argument.
      output for each iteration.  Hence, \code{options(digits = *)}
      can be used to increase the precision.
 
-     dispTrans sets the transformation of the dispersion parameter
-     for which the bias reduced estimates are computed. Can be one
-     of "identity", "sqrt", "inverse", "log" and
-     "inverseSqrt". Custom transformations are accommodated by
+     \code{transformation} sets the transformation of the
+     dispersion parameter for which the bias reduced estimates are
+     computed. Can be one of "identity", "sqrt", "inverse", "log"
+     and "inverseSqrt". Custom transformations are accommodated by
      supplying a list of two expressions (transformation and
      inverse transformation). See the examples for more details.
 }
@@ -69,12 +69,13 @@ coalitionBRi <- update(coalitionML, method = "brglmFit")
 coef(coalitionBRi, model = "dispersion")
 
 ## Bias reduced estimation of log(dispersion)
-coalitionBRl <- update(coalitionML, method = "brglmFit",  dispTrans = "log")
+coalitionBRl <- update(coalitionML, method = "brglmFit",  transformation = "log")
 coef(coalitionBRl, model = "dispersion")
 
 ## Just for illustration: Bias reduced estimation of dispersion^0.25
+my_transformation <- list(expression(disp^0.25), expression(transformed_dispersion^4))
 coalitionBRc <- update(coalitionML, method = "brglmFit",
-                       dispTrans = list(expression(disp^0.25), expression(transdisp^4)))
+                       transformation = my_transformation)
 coef(coalitionBRc, model = "dispersion")
 
 }

@@ -7,7 +7,7 @@ estimation and inference}
 \usage{
 brglmFit(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
   mustart = NULL, offset = rep(0, nobs), family = gaussian(),
-  control = list(), intercept = TRUE, fixedTotals = NULL)
+  control = list(), intercept = TRUE, fixed_totals = NULL)
 }
 \arguments{
 \item{x}{\code{x} is a design matrix of dimension \code{n * p},}
@@ -51,7 +51,7 @@ process. See \code{\link{brglmControl}} for details.}
 \item{intercept}{logical. Should an intercept be included in the
     \emph{null} model?}
 
-\item{fixedTotals}{effective only when \code{family} is
+\item{fixed_totals}{effective only when \code{family} is
 \code{poisson}. Either \code{NULL} (no effect) or a vector that
 indicates which counts must be treated as a group. See Details
 for more information and \code{\link{brmultinom}}.}
@@ -89,7 +89,7 @@ functions} section in \code{\link{glm}} gives information on
 supplying fitting methods to \code{\link{glm}}.
 
 If \code{type == "correction"} (see \code{\link{brglmControl}}),
-then \code{coefficients} and \code{transDispersion} carry the
+then \code{coefficients} and \code{transformed_dispersion} carry the
 estimated biases as attributes.
 }
 \examples{
