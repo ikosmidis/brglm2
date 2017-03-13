@@ -12,4 +12,4 @@ test_that("ML estimate of gamma dispersion from brglmFit and from MASS::gamma.di
           expect_equal(update(mod, method = "brglmFit", epsilon = 1e-10)$dispersionML, MASS::gamma.dispersion(mod), tolerance = tol))
 
 test_that("ML estimate of gamma shape from brglmFit and from MASS::gamma.dispersion are the same",
-          expect_equal(1/update(mod, method = "brglmFit", epsilon = 1e-10, dispTrans = "inverse")$dispersionML, MASS::gamma.shape(mod)$alpha, tolerance = tol))
+          expect_equal(1/update(mod, method = "brglmFit", epsilon = 1e-10, transformation = "inverse")$dispersionML, MASS::gamma.shape(mod)$alpha, tolerance = tol))

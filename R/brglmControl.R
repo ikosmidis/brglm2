@@ -14,7 +14,7 @@
 #'     \code{AS-mean} (mean-bias reducing adjusted scores; default),
 #'     \code{correction} (asymptotic bias correction) and
 #'     \code{ML} (maximum likelihood).
-#' @param dispTrans the transformation of the dispersion to be
+#' @param transformation the transformation of the dispersion to be
 #'     estimated. Default is \code{identity}. See Details.
 #' @param slowit a positive real used as a multiplier for the
 #'     stepsize. The smaller it is the smaller the steps are
@@ -30,10 +30,10 @@
 #'      output for each iteration.  Hence, \code{options(digits = *)}
 #'      can be used to increase the precision.
 #'
-#'      dispTrans sets the transformation of the dispersion parameter
-#'      for which the bias reduced estimates are computed. Can be one
-#'      of "identity", "sqrt", "inverse", "log" and
-#'      "inverseSqrt". Custom transformations are accommodated by
+#'      \code{transformation} sets the transformation of the
+#'      dispersion parameter for which the bias reduced estimates are
+#'      computed. Can be one of "identity", "sqrt", "inverse", "log"
+#'      and "inverseSqrt". Custom transformations are accommodated by
 #'      supplying a list of two expressions (transformation and
 #'      inverse transformation). See the examples for more details.
 #'
@@ -55,56 +55,57 @@
 #' coef(coalitionBRi, model = "dispersion")
 #'
 #' ## Bias reduced estimation of log(dispersion)
-#' coalitionBRl <- update(coalitionML, method = "brglmFit",  dispTrans = "log")
+#' coalitionBRl <- update(coalitionML, method = "brglmFit",  transformation = "log")
 #' coef(coalitionBRl, model = "dispersion")
 #'
 #' ## Just for illustration: Bias reduced estimation of dispersion^0.25
+#' my_transformation <- list(expression(disp^0.25), expression(transformed_dispersion^4))
 #' coalitionBRc <- update(coalitionML, method = "brglmFit",
-#'                        dispTrans = list(expression(disp^0.25), expression(transdisp^4)))
+#'                        transformation = my_transformation)
 #' coef(coalitionBRc, model = "dispersion")
 #'
 brglmControl <- function(epsilon = 1e-10, maxit = 100,
                          trace = FALSE,
                          type = c("AS-mean", "correction", "ML"),
-                         dispTrans = "identity",
+                         transformation = "identity",
                          slowit = 1,
                          maxStepFactor = 1) {
     type <- match.arg(type)
 
-    if (is.character(dispTrans)) {
-        Trans <- switch(dispTrans,
+    if (is.character(transformation)) {
+        Trans <- switch(transformation,
                         identity = expression(disp),
                         sqrt = expression(disp^0.5),
                         inverse = expression(1/disp),
                         log = expression(log(disp)),
                         inverseSqrt = expression(1/sqrt(disp)),
-                        stop(dispTrans, " is not one of the implemented dispersion transformations"))
-        inverseTrans <- switch(dispTrans,
-                               identity = expression(transdisp),
-                               sqrt = expression(transdisp^2),
-                               inverse = expression(1/transdisp),
-                               log = expression(exp(transdisp)),
-                               inverseSqrt = expression(1/transdisp^2))
+                        stop(transformation, " is not one of the implemented dispersion transformations"))
+        inverseTrans <- switch(transformation,
+                               identity = expression(transformed_dispersion),
+                               sqrt = expression(transformed_dispersion^2),
+                               inverse = expression(1/transformed_dispersion),
+                               log = expression(exp(transformed_dispersion)),
+                               inverseSqrt = expression(1/transformed_dispersion^2))
     }
     else {
-        if (is.list(dispTrans) && (length(dispTrans) == 2)) {
-            Trans <- dispTrans[[1]]
-            inverseTrans <- dispTrans[[2]]
-            dispTrans <- "custom_transformation"
+        if (is.list(transformation) && (length(transformation) == 2)) {
+            Trans <- transformation[[1]]
+            inverseTrans <- transformation[[2]]
+            transformation <- "custom_transformation"
         }
         else {
-            stop("dispTrans can be either one of 'identity', 'sqrt', 'inverse', 'log' and 'inverseSqrt', or a list of two expressions")
+            stop("transformation can be either one of 'identity', 'sqrt', 'inverse', 'log' and 'inverseSqrt', or a list of two expressions")
         }
     }
     if (!is.numeric(epsilon) || epsilon <= 0)
         stop("value of 'epsilon' must be > 0")
     list(epsilon = epsilon, maxit = maxit, trace = trace,
-       type = type,
-       Trans = Trans,
-       inverseTrans = inverseTrans,
-       dispTrans = dispTrans,
-       slowit = slowit,
-       maxStepFactor = maxStepFactor)
+         type = type,
+         Trans = Trans,
+         inverseTrans = inverseTrans,
+         transformation = transformation,
+         slowit = slowit,
+         maxStepFactor = maxStepFactor)
 }
 
 

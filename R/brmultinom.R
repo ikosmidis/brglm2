@@ -119,7 +119,7 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
 
     fit <- brglmFit(x = Xextended, y = Yextended,
                     start = NULL,
-                    family = poisson("log"), control = control, intercept = TRUE, fixedTotals = rep(seq.int(nkeep), ncat))
+                    family = poisson("log"), control = control, intercept = TRUE, fixed_totals = rep(seq.int(nkeep), ncat))
 
     ## TODO:
     ## + starting values

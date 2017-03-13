@@ -55,23 +55,23 @@ enzymes$Group <- factor(enzymes$Group, levels=c("2","1","3"))
 enzymes$counts <- rep(1, nrow(enzymes))
 ## enzpmlr <- pmlr(Group ~ AST + GLDH, weights = counts, data = enzymes, method = "wald")
 ## enzbrmultinom <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes)
-enzbrmultinom_ml <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes, type = "maximum_likelihood")
+enzbrmultinom_ml <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes, type = "ML")
 enzmultinom <- nnet::multinom(Group ~ AST + GLDH, weights = counts, data = enzymes, trace = FALSE)
 
 ###############
-test_that("brmultinom returns the same estimates as nnet::multinom if type = 'maximum_likelihood'", {
+test_that("brmultinom returns the same estimates as nnet::multinom if type = 'ML'", {
     expect_equal(coef(enzbrmultinom_ml), coef(enzmultinom), tolerance = 1e-04)
 })
 
-test_that("brmultinom returns the same fitted values as nnet::multinom if type = 'maximum_likelihood'", {
+test_that("brmultinom returns the same fitted values as nnet::multinom if type = 'ML'", {
     expect_equal(fitted(enzbrmultinom_ml), fitted(enzmultinom), tolerance = 1e-04)
 })
 
-test_that("brmultinom returns the same maximized loglikelihood as nnet::multinom if type = 'maximum_likelihood'", {
+test_that("brmultinom returns the same maximized loglikelihood as nnet::multinom if type = 'ML'", {
     expect_equal(logLik(enzbrmultinom_ml), logLik(enzmultinom), tolerance = tol)
 })
 
-test_that("brmultinom returns the same standard errors as nnet::multinom if type = 'maximum_likelihood'", {
+test_that("brmultinom returns the same standard errors as nnet::multinom if type = 'ML'", {
     expect_equal(summary(enzbrmultinom_ml)$standard.errors, summary(enzmultinom)$standard.errors, tolerance = 1e-04)
 })
 
