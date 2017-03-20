@@ -10,15 +10,16 @@ Description: Estimation and inference from generalized linear models
     score equations approach in Firth (1993, Biometrika) and Kosmidis
     and Firth (2009, Biometrika), or through the direct subtraction of
     an estimate of the bias of the maximum likelihood estimator from
-    the maximum likelihood estimates. In the special case of
-    generalized linear models for binomial and multinomial responses,
-    the adjusted score equations approach returns estimates with
-    improved frequentist properties, that are also always finite, even
-    in cases where the maximum likelihood estimates are infinite
-    (e.g. complete and quasi-complete separation). Estimation in all
-    cases takes place via a modified Fisher scoring algorithm, and S3
-    methods for the construction of of confidence intervals for the
-    reduced-bias estimates are provided.
+    the maximum likelihood estimates (Cordeiro and McCullagh,
+    1991). In the special case of generalized linear models for
+    binomial and multinomial responses, the adjusted score equations
+    approach returns estimates with improved frequentist properties,
+    that are also always finite, even in cases where the maximum
+    likelihood estimates are infinite (e.g. complete and
+    quasi-complete separation). Estimation in all cases takes place
+    via a modified Fisher scoring algorithm, and S3 methods for the
+    construction of of confidence intervals for the reduced-bias
+    estimates are provided.
 Depends:
     R (>= 3.3.0)
 License: GPL-2 | GPL-3
