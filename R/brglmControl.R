@@ -18,7 +18,7 @@
 #'     estimated. Default is \code{identity}. See Details.
 #' @param slowit a positive real used as a multiplier for the
 #'     stepsize. The smaller it is the smaller the steps are
-#' @param maxStepFactor the maximum number of step halving steps to
+#' @param max_step_factor the maximum number of step halving steps to
 #'     consider
 #'
 #' @details \code{\link{brglmControl}} provides default values and
@@ -69,7 +69,7 @@ brglmControl <- function(epsilon = 1e-10, maxit = 100,
                          type = c("AS-mean", "correction", "ML"),
                          transformation = "identity",
                          slowit = 1,
-                         maxStepFactor = 1) {
+                         max_step_factor = 1) {
     type <- match.arg(type)
 
     if (is.character(transformation)) {
@@ -105,7 +105,7 @@ brglmControl <- function(epsilon = 1e-10, maxit = 100,
          inverseTrans = inverseTrans,
          transformation = transformation,
          slowit = slowit,
-         maxStepFactor = maxStepFactor)
+         max_step_factor = max_step_factor)
 }
 
 

@@ -544,6 +544,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         if (is_correction) {
             control$maxit <- 1
             control$slowit <- 1
+            control$max_step_factor <- 1
         }
 
         ## Main iterations
@@ -611,7 +612,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             for (iter in seq.int(control$maxit)) {
                 step_factor <- 0
                 testhalf <- TRUE
-                while (testhalf & step_factor < control$maxStepFactor) {
+                while (testhalf & step_factor < control$max_step_factor) {
                     step_beta_previous <- step_beta
                     step_zeta_previous <- step_zeta
                     ## Update betas
