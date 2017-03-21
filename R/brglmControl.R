@@ -69,7 +69,7 @@ brglmControl <- function(epsilon = 1e-10, maxit = 100,
                          type = c("AS_mean", "correction", "ML"),
                          transformation = "identity",
                          slowit = 1,
-                         max_step_factor = 1) {
+                         max_step_factor = 12) {
     type <- match.arg(type)
 
     if (is.character(transformation)) {

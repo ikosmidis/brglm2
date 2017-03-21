@@ -159,7 +159,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             st <-  max(abs(step_beta), na.rm = TRUE)
             gr <- max(abs(adjusted_grad_beta), na.rm = TRUE)
             cat("Coefficients update:\t")
-            cat("Outer/Inner iteration:\t", sprintf("%03d", iter), "   |", sprintf("%03d", step_factor), "\n")
+            cat("Outer/Inner iteration:\t", sprintf("%03d", iter), "/", sprintf("%03d", step_factor), "\n", sep = "")
             if (!no_dispersion) {
                 st <- abs(step_zeta)
                 gr <- abs(adjusted_grad_zeta)
@@ -688,9 +688,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                         testhalf <- TRUE
                     }
                     else {
-                        s2 <- sum(step_beta^2) + step_zeta^2
-                        s1 <- sum(step_beta_previous^2) + step_zeta_previous^2
-                        testhalf <- s2 < s1
+                        s2 <- c(abs(step_beta), abs(step_zeta))
+                        s1 <- c(abs(step_beta_previous), abs(step_zeta_previous))
+                        testhalf <- any(s2 > s1, na.rm = TRUE)
                     }
                     step_factor <- step_factor + 1
                     ##  Trace here
