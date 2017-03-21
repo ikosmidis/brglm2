@@ -690,7 +690,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     else {
                         s2 <- c(abs(step_beta), abs(step_zeta))
                         s1 <- c(abs(step_beta_previous), abs(step_zeta_previous))
-                        testhalf <- any(s2 > s1, na.rm = TRUE)
+                        testhalf <- sum(s2, na.rm = TRUE) > sum(s1, na.rm = TRUE)
                     }
                     step_factor <- step_factor + 1
                     ##  Trace here
@@ -700,7 +700,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 }
 
                 failed <- failed_adjustment_beta | failed_inversion_beta | failed_adjustment_zeta | failed_inversion_zeta
-                if (failed | all(abs(c(step_beta, step_zeta)) < control$epsilon, na.rm = TRUE)) {
+                if (failed | sum(abs(c(step_beta, step_zeta)), na.rm = TRUE) < control$epsilon) {
                     break
                 }
             }
