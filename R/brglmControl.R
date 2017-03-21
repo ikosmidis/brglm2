@@ -66,7 +66,7 @@
 #'
 brglmControl <- function(epsilon = 1e-10, maxit = 100,
                          trace = FALSE,
-                         type = c("AS-mean", "correction", "ML"),
+                         type = c("AS_mean", "correction", "ML"),
                          transformation = "identity",
                          slowit = 1,
                          max_step_factor = 1) {

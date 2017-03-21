@@ -1,4 +1,4 @@
- #' Fitting function for \code{\link{glm}} for reduced-bias
+#' Fitting function for \code{\link{glm}} for reduced-bias
 #' estimation and inference
 #'
 #' \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
@@ -139,7 +139,7 @@
 #' endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
 #'                      family = binomial("probit"))
 #' endometrialBR <- update(endometrialML, method = "brglmFit",
-#'                         type = "AS-mean")
+#'                         type = "AS_mean")
 #' endometrialBC <- update(endometrialML, method = "brglmFit",
 #'                         type = "correction")
 #' summary(endometrialML)
@@ -354,7 +354,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## FIXME: Add IBLA
     adjustment_function <- switch(control$type,
                             "correction" = ASmean_adjustment,
-                            "AS-mean" = ASmean_adjustment,
+                            "AS_mean" = ASmean_adjustment,
                             "ML" = function(pars, ...) 0)
 
 
@@ -381,7 +381,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 grad <-  gradient(theta, fit = fit, level = 1)/d1zeta
                 inverse_info <- 1/information(theta, inverse = FALSE, fit = fit, level = 1) * d1zeta^2
                 failed_inversion <- !is.finite(inverse_info)
-                adjustment <- adjustment_function(theta, fit = fit, level = 1)/d1zeta - 0.5 * d2zeta / d1zeta^2
+                adjustment <- adjustment_function(theta, fit = fit, level = 1)/d1zeta - if (is_ML) 0 else 0.5 * d2zeta / d1zeta^2
                 failed_adjustment <- is.na(adjustment)
             }
         }
@@ -398,7 +398,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     is_ML <- control$type == "ML"
     is_correction <- control$type == "correction"
     no_dispersion <- family$family %in% c("poisson", "binomial")
-    just_evaluate <- control$maxit == 0
+
     ## If fixed_totals is specified the compute row_totals
     if (is.null(fixed_totals)) {
         has_fixed_totals <- FALSE
@@ -576,10 +576,11 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 stop(paste(paste(gettextf("length of 'start' should be equal to %d and correspond to initial betas for %s", nvars_all, paste(deparse(betas_names_all), collapse = ", "), "or", gettextf("to %d and also include a starting value for the transformed dispersion", nvars_all + 1)))), domain = NA)
             }
         }
+
         adjusted_grad_all <- rep(NA, nvars_all + 1)
         names(adjusted_grad_all) <- c(betas_names_all, "Transformed dispersion")
         if (is_correction) {
-            control$maxit <- 1
+            if (control$maxit > 0) control$maxit <- 1
             control$slowit <- 1
             control$max_step_factor <- 1
         }
@@ -621,10 +622,13 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
         }
 
-
-
         ## Main iterations
-        if (control$maxit > 0) {
+
+        if (control$maxit == 0) {
+            iter <- 0
+            failed <- FALSE
+        }
+        else {
             ## Outer iteration
             for (iter in seq.int(control$maxit)) {
                 step_factor <- 0
@@ -793,6 +797,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## ML is used
     ##
     control0 <- control
+    control0$maxit <- 1000
     if (customTransformation) {
         control0$transformation <- transformation0
     }
