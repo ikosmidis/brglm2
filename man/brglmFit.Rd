@@ -91,6 +91,9 @@ supplying fitting methods to \code{\link{glm}}.
 If \code{type == "correction"} (see \code{\link{brglmControl}}),
 then \code{coefficients} and \code{transformed_dispersion} carry the
 estimated biases as attributes.
+
+\code{fixed_totals} can be used to constrain the means of a poisson
+model to add up to the corresponding observed counts according to
 }
 \examples{
 ## The lizards example from ?brglm::brglm
@@ -138,7 +141,7 @@ anorexBC <- update(anorexML, method = "brglmFit", type = "correction")
 ## residual variance.
 summary(anorexML)
 summary(anorexBR)
-summary(anorexBC, start = coef(anorexML))
+summary(anorexBC)
 }
 
 ## endometrial data from Heinze \\& Schemper (2002) (see ?endometrial)
@@ -146,7 +149,7 @@ data("endometrial", package = "brglm2")
 endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
                      family = binomial("probit"))
 endometrialBR <- update(endometrialML, method = "brglmFit",
-                        type = "AS-mean")
+                        type = "AS_mean")
 endometrialBC <- update(endometrialML, method = "brglmFit",
                         type = "correction")
 summary(endometrialML)

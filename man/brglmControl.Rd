@@ -6,8 +6,8 @@
 \code{\link{brglmFit}} method.}
 \usage{
 brglmControl(epsilon = 1e-10, maxit = 100, trace = FALSE,
-  type = c("AS-mean", "correction", "ML"), transformation = "identity",
-  slowit = 1, maxStepFactor = 1)
+  type = c("AS_mean", "correction", "ML"), transformation = "identity",
+  slowit = 1, max_step_factor = 12)
 }
 \arguments{
 \item{epsilon}{positive convergence tolerance epsilon}
@@ -29,7 +29,7 @@ estimated. Default is \code{identity}. See Details.}
 \item{slowit}{a positive real used as a multiplier for the
 stepsize. The smaller it is the smaller the steps are}
 
-\item{maxStepFactor}{the maximum number of step halving steps to
+\item{max_step_factor}{the maximum number of step halving steps to
 consider}
 }
 \value{
@@ -73,7 +73,7 @@ coalitionBRl <- update(coalitionML, method = "brglmFit",  transformation = "log"
 coef(coalitionBRl, model = "dispersion")
 
 ## Just for illustration: Bias reduced estimation of dispersion^0.25
-my_transformation <- list(expression(disp^0.25), expression(transformed_dispersion^4))
+my_transformation <- list(expression(dispersion^0.25), expression(transformed_dispersion^4))
 coalitionBRc <- update(coalitionML, method = "brglmFit",
                        transformation = my_transformation)
 coef(coalitionBRc, model = "dispersion")
