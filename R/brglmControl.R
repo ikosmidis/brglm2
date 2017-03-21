@@ -59,7 +59,7 @@
 #' coef(coalitionBRl, model = "dispersion")
 #'
 #' ## Just for illustration: Bias reduced estimation of dispersion^0.25
-#' my_transformation <- list(expression(disp^0.25), expression(transformed_dispersion^4))
+#' my_transformation <- list(expression(dispersion^0.25), expression(transformed_dispersion^4))
 #' coalitionBRc <- update(coalitionML, method = "brglmFit",
 #'                        transformation = my_transformation)
 #' coef(coalitionBRc, model = "dispersion")
@@ -74,11 +74,11 @@ brglmControl <- function(epsilon = 1e-10, maxit = 100,
 
     if (is.character(transformation)) {
         Trans <- switch(transformation,
-                        identity = expression(disp),
-                        sqrt = expression(disp^0.5),
-                        inverse = expression(1/disp),
-                        log = expression(log(disp)),
-                        inverseSqrt = expression(1/sqrt(disp)),
+                        identity = expression(dispersion),
+                        sqrt = expression(dispersion^0.5),
+                        inverse = expression(1/dispersion),
+                        log = expression(log(dispersion)),
+                        inverseSqrt = expression(1/sqrt(dispersion)),
                         stop(transformation, " is not one of the implemented dispersion transformations"))
         inverseTrans <- switch(transformation,
                                identity = expression(transformed_dispersion),

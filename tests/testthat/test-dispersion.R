@@ -7,8 +7,8 @@ anorexML <- glm(Postwt ~ Prewt + Treat+ offset(Prewt),
 anorexBR <- update(anorexML, method = "brglmFit")
 
 tol <- sqrt(.Machine$double.eps)
-test_that("dispersionML is the usual biased estimate for the residual variance",
-          expect_equal(anorexBR$dispersionML, sum((anorexia$Postwt - fitted(anorexML))^2)/nrow(anorexia)))
+test_that("dispersion_ML is the usual biased estimate for the residual variance",
+          expect_equal(anorexBR$dispersion_ML, sum((anorexia$Postwt - fitted(anorexML))^2)/nrow(anorexia)))
 
 test_that("dispersion is the usual bias-corrected estimate for the residual variance",
           expect_equal(anorexBR$dispersion, sum((anorexia$Postwt - fitted(anorexML))^2)/(nrow(anorexia) - length(coef(anorexML)))))

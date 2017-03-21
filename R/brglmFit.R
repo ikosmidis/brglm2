@@ -1,4 +1,4 @@
-#' Fitting function for \code{\link{glm}} for reduced-bias
+ #' Fitting function for \code{\link{glm}} for reduced-bias
 #' estimation and inference
 #'
 #' \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
@@ -172,7 +172,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     }
 
     ## key_quantities, grad, info and bias are ALWAYS in beta, dispersion parameterization
-    key_quantities <- function(pars, y, what = "mean", scale_totals = FALSE, qr = TRUE) {
+    key_quantities <- function(pars, y, level = 0, scale_totals = FALSE, qr = TRUE) {
         betas <- pars[seq.int(nvars)]
         dispersion <- pars[nvars + 1]
         prec <- 1/dispersion
@@ -218,41 +218,40 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             out$Edeviance_residuals <- weights * d1afuns
             out
         }
-        if (what == "mean") {
+        if (level == 0) {
             out <- mean_quantities(out)
-
         }
-        if (what == "dispersion") {
+        if (level == 1) {
             out <- dispersion_quantities(out)
         }
-        if (what == "all") {
+        if (level > 1) {
             out <- mean_quantities(out)
             out <- dispersion_quantities(out)
         }
         out
     }
 
-    gradient <- function(pars, what = "mean", fit = NULL) {
+    gradient <- function(pars, level = 0, fit = NULL) {
         if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, what = what, qr = FALSE)
+            fit <- key_quantities(pars, y = y, level = level, qr = FALSE)
         }
         with(fit, {
-            if (what == "mean") {
+            if (level == 0) {
                 score_components <- weights * d1mus  * (y - mus) / varmus * x
                 return(precision * .colSums(score_components, nobs, nvars, TRUE))
             }
-            if (what == "dispersion") {
+            if (level == 1) {
                 return(1/2 * precision^2 * sum(deviance_residuals - Edeviance_residuals, na.rm = TRUE))
             }
         })
     }
 
-    information <- function(pars, what = "mean", fit = NULL, inverse = FALSE) {
+    information <- function(pars, level = 0, fit = NULL, inverse = FALSE) {
         if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, what = what, qr = TRUE)
+            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
         }
         with(fit, {
-            if (what == "mean") {
+            if (level == 0) {
                 R_matrix <- qr.R(qr_decomposition)
                 if (inverse) {
                     return(dispersion * tcrossprod(solve(R_matrix)))
@@ -261,8 +260,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     return(precision * crossprod(R_matrix))
                 }
             }
-            if (what == "dispersion") {
-                info <- 0.5 * sum(weights^2 * d2afuns, na.rm = TRUE)/disp^4
+            if (level == 1) {
+                info <- 0.5 * sum(weights^2 * d2afuns, na.rm = TRUE)/dispersion^4
                 if (inverse) {
                     return(1/info)
                 }
@@ -275,7 +274,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     hat_values <- function(pars, fit = NULL) {
         if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, what = "mean", qr = TRUE)
+            fit <- key_quantities(pars, y = y, level = 0, qr = TRUE)
         }
         with(fit, {
             Qmat <- qr.Q(qr_decomposition)
@@ -307,8 +306,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             if (df_residual > 0) {
                 dispFit <- try(uniroot(f = function(phi) {
                     theta <- c(betas, phi)
-                    cfit <- key_quantities(theta, y = y, what = "dispersion", qr = FALSE)
-                    gradient(theta, what = "dispersion", fit = cfit)
+                    cfit <- key_quantities(theta, y = y, level = 1, qr = FALSE)
+                    gradient(theta, level = 1, fit = cfit)
                 }, lower = .Machine$double.eps, upper = 10000, tol = control$epsilon), silent = FALSE)
                 if (inherits(dispFit, "try-error")) {
                     warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
@@ -324,21 +323,21 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 dispML <- NA
             }
         }
-        list(disp = disp, dispML = dispML)
+        list(dispersion = disp, dispersion_ML = dispML)
     }
 
-    ASmean_adjustment <- function(pars, what = "mean", fit = NULL) {
+    ASmean_adjustment <- function(pars, level = 0, fit = NULL) {
         if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, what = what, qr = TRUE)
+            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
         }
         with(fit, {
-            if (what == "mean") {
+            if (level == 0) {
                 hatvalues <- hat_values(pars, fit = fit)
                 ## User only observations with keep = TRUE to ensure that no division with zero takes place
                 return(.colSums(0.5 * hatvalues * d2mus/d1mus * x, nobs, nvars, TRUE))
                 ## return(colSums(0.5 * hatvalues * d2mus/d1mus * x))
             }
-            if (what == "dispersion") {
+            if (level == 1) {
                 s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
                 s2 <- sum(weights^2 * d2afuns, na.rm = TRUE)
                 return((nvars - 2)/(2 * dispersion) + s1/(2 * dispersion^2 * s2))
@@ -355,7 +354,45 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## FIXME: Add IBLA
     adjustment_function <- switch(control$type,
                             "correction" = ASmean_adjustment,
-                            "AS-mean" = ASmean_adjustment)
+                            "AS-mean" = ASmean_adjustment,
+                            "ML" = function(pars, ...) 0)
+
+
+    ## compute_step_components does everything on the scale of the /transformed/ dispersion
+    compute_step_components <- function(pars, level = 0, fit = NULL) {
+        if (is.null(fit)) {
+            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
+        }
+        if (level == 0) {
+            grad <-  gradient(pars, fit = if (has_fixed_totals) NULL else fit, level = 0)
+            inverse_info <- try(information(pars, inverse = TRUE, fit = fit, level = 0))
+            failed_inversion <- inherits(inverse_info, "try-error")
+            adjustment <- adjustment_function(pars, fit = fit, level = 0)
+            failed_adjustment <- any(is.na(adjustment))
+        }
+        if (level == 1) {
+            if (no_dispersion | df_residual < 1) {
+                grad <- adjustment <- inverse_info <- NA
+                failed_adjustment <- failed_inversion <- FALSE
+            }
+            else {
+                d1zeta <- eval(d1_transformed_dispersion)
+                d2zeta <- eval(d2_transformed_dispersion)
+                grad <-  gradient(theta, fit = fit, level = 1)/d1zeta
+                inverse_info <- 1/information(theta, inverse = FALSE, fit = fit, level = 1) * d1zeta^2
+                failed_inversion <- !is.finite(inverse_info)
+                adjustment <- adjustment_function(theta, fit = fit, level = 1)/d1zeta - 0.5 * d2zeta / d1zeta^2
+                failed_adjustment <- is.na(adjustment)
+            }
+        }
+        out <- list(grad = grad,
+                    inverse_info = inverse_info,
+                    adjustment = adjustment,
+                    failed_adjustment = failed_adjustment,
+                    failed_inversion = failed_inversion)
+        out
+    }
+
 
     ## Some useful quantities
     is_ML <- control$type == "ML"
@@ -413,8 +450,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     d2afun <- family$d2afun
     d3afun <- family$d3afun
     simulate <- family$simulate
-    d1_transformed_dispersion <- DD(control$Trans, "disp", order = 1)
-    d2_transformed_dispersion <- DD(control$Trans, "disp", order = 2)
+    d1_transformed_dispersion <- DD(control$Trans, "dispersion", order = 1)
+    d2_transformed_dispersion <- DD(control$Trans, "dispersion", order = 2)
 
     ## Check for invalid etas and mus
     valid_eta <- unless_null(family$valideta, function(eta) TRUE)
@@ -498,9 +535,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             betas <- coef(tempFit)
             names(betas) <- betas_names
             dispList <- estimate_dispersion(betas, y = y)
-            disp <- dispList$disp
-            if (is.na(disp)) disp <- var(y)/variance(sum(weights * y)/sum(weights))
-            dispML <- dispList$dispML
+            dispersion <- dispList$dispersion
+            if (is.na(dispersion)) dispersion <- var(y)/variance(sum(weights * y)/sum(weights))
+            dispersion_ML <- dispList$dispersion_ML
             transformed_dispersion <- eval(control$Trans)
         }
         else {
@@ -516,9 +553,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 }
                 ## Estimate dispersion based on current value for betas
                 dispList <- estimate_dispersion(betas, y = y)
-                disp <- dispList$disp
-                if (is.na(disp)) disp <- var(y)/variance(sum(weights * y)/sum(weights))
-                dispML <- dispList$dispML
+                dispersion <- dispList$dispersion
+                if (is.na(dispersion)) dispersion <- var(y)/variance(sum(weights * y)/sum(weights))
+                dispersion_ML <- dispList$dispersion_ML
                 transformed_dispersion <- eval(control$Trans)
             }
             if ((length(start) == nvars_all + 1) & is.numeric(start)) {
@@ -532,8 +569,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     betas <- betas_all
                 }
                 transformed_dispersion <- start[nvars_all + 1]
-                dispML <- NA
-                disp <- eval(control$inverseTrans)
+                dispersion_ML <- NA
+                dispersion <- eval(control$inverseTrans)
             }
             if (length(start) > nvars_all + 1 | length(start) < nvars_all) {
                 stop(paste(paste(gettextf("length of 'start' should be equal to %d and correspond to initial betas for %s", nvars_all, paste(deparse(betas_names_all), collapse = ", "), "or", gettextf("to %d and also include a starting value for the transformed dispersion", nvars_all + 1)))), domain = NA)
@@ -547,142 +584,107 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             control$max_step_factor <- 1
         }
 
-        ## Main iterations
-        what <- if (no_dispersion) "mean" else "all"
-        ## If maxit == 0
-        if (just_evaluate) {
-            iter <- 0
-            theta <- c(betas, disp)
-            ## If fixed_totals is provided (i.e. multinomial regression
-            ## via the Poisson trick) then evaluate everything expect
-            ## the score function at the scaled fitted means
-            quantities <- key_quantities(theta, y = y, what = what, scale_totals = has_fixed_totals, qr = TRUE)
-            grad_beta <-  gradient(theta, fit = if (has_fixed_totals) NULL else quantities, what = "mean")
-            inverse_info_beta <- try(information(theta, inverse = TRUE, fit = quantities, what = "mean"))
-            if (failed_inversion <- inherits(inverse_info_beta, "try-error")) {
-                warning("failed to invert the information matrix: iteration stopped prematurely")
-                break
-            }
-            if (is_ML) {
-                adjustment_beta <- 0
-                failed_adjustment <- FALSE
-            }
-            else {
-                adjustment_beta <- adjustment_function(theta, fit = quantities, what = "mean")
-                if (failed_adjustment <- any(is.na(adjustment_beta))) {
-                    warning("failed to calculate the bias-reducing score adjustment: iteration stopped prematurely")
-                    break
-                }
-            }
-            adjusted_grad_beta <- grad_beta + adjustment_beta
-            if (no_dispersion) {
-                    disp <- 1
-                    transformed_dispersion <- eval(control$Trans)
-                    adjusted_grad_zeta <- NA
-                    adjustment_zeta <- NA
-                    info_dispersion <- NA
-                    d1zeta <- NA
-            }
-            else {
-                if (df_residual > 0) {
-                    gradDispersion <-  gradient(theta, fit = quantities, what = "dispersion")
-                    info_dispersion <- information(theta, inverse = FALSE, fit = quantities, what = "dispersion")
-                    d1zeta <- eval(d1_transformed_dispersion)
-                    if (is_ML) {
-                        adjusted_grad_zeta <- 0
-                    }
-                    else {
-                        adjustmentDispersion <- adjustment_function(theta, fit = quantities, what = "dispersion")
-                        ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
-                        ## FIXME: some redundancy below...
-                        adjustment_zeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2_transformed_dispersion) / d1zeta^2
-                        adjusted_grad_zeta <- gradDispersion/d1zeta + adjustment_zeta
-                    }
-                }
-                else {
-                    disp <- 1 # No effect to the adjusted scores
-                    transformed_dispersion <- eval(control$Trans)
-                    adjusted_grad_zeta <- NA
-                }
-            }
+        ## Main iterations. REMOVE ME!
+        level <- if (no_dispersion) 1 else 3
+
+################ BEGIN: NEW ITERATION
+
+        ## Evaluate at the starting values
+        theta <- c(betas, dispersion)
+        transformed_dispersion <- eval(control$Trans)
+        ## Mean quantities
+        ## If fixed_totals is provided (i.e. multinomial regression
+        ## via the Poisson trick) then evaluate everything expect
+        ## the score function at the scaled fitted means
+        quantities <- key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE)
+        step_components_beta <- compute_step_components(theta, level = 0, fit = quantities)
+        step_components_zeta <- compute_step_components(theta, level = 1, fit = quantities)
+        if (step_components_beta$failed_inversion) {
+            warning("failed to invert the information matrix")
+        }
+        if (step_components_beta$failed_adjustment) {
+            warning("failed to calculate score adjustment")
+        }
+        adjusted_grad_beta <- with(step_components_beta, {
+            grad + adjustment
+        })
+        step_beta <- drop(step_components_beta$inverse_info %*% adjusted_grad_beta)
+        ## Dispersion quantities
+        if (no_dispersion) {
+            adjusted_grad_zeta <- step_zeta <- NA
         }
         else {
-            step_beta <- 0
-            step_zeta <- 0
+            if (step_components_zeta$failed_inversion) {
+                warning("failed to invert the information matrix")
+            }
+            if (step_components_zeta$failed_adjustment) {
+                warning("failed to calculate score adjustment")
+            }
+            adjusted_grad_zeta <- with(step_components_zeta, {
+                grad + adjustment
+            })
+            step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
+        }
+
+
+
+        ## Main iterations
+        if (control$maxit > 0) {
+            ## Outer iteration
             for (iter in seq.int(control$maxit)) {
                 step_factor <- 0
                 testhalf <- TRUE
+                ## Inner iteration
                 while (testhalf & step_factor < control$max_step_factor) {
                     step_beta_previous <- step_beta
                     step_zeta_previous <- step_zeta
                     ## Update betas
                     betas <- betas + 2^(-step_factor) * step_beta
-                    ## Update transformed_dispersion, if any
-                    if (no_dispersion) {
-                        disp <- 1
+                    ## Update zetas
+                    if (!no_dispersion & df_residual > 0) {
                         transformed_dispersion <- eval(control$Trans)
-                        adjusted_grad_zeta <- NA
-                        adjustment_zeta <- NA
-                        info_dispersion <- NA
-                        d1zeta <- NA
-                        step_zeta <- 0
+                        transformed_dispersion <- transformed_dispersion + 2^(-step_factor) * step_zeta
+                        dispersion <- eval(control$inverseTrans)
                     }
-                    else {
-                        if (df_residual > 0) {
-                            transformed_dispersion <- transformed_dispersion + 2^(-step_factor) * step_zeta
-                            disp <- eval(control$inverseTrans)
-                        }
-                        else {
-                            disp <- 1 # No effect to the adjusted scores
-                            transformed_dispersion <- eval(control$Trans)
-                            adjusted_grad_zeta <- NA
-                            step_zeta <- 0
-                        }
-                    }
-                    # Compute key quantities to update direction
-                    theta <- c(betas, disp)
-                    quantities <- key_quantities(theta, y = y, what = what,
-                                                 scale_totals = has_fixed_totals, qr = TRUE)
-                    grad_beta <-  gradient(theta, fit = if (has_fixed_totals) NULL else quantities,
-                                           what = "mean")
-                    inverse_info_beta <- try(information(theta, inverse = TRUE, fit = quantities,
-                                                         what = "mean"))
-                    if (failed_inversion <- inherits(inverse_info_beta, "try-error")) {
-                        warning("failed to invert the information matrix: iteration stopped prematurely")
+                    ## Compute key quantities
+                    theta <- c(betas, dispersion)
+                    transformed_dispersion <- eval(control$Trans)
+                    ## Mean quantities
+                    quantities <- key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE)
+                    step_components_beta <- compute_step_components(theta, level = 0, fit = quantities)
+                    step_components_zeta <- compute_step_components(theta, level = 1, fit = quantities)
+                    if (failed_inversion_beta <- step_components_beta$failed_inversion) {
+                        warning("failed to invert the information matrix")
                         break
                     }
-                    ## Step for betas
-                    if (is_ML) {
-                        adjustment_beta <- 0
-                        failed_adjustment <- FALSE
+                    if (failed_adjustment_beta <- step_components_beta$failed_adjustment) {
+                        warning("failed to calculate score adjustment")
+                        break
+                    }
+                    adjusted_grad_beta <- with(step_components_beta, {
+                        grad + adjustment
+                    })
+                    step_beta <- drop(step_components_beta$inverse_info %*% adjusted_grad_beta)
+                    ## Dispersion quantities
+                    if (no_dispersion) {
+                        adjusted_grad_zeta <- step_zeta <- NA
+                        failed_inversion_zeta <- failed_adjustment_zeta <- FALSE
                     }
                     else {
-                        adjustment_beta <- adjustment_function(theta, fit = quantities, what = "mean")
-                        if (failed_adjustment <- any(is.na(adjustment_beta))) {
-                            warning("failed to calculate the adjusted score equations: iteration stopped prematurely")
+                        if (failed_inversion_zeta <- step_components_zeta$failed_inversion) {
+                            warning("failed to invert the information matrix")
                             break
                         }
-                    }
-                    adjusted_grad_beta <- grad_beta + adjustment_beta
-                    step_beta <- drop(inverse_info_beta %*% adjusted_grad_beta)
-                    ## Step for zetas
-                    if (!no_dispersion & df_residual > 0) {
-                        gradDispersion <-  gradient(theta, fit = quantities, what = "dispersion")
-                        info_dispersion <- information(theta, inverse = FALSE, fit = quantities, what = "dispersion")
-                        d1zeta <- eval(d1_transformed_dispersion)
-                        if (is_ML) {
-                            adjusted_grad_zeta <- 0
+                        if (failed_adjustment_zeta <- step_components_zeta$failed_adjustment) {
+                            warning("failed to calculate score adjustment")
+                            break
                         }
-                        else {
-                            adjustmentDispersion <- adjustment_function(theta, fit = quantities, what = "dispersion")
-                            ## The adjustment for transformed_dispersion (use Kosmidis & Firth, 2010, Remark 3 for derivation)
-                            ## FIXME: some redundancy below...
-                            adjustment_zeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2_transformed_dispersion) / d1zeta^2
-                            adjusted_grad_zeta <- gradDispersion/d1zeta + adjustment_zeta
-                        }
-                        step_zeta <- as.vector(d1zeta^2 * adjusted_grad_zeta/info_dispersion)
+                        adjusted_grad_zeta <- with(step_components_zeta, {
+                            grad + adjustment
+                        })
+                        step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
                     }
-                    ## Only test if iteration is > 1 and step_beta has left its starting value of zero
+                    ## Continue inner loop
                     if (step_factor == 0 & iter == 1)  {
                         testhalf <- TRUE
                     }
@@ -697,11 +699,171 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                         trace_iteration()
                     }
                 }
-                if (failed_adjustment | failed_inversion | all(abs(c(abs(step_beta), abs(step_zeta))) < control$epsilon, na.rm = TRUE)) {
+
+                failed <- failed_adjustment_beta | failed_inversion_beta | failed_adjustment_zeta | failed_inversion_zeta
+                if (failed | all(abs(c(step_beta, step_zeta)) < control$epsilon, na.rm = TRUE)) {
                     break
                 }
             }
         }
+
+
+################ END: NEW ITERATION
+
+
+        ## ## If maxit == 0
+        ## if (just_evaluate) {
+        ##     iter <- 0
+        ##     theta <- c(betas, dispersion)
+        ##     ## If fixed_totals is provided (i.e. multinomial regression
+        ##     ## via the Poisson trick) then evaluate everything expect
+        ##     ## the score function at the scaled fitted means
+        ##     quantities <- key_quantities(theta, y = y, level = level, scale_totals = has_fixed_totals, qr = TRUE)
+        ##     grad_beta <-  gradient(theta, fit = if (has_fixed_totals) NULL else quantities, level = 0)
+        ##     inverse_info_beta <- try(information(theta, inverse = TRUE, fit = quantities, level = 0))
+        ##     if (failed_inversion <- inherits(inverse_info_beta, "try-error")) {
+        ##         warning("failed to invert the information matrix: iteration stopped prematurely")
+        ##         break
+        ##     }
+        ##     if (is_ML) {
+        ##         adjustment_beta <- 0
+        ##         failed_adjustment <- FALSE
+        ##     }
+        ##     else {
+        ##         adjustment_beta <- adjustment_function(theta, fit = quantities, level = 0)
+        ##         if (failed_adjustment <- any(is.na(adjustment_beta))) {
+        ##             warning("failed to calculate the bias-reducing score adjustment: iteration stopped prematurely")
+        ##             break
+        ##         }
+        ##     }
+        ##     adjusted_grad_beta <- grad_beta + adjustment_beta
+        ##     if (no_dispersion) {
+        ##             dispersion <- 1
+        ##             transformed_dispersion <- eval(control$Trans)
+        ##             adjusted_grad_zeta <- NA
+        ##             adjustment_zeta <- NA
+        ##             info_dispersion <- NA
+        ##             d1zeta <- NA
+        ##     }
+        ##     else {
+        ##         if (df_residual > 0) {
+        ##             gradDispersion <-  gradient(theta, fit = quantities, level = 1)
+        ##             info_dispersion <- information(theta, inverse = FALSE, fit = quantities, level = 1)
+        ##             d1zeta <- eval(d1_transformed_dispersion)
+        ##             if (is_ML) {
+        ##                 adjusted_grad_zeta <- 0
+        ##             }
+        ##             else {
+        ##                 adjustmentDispersion <- adjustment_function(theta, fit = quantities, level = 1)
+        ##                 ## The adjustment for transDisp (use Kosmidis & Firth, 2010, Remark 3 for derivation)
+        ##                 ## FIXME: some redundancy below...
+        ##                 adjustment_zeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2_transformed_dispersion) / d1zeta^2
+        ##                 adjusted_grad_zeta <- gradDispersion/d1zeta + adjustment_zeta
+        ##             }
+        ##         }
+        ##         else {
+        ##             dispersion <- 1 # No effect to the adjusted scores
+        ##             transformed_dispersion <- eval(control$Trans)
+        ##             adjusted_grad_zeta <- NA
+        ##         }
+        ##     }
+        ## }
+        ## else {
+        ##     step_beta <- 0
+        ##     step_zeta <- 0
+        ##     for (iter in seq.int(control$maxit)) {
+        ##         step_factor <- 0
+        ##         testhalf <- TRUE
+        ##         while (testhalf & step_factor < control$max_step_factor) {
+        ##             step_beta_previous <- step_beta
+        ##             step_zeta_previous <- step_zeta
+        ##             ## Update betas
+        ##             betas <- betas + 2^(-step_factor) * step_beta
+        ##             ## Update transformed_dispersion, if any
+        ##             if (no_dispersion) {
+        ##                 dispersion <- 1
+        ##                 transformed_dispersion <- eval(control$Trans)
+        ##                 adjusted_grad_zeta <- NA
+        ##                 adjustment_zeta <- NA
+        ##                 info_dispersion <- NA
+        ##                 d1zeta <- NA
+        ##                 step_zeta <- 0
+        ##             }
+        ##             else {
+        ##                 if (df_residual > 0) {
+        ##                     transformed_dispersion <- transformed_dispersion + 2^(-step_factor) * step_zeta
+        ##                     dispersion <- eval(control$inverseTrans)
+        ##                 }
+        ##                 else {
+        ##                     dispersion <- 1 # No effect to the adjusted scores
+        ##                     transformed_dispersion <- eval(control$Trans)
+        ##                     adjusted_grad_zeta <- NA
+        ##                     step_zeta <- 0
+        ##                 }
+        ##             }
+        ##             # Compute key quantities to update direction
+        ##             theta <- c(betas, dispersion)
+        ##             quantities <- key_quantities(theta, y = y, level = level,
+        ##                                          scale_totals = has_fixed_totals, qr = TRUE)
+        ##             grad_beta <-  gradient(theta, fit = if (has_fixed_totals) NULL else quantities,
+        ##                                    level = 0)
+        ##             inverse_info_beta <- try(information(theta, inverse = TRUE, fit = quantities,
+        ##                                                  level = 0))
+        ##             if (failed_inversion <- inherits(inverse_info_beta, "try-error")) {
+        ##                 warning("failed to invert the information matrix: iteration stopped prematurely")
+        ##                 break
+        ##             }
+        ##             ## Step for betas
+        ##             if (is_ML) {
+        ##                 adjustment_beta <- 0
+        ##                 failed_adjustment <- FALSE
+        ##             }
+        ##             else {
+        ##                 adjustment_beta <- adjustment_function(theta, fit = quantities, level = 0)
+        ##                 if (failed_adjustment <- any(is.na(adjustment_beta))) {
+        ##                     warning("failed to calculate the adjusted score equations: iteration stopped prematurely")
+        ##                     break
+        ##                 }
+        ##             }
+        ##             adjusted_grad_beta <- grad_beta + adjustment_beta
+        ##             step_beta <- drop(inverse_info_beta %*% adjusted_grad_beta)
+        ##             ## Step for zetas
+        ##             if (!no_dispersion & df_residual > 0) {
+        ##                 gradDispersion <-  gradient(theta, fit = quantities, level = 1)
+        ##                 info_dispersion <- information(theta, inverse = FALSE, fit = quantities, level = 1)
+        ##                 d1zeta <- eval(d1_transformed_dispersion)
+        ##                 if (is_ML) {
+        ##                     adjusted_grad_zeta <- 0
+        ##                 }
+        ##                 else {
+        ##                     adjustmentDispersion <- adjustment_function(theta, fit = quantities, level = 1)
+        ##                     ## The adjustment for transformed_dispersion (use Kosmidis & Firth, 2010, Remark 3 for derivation)
+        ##                     ## FIXME: some redundancy below...
+        ##                     adjustment_zeta <- adjustmentDispersion/d1zeta - 0.5 * eval(d2_transformed_dispersion) / d1zeta^2
+        ##                     adjusted_grad_zeta <- gradDispersion/d1zeta + adjustment_zeta
+        ##                 }
+        ##                 step_zeta <- as.vector(d1zeta^2 * adjusted_grad_zeta/info_dispersion)
+        ##             }
+        ##             ## Only test if iteration is > 1 and step_beta has left its starting value of zero
+        ##             if (step_factor == 0 & iter == 1)  {
+        ##                 testhalf <- TRUE
+        ##             }
+        ##             else {
+        ##                 s2 <- sum(step_beta^2) + step_zeta^2
+        ##                 s1 <- sum(step_beta_previous^2) + step_zeta_previous^2
+        ##                 testhalf <- s2 < s1
+        ##             }
+        ##             step_factor <- step_factor + 1
+        ##             ##  Trace here
+        ##             if (control$trace) {
+        ##                 trace_iteration()
+        ##             }
+        ##         }
+        ##         if (failed_adjustment | failed_inversion | all(abs(c(abs(step_beta), abs(step_zeta))) < control$epsilon, na.rm = TRUE)) {
+        ##             break
+        ##         }
+        ##     }
+        ## }
 
         ## Objects used from above iteration
         ## adjusted_grad_beta
@@ -714,7 +876,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         betas_all[betas_names] <- betas
 
         ## Convergence analysis
-        if ((failed_inversion | failed_adjustment | iter >= control$maxit) & !(is_correction)) {
+        if ((failed | iter >= control$maxit) & !(is_correction)) {
             warning("brglmFit: algorithm did not converge", call. = FALSE)
             converged <- FALSE
         }
@@ -752,7 +914,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## Fisher information for the transformed dispersion
         d1zeta <- eval(d1_transformed_dispersion)
         if (!no_dispersion) {
-            info_transformed_dispersion <- info_dispersion/d1zeta^2
+            info_transformed_dispersion <- 1/step_components_zeta$inverse_info
         }
 
         eps <- 10 * .Machine$double.eps
@@ -768,7 +930,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 boundary <- TRUE
             }
         }
-        if (df_residual == 0) disp <- NaN
+        if (df_residual == 0) dispersion <- NaN
 
         ## Estimate of first-order bias from the last iteration (so
         ## not at the final value for the coefficients)
@@ -777,8 +939,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             bias_betas <- bias_zeta <- NULL
         }
         else {
-            bias_betas <- -drop(inverse_info_beta %*% adjustment_beta)
-            bias_zeta <- -adjustment_zeta/info_dispersion/d1zeta^2
+            bias_betas <- with(step_components_beta, -drop(inverse_info %*% adjustment))
+            bias_zeta <- with(step_components_zeta, -drop(inverse_info %*% adjustment))
             bias_betas_all <- betas_all
             bias_betas_all[betas_names] <- bias_betas
             ## If correction has been requested then add estimated biases an attribute to the coefficients
@@ -853,8 +1015,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
          y = y,
          converged = converged,
          boundary = boundary,
-         dispersion = disp,
-         dispersionML = dispML,
+         dispersion = dispersion,
+         dispersion_ML = dispersion_ML,
          transformed_dispersion = transformed_dispersion,
          info_transformed_dispersion = if (no_dispersion) NA else info_transformed_dispersion,
          grad = adjusted_grad_all,

@@ -9,7 +9,7 @@ mod <- glm(conc ~ lot*log(u), data = clotting, family = Gamma)
 
 tol <- sqrt(.Machine$double.eps)
 test_that("ML estimate of gamma dispersion from brglmFit and from MASS::gamma.dispersion are the same",
-          expect_equal(update(mod, method = "brglmFit", epsilon = 1e-10)$dispersionML, MASS::gamma.dispersion(mod), tolerance = tol))
+          expect_equal(update(mod, method = "brglmFit", epsilon = 1e-10)$dispersion_ML, MASS::gamma.dispersion(mod), tolerance = tol))
 
 test_that("ML estimate of gamma shape from brglmFit and from MASS::gamma.dispersion are the same",
-          expect_equal(1/update(mod, method = "brglmFit", epsilon = 1e-10, transformation = "inverse")$dispersionML, MASS::gamma.shape(mod)$alpha, tolerance = tol))
+          expect_equal(1/update(mod, method = "brglmFit", epsilon = 1e-10, transformation = "inverse")$dispersion_ML, MASS::gamma.shape(mod)$alpha, tolerance = tol))
