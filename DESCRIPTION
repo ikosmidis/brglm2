@@ -1,7 +1,7 @@
 Package: brglm2
 Title: Estimation and inference from generalized linear models using explicit
     and implicit methods for bias reduction
-Version: 0.0.1
+Version: 0.3.4
 Authors@R: person("Ioannis", "Kosmidis", email = "i.kosmidis@ucl.ac.uk", role = c("aut", "cre"))
 Description: Estimation and inference from generalized linear models
     based on various methods for bias reduction (see Kosmidis, 2014,
