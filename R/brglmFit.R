@@ -131,7 +131,7 @@
 #' ## residual variance.
 #' summary(anorexML)
 #' summary(anorexBR)
-#' summary(anorexBC, start = coef(anorexML))
+#' summary(anorexBC)
 #' }
 #'
 #' ## endometrial data from Heinze \& Schemper (2002) (see ?endometrial)
