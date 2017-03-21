@@ -208,7 +208,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             out$zetas <- zetas
             ## Evaluate the derivatives of the a function only for
             ## objervations with non-zero weight
-            d1afuns <- d2afuns <- d3afuns <- rep(NA, nobs)
+            d1afuns <- d2afuns <- d3afuns <- rep(NA_real_, nobs)
             d1afuns[keep] <- d1afun(zetas[keep])
             d2afuns[keep] <- d2afun(zetas[keep])
             d3afuns[keep] <- d3afun(zetas[keep])
@@ -311,16 +311,16 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 }, lower = .Machine$double.eps, upper = 10000, tol = control$epsilon), silent = FALSE)
                 if (inherits(dispFit, "try-error")) {
                     warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
-                    dispML <- NA
-                    disp <- NA
+                    dispML <- NA_real_
+                    disp <- NA_real_
                 }
                 else {
                     disp <- dispML <- dispFit$root
                 }
             }
-            else { ## if the model is saturated dispML is NA
+            else { ## if the model is saturated dispML is NA_real_
                 disp <- 1 ## A convenient value
-                dispML <- NA
+                dispML <- NA_real_
             }
         }
         list(dispersion = disp, dispersion_ML = dispML)
@@ -372,7 +372,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         }
         if (level == 1) {
             if (no_dispersion | df_residual < 1) {
-                grad <- adjustment <- inverse_info <- NA
+                grad <- adjustment <- inverse_info <- NA_real_
                 failed_adjustment <- failed_inversion <- FALSE
             }
             else {
@@ -500,7 +500,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             nvars_all <- nvars
             betas_names_all <- betas_names
         }
-        betas_all <- structure(rep(NA, nvars_all), .Names = betas_names_all)
+        betas_all <- structure(rep(NA_real_, nvars_all), .Names = betas_names_all)
         keep <- weights > 0
         ## Check for zero weights
         ## if (any(!keep)) {
@@ -545,7 +545,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 betas_all <- start
                 names(betas_all) <- betas_names_all
                 if (!isTRUE(is_full_rank)) {
-                    betas_all[aliased] <- NA
+                    betas_all[aliased] <- NA_real_
                     betas <- betas_all[-aliased]
                 }
                 else {
@@ -562,22 +562,22 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 betas_all <- start[seq.int(nvars_all)]
                 names(betas_all) <- betas_names_all
                 if (!isTRUE(is_full_rank)) {
-                    betas_all[aliased] <- NA
+                    betas_all[aliased] <- NA_real_
                     betas <- betas_all[-aliased]
                 }
                 else {
                     betas <- betas_all
                 }
                 transformed_dispersion <- start[nvars_all + 1]
-                dispersion_ML <- NA
+                dispersion_ML <- NA_real_
                 dispersion <- eval(control$inverseTrans)
             }
             if (length(start) > nvars_all + 1 | length(start) < nvars_all) {
-                stop(paste(paste(gettextf("length of 'start' should be equal to %d and correspond to initial betas for %s", nvars_all, paste(deparse(betas_names_all), collapse = ", "), "or", gettextf("to %d and also include a starting value for the transformed dispersion", nvars_all + 1)))), domain = NA)
+                stop(paste(paste(gettextf("length of 'start' should be equal to %d and correspond to initial betas for %s", nvars_all, paste(deparse(betas_names_all), collapse = ", "), "or", gettextf("to %d and also include a starting value for the transformed dispersion", nvars_all + 1)))), domain = NA_real_)
             }
         }
 
-        adjusted_grad_all <- rep(NA, nvars_all + 1)
+        adjusted_grad_all <- rep(NA_real_, nvars_all + 1)
         names(adjusted_grad_all) <- c(betas_names_all, "Transformed dispersion")
         if (is_correction) {
             if (control$maxit > 0) control$maxit <- 1
@@ -607,7 +607,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         step_beta <- drop(step_components_beta$inverse_info %*% adjusted_grad_beta)
         ## Dispersion quantities
         if (no_dispersion) {
-            adjusted_grad_zeta <- step_zeta <- NA
+            adjusted_grad_zeta <- step_zeta <- NA_real_
         }
         else {
             if (step_components_zeta$failed_inversion) {
@@ -666,7 +666,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     step_beta <- drop(step_components_beta$inverse_info %*% adjusted_grad_beta)
                     ## Dispersion quantities
                     if (no_dispersion) {
-                        adjusted_grad_zeta <- step_zeta <- NA
+                        adjusted_grad_zeta <- step_zeta <- NA_real_
                         failed_inversion_zeta <- failed_adjustment_zeta <- FALSE
                     }
                     else {
@@ -765,7 +765,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 boundary <- TRUE
             }
         }
-        if (df_residual == 0) dispersion <- NaN
+        if (df_residual == 0) dispersion <- NA_real_
 
         ## ## Estimate of first-order bias from the last iteration (so
         ## ## not at the final value for the coefficients)
@@ -854,7 +854,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
          dispersion = dispersion,
          dispersion_ML = dispersion_ML,
          transformed_dispersion = transformed_dispersion,
-         info_transformed_dispersion = if (no_dispersion) NA else info_transformed_dispersion,
+         info_transformed_dispersion = if (no_dispersion) NA_real_ else info_transformed_dispersion,
          grad = adjusted_grad_all,
          transformation = control$transformation,
          ## cov.unscaled = tcrossprod(R_matrix),
