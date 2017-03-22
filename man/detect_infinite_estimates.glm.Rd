@@ -50,4 +50,7 @@ Lesaffre, E., & Albert, A. (1989). Partial Separation in Logistic
 Discrimination. *Journal of the Royal Statistical Society. Series B
 (Methodological)*, **51**, 109-116
 }
+\seealso{
+\code{\link[nnet]{multinom}}
+}
 

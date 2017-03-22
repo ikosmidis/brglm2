@@ -44,7 +44,10 @@ a list of contrasts to be used for some or all of
 the factors appearing as variables in the model formula.
 }
 
-\item{ref}{the reference category to use for multinomial regression}
+\item{ref}{the reference category to use for multinomial
+regression. Either an integer, in which case
+levels(response)[ref] is used as a baseline, or a character
+string. Default is 1.}
 
 \item{control}{a list of parameters for controlling the fitting
 process. See \code{\link{brglmControl}} for details.}
@@ -59,12 +62,20 @@ reduction methods. See Kosmidis & Firth (2011) for details.
 }
 \details{
 \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
-multinomial regression models through the "Poisson trick" (see, for
-example, Palmgren, 1981 and Kosmidis & Firth, 2009). The
-implementation relies on the construction of an "extended" model
-matrix for the log-linear model and constraints on the sums of the
-Poisson means. Specifically, a log-linear model is fitted on a
-Kronecker product
+multinomial logit regression models through the "Poisson trick" (see, for
+example, Palmgren, 1981 and Kosmidis & Firth, 2009).
+
+The models are also know as baseline-category logit models (see,
+Agresti, 2002, Section 7.1), because they model the log-odds of
+every category against a baseline category. The user can control
+which baseline (or reference) category is used via the
+\code{\link{ref}}. By default \code{\link{brmultinom}} uses the
+first category as reference.
+
+The implementation relies on the construction of an "extended"
+model matrix for the log-linear model and constraints on the sums
+of the Poisson means. Specifically, a log-linear model is fitted on
+a Kronecker product
 (\url{https://en.wikipedia.org/wiki/Kronecker_product}) of the
 original model matrix \code{X} implied by the formula, augmented by
 \code{nrow(X)} dummy variables.
@@ -78,7 +89,38 @@ of a "proof of concept" and is not expected to scale well with
 either of \code{nrow(X)}, \code{ncol(X)} or the number of levels in
 the cateogrical response.
 }
+\examples{
+
+data("housing", package = "MASS")
+
+# Maximum likelihood using nnet::multinom
+houseML1nnet <- nnet::multinom(Sat ~ Infl + Type + Cont, weights = Freq,
+                               data = housing)
+# Maximum likelihood using brmultinom with baseline category "Low"
+houseML1 <- brmultinom(Sat ~ Infl + Type + Cont, weights = Freq,
+                       data = housing, type = "ML", ref = 1)
+# The estimates are numerically the same as houseML0
+all.equal(coef(houseML1nnet), coef(houseML1), tolerance = 1e-04)
+
+# Maximum likelihood using brmultinom with "High" as baseline
+houseML3 <- brmultinom(Sat ~ Infl + Type + Cont, weights = Freq,
+                      data = housing, type = "ML", ref = 3)
+# The fitted values are the same as houseML1
+all.equal(fitted(houseML1), fitted(houseML1), tolerance = 1e-10)
+
+# Bias reduction
+houseBR3 <- update(houseML3, type = "AS_mean")
+# Bias correction
+houseBC3 <- update(houseML3, type = "correction")
+
+
+}
+\author{
+Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
+}
 \references{
+Agrest A (2002). Categorical data analysis (2nd Edition). Wiley. New York.
+
 Kosmidis I and Firth D (2011). Multinomial logit bias reduction via
 the Poisson log-linear model. *Biometrika*, **98**, 755-759.
 

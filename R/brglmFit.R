@@ -56,6 +56,7 @@
 #' \code{fixed_totals} can be used to constrain the means of a poisson
 #' model to add up to the corresponding observed counts according to
 #'
+#' @author Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
 #'
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
 #'
@@ -78,8 +79,6 @@
 #' Kosmidis I (2014). Bias in parametric estimation: reduction and
 #' useful side-effects. *WIRE Computational Statistics*, **6**,
 #' 185-196
-#'
-#'
 #'
 #' @examples
 #' ## The lizards example from ?brglm::brglm

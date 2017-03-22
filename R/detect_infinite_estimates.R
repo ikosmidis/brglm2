@@ -25,6 +25,8 @@
 #' estimate for the corresponding parameter has value minus or plus
 #' infinity.
 #'
+#' @seealso \code{\link[nnet]{multinom}}
+#'
 #' @references
 #'
 #' Lesaffre, E., & Albert, A. (1989). Partial Separation in Logistic

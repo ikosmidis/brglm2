@@ -88,10 +88,6 @@ The description of \code{method} argument and the \code{Fitting
 functions} section in \code{\link{glm}} gives information on
 supplying fitting methods to \code{\link{glm}}.
 
-If \code{type == "correction"} (see \code{\link{brglmControl}}),
-then \code{coefficients} and \code{transformed_dispersion} carry the
-estimated biases as attributes.
-
 \code{fixed_totals} can be used to constrain the means of a poisson
 model to add up to the corresponding observed counts according to
 }
@@ -156,6 +152,9 @@ summary(endometrialML)
 summary(endometrialBC)
 summary(endometrialBR)
 
+}
+\author{
+Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
 }
 \references{
 Cordeiro G. M. & McCullagh, P. (1991). Bias correction in generalized

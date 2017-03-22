@@ -3,22 +3,23 @@ Title: Bias Reduction in Generalized Linear Models
 Version: 0.1.2
 Authors@R: person("Ioannis", "Kosmidis", email = "i.kosmidis@ucl.ac.uk", role = c("aut", "cre"))
 Description: Estimation and inference from generalized linear models
-    based on various methods for bias reduction (see Kosmidis, 2014,
-    WIRE computational statistics). The brglmFit fitting method can
-    achieve reduction of estimation bias either through the adjusted
-    score equations approach in Firth (1993, Biometrika) and Kosmidis
-    and Firth (2009, Biometrika), or through the direct subtraction of
-    an estimate of the bias of the maximum likelihood estimator from
-    the maximum likelihood estimates (Cordeiro and McCullagh,
-    1991). In the special case of generalized linear models for
-    binomial and multinomial responses, the adjusted score equations
-    approach returns estimates with improved frequentist properties,
-    that are also always finite, even in cases where the maximum
-    likelihood estimates are infinite (e.g. complete and
-    quasi-complete separation). Estimation in all cases takes place
-    via a quasi Fisher scoring algorithm, and S3 methods for the
-    construction of of confidence intervals for the reduced-bias
-    estimates are provided.
+    based on various methods for bias reduction. The brglmFit fitting
+    method can achieve reduction of estimation bias either through the
+    adjusted score equations approach in Firth (1993)
+    <https://doi.org/10.1093/biomet/80.1.27> and Kosmidis and Firth
+    (2009) <https://doi.org/10.1093/biomet/asp055>, or through the
+    direct subtraction of an estimate of the bias of the maximum
+    likelihood estimator from the maximum likelihood estimates as in
+    Cordeiro and McCullagh (1991)
+    <http://www.jstor.org/stable/2345592>. In the special case of
+    generalized linear models for binomial and multinomial responses,
+    the adjusted score equations approach returns estimates with
+    improved frequentist properties, that are also always finite, even
+    in cases where the maximum likelihood estimates are infinite
+    (e.g. complete and quasi-complete separation). Estimation in all
+    cases takes place via a quasi Fisher scoring algorithm, and S3
+    methods for the construction of of confidence intervals for the
+    reduced-bias estimates are provided.
 Depends:
     R (>= 3.3.0)
 License: GPL-2 | GPL-3
