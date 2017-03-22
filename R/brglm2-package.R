@@ -26,7 +26,7 @@
 #' user loads **brglm2** and **brglm** simultaneously. The development
 #' and maintenance of the two packages will continue, until **brglm2**
 #' incorporates all **brglm** functionality and gets an appropriate
-#' wrapper to the \code{\link{brglm}} function.
+#' wrapper to the \code{brglm::brglm} function.
 #'
 #' @author Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
 #'

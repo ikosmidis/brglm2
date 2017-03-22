@@ -17,16 +17,32 @@
 #'
 #' @details
 #'
+#' The models \code{\link{brmultinom}} handles are also known as
+#' baseline-category logit models (see, Agresti, 2002, Section 7.1),
+#' because they model the log-odds of every category against a
+#' baseline category. The user can control which baseline (or
+#' reference) category is used via the \code{ref}. By default
+#' \code{\link{brmultinom}} uses the first category as reference.
+#'
+#' The maximum likelihood estimates for the parameters of
+#' baseline-category logit models have infinite components with
+#' positive probability, which can result in problems in their
+#' estimation and the use of inferential procedures (e.g. Wad
+#' tests). Albert and Andreson (1984) have categorised the possible
+#' data patterns for such models into the exclusive and exhaustive
+#' categories of complete separation, quasi-complete separation and
+#' overlap, and showed that infinite maximum likelihood estimates
+#' result when complete or quasi-complete separation occurs.
+#'
+#' The adjusted score approach to bias reduction that
+#' \code{\link{brmultinom}} implements (\code{type = "AS_mean"}) is an
+#' alternative to maximum likelihood that results in estimates with
+#' smaller asymptotic bias that are also *always* finite, even in
+#' cases of complete or quasi-complete separation.
+#'
 #' \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
 #' multinomial logit regression models through the "Poisson trick" (see, for
-#' example, Palmgren, 1981 and Kosmidis & Firth, 2009).
-#'
-#' The models are also know as baseline-category logit models (see,
-#' Agresti, 2002, Section 7.1), because they model the log-odds of
-#' every category against a baseline category. The user can control
-#' which baseline (or reference) category is used via the
-#' \code{\link{ref}}. By default \code{\link{brmultinom}} uses the
-#' first category as reference.
+#' example, Palmgren, 1981; Kosmidis & Firth, 2011).
 #'
 #' The implementation relies on the construction of an "extended"
 #' model matrix for the log-linear model and constraints on the sums
@@ -52,6 +68,10 @@
 #' @references
 #'
 #' Agrest A (2002). Categorical data analysis (2nd Edition). Wiley. New York.
+#'
+#' Albert A and Anderson J A (1984). On the Existence of Maximum
+#' Likelihood Estimates in Logistic Regression Models. *Biometrika*,
+#' **71** 1--10.
 #'
 #' Kosmidis I and Firth D (2011). Multinomial logit bias reduction via
 #' the Poisson log-linear model. *Biometrika*, **98**, 755-759.
