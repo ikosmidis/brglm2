@@ -48,7 +48,7 @@ Most of the material in this vignette comes from a presentation by [Ioannis Kosm
 
 Suppose that $y_1, \ldots, y_n$ are observations on independent random variables $Y_1, \ldots, Y_n$, each with probability density/mass function of the form
 $$
-f_{Y_i}(y) = \exp\left\{\frac{y \theta_i - b(\theta_i) - c_1(y)}{\phi/m_i} - a(-m_i/\phi) + c_2(y) \right\}
+f_{Y_i}(y) = \exp\left\{\frac{y \theta_i - b(\theta_i) - c_1(y)}{\phi/m_i} - \frac{1}{2}a\left(-\frac{m_i}{\phi}\right) + c_2(y) \right\}
 $$
 for some sufficiently smooth functions $b(.)$, $c_1(.)$, $a(.)$ and $c_2(.)$, and fixed observation weights $m_1, \ldots, m_n$. The expected value and the variance of $Y_i$ are then
 \begin{align*}
@@ -90,6 +90,7 @@ i_{\beta\beta}(\beta, \phi) & 0_p \\
 \right]\,,
 $$
 where $0_p$ is a $p$-vector of zeros.
+
 
 ### Maximum likelihood estimation
 
