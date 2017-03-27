@@ -19,8 +19,12 @@ devtools::install_github("ikosmidis/brglm2")
 The workhorse function in **brglm2** is [`brglmFit`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R), which can be passed directly to the `method` argument of the `glm` function and . `brglmFit` implements a quasi
 [Fisher scoring](https://en.wikipedia.org/wiki/Scoring_algorithm)
 procedure, whose special cases result in various explicit and implicit
-bias reduction methods for generalized linear models. The classification of bias reduction methods into explicit and implicit is
-as given in [Kosmidis (2014)](https://doi.org/10.1002/wics.1296)
+bias reduction methods for generalized linear models.
+
+The [iteration vignette](https://github.com/ikosmidis/brglm2/blob/master/vignettes/iteration.md) describes the iteration and gives the mathematical details for the bias-reducing adjustments to the score functions for generalized linear models.
+
+The classification of bias reduction methods into explicit and implicit is
+as given in [Kosmidis (2014)](https://doi.org/10.1002/wics.1296).
 
 ### References and resources
 
