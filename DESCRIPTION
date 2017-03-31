@@ -1,6 +1,6 @@
 Package: brglm2
 Title: Bias Reduction in Generalized Linear Models
-Version: 0.1.3
+Version: 0.1.3.0900
 Authors@R: person("Ioannis", "Kosmidis", email = "i.kosmidis@ucl.ac.uk", role = c("aut", "cre"))
 Description: Estimation and inference from generalized linear models
     based on various methods for bias reduction. The brglmFit fitting
