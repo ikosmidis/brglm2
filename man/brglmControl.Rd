@@ -6,8 +6,8 @@
 \code{\link{brglmFit}} method.}
 \usage{
 brglmControl(epsilon = 1e-10, maxit = 100, trace = FALSE,
-  type = c("AS_mean", "correction", "ML"), transformation = "identity",
-  slowit = 1, max_step_factor = 12)
+  type = c("AS_mean", "AS_median", "correction", "ML"),
+  transformation = "identity", slowit = 1, max_step_factor = 12)
 }
 \arguments{
 \item{epsilon}{positive convergence tolerance epsilon}
@@ -19,9 +19,10 @@ allowed}
 each iteration}
 
 \item{type}{the type of fitting methodo to be used. The options are
-\code{AS-mean} (mean-bias reducing adjusted scores; default),
-\code{correction} (asymptotic bias correction) and
-\code{ML} (maximum likelihood).}
+\code{AS_mean} (mean-bias reducing adjusted scores; default),
+\code{AS_median} (median-bias reducting adjusted scores),
+\code{correction} (asymptotic bias correction) and \code{ML}
+(maximum likelihood).}
 
 \item{transformation}{the transformation of the dispersion to be
 estimated. Default is \code{identity}. See Details.}

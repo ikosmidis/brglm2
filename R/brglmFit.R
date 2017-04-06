@@ -194,6 +194,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             out$d1mus <- d1mus
             out$d2mus <- d2mus
             out$varmus <- varmus
+            out$d1varmus <- d1variance(mus)
             out$working_weights <- working_weights
             if (qr) out$qr_decomposition <- qr(wx)
             out
@@ -277,6 +278,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
+    ## FIXME: Redundant function for now
     refit <- function(y, betas_start = NULL) {
         ## Estimate Beta
         betas <- coef(glm.fit(x = x, y = y, weights = weights,
@@ -321,7 +323,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         list(dispersion = disp, dispersion_ML = dispML)
     }
 
-    ASmean_adjustment <- function(pars, level = 0, fit = NULL) {
+    AS_mean_adjustment <- function(pars, level = 0, fit = NULL) {
         if (is.null(fit)) {
             fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
         }
@@ -340,6 +342,20 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
+    AS_median_adjustment <- function() {
+        if (is.null(fit)) {
+            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
+        }
+        with(fit, {
+            if (level == 0) {
+                0
+            }
+            if (level == 1) {
+                0
+            }
+        })
+    }
+
     customTransformation <- is.list(control$transformation) & length(control$transformation == 2)
     if (customTransformation) {
         transformation0 <- control$transformation
@@ -348,10 +364,10 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     ## FIXME: Add IBLA
     adjustment_function <- switch(control$type,
-                            "correction" = ASmean_adjustment,
-                            "AS_mean" = ASmean_adjustment,
+                            "correction" = AS_mean_adjustment,
+                            "AS_mean" = AS_mean_adjustment,
+                            "AS_median" = AS_median_adjustment,
                             "ML" = function(pars, ...) 0)
-
 
     ## compute_step_components does everything on the scale of the /transformed/ dispersion
     compute_step_components <- function(pars, level = 0, fit = NULL) {
@@ -376,7 +392,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 grad <-  gradient(theta, fit = fit, level = 1)/d1zeta
                 inverse_info <- 1/information(theta, inverse = FALSE, fit = fit, level = 1) * d1zeta^2
                 failed_inversion <- !is.finite(inverse_info)
-                adjustment <- adjustment_function(theta, fit = fit, level = 1)/d1zeta - if (is_ML) 0 else 0.5 * d2zeta / d1zeta^2
+                adjustment <- adjustment_function(theta, fit = fit, level = 1)/d1zeta - if (is_ML | is_AS_median) 0 else 0.5 * d2zeta / d1zeta^2
                 failed_adjustment <- is.na(adjustment)
             }
         }
@@ -391,6 +407,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     ## Some useful quantities
     is_ML <- control$type == "ML"
+    is_AS_median <- control$type == "AS_median"
     is_correction <- control$type == "correction"
     no_dispersion <- family$family %in% c("poisson", "binomial")
 
@@ -427,11 +444,12 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
     ## Enrich the family object with the required derivatives
     linkglm <- make.link(family$link)
-    family <- enrichwith::enrich(family, with = "function a derivatives")
+    family <- enrichwith::enrich(family, with = c("d1afun", "d2afun", "d3afun", "d1variance"))
     linkglm <- enrichwith::enrich(linkglm, with = "d2mu.deta")
 
     ## Extract functions from the enriched family object
     variance <- family$variance
+    d1variance <- family$d1variance
     linkinv <- linkglm$linkinv
     linkfun <- linkglm$linkfun
     if (!is.function(variance) || !is.function(linkinv))

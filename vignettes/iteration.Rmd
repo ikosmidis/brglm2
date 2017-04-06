@@ -96,7 +96,7 @@ where $0_p$ is a $p$-vector of zeros.
 
 The maximum likelihood estimator of $\beta$ and $\phi$ satisfies $s_\beta(\hat\beta,\hat\phi) = 0_p$ and $s_\phi(\hat\beta, \hat\phi) = 0$.
 
-### Bias-reducing adjusted score functions
+### Mean bias-reducing adjusted score functions
 
 Let $A_\beta(\beta, \phi) = -i_\beta(\beta, \phi) b_\beta(\beta, \phi)$ and $A_\phi(\beta, \phi) = -i_\phi(\beta, \phi) b_\phi(\beta, \phi)$, where $b_\beta(\beta, \phi)$ and $b_\phi(\beta, \phi)$ are the first terms in the expansion of the bias of the maximum likelihood estimator of the regression parameters $\beta$ and dispersion $\phi$, respectively. The results in @firth:93 can be used to show that the solution of the adjusted score equations
 \begin{align*}
