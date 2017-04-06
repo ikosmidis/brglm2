@@ -113,7 +113,7 @@ The results in either @kosmidis:09 or @cordeiro:91 can then be used to re-expres
                    a'''(-m_i/\phi))}{2\phi^2\sum_{i = 1}^n m_i^2
                    a''(-m_i/\phi)}
 \end{align*}
-where  $\xi = (\xi_1, \ldots, \xi_n)^T$ with $\xi_i = -h_id_i'/(2d_iw_i)$, $d_i' = d^2\mu_i/d\eta_i^2$ and $h_i$ is the "hat" value for the $i$th observation (see, e.g. `?hatvalues`).
+where  $\xi = (\xi_1, \ldots, \xi_n)^T$ with $\xi_i = h_id_i'/(2d_iw_i)$, $d_i' = d^2\mu_i/d\eta_i^2$ and $h_i$ is the "hat" value for the $i$th observation (see, e.g. `?hatvalues`).
 
 
 # Fitting algorithm in `brglmFit`
