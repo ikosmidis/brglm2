@@ -438,7 +438,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     if (is.null(weights)) {
         weights <- rep.int(1, nobs)
     }
-    if (missingOffset <- is.null(offset)) {
+    if (missing_offset <- is.null(offset)) {
         offset <- rep.int(0, nobs)
     }
 
@@ -814,7 +814,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     if (customTransformation) {
         control0$transformation <- transformation0
     }
-    if (intercept & missingOffset) {
+    if (intercept & missing_offset) {
         nullFit <- brglmFit(x = x[, "(Intercept)"], y = y, weights = weights,
                             offset = rep(0, nobs), family = family, intercept = TRUE,
                             control = control0[c("epsilon", "maxit", "type", "transformation", "slowit")])
@@ -832,7 +832,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## If there is an intercept and an offset then, for calculating
     ## the null deviance glm will make a call to the fitter to fit the
     ## glm with intercept and the offset
-    if (intercept & !missingOffset) {
+    if (intercept & !missing_offset) {
         nullmus <- mus
         ## doen't really matter what nullmus is set to. glm will make
         ## a new call to brglmFit and use the deviance from that call
