@@ -5,6 +5,7 @@
 #' be used to construct a \code{control} argument.
 #'
 #' @inheritParams stats::glm.control
+#' @aliases brglm_control
 #' @param epsilon positive convergence tolerance epsilon
 #' @param maxit integer giving the maximal number of iterations
 #'     allowed
@@ -112,4 +113,5 @@ brglmControl <- function(epsilon = 1e-10, maxit = 100,
          max_step_factor = max_step_factor)
 }
 
-
+#' @export
+brglm_control <- brglmControl

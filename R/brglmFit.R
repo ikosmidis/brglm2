@@ -11,6 +11,7 @@
 #' correction of the asymptotic bias of the Fisher scoring iterates.
 #'
 #' @inheritParams stats::glm.fit
+#' @aliases brglm_fit
 #' @param x \code{x} is a design matrix of dimension \code{n * p},
 #' @param y \code{y} is a vector of observations of length \code{n}
 #' @param control a list of parameters controlling the fitting
@@ -874,6 +875,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
          type = control$type,
          class = "brglmFit")
 }
+
+brglm_fit <- brglmFit
 
 #' @export
 coef.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) {

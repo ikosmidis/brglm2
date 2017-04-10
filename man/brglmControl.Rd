@@ -2,6 +2,7 @@
 % Please edit documentation in R/brglmControl.R
 \name{brglmControl}
 \alias{brglmControl}
+\alias{brglm_control}
 \title{Auxiliary function for \code{\link{glm}} fitting using the
 \code{\link{brglmFit}} method.}
 \usage{
