@@ -1,4 +1,5 @@
-#' A simple check of whether the maximum likelihood estimates are infinite
+#' A simple diagnostic of whether the maximum likelihood estimates are
+#' infinite
 #'
 #'
 #' @param object the result of a \code{\link{glm}} call
@@ -10,7 +11,7 @@
 #'
 #' @details
 #'
-#' \code{detect_infinite_estimates} attempts to identify the occurence
+#' \code{check_infinite_estimates} attempts to identify the occurence
 #' of infinite estimates in GLMs with binomial responses by
 #' successively refitting the model. At each iteration the maximum
 #' number of allowed IWLS iterations is fixed starting from 1 to
@@ -41,16 +42,16 @@
 #'                      family = binomial("probit"))
 #' ## clearly the maximum likelihood estimate for the coefficient of
 #' ## NV is infinite
-#' detect_infinite_estimates(endometrialML)
+#' check_infinite_estimates(endometrialML)
 #'
 #' @export
-detect_infinite_estimates.glm <- function (object, nsteps = 30, ...)
+check_infinite_estimates.glm <- function (object, nsteps = 30, ...)
 {
     if (class(object)[1] != "glm") {
-        warning("detect_infinite_estimates has been designed for objects of class 'glm'")
+        warning("ceheck_infinite_estimates has been designed for objects of class 'glm'")
     }
     if (object$family$family != "binomial") {
-        warning("detect_infinite_estimates has been designed for binomial-response models")
+        warning("check_infinite_estimates has been designed for binomial-response models")
     }
     eps <- .Machine$double.eps
     betasNames <- names(betas <- coef(object))

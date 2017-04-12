@@ -2,6 +2,7 @@
 % Please edit documentation in R/brglmFit.R
 \name{brglmFit}
 \alias{brglmFit}
+\alias{brglm_fit}
 \title{Fitting function for \code{\link{glm}} for reduced-bias
 estimation and inference}
 \usage{
