@@ -39,6 +39,7 @@
 #'      supplying a list of two expressions (transformation and
 #'      inverse transformation). See the examples for more details.
 #'
+#' \code{brglm_control} is an alias to \code{brglmControl}.
 #'
 #' @return a list with components named as the arguments, including
 #'     symbolic expressions for the dispersion transformation
@@ -113,5 +114,3 @@ brglmControl <- function(epsilon = 1e-10, maxit = 100,
          max_step_factor = max_step_factor)
 }
 
-#' @export
-brglm_control <- brglmControl

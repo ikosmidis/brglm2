@@ -91,6 +91,8 @@ supplying fitting methods to \code{\link{glm}}.
 
 \code{fixed_totals} can be used to constrain the means of a poisson
 model to add up to the corresponding observed counts according to
+
+\code{brglm_fit} is an alias to \code{brglmFit}.
 }
 \examples{
 ## The lizards example from ?brglm::brglm

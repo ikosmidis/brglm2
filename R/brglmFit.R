@@ -57,6 +57,8 @@
 #' \code{fixed_totals} can be used to constrain the means of a poisson
 #' model to add up to the corresponding observed counts according to
 #'
+#' \code{brglm_fit} is an alias to \code{brglmFit}.
+#'
 #' @author Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
 #'
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
@@ -875,8 +877,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
          type = control$type,
          class = "brglmFit")
 }
-
-brglm_fit <- brglmFit
 
 #' @export
 coef.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) {

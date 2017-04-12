@@ -59,6 +59,8 @@ be used to construct a \code{control} argument.
      and "inverseSqrt". Custom transformations are accommodated by
      supplying a list of two expressions (transformation and
      inverse transformation). See the examples for more details.
+
+\code{brglm_control} is an alias to \code{brglmControl}.
 }
 \examples{
 
