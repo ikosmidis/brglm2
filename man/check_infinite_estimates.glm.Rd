@@ -5,7 +5,7 @@
 \title{A simple diagnostic of whether the maximum likelihood estimates are
 infinite}
 \usage{
-check_infinite_estimates.glm(object, nsteps = 30, ...)
+\method{check_infinite_estimates}{glm}(object, nsteps = 30, ...)
 }
 \arguments{
 \item{object}{the result of a \code{\link{glm}} call}

@@ -67,11 +67,11 @@ NULL
 ## of n which is evaluated by family$initialize
 if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 
-#' Generic method for detecting infinite estimates
+#' Generic method for checking for infinite estimates
 #' @param object a fitted model object (e.g. the result of a
 #'     \code{\link{glm}} call)
 #' @param ... other options to be passed to the method
 #' @export
-detect_infinite_estimates <- function(object, ...) {
-    UseMethod("detect_infinite_estimates")
+check_infinite_estimates <- function(object, ...) {
+    UseMethod("check_infinite_estimates")
 }
