@@ -345,7 +345,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
-    AS_median_adjustment <- function() {
+    AS_median_adjustment <- function(pars, level = 0, fit = NULL) {
         if (is.null(fit)) {
             fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
         }
