@@ -115,6 +115,7 @@ The results in either @kosmidis:09 or @cordeiro:91 can then be used to re-expres
 \end{align*}
 where  $\xi = (\xi_1, \ldots, \xi_n)^T$ with $\xi_i = h_id_i'/(2d_iw_i)$, $d_i' = d^2\mu_i/d\eta_i^2$ and $h_i$ is the "hat" value for the $i$th observation (see, e.g. `?hatvalues`).
 
+### Median bias-reducing adjusted score functions
 
 # Fitting algorithm in `brglmFit`
 
