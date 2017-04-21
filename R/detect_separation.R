@@ -91,7 +91,7 @@ detect_separation <- function (x, y, weights = rep(1, nobs),
                               offset = rep(0, nobs), family = gaussian(),
                               control = list(), intercept = TRUE) {
     if (family$family != "binomial") {
-        "separation detection is implemented only for binomial-response models"
+        warning("detect_separation has been developed for use with binomial-response models")
     }
     control <- do.call("detect_separation_control", control)
     ## ensure x is a matrix
