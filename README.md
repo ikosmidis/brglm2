@@ -3,7 +3,7 @@ brglm2
 
 [**brglm2**](https://github.com/ikosmidis/brglm2) provides tools for the estimation and inference from generalized linear models using various methods for bias reduction ([Kosmidis, 2014](https://doi.org/10.1002/wics.1296)). Reduction of estimation bias is achieved either through the adjusted score equations approach in [Firth (1993)](https://doi.org/10.1093/biomet/80.1.27) and [Kosmidis & Firth (2009)](https://doi.org/10.1093/biomet/asp055) or through the direct subtraction of an estimate of the bias of the maximum likelihood estimator from the maximum likelihood estimates as prescribed in [Cordeiro and McCullagh (1991)](http://www.jstor.org/stable/2345592)
 
-In the special case of generalized linear models for binomial and multinomial responses, the adjusted score equations approach returns estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite (e.g. complete and quasi-complete separation).
+In the special case of generalized linear models for binomial and multinomial responses, the adjusted score equations approach returns estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite (e.g. complete and quasi-complete separation; see also `?detect_separation` and `?check_infinite_estimates` for pre-fit and post-fit methods for the detection of infinite estimates in binomial response generalized linear models).
 
 ### Installation
 
