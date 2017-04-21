@@ -141,7 +141,6 @@ detect_separation <- function (x, y, weights = rep(1, nobs),
         ones <- y == 1
         zeros <- y == 0
         non_boundary <- !(ones | zeros)
-        n_non_boundary <-
         x <- x[c(which(ones), which(zeros), rep(which(non_boundary), 2)), ]
         y <- c(y[ones], y[zeros], rep(c(0., 1.), each = sum(non_boundary)))
         ## Run linear program
