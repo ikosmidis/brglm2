@@ -67,8 +67,9 @@ passed directly as a method to the \code{\link{glm}} function. See,
 examples.
 
 The interface to \code{separator} was designed by Ioannis Kosmidis
-after correspondence with Kjell Konis, and \code{separator} ships
-with **brglm2** under the permission of Kjell Konis.
+after correspondence with Kjell Konis, and a port of
+\code{separator} has been included in **brglm2** under the
+permission of Kjell Konis.
 
 \code{detectSeparation} is an alias for \code{detect_separation}.
 }
