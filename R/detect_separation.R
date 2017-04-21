@@ -162,6 +162,7 @@ detect_separation <- function (x, y, weights = rep(1, nobs),
     out$linear_program <- control$linear_program
     out$purpose <- control$purpose
     out$class <- "detect_separation"
+    class(out) <- "detect_separation_core"
     return(out)
 }
 
@@ -192,8 +193,19 @@ detect_separation_control <- function(linear_program = c("primal", "dual"),
 
 
 #' @method print detect_separation
+#' @aliases print detect_separation_core
 #' @export
 print.detect_separation <- function(x, digits = max(5L, getOption("digits") - 3L), ...) {
+    cat("Separation:", x$separation, "\n")
+    if (!is.null(x$betas)) {
+        cat("Existence of maximum likelihood estimates\n")
+        print(x$betas)
+        cat("0: finite value, Inf: infinity, -Inf: -infinity\n")
+    }
+}
+
+#' @export
+print.detect_separation_core <- function(x, digits = max(5L, getOption("digits") - 3L), ...) {
     cat("Separation:", x$separation, "\n")
     if (!is.null(x$betas)) {
         cat("Existence of maximum likelihood estimates\n")
