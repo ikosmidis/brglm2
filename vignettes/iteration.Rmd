@@ -2,7 +2,7 @@
 title: "Bias reduction in generalized linear models"
 author: "[Ioannis Kosmidis](http://www.ucl.ac.uk/~ucakiko/)"
 date: "21 March 2017"
-output: rmarkdown::html_vignette
+output: rmarkdown::html_document
 bibliography: brglm2.bib
 vignette: >
   %\VignetteIndexEntry{Bias reduction in generalized linear models using enrichwith}
@@ -115,6 +115,30 @@ The results in either @kosmidis:09 or @cordeiro:91 can then be used to re-expres
 \end{align*}
 where  $\xi = (\xi_1, \ldots, \xi_n)^T$ with $\xi_i = h_id_i'/(2d_iw_i)$, $d_i' = d^2\mu_i/d\eta_i^2$ and $h_i$ is the "hat" value for the $i$th observation (see, e.g. `?hatvalues`).
 
+### Median bias-reducing adjusted score functions
+
+The results in @kenne:17 can be used to show that the solution of the median adjusted score equations
+\begin{align*}
+s_\beta(\beta,\phi) + A_\beta(\beta, \phi) & = 0_p \\
+s_\phi(\beta, \phi) + A_\phi(\beta, \phi) & = 0
+\end{align*}
+results in estimators $\tilde\beta$ and $\tilde\phi$ with median bias of smaller asymptotic order than the maximum likelihood estimator. The median bias-reducing adjustments for generalized linear models can be written as 
+\begin{align*}
+ A_\beta(\beta, \phi) & = i_\beta(\beta, \phi) u_\beta(\beta, \phi) \\
+ A_\phi(\beta, \phi) & = \frac{p}{2\phi}+\frac{ \sum_{i = 1}^n m_i^3
+                   a'''(-m_i/\phi))}{6\phi^2\sum_{i = 1}^n m_i^2
+                   a''(-m_i/\phi)}\,,
+\end{align*}
+where the $r$th element of 
+$u_\beta(\beta, \phi)$ is $u_{1r}/2+u_{2r}/6$, with 
+\begin{align*}
+u_{1r}   =  \sum_{s=1}^p i^{rs}_\beta(\beta, \phi)tr\{\nu_\beta(\beta,\phi)(L_s+K_s)\} \text{ and }
+u_{2r}   =  \sum_{s=1}^p i^{rs}_\beta(\beta, \phi)i^{r}_\beta(\beta, \phi)^TL_si^{r}_\beta(\beta,\phi)/i^{rr}_\beta(\beta, \phi), \\
+\end{align*}
+where $i^{rs}_\beta(\beta, \phi)$ is the $(r,s)$ element of $i^{-1}_\beta(\beta, \phi),\,$ $i^{r}_\beta(\beta, \phi)$ is the $r$th column of $i^{-1}_\beta(\beta, \phi),\,$
+$\nu_\beta(\beta,\phi) = i^{-1}_\beta(\beta, \phi)-i^{r}_\beta(\beta, \phi)i^{r}_\beta(\beta, \phi)^T,\,$ $L_s = X^TWQ_{1s}X/\phi,\,$  $K_s = -X^TWQ_{2s}X/\phi,\,$ $Q_{1s} = diag\{V'(\mu_1)d_1x_{1s}/V(\mu_1),\ldots,V'(\mu_n)d_1x_{ns}/V(\mu_n)\}$ and
+$Q_{2s} = diag\{d_1x_{1s}(\frac{V'(\mu_1)}{V(\mu_1)}-\frac{d'_1}{d^2_1}),\ldots,
+d_nx_{ns}(\frac{V'(\mu_n)}{V(\mu_n)}-\frac{d'_n}{d^2_n})\}$. 
 
 # Fitting algorithm in `brglmFit`
 
