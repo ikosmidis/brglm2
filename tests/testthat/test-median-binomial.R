@@ -1,7 +1,8 @@
 context("agreement with mbrglm when estimating binomial response models")
 
 data("lizards", package = "brglm2")
-data("endo",package = "mbrglm")
+
+data("endometrial",package = "brglm2")
 
 links <- lapply(c("logit", "probit", "cloglog", "cauchit"), make.link)
 
@@ -10,13 +11,13 @@ tol <- 1e-10
 for (l in seq_along(links)) {
     lizardsMBRlegacy <- mbrglm::mbrglm(cbind(grahami, opalinus) ~ height + diameter +
                                       light + time, family = binomial(links[[l]]), data=lizards,
-                                    method = "mbrglm.fit", 
+                                    method = "mbrglm.fit",
                                     control.mbrglm = mbrglm::mbrglm.control(mbr.epsilon = 1e-10, mbr.maxit = 1000))
     lizardsMBR <- glm(cbind(grahami, opalinus) ~ height + diameter +
                        light + time, family = binomial(links[[l]]), data=lizards,
                      method = "brglmFit", epsilon = 1e-10, maxit = 1000,type="AS_median")
-    
-    endoMBRlegacy <- mbrglm::mbrglm(HG~NV+PI+EH, family = binomial(links[[l]]), data=endo,method = "mbrglm.fit", 
+
+    endoMBRlegacy <- mbrglm::mbrglm(HG~NV+PI+EH, family = binomial(links[[l]]), data=endo,method = "mbrglm.fit",
                                     control.mbrglm = mbrglm::mbrglm.control(mbr.epsilon = 1e-10, mbr.maxit = 1000))
     c1 <- coef(summary(endoMBRlegacy))
     endoMBR <- glm(HG~NV+PI+EH, family = binomial(links[[l]]), data=endo,
