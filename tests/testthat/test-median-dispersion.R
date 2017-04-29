@@ -9,28 +9,6 @@ anorexMBR <- update(anorexML, method = "brglmFit",control=list(type="AS_median")
 
 tol <- sqrt(.Machine$double.eps)
 
-test_that("dispersion is the SSR over the usual residual degree of freedom minus 2/3",
-          expect_equal(anorexMBR$dispersion, sum((anorexia$Postwt - fitted(anorexML))^2)/(nrow(anorexia) - length(coef(anorexML))-2/3)))
-
-## context("dispersion parameter estimation")
-
-## set.seed(123)
-## N <- 20
-## x <- matrix(rnorm(2*N), N, 2)
-## y <- 0.3 + drop(x %*% c(-3, 1)) + rnorm(N, 0.4)
-
-## fitML <- glm(y ~ x, family = gaussian())
-## fitBR <- update(fitML, method = "brglmFit")
-
-## tol <- sqrt(.Machine$double.eps)
-## test_that("dispersionML is the usual biased estimate for the residual variance",
-##           expect_equal(fitBR$dispersionML, sum((fitML$y - fitted(fitML))^2)/N))
-
-## test_that("dispersion is the usual bias-corrected estimate for the residual variance",
-##           expect_equal(fitBR$dispersion, sum((fitML$y - fitted(fitML))^2)/(N - 3)))
-
-
-
-
-
+test_that("dispersion is RSS over residual degrees of freedom minus 2/3",
+          expect_equal(anorexMBR$dispersion, sum((anorexia$Postwt - fitted(anorexML))^2)/(nrow(anorexia) - length(coef(anorexML)) - 2/3)))
 
