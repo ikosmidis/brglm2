@@ -77,9 +77,10 @@ brglmControl <- function(epsilon = 1e-10, maxit = 100,
                          slowit = 1,
                          max_step_factor = 12) {
     type <- match.arg(type)
-    
-    if (type=="AS_median")  
-      transformation = "identity"
+
+    if (type=="AS_median")  {
+        transformation <- "identity"
+    }
 
     if (is.character(transformation)) {
         Trans <- switch(transformation,
