@@ -12,7 +12,7 @@ vignette: >
 
 # The **brglm2** package
 
-[**brglm2**](https://github.com/ikosmidis/brglm2) provides tools for the estimation and inference from [generalized linear models](https://en.wikipedia.org/wiki/Generalized_linear_model) using various methods for bias reduction [@kosmidis:14]. Reduction of estimation bias is achieved either through the adjusted score equations approach in @firth:93 and @kosmidis:09, or through the direct subtraction of an estimate of the bias of the maximum likelihood estimator from the maximum likelihood estimates as prescribed in @cordeiro:91.
+[**brglm2**](https://github.com/ikosmidis/brglm2) provides tools for the estimation and inference from [generalized linear models](https://en.wikipedia.org/wiki/Generalized_linear_model) using various methods for bias reduction. Reduction of estimation bias is achieved either through the mean-bias reducing adjusted score equations in @firth:93 and @kosmidis:09, or through the direct subtraction of an estimate of the bias of the maximum likelihood estimator from the maximum likelihood estimates as prescribed in @cordeiro:91, or through the median-bias reducing adjusted score equations in @kenne:17.
 
 In the special case of generalized linear models for binomial and multinomial responses, the adjusted score equations approach returns estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite, like in complete and quasi-complete separation as defined in @albert:84.
 
@@ -65,89 +65,87 @@ where $g(.)$ is a monotone, sufficiently smooth link function, taking values on 
 
 ### Score functions and information matrix
 
-The derivatives of the log-likelihood about $\beta$ and $\phi$ (score functions) are
+Suppressing the dependence of the various quantities on the model parameters and the data, the derivatives of the log-likelihood about $\beta$ and $\phi$ (score functions) are
 \begin{align*}
-    s_\beta(\beta, \phi) & = \frac{1}{\phi}X^TWD^{-1}(y - \mu) \\
-	s_\phi(\beta, \phi) & = \frac{1}{2\phi^2}\sum_{i = 1}^n (q_i - \rho_i)
+    s_\beta & = \frac{1}{\phi}X^TWD^{-1}(y - \mu) \\
+	s_\phi & = \frac{1}{2\phi^2}\sum_{i = 1}^n (q_i - \rho_i)
 \end{align*}
-with $y = (y_1, \ldots, y_n)^\top$, $\mu = (\mu_1, \ldots, \mu_n)^\top$, $W = {\rm diag}\left\{w_1, \ldots, w_n\right\}$ and $D = {\rm diag}\left\{d_1, \ldots, d_n\right\}$, where $w_i = m_i d_i^2/V(\mu_i)$ is the $i$th working weight, and  $d_i = d\mu_i/d\eta_i$. Furthermore, $q_i = -2 m_i \{y_i\theta_i - b(\theta_i) - c_1(y_i)\}$ and $\rho_i = m_i a'(-m_i/\phi)$ are the $i$th deviance residual (e.g. as implemented in the `dev.resid` component of a `family` object) and its expectation, respectively.
+with $y = (y_1, \ldots, y_n)^\top$, $\mu = (\mu_1, \ldots, \mu_n)^\top$, $W = {\rm diag}\left\{w_1, \ldots, w_n\right\}$ and $D = {\rm diag}\left\{d_1, \ldots, d_n\right\}$, where $w_i = m_i d_i^2/v_i$ is the $i$th working weight, with  $d_i = d\mu_i/d\eta_i$ and $v_i = V(\mu_i)$. Furthermore, $q_i = -2 m_i \{y_i\theta_i - b(\theta_i) - c_1(y_i)\}$ and $\rho_i = m_i a'_1$ are the $i$th deviance residual (e.g. as implemented in the `dev.resid` component of a `family` object) and its expectation, respectively, with $a'_i = a'(-m_i/\phi)$.
 
 The expected information matrix about $\beta$ and $\phi$ is
 $$
-i(\beta, \phi) =
+i =
 \left[
 \begin{array}{cc}
-i_{\beta\beta}(\beta, \phi) & 0_p \\
-0_p^\top & i_{\phi\phi}(\beta, \phi)
+i_{\beta\beta} & 0_p \\
+0_p^\top & i_{\phi\phi}
 \end{array}
 \right]
 =
 \left[
 \begin{array}{cc}
 \frac{1}{\phi} X^\top W X & 0_p \\
-0_p^\top & \frac{1}{2\phi^4}\sum_{i = 1}^n m_i^2 a''(-m_i/\phi)
+0_p^\top & \frac{1}{2\phi^4}\sum_{i = 1}^n m_i^2 a''_i
 \end{array}
 \right]\,,
 $$
-where $0_p$ is a $p$-vector of zeros.
+where $0_p$ is a $p$-vector of zeros, and $a''_i = a''(-m_i/\phi)$.
 
 
 ### Maximum likelihood estimation
 
-The maximum likelihood estimator of $\beta$ and $\phi$ satisfies $s_\beta(\hat\beta,\hat\phi) = 0_p$ and $s_\phi(\hat\beta, \hat\phi) = 0$.
+The maximum likelihood estimators $\hat\beta$ and $\hat\phi$ of $\beta$ and $\phi$, respectively, can be found by the solution of the score equations $s_\beta = 0_p$ and $s_\phi = 0$.
 
 ### Mean bias-reducing adjusted score functions
 
-Let $A_\beta(\beta, \phi) = -i_\beta(\beta, \phi) b_\beta(\beta, \phi)$ and $A_\phi(\beta, \phi) = -i_\phi(\beta, \phi) b_\phi(\beta, \phi)$, where $b_\beta(\beta, \phi)$ and $b_\phi(\beta, \phi)$ are the first terms in the expansion of the bias of the maximum likelihood estimator of the regression parameters $\beta$ and dispersion $\phi$, respectively. The results in @firth:93 can be used to show that the solution of the adjusted score equations
+Let $A_\beta = -i_\beta b_\beta$ and $A_\phi = -i_\phi b_\phi$, where $b_\beta$ and $b_\phi$ are the first terms in the expansion of the mean bias of the maximum likelihood estimator of the regression parameters $\beta$ and dispersion $\phi$, respectively. The results in @firth:93 can be used to show that the solution of the adjusted score equations
 \begin{align*}
-s_\beta(\beta,\phi) + A_\beta(\beta, \phi) & = 0_p \\
-s_\phi(\beta, \phi) + A_\phi(\beta, \phi) & = 0
+s_\beta + A_\beta & = 0_p \\
+s_\phi + A_\phi & = 0
 \end{align*}
 results in estimators $\tilde\beta$ and $\tilde\phi$ with bias of smaller asymptotic order than the maximum likelihood estimator.
 
 The results in either @kosmidis:09 or @cordeiro:91 can then be used to re-express the adjustments in forms that are convenient for implementation. In particular, and after some algebra the bias-reducing adjustments for generalized linear models are
 \begin{align*}
- A_\beta(\beta, \phi) & = X^\top W \xi \,, \\
- A_\phi(\beta, \phi) & = \frac{(p - 2)\phi\sum_{i = 1}^n m_i^2
-                   a''(-m_i/\phi) + \sum_{i = 1}^n m_i^3
-                   a'''(-m_i/\phi))}{2\phi^2\sum_{i = 1}^n m_i^2
-                   a''(-m_i/\phi)}
+ A_\beta & = X^\top W \xi \,, \\
+ A_\phi & = \frac{(p - 2)}{2\phi} + \frac{\sum_{i = 1}^n m_i^3
+                   a'''_i}{2\phi^2\sum_{i = 1}^n m_i^2
+                   a''_i}
+%A_\phi & = \frac{(p - 2)\phi\sum_{i = 1}^n m_i^2
+%                   a''(-m_i/\phi) + \sum_{i = 1}^n m_i^3
+%                   a'''(-m_i/\phi))}{2\phi^2\sum_{i = 1}^n m_i^2
+%                   a''(-m_i/\phi)}
 \end{align*}
-where  $\xi = (\xi_1, \ldots, \xi_n)^T$ with $\xi_i = h_id_i'/(2d_iw_i)$, $d_i' = d^2\mu_i/d\eta_i^2$ and $h_i$ is the "hat" value for the $i$th observation (see, e.g. `?hatvalues`).
+where  $\xi = (\xi_1, \ldots, \xi_n)^T$ with $\xi_i = h_id_i'/(2d_iw_i)$, $d_i' = d^2\mu_i/d\eta_i^2$, $a''_i = a''(-m_i/\phi)$, $a'''_i = a'''(-m_i/\phi)$, and $h_i$ is the "hat" value for the $i$th observation (see, e.g. `?hatvalues`).
 
 ### Median bias-reducing adjusted score functions
 
-The results in @kenne:17 can be used to show that the solution of the median adjusted score equations
+The results in @kenne:17 can be used to show that if
 \begin{align*}
-s_\beta(\beta,\phi) + A_\beta(\beta, \phi) & = 0_p \\
-s_\phi(\beta, \phi) + A_\phi(\beta, \phi) & = 0
+ A_\beta & = i_\beta \left\{\frac{u_1}{2} + \frac{u_2}{6} \right\} \\
+ A_\phi & = \frac{p}{2\phi}+\frac{ \sum_{i = 1}^n m_i^3
+                   a'''_i}{6\phi^2\sum_{i = 1}^n m_i^2 a''_i} \, ,
 \end{align*}
-results in estimators $\tilde\beta$ and $\tilde\phi$ with median bias of smaller asymptotic order than the maximum likelihood estimator. The median bias-reducing adjustments for generalized linear models can be written as
+then the solution of the adjusted score equations $s_\beta + A_\beta = 0_p$ and $s_\phi + A_\phi = 0$ results in estimators $\tilde\beta$ and $\tilde\phi$ with median bias of smaller asymptotic order than the maximum likelihood estimator. In the above expressions,
 \begin{align*}
- A_\beta(\beta, \phi) & = i_\beta(\beta, \phi) u_\beta(\beta, \phi) \\
- A_\phi(\beta, \phi) & = \frac{p}{2\phi}+\frac{ \sum_{i = 1}^n m_i^3
-                   a'''(-m_i/\phi))}{6\phi^2\sum_{i = 1}^n m_i^2
-                   a''(-m_i/\phi)}\,,
+u_{1r} &  =  \sum_{s=1}^p i^{rs}_\beta tr\{\nu_\beta (L_s+K_s)\} \\
+u_{2r}  & =  \sum_{s=1}^p i^{rs}_\beta \{i^{r}_\beta\}^TL_si^{r}_\beta/i^{rr}_\beta
 \end{align*}
-where the $r$th element of
-$u_\beta(\beta, \phi)$ is $u_{1r}/2+u_{2r}/6$, with
-\begin{align*}
-u_{1r}   =  \sum_{s=1}^p i^{rs}_\beta(\beta, \phi)tr\{\nu_\beta(\beta,\phi)(L_s+K_s)\} \text{ and }
-u_{2r}   =  \sum_{s=1}^p i^{rs}_\beta(\beta, \phi)i^{r}_\beta(\beta, \phi)^TL_si^{r}_\beta(\beta,\phi)/i^{rr}_\beta(\beta, \phi), \\
-\end{align*}
-where $i^{rs}_\beta(\beta, \phi)$ is the $(r,s)$ element of $i^{-1}_\beta(\beta, \phi),\,$ $i^{r}_\beta(\beta, \phi)$ is the $r$th column of $i^{-1}_\beta(\beta, \phi),\,$
-$\nu_\beta(\beta,\phi) = i^{-1}_\beta(\beta, \phi)-i^{r}_\beta(\beta, \phi)i^{r}_\beta(\beta, \phi)^T,\,$ $L_s = X^TWQ_{1s}X/\phi,\,$  $K_s = -X^TWQ_{2s}X/\phi,\,$ $Q_{1s} = diag\{V'(\mu_1)d_1x_{1s}/V(\mu_1),\ldots,V'(\mu_n)d_1x_{ns}/V(\mu_n)\}$ and
-$Q_{2s} = diag\{d_1x_{1s}(\frac{V'(\mu_1)}{V(\mu_1)}-\frac{d'_1}{d^2_1}),\ldots,
-d_nx_{ns}(\frac{V'(\mu_n)}{V(\mu_n)}-\frac{d'_n}{d^2_n})\}$.
+where $i^{rs}_\beta$ is the $(r,s)$ element of $i^{-1}_\beta,\,$ $i^{r}_\beta$ is the $r$th column of $i^{-1}_\beta$,
+$\nu_{\beta, r} = i^{-1}_\beta - i^{r}_\beta \left\{i^{r}_\beta\right\}^\top$, $L_s = X^TWQ_{1s}X/\phi,\,$  $K_s = -X^TWQ_{2s}X/\phi$,
+<!--$Q_{1s} = diag\{V'(\mu_1)d_1x_{1s}/V(\mu_1),\ldots,V'(\mu_n)d_1x_{ns}/V(\mu_n)\}$ and -->
+<!--$Q_{2s} = diag\{d_1x_{1s}(\frac{V'(\mu_1)}{V(\mu_1)}-\frac{d'_1}{d^2_1}),\ldots, -->
+<!--d_nx_{ns}(\frac{V'(\mu_n)}{V(\mu_n)}-\frac{d'_n}{d^2_n})\}$. -->
+$Q_{1s} = {\rm diag}\{v'_1 d_1x_{1s}/v_1, \ldots, v'_n d_n x_{ns}/v_n\}$ and $Q_{2s} = Q_{1s} - {\rm diag}\{d_1x_{1s}/d'_1, \ldots, d_n x_{ns}/d'_n\}$
 
 # Fitting algorithm in `brglmFit`
 
-`brglmFit` implements a quasi Fisher scoring procedure for solving the adjusted score equations $s_\beta(\beta,\phi) + A_\beta(\beta, \phi) = 0_p$ and $s_\phi(\beta, \phi) + A_\phi(\beta, \phi) = 0$. The iteration consists of an outer loop and an inner loop that implements step-halving. The algorithm is as follows:
+`brglmFit` implements a quasi Fisher scoring procedure for solving the adjusted score equations $s_\beta + A_\beta = 0_p$ and $s_\phi + A_\phi = 0$. The iteration consists of an outer loop and an inner loop that implements step-halving. The algorithm is as follows:
 
 ### Input
 
-+ $s_\beta(\beta, \phi)$, $i_{\beta\beta}(\beta, \phi)$, $A_\beta(\beta, \phi)$
-+ $s_\phi(\beta, \phi)$, $i_{\phi\phi}(\beta, \phi)$, $A_\phi(\beta, \phi)$
++ $s_\beta$, $i_{\beta\beta}$, $A_\beta$
++ $s_\phi$, $i_{\phi\phi}$, $A_\phi$
 + Starting values $\beta^{(0)}$ and $\phi^{(0)}$
 + $\epsilon > 0$: tolerance for the $L1$ norm of the direction before reporting convergence
 + $M$: maximum number of halving steps that can be taken
@@ -234,7 +232,7 @@ d_nx_{ns}(\frac{V'(\mu_n)}{V(\mu_n)}-\frac{d'_n}{d^2_n})\}$.
 
 + The implementation of the adjusted score functions requires ready implementations of $d^2\mu_i/d\eta_i^2$, $a'(.)$, $a''(.)$ and $a'''(.)$. The [**enrichwith**](https://cran.r-project.org/package=enrichwith) R package is used internally to enrich the base `family` and `link-glm` objects with implementations of those functions (see `?enrich.family` and `?enrich.link-glm`).
 
-+ The above iteration can be used to implement a variety of additive adjustments to the score function, by supplying the algorithm with appropriate adjustment functions $A_\beta(\beta, \phi)$ and $A_\phi(\beta, \phi)$
++ The above iteration can be used to implement a variety of additive adjustments to the score function, by supplying the algorithm with appropriate adjustment functions $A_\beta$ and $A_\phi$
 
 # Contributions to this vignette
 
