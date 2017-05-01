@@ -403,7 +403,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                   nu_r_st[r,,] <- -t(x) %*% ((working_weights * d1mus * (d1varmus / varmus - d2mus / d1mus^2) * x[,r]) * x)
                 }
                 k2 <- 1 / diag(inverse_info)
-
                 for (r in 1:nvars)
                 {
                   sum_s1 <- rep(0,nvars)
@@ -433,15 +432,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     }
 
     control <- do.call("brglmControl", control)
-
-    if (control$type == "AS_median") {
-        transformation1 <- control$transformation
-        Trans1 <- control$Trans
-        inverseTrans1 <- control$inverseTrans
-        control$transformation <- "identity"
-        control$Trans <- expression(dispersion)
-        control$inverseTrans <- expression(transformed_dispersion)
-    }
 
     ## FIXME: Add IBLA
     adjustment_function <- switch(control$type,
@@ -491,6 +481,17 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     is_AS_median <- control$type == "AS_median"
     is_correction <- control$type == "correction"
     no_dispersion <- family$family %in% c("poisson", "binomial")
+
+
+    if (is_AS_median) {
+        transformation1 <- control$transformation
+        Trans1 <- control$Trans
+        inverseTrans1 <- control$inverseTrans
+        control$transformation <- "identity"
+        control$Trans <- expression(dispersion)
+        control$inverseTrans <- expression(transformed_dispersion)
+    }
+
 
     ## If fixed_totals is specified the compute row_totals
     if (is.null(fixed_totals)) {
@@ -842,17 +843,20 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
         ## Fisher information for the transformed dispersion
         ## d1zeta <- eval(d1_transformed_dispersion)
+
         if (!no_dispersion) {
             info_transformed_dispersion <- 1/step_components_zeta$inverse_info
-            if (control$type == "AS_median") {
+            if (is_AS_median) {
                 transformed_dispersion <- eval(Trans1)
                 d1zeta <- eval(DD(Trans1, "dispersion", order = 1))
                 adjusted_grad_all["Transformed dispersion"] <- adjusted_grad_all["Transformed dispersion"] / d1zeta
                 info_transformed_dispersion <- info_transformed_dispersion / d1zeta^2
-                control$transformation <- transformation1
-                control$trans <- Trans1
-                control$inverseTrans <- inverseTrans1
             }
+        }
+        if (is_AS_median) {
+            control$transformation <- transformation1
+            control$trans <- Trans1
+            control$inverseTrans <- inverseTrans1
         }
 
         eps <- 10 * .Machine$double.eps
