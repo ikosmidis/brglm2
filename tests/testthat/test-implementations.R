@@ -1,4 +1,4 @@
-context("comparison for Poisson with brpr from the supplementary material of Kosmidis & Firth (2010)")
+context("comparison of brglmFit with method = 'AS_mean' for Poisson with brpr from the supplementary material of Kosmidis & Firth (2010)")
 
 source(system.file("brpr", "brpr.R", package = "brglm2"))
 
