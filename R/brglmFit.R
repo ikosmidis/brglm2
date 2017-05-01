@@ -463,7 +463,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 grad <-  gradient(theta, fit = fit, level = 1)/d1zeta
                 inverse_info <- 1/information(theta, inverse = FALSE, fit = fit, level = 1) * d1zeta^2
                 failed_inversion <- !is.finite(inverse_info)
-                adjustment <- adjustment_function(theta, fit = fit, level = 1)/d1zeta - if (is_ML | is_AS_median) 0 else 0.5 * d2zeta / d1zeta^2
+                ## adjustment <- adjustment_function(theta, fit = fit, level = 1)/d1zeta - if (is_ML | is_AS_median) 0 else 0.5 * d2zeta / d1zeta^2
+                adjustment <- adjustment_function(theta, fit = fit, level = 1)/d1zeta - 0.5 * d2zeta / d1zeta^2
                 failed_adjustment <- is.na(adjustment)
             }
         }
@@ -547,6 +548,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     simulate <- family$simulate
     d1_transformed_dispersion <- DD(control$Trans, "dispersion", order = 1)
     d2_transformed_dispersion <- DD(control$Trans, "dispersion", order = 2)
+
 
     ## Check for invalid etas and mus
     valid_eta <- unless_null(family$valideta, function(eta) TRUE)
