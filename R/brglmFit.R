@@ -428,7 +428,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     }
 
 
-    customTransformation <- is.list(control$transformation) & length(control$transformation == 2)
+    customTransformation <- is.list(control$transformation) & length(control$transformation) == 2
     if (customTransformation) {
         transformation0 <- control$transformation
     }
