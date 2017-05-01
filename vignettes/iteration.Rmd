@@ -16,7 +16,7 @@ vignette: >
 
 In the special case of generalized linear models for binomial and multinomial responses, the adjusted score equations approach returns estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite, like in complete and quasi-complete separation as defined in @albert:84.
 
-The workhorse function is [`brglmFit`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R), which can be passed directly to the `method` argument of the `glm` function. `brglmFit` implements a quasi
+The workhorse function is [`brglmFit`](https://cran.r-project.org/package=brglm2/brglm2.pdf), which can be passed directly to the `method` argument of the `glm` function. `brglmFit` implements a quasi
 [Fisher scoring](https://en.wikipedia.org/wiki/Scoring_algorithm)
 procedure, whose special cases result in various explicit and implicit
 bias reduction methods for generalized linear models [the
@@ -27,7 +27,7 @@ given in @kosmidis:14].
 
 This vignette
 
-+ presents the bias-reducing adjustments to the score functions for generalized linear models
++ presents the supported bias-reducing adjustments to the score functions for generalized linear models
 + describes the fitting algorithm at the core of **brglm2**
 
 # Other resources
@@ -136,7 +136,7 @@ $\nu_{\beta, r} = i^{-1}_\beta - i^{r}_\beta \left\{i^{r}_\beta\right\}^\top$, $
 <!--$Q_{1s} = diag\{V'(\mu_1)d_1x_{1s}/V(\mu_1),\ldots,V'(\mu_n)d_1x_{ns}/V(\mu_n)\}$ and -->
 <!--$Q_{2s} = diag\{d_1x_{1s}(\frac{V'(\mu_1)}{V(\mu_1)}-\frac{d'_1}{d^2_1}),\ldots, -->
 <!--d_nx_{ns}(\frac{V'(\mu_n)}{V(\mu_n)}-\frac{d'_n}{d^2_n})\}$. -->
-$Q_{1s} = {\rm diag}\{v'_1 d_1x_{1s}/v_1, \ldots, v'_n d_n x_{ns}/v_n\}$ and $Q_{2s} = Q_{1s} - {\rm diag}\{d_1x_{1s}/d'_1, \ldots, d_n x_{ns}/d'_n\}$
+$Q_{1s} = {\rm diag}\{v'_1 d_1x_{1s}/v_1, \ldots, v'_n d_n x_{ns}/v_n\}$ and $Q_{2s} = Q_{1s} - {\rm diag}\{d_1x_{1s}/d'_1, \ldots, d_n x_{ns}/d'_n\}$, with $v'_i = V'(\mu_i)$.
 
 # Fitting algorithm in `brglmFit`
 
@@ -226,7 +226,9 @@ $Q_{1s} = {\rm diag}\{v'_1 d_1x_{1s}/v_1, \ldots, v'_n d_n x_{ns}/v_n\}$ and $Q_
 
 # Notes
 
-+ For $K = M = 1$, $\beta^{(0)} = \hat\beta$ and $\phi^{(0)} = \hat\phi$, the above iteration computes the bias-corrected estimates proposed in @cordeiro:91.
++ For $K = M = 1$, $\beta^{(0)} = \hat\beta$ and $\phi^{(0)} = \hat\phi$, the above iteration computes the bias-corrected estimates proposed in @cordeiro:91. This is achieved with the `brglmFit` method is used with `type = "correction"` (see `?brglmFit`).
+
++ The mean-bias reducing adjusted score functions are solved when the `brglmFit` method is used with `type = "AS_mean"`, and the median-bias reducing adjusted score functions with `type = AS_median` (see `?brglmFit`).
 
 + The steps where $\phi$ and the $\phi$ direction are updated are ignored for generalized linear models with known dispersion parameter, like in models with binomial and poisson responses. Also, in that case, $v_\phi^{(.)}$ and $\upsilon_\phi^{(.)}$ in steps 9, 14 and 16 are set to zero.
 
@@ -236,6 +238,6 @@ $Q_{1s} = {\rm diag}\{v'_1 d_1x_{1s}/v_1, \ldots, v'_n d_n x_{ns}/v_n\}$ and $Q_
 
 # Contributions to this vignette
 
-The vignette has been written and by Ioannis Kosmidis. Eugene Clovis Kenne Pagui and Nicola Sartori have contributed the section "Median bias-reducing adjusted score functions" as supporting documentation when the `brglmFit` method is used with `type = "AS_median"`.
+The vignette has been written and by Ioannis Kosmidis. Eugene Clovis Kenne Pagui and Nicola Sartori have contributed the first version of the section "Median bias-reducing adjusted score functions".
 
 # References
