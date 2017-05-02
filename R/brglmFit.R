@@ -736,7 +736,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         }
 
         ## Main iterations
-
+        slowit <- control$slowit
         if (control$maxit == 0) {
             iter <- 0
             failed <- FALSE
@@ -751,7 +751,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     step_beta_previous <- step_beta
                     step_zeta_previous <- step_zeta
                     ## Update betas
-                    betas <- betas + 2^(-step_factor) * step_beta
+                    betas <- betas + slowit * 2^(-step_factor) * step_beta
                     ## Update zetas
                     if (!no_dispersion & df_residual > 0) {
                         transformed_dispersion <- eval(control$Trans)
