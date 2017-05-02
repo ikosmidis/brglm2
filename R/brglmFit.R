@@ -1,13 +1,32 @@
+# Copyright (C) 2016, 2017 Ioannis Kosmidis
+# `AS_median_adjustment`: Copyright (C) 2017, Eugene Clovis Kenne Pagui, Ioannis Kosmidis
+
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 or 3 of the License
+#  (at your option).
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  A copy of the GNU General Public License is available at
+#  http://www.r-project.org/Licenses/
+
+
 #' Fitting function for \code{\link{glm}} for reduced-bias
 #' estimation and inference
 #'
 #' \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
 #' that fits generalized linear models using implicit and explicit
 #' bias reduction methods. Currently supported methods include the
-#' implicit adjusted scores approach in Firth (1993) and Kosmidis \&
-#' Firth (2009), the correction of the asymptotic bias in Cordeiro &
-#' McCullagh (1991), and maximum likelihood.  Estimation is performed
-#' using a quasi Fisher scoring iteration based on the iterative
+#' mean bias-reducing adjusted scores approach in Firth (1993) and
+#' Kosmidis \& Firth (2009), the median bias-reduction adjusted scores
+#' approach in Kenne et al. (2016), the correction of the asymptotic
+#' bias in Cordeiro & McCullagh (1991), and maximum likelihood.
+#' Estimation is performed using a quasi Fisher scoring iteration,
+#' which in the case of mean-bias reduction resembles an iterative
 #' correction of the asymptotic bias of the Fisher scoring iterates.
 #'
 #' @inheritParams stats::glm.fit
@@ -40,9 +59,12 @@
 #' detail in Kosmidis (2014). The quasi (or modified) Fisher scoring
 #' iteration is described in Kosmidis (2010) and is based on the
 #' iterative correction of the asymptotic bias of the Fisher scoring
-#' iterates. A quick description of the quasi Fisher scoring iteration
-#' is also given in one of the vignettes of the *enrichwith* R package
-#' (see,
+#' iterates. A mathematical description of the supported adjustments
+#' and the quasi Fisher scoring iteration is provided in the iteration
+#' vignette (see,
+#' \url{https://cran.r-project.org/package=brglm2/vignettes/iteration.pdf}).
+#' A quick description of the quasi Fisher scoring iteration is also
+#' given in one of the vignettes of the *enrichwith* R package (see,
 #' \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
 #'
 #'
@@ -59,7 +81,7 @@
 #'
 #' \code{brglm_fit} is an alias to \code{brglmFit}.
 #'
-#' @author Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
+#' @author Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Eugene Clovis Kenne Pagui [ctb] \email{kenne@stats.unipd.it}
 #'
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
 #'
