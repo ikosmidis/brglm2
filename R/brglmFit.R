@@ -94,6 +94,10 @@
 #' Firth D. (1993). Bias reduction of maximum likelihood estimates,
 #' Biometrika, **80**, 27-38
 #'
+#' Kenne Pagui E C, Salvan A and Sartori N (2016). Median bias
+#' reduction of maximum likelihood estimates. *arXiv*,
+#' **arXiv:1604.04768**
+#'
 #' Kosmidis I and Firth D (2009). Bias reduction in exponential family
 #' nonlinear models. *Biometrika*, **96**, 793-804
 #'
