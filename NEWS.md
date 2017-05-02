@@ -2,14 +2,18 @@
 
 ## Bug fixes
 * `brglmControl` is now exported
+* **DO ME** `slowit` did nothing; now included in iteration
 
 ## New functionality
 * The `detect_separation` `method` for the `glm` function can be used to check for separation in binomial response settings without fitting the model. This relies on a port of Kjell Konis' `safeBinaryRegression:::separator` function (see ?detect_separation)
-* brglm2 provides aliases of basic methods (`brglm_fit`, `detectSeparation`, `brglm_fit_control`, `detect_separation_control`)
-* brglm2 provides estimation via median-bias reducing score functions
+* brglm2 provides estimation via **median-bias reducing score functions** with `type = "AS_median"`
+* brglm2 provides camel and underscored aliases for basic methods (`brglmFit`, `brglm_fit`, `detectSeparation`, `detect_separation`, `brglm_control`, `brglmControl`, `detectSeparationControl`, `detect_separation_control`, `checkInfiniteEstimates`, `check_infinite_estimates`)
 
 ## Other improvements, updates and additions
 * Minor enhancements in the codebase
+* The inverse expected information matrix is computed internally using cho2inv
+* Internal changes to have more meaningful variable names
+* Renamed detect_infinite* to check_infinite
 
 # brglm2 0.1.3
 
