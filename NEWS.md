@@ -2,7 +2,7 @@
 
 ## Bug fixes
 * `brglmControl` is now exported
-* **DO ME** `slowit` did nothing; now included in iteration
+* `slowit` did nothing; now included in iteration
 
 ## New functionality
 * The `detect_separation` `method` for the `glm` function can be used to check for separation in binomial response settings without fitting the model. This relies on a port of Kjell Konis' `safeBinaryRegression:::separator` function (see ?detect_separation)
