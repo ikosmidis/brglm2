@@ -11,3 +11,6 @@ detectSeparation <- detect_separation
 
 #' @export
 detectSeparationControl <- detect_separation_control
+
+#' @export
+checkInfiniteEstimates <- check_infinite_estimates
