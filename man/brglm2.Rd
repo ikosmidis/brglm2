@@ -7,12 +7,14 @@
 \title{brglm2: Bias Reduction in Generalized Linear Models}
 \description{
 Estimation and inference from generalized linear models based on
-implicit methods for bias reduction (see Kosmidis, 2014). brglm can
-achieve reduction of estimation bias either through the adjusted
-score equations approach in Firth (1993) and Kosmidis and Firth
-(2009), or through the direct subtraction of an estimate of the
-bias of the maximum likelihood estimator from the maximum
-likelihood estimates as in Cordeiro and McCullagh (1991).
+implicit methods for bias reduction (see Kosmidis, 2014). brglm2
+can achieve reduction of estimation bias either through the
+mean-bias reducing adjusted score equations approach in Firth
+(1993) and Kosmidis and Firth (2009), or through the direct
+subtraction of an estimate of the bias of the maximum likelihood
+estimator from the maximum likelihood estimates as in Cordeiro and
+McCullagh (1991), or through the median-bias reducing adjusted
+score equations in Kenne et al. (2016).
 }
 \details{
 In the special case of generalized linear models for binomial and
@@ -49,6 +51,10 @@ linear models. *Journal of the Royal Statistical Society. Series B
 
 Firth D. (1993). Bias reduction of maximum likelihood estimates,
 Biometrika, **80**, 27-38
+
+Kenne Pagui E C, Salvan A and Sartori N (2016). Median bias
+reduction of maximum likelihood estimates. *arXiv*,
+**arXiv:1604.04768**
 
 Kosmidis I and Firth D (2009). Bias reduction in exponential family
 nonlinear models. *Biometrika*, **96**, 793-804

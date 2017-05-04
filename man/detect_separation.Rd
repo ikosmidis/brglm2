@@ -104,7 +104,7 @@ update(murder_glm, method = "brglm_fit")
 }
 }
 \author{
-Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}, Kjell Konis \email{kjell.konis@me.com}
+Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Kjell Konis [ctb] \email{kjell.konis@me.com}
 }
 \references{
 Kjell Konis (2007). *Linear Programming Algorithms for Detecting
