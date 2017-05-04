@@ -213,16 +213,39 @@ The results in either <span class="citation">Kosmidis and Firth (2009)</span> or
 <h3>Median bias-reducing adjusted score functions</h3>
 The results in <span class="citation">Kenne Pagui, Salvan, and Sartori (2017)</span> can be used to show that if
 <span class="math display">\[\begin{align*}
- A_\beta &amp; = i_\beta \left\{\frac{u_1}{2} + \frac{u_2}{6} \right\} \\
+ A_\beta &amp; =  \phi X^\top W (\xi + X u) \\
  A_\phi &amp; = \frac{p}{2\phi}+\frac{ \sum_{i = 1}^n m_i^3
                    a'''_i}{6\phi^2\sum_{i = 1}^n m_i^2 a''_i} \, ,
 \end{align*}\]</span>
-then the solution of the adjusted score equations <span class="math inline">\(s_\beta + A_\beta = 0_p\)</span> and <span class="math inline">\(s_\phi + A_\phi = 0\)</span> results in estimators <span class="math inline">\(\tilde\beta\)</span> and <span class="math inline">\(\tilde\phi\)</span> with median bias of smaller asymptotic order than the maximum likelihood estimator. In the above expressions,
+then the solution of the adjusted score equations <span class="math inline">\(s_\beta + A_\beta = 0_p\)</span> and <span class="math inline">\(s_\phi + A_\phi = 0\)</span> results in estimators <span class="math inline">\(\tilde\beta\)</span> and <span class="math inline">\(\tilde\phi\)</span> with median bias of smaller asymptotic order than the maximum likelihood estimator. In the above expression, <span class="math inline">\(u = (u_1, \ldots, u_p)^\top\)</span> with
 <span class="math display">\[\begin{align*}
-u_{1r} &amp;  =  \sum_{s=1}^p i^{rs}_\beta tr\{\nu_\beta (L_s+K_s)\} \\
-u_{2r}  &amp; =  \sum_{s=1}^p i^{rs}_\beta \{i^{r}_\beta\}^TL_si^{r}_\beta/i^{rr}_\beta
+    u_j = [(X^\top W X)^{-1}]_{j}^\top X^\top \left[
+    \begin{array}{c}
+    \tilde{h}_{j,1} \left\{d_1 v'_1 / (6 v_1) - d'_1/(2 d_1)\right\} \\
+    \vdots \\
+    \tilde{h}_{j,n} \left\{d_n v'_n / (6 v_n) - d'_n/(2 d_n)\right\}
+    \end{array}
+    \right]
 \end{align*}\]</span>
-<p>where <span class="math inline">\(i^{rs}_\beta\)</span> is the <span class="math inline">\((r,s)\)</span> element of <span class="math inline">\(i^{-1}_\beta,\,\)</span> <span class="math inline">\(i^{r}_\beta\)</span> is the <span class="math inline">\(r\)</span>th column of <span class="math inline">\(i^{-1}_\beta\)</span>, <span class="math inline">\(\nu_{\beta, r} = i^{-1}_\beta - i^{r}_\beta \left\{i^{r}_\beta\right\}^\top\)</span>, <span class="math inline">\(L_s = X^TWQ_{1s}X/\phi,\,\)</span> <span class="math inline">\(K_s = -X^TWQ_{2s}X/\phi\)</span>, <!--$Q_{1s} = diag\{V'(\mu_1)d_1x_{1s}/V(\mu_1),\ldots,V'(\mu_n)d_1x_{ns}/V(\mu_n)\}$ and --> <!--$Q_{2s} = diag\{d_1x_{1s}(\frac{V'(\mu_1)}{V(\mu_1)}-\frac{d'_1}{d^2_1}),\ldots, --> <!--d_nx_{ns}(\frac{V'(\mu_n)}{V(\mu_n)}-\frac{d'_n}{d^2_n})\}$. --> <span class="math inline">\(Q_{1s} = {\rm diag}\{v'_1 d_1x_{1s}/v_1, \ldots, v'_n d_n x_{ns}/v_n\}\)</span> and <span class="math inline">\(Q_{2s} = Q_{1s} - {\rm diag}\{d_1x_{1s}/d'_1, \ldots, d_n x_{ns}/d'_n\}\)</span>, with <span class="math inline">\(v'_i = V'(\mu_i)\)</span>.</p>
+<p>where <span class="math inline">\([A]_j\)</span> denotes the <span class="math inline">\(j\)</span>th row of matrix <span class="math inline">\(A\)</span> as a column vector, <span class="math inline">\(v'_i = V'(\mu_i)\)</span>, and <span class="math inline">\(\tilde{h}_{j,i}\)</span> is the <span class="math inline">\(i\)</span>th diagonal element of <span class="math inline">\(X K_j X^T W\)</span>, with <span class="math inline">\(K_j = [(X^\top W X)^{-1}]_{j} [(X^\top W X)^{-1}]_{j}^\top / [(X^\top W X)^{-1}]_{jj}\)</span>.</p>
+<!-- The results in @kenne:17 can be used to show that if -->
+<!-- \begin{align*} -->
+<!--  A_\beta & = i_\beta \left\{\frac{u_1}{2} + \frac{u_2}{6} \right\} \\ -->
+<!--  A_\phi & = \frac{p}{2\phi}+\frac{ \sum_{i = 1}^n m_i^3 -->
+<!--                    a'''_i}{6\phi^2\sum_{i = 1}^n m_i^2 a''_i} \, , -->
+<!-- \end{align*} -->
+<!-- then the solution of the adjusted score equations $s_\beta + A_\beta = 0_p$ and $s_\phi + A_\phi = 0$ results in estimators $\tilde\beta$ and $\tilde\phi$ with median bias of smaller asymptotic order than the maximum likelihood estimator.  -->
+<!-- In the above expressions, -->
+<!-- \begin{align*} -->
+<!-- u_{1r} &  =  \sum_{s=1}^p i^{rs}_\beta tr\{\nu_\beta (L_s+K_s)\} \\ -->
+<!-- u_{2r}  & =  \sum_{s=1}^p i^{rs}_\beta \{i^{r}_\beta\}^TL_si^{r}_\beta/i^{rr}_\beta -->
+<!-- \end{align*} -->
+<!-- where $i^{rs}_\beta$ is the $(r,s)$ element of $i^{-1}_\beta,\,$ $i^{r}_\beta$ is the $r$th column of $i^{-1}_\beta$, -->
+<!-- $\nu_{\beta, r} = i^{-1}_\beta - i^{r}_\beta \left\{i^{r}_\beta\right\}^\top$, $L_s = X^TWQ_{1s}X/\phi,\,$  $K_s = -X^TWQ_{2s}X/\phi$, -->
+<!-- <\!--$Q_{1s} = diag\{V'(\mu_1)d_1x_{1s}/V(\mu_1),\ldots,V'(\mu_n)d_1x_{ns}/V(\mu_n)\}$ and -\-> -->
+<!-- <\!--$Q_{2s} = diag\{d_1x_{1s}(\frac{V'(\mu_1)}{V(\mu_1)}-\frac{d'_1}{d^2_1}),\ldots, -\-> -->
+<!-- <\!--d_nx_{ns}(\frac{V'(\mu_n)}{V(\mu_n)}-\frac{d'_n}{d^2_n})\}$. -\-> -->
+<!-- $Q_{1s} = {\rm diag}\{v'_1 d_1x_{1s}/v_1, \ldots, v'_n d_n x_{ns}/v_n\}$ and $Q_{2s} = Q_{1s} - {\rm diag}\{d_1x_{1s}/d'_1, \ldots, d_n x_{ns}/d'_n\}$, with $v'_i = V'(\mu_i)$. -->
 </div>
 </div>
 <div id="fitting-algorithm-in-brglmfit" class="section level1">
@@ -306,7 +329,7 @@ u_{2r}  &amp; =  \sum_{s=1}^p i^{rs}_\beta \{i^{r}_\beta\}^TL_si^{r}_\beta/i^{rr
 </div>
 <div id="contributions-to-this-vignette" class="section level1">
 <h1>Contributions to this vignette</h1>
-<p>The vignette has been written and by Ioannis Kosmidis. Eugene Clovis Kenne Pagui and Nicola Sartori have contributed the first version of the section “Median bias-reducing adjusted score functions”.</p>
+<p>The first version of the vignette has been written by Ioannis Kosmidis. Eugene Clovis Kenne Pagui and Nicola Sartori contributed the first version of the section “Median bias-reducing adjusted score functions”, and Ioannis Kosmidis brought the expressions for the median bias-reducing adjustments in the reduced form that is shown above.</p>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1>References</h1>
