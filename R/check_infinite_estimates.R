@@ -17,6 +17,7 @@
 #' A simple diagnostic of whether the maximum likelihood estimates are
 #' infinite
 #'
+#' @aliases checkInfiniteEstimates
 #'
 #' @param object the result of a \code{\link{glm}} call
 #' @param nsteps starting from \code{maxit = 1}, the GLM is refitted

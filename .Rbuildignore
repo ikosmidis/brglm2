@@ -1,8 +1,13 @@
 inst/brglm0
-inst/brpr/
+inst/brpr
 inst/demos
+inst/mbrpr
+inst/other
 inst/useR!2016
 inst/TODO.org
 src/hats.c
 tests/
 vignettes/iteration\[exported\].html
+vignettes/iteration\[exported\].pdf
+vignettes/iteration.html
+vignettes/iteration.pdf

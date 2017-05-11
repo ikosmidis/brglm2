@@ -2,6 +2,7 @@
 % Please edit documentation in R/check_infinite_estimates.R
 \name{check_infinite_estimates.glm}
 \alias{check_infinite_estimates.glm}
+\alias{checkInfiniteEstimates}
 \title{A simple diagnostic of whether the maximum likelihood estimates are
 infinite}
 \usage{

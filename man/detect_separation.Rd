@@ -3,6 +3,8 @@
 \name{detect_separation}
 \alias{detect_separation}
 \alias{detectSeparation}
+\alias{print.detect_separation}
+\alias{print.detect_separation_core}
 \title{Method for \code{\link{glm}} that tests for data separation and
 finds which parameters have infinite maximum likelihood estimates
 in generalized linear models with binomial responses}
