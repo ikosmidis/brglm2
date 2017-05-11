@@ -27,7 +27,7 @@
 #'
 #' @inheritParams stats::glm.fit
 #'
-#' @aliases detectSeparation print.detect_separation print.detect_separation_core
+#' @aliases detectSeparation print.detect_separation
 #'
 #' @param x \code{x} is a design matrix of dimension \code{n * p},
 #' @param y \code{y} is a vector of observations of length \code{n}
@@ -219,7 +219,6 @@ print.detect_separation <- function(x, digits = max(5L, getOption("digits") - 3L
     }
 }
 
-#' @export
 print.detect_separation_core <- function(x, digits = max(5L, getOption("digits") - 3L), ...) {
     cat("Separation:", x$separation, "\n")
     if (!is.null(x$betas)) {
