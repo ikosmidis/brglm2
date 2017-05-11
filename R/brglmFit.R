@@ -431,8 +431,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     hats_j <- .rowSums((x %*% vcov_j) * x, nobs, nvars, TRUE) * working_weights
                     b_vector[j] <- inverse_info_unscaled_j %*% .colSums(x * (hats_j * (d1mus * d1varmus / (6 * varmus) - 0.5 * d2mus/d1mus)), nobs, nvars, TRUE)
                 }
-                return(dispersion * (.colSums(0.5 * hatvalues * d2mus / d1mus * x, nobs, nvars, TRUE) +
-                                     info_unscaled %*% b_vector))
+                return(.colSums(0.5 * hatvalues * d2mus / d1mus * x, nobs, nvars, TRUE) +
+                       info_unscaled %*% b_vector)
             }
             if (level == 1) {
                 s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
