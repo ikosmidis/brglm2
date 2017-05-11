@@ -70,7 +70,7 @@ Suppressing the dependence of the various quantities on the model parameters and
     s_\beta & = \frac{1}{\phi}X^TWD^{-1}(y - \mu) \\
 	s_\phi & = \frac{1}{2\phi^2}\sum_{i = 1}^n (q_i - \rho_i)
 \end{align*}
-with $y = (y_1, \ldots, y_n)^\top$, $\mu = (\mu_1, \ldots, \mu_n)^\top$, $W = {\rm diag}\left\{w_1, \ldots, w_n\right\}$ and $D = {\rm diag}\left\{d_1, \ldots, d_n\right\}$, where $w_i = m_i d_i^2/v_i$ is the $i$th working weight, with  $d_i = d\mu_i/d\eta_i$ and $v_i = V(\mu_i)$. Furthermore, $q_i = -2 m_i \{y_i\theta_i - b(\theta_i) - c_1(y_i)\}$ and $\rho_i = m_i a'_1$ are the $i$th deviance residual (e.g. as implemented in the `dev.resid` component of a `family` object) and its expectation, respectively, with $a'_i = a'(-m_i/\phi)$.
+with $y = (y_1, \ldots, y_n)^\top$, $\mu = (\mu_1, \ldots, \mu_n)^\top$, $W = {\rm diag}\left\{w_1, \ldots, w_n\right\}$ and $D = {\rm diag}\left\{d_1, \ldots, d_n\right\}$, where $w_i = m_i d_i^2/v_i$ is the $i$th working weight, with  $d_i = d\mu_i/d\eta_i$ and $v_i = V(\mu_i)$. Furthermore, $q_i = -2 m_i \{y_i\theta_i - b(\theta_i) - c_1(y_i)\}$ and $\rho_i = m_i a'_1$ are the $i$th deviance residual (e.g. as implemented in the `dev.resids` component of a `family` object) and its expectation, respectively, with $a'_i = a'(-m_i/\phi)$.
 
 The expected information matrix about $\beta$ and $\phi$ is
 $$
@@ -121,7 +121,7 @@ where  $\xi = (\xi_1, \ldots, \xi_n)^T$ with $\xi_i = h_id_i'/(2d_iw_i)$, $d_i' 
 ### Median bias-reducing adjusted score functions
 The results in @kenne:17 can be used to show that if
 \begin{align*}
- A_\beta & =  \phi X^\top W (\xi + X u) \\
+ A_\beta & =  X^\top W (\xi + X u) \\
  A_\phi & = \frac{p}{2\phi}+\frac{ \sum_{i = 1}^n m_i^3
                    a'''_i}{6\phi^2\sum_{i = 1}^n m_i^2 a''_i} \, ,
 \end{align*}
