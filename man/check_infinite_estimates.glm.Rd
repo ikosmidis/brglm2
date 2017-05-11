@@ -55,4 +55,3 @@ Discrimination. *Journal of the Royal Statistical Society. Series B
 \seealso{
 \code{\link[nnet]{multinom}}
 }
-

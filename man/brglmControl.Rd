@@ -83,10 +83,9 @@ coalitionBRc <- update(coalitionML, method = "brglmFit",
 coef(coalitionBRc, model = "dispersion")
 
 }
-\author{
-Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
-}
 \seealso{
 \code{\link{brglmFit}} and \code{\link{glm.fit}}
 }
-
+\author{
+Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
+}

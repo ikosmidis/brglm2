@@ -39,4 +39,3 @@ Heinze, G., & Schemper, M. (2002). A Solution to the Problem of
 Separation in Logistic Regression. *Statistics in Medicine*, **21**, 2409–2419
 }
 \keyword{datasets}
-

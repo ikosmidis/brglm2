@@ -131,9 +131,6 @@ houseBC3 <- update(houseML3, type = "correction")
 
 
 }
-\author{
-Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
-}
 \references{
 Agrest A (2002). Categorical data analysis (2nd Edition). Wiley. New York.
 
@@ -151,4 +148,6 @@ Variables. *Biometrika*, **68**, 563-566.
 \seealso{
 \code{\link[nnet]{multinom}}
 }
-
+\author{
+Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
+}

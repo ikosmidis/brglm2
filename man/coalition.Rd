@@ -24,4 +24,3 @@ King, G., Alt, J. E., Burns, N. E. and Laver, M. (1990). A Unified
  Publication Related Archive, 1115.
 }
 \keyword{datasets}
-

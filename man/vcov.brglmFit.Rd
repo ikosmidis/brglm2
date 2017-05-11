@@ -25,4 +25,3 @@ in a \code{\link{brglmFit}} object}
 Return the variance-covariance matrix for the regression parameters
 in a \code{\link{brglmFit}} object
 }
-

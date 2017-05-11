@@ -34,4 +34,3 @@ sun and in shade, at three times of day.
 }
 }
 \keyword{datasets}
-

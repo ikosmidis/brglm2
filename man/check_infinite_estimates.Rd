@@ -15,4 +15,3 @@ check_infinite_estimates(object, ...)
 \description{
 Generic method for checking for infinite estimates
 }
-

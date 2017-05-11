@@ -41,9 +41,6 @@ and maintenance of the two packages will continue, until **brglm2**
 incorporates all **brglm** functionality and gets an appropriate
 wrapper to the \code{brglm::brglm} function.
 }
-\author{
-Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
-}
 \references{
 Cordeiro G. M. & McCullagh, P. (1991). Bias correction in generalized
 linear models. *Journal of the Royal Statistical Society. Series B
@@ -67,4 +64,6 @@ Kosmidis I (2014). Bias in parametric estimation: reduction and
 useful side-effects. *WIRE Computational Statistics*, **6**,
 185-196
 }
-
+\author{
+Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
+}

@@ -42,4 +42,3 @@ The interface of the summary method for
 \seealso{
 \code{\link{summary.glm}} and \code{\link{glm}}
 }
-

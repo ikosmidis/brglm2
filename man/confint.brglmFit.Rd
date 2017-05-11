@@ -22,4 +22,3 @@ regression parameters in a \code{\link{brglmFit}} object}
 Method for computing confidence intervals for one or more
 regression parameters in a \code{\link{brglmFit}} object
 }
-

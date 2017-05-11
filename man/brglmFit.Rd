@@ -161,9 +161,6 @@ summary(endometrialBC)
 summary(endometrialBR)
 
 }
-\author{
-Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Eugene Clovis Kenne Pagui [ctb] \email{kenne@stats.unipd.it}
-}
 \references{
 Cordeiro G. M. & McCullagh, P. (1991). Bias correction in generalized
 linear models. *Journal of the Royal Statistical Society. Series B
@@ -190,4 +187,6 @@ useful side-effects. *WIRE Computational Statistics*, **6**,
 \seealso{
 \code{\link{glm.fit}} and \code{\link{glm}}
 }
-
+\author{
+Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Eugene Clovis Kenne Pagui [ctb] \email{kenne@stats.unipd.it}
+}
