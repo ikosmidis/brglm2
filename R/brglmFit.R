@@ -114,19 +114,19 @@
 #' data("lizards")
 #' # Fit the model using maximum likelihood
 #' lizardsML <- glm(cbind(grahami, opalinus) ~ height + diameter +
-#'                      light + time, family = binomial(logit), data = lizards,
+#'                  light + time, family = binomial(logit), data = lizards,
 #'                  method = "glm.fit")
 #' # Mean bias-reduced fit:
-#' lizardsBR <- glm(cbind(grahami, opalinus) ~ height + diameter +
-#'                      light + time, family = binomial(logit), data = lizards,
-#'                  method = "brglmFit")
+#' lizardsBR_mean <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                       light + time, family = binomial(logit), data = lizards,
+#'                       method = "brglmFit")
 #' # Median bias-reduced fit:
-#' lizardsMBR <- glm(cbind(grahami, opalinus) ~ height + diameter +
-#'                      light + time, family = binomial(logit), data = lizards,
-#'                  method = "brglmFit",type = "AS_median")
+#' lizardsBR_median <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                         light + time, family = binomial(logit), data = lizards,
+#'                         method = "brglmFit", type = "AS_median")
 #' summary(lizardsML)
-#' summary(lizardsBR)
-#' summary(lizardsMBR)
+#' summary(lizardsBR_median)
+#' summary(lizardsBR_mean)
 #'
 #'
 #' ## Another example from
@@ -139,11 +139,11 @@
 #' # The maximum likelihood fit with log link
 #' coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
 #' # The mean bias-reduced fit
-#' coalitionBR <- update(coalitionML, method = "brglmFit")
+#' coalitionBR_mean <- update(coalitionML, method = "brglmFit")
 #' # The bias-corrected fit
 #' coalitionBC <- update(coalitionML, method = "brglmFit", type = "correction")
 #' # The median bias-corrected fit
-#' coalitionMBR <- update(coalitionML, method = "brglmFit", type = "AS_median")
+#' coalitionBR_median <- update(coalitionML, method = "brglmFit", type = "AS_median")
 #' }
 #'
 #' \dontrun{
@@ -153,34 +153,40 @@
 #' anorexML <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
 #'                 family = gaussian, data = anorexia)
 #' anorexBC <- update(anorexML, method = "brglmFit", type = "correction")
-#' anorexBR <- update(anorexML, method = "brglmFit")
-#' anorexMBR <- update(anorexML, method = "brglmFit", type = "AS_median")
+#' anorexBR_mean <- update(anorexML, method = "brglmFit")
+#' anorexBR_median <- update(anorexML, method = "brglmFit", type = "AS_median")
 #'
-#' ## The outputs are identical, because the maximum likelihood
-#' ## estimators of the regression parameters are unbiased when family
-#' ## is Gaussian, and the bias-reduced estimator of the dispersion is
-#' ## the unbiased, by degree of freedom adjustment, estimator of the
-#' ## residual variance. 
+#' ## All methods return the same estimates for the regression
+#' ## parameters because the maximum likelihood estimator is normally
+#' ## distributed around the `true` value under the model (hence, both
+#' ## mean and component-wise median unbiased). The Wald tests for
+#' ## anorexBC and anorexBR_mean differ from anorexML
+#' ## because the bias-reduced estimator of the dispersion is the
+#' ## unbiased, by degree of freedom adjustment (divide by n - p),
+#' ## estimator of the residual variance. The Wald tests from
+#' ## anorexBR_median are based on the median bias-reduced estimator
+#' ## of the dispersion that results from a different adjustment of the
+#' ## degrees of freedom (divide by n - p - 2/3)
 #' summary(anorexML)
 #' summary(anorexBC)
-#' summary(anorexBR)
-#' summary(anorexMBR)
+#' summary(anorexBR_mean)
+#' summary(anorexBR_median)
 #' }
 #'
 #' ## endometrial data from Heinze \& Schemper (2002) (see ?endometrial)
 #' data("endometrial", package = "brglm2")
 #' endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
 #'                      family = binomial("probit"))
-#' endometrialBR <- update(endometrialML, method = "brglmFit",
-#'                         type = "AS_mean")
+#' endometrialBR_mean <- update(endometrialML, method = "brglmFit",
+#'                              type = "AS_mean")
 #' endometrialBC <- update(endometrialML, method = "brglmFit",
 #'                         type = "correction")
-#' endometrialMBR <- update(endometrialML, method = "brglmFit",
-#'                         type = "AS_median")                         
+#' endometrialBR_median <- update(endometrialML, method = "brglmFit",
+#'                                type = "AS_median")
 #' summary(endometrialML)
 #' summary(endometrialBC)
-#' summary(endometrialBR)
-#' summary(endometrialMBR)
+#' summary(endometrialBR_mean)
+#' summary(endometrialBR_median)
 #'
 #' @export
 brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
