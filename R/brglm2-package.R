@@ -2,13 +2,14 @@
 #'
 #' Estimation and inference from generalized linear models based on
 #' implicit methods for bias reduction (see Kosmidis, 2014). brglm2
-#' can achieve reduction of estimation bias either through the
-#' mean-bias reducing adjusted score equations approach in Firth
-#' (1993) and Kosmidis and Firth (2009), or through the direct
+#' can achieve reduction of estimation bias by solving either the
+#' mean-bias reducing adjusted score equations in Firth (1993) and
+#' Kosmidis and Firth (2009), or the median-bias reducing adjusted
+#' score equations in Kenne et al. (2016), or through the direct
 #' subtraction of an estimate of the bias of the maximum likelihood
 #' estimator from the maximum likelihood estimates as in Cordeiro and
-#' McCullagh (1991), or through the median-bias reducing adjusted
-#' score equations in Kenne et al. (2016).
+#' McCullagh (1991),
+#'
 #'
 #' In the special case of generalized linear models for binomial and
 #' multinomial responses, the adjusted score equations approach
