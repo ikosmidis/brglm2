@@ -1,5 +1,5 @@
 # Copyright (C) 2016, 2017 Ioannis Kosmidis
-# function `AS_median_adjustment`: Copyright (C) 2017, Eugene Clovis Kenne Pagui, Ioannis Kosmidis
+# function `AS_median_adjustment`: Copyright (C) 2017, Euloge Clovis Kenne Pagui, Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@
 #'
 #' \code{brglm_fit} is an alias to \code{brglmFit}.
 #'
-#' @author Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Eugene Clovis Kenne Pagui [ctb] \email{kenne@stats.unipd.it}
+#' @author Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}
 #'
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
 #'
@@ -114,14 +114,19 @@
 #' data("lizards")
 #' # Fit the model using maximum likelihood
 #' lizardsML <- glm(cbind(grahami, opalinus) ~ height + diameter +
-#'                      light + time, family = binomial(logit), data = lizards,
+#'                  light + time, family = binomial(logit), data = lizards,
 #'                  method = "glm.fit")
-#' # Now the bias-reduced fit:
-#' lizardsBR <- glm(cbind(grahami, opalinus) ~ height + diameter +
-#'                      light + time, family = binomial(logit), data = lizards,
-#'                  method = "brglmFit")
+#' # Mean bias-reduced fit:
+#' lizardsBR_mean <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                       light + time, family = binomial(logit), data = lizards,
+#'                       method = "brglmFit")
+#' # Median bias-reduced fit:
+#' lizardsBR_median <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                         light + time, family = binomial(logit), data = lizards,
+#'                         method = "brglmFit", type = "AS_median")
 #' summary(lizardsML)
-#' summary(lizardsBR)
+#' summary(lizardsBR_median)
+#' summary(lizardsBR_mean)
 #'
 #'
 #' ## Another example from
@@ -133,10 +138,12 @@
 #' data("coalition", package = "brglm2")
 #' # The maximum likelihood fit with log link
 #' coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
-#' # The bias-reduced fit
-#' coalitionBR <- update(coalitionML, method = "brglmFit")
+#' # The mean bias-reduced fit
+#' coalitionBR_mean <- update(coalitionML, method = "brglmFit")
 #' # The bias-corrected fit
 #' coalitionBC <- update(coalitionML, method = "brglmFit", type = "correction")
+#' # The median bias-corrected fit
+#' coalitionBR_median <- update(coalitionML, method = "brglmFit", type = "AS_median")
 #' }
 #'
 #' \dontrun{
@@ -145,30 +152,41 @@
 #'
 #' anorexML <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
 #'                 family = gaussian, data = anorexia)
-#' anorexBR <- update(anorexML, method = "brglmFit")
 #' anorexBC <- update(anorexML, method = "brglmFit", type = "correction")
+#' anorexBR_mean <- update(anorexML, method = "brglmFit")
+#' anorexBR_median <- update(anorexML, method = "brglmFit", type = "AS_median")
 #'
-#' ## The outputs are identical, because the maximum likelihood
-#' ## estimators of the regression parameters are unbiased when family
-#' ## is Gaussian, and the bias-reduced estimator of the dispersion is
-#' ## the unbiased, by degree of freedom adjustment, estimator of the
-#' ## residual variance.
+#' ## All methods return the same estimates for the regression
+#' ## parameters because the maximum likelihood estimator is normally
+#' ## distributed around the `true` value under the model (hence, both
+#' ## mean and component-wise median unbiased). The Wald tests for
+#' ## anorexBC and anorexBR_mean differ from anorexML
+#' ## because the bias-reduced estimator of the dispersion is the
+#' ## unbiased, by degree of freedom adjustment (divide by n - p),
+#' ## estimator of the residual variance. The Wald tests from
+#' ## anorexBR_median are based on the median bias-reduced estimator
+#' ## of the dispersion that results from a different adjustment of the
+#' ## degrees of freedom (divide by n - p - 2/3)
 #' summary(anorexML)
-#' summary(anorexBR)
 #' summary(anorexBC)
+#' summary(anorexBR_mean)
+#' summary(anorexBR_median)
 #' }
 #'
 #' ## endometrial data from Heinze \& Schemper (2002) (see ?endometrial)
 #' data("endometrial", package = "brglm2")
 #' endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
 #'                      family = binomial("probit"))
-#' endometrialBR <- update(endometrialML, method = "brglmFit",
-#'                         type = "AS_mean")
+#' endometrialBR_mean <- update(endometrialML, method = "brglmFit",
+#'                              type = "AS_mean")
 #' endometrialBC <- update(endometrialML, method = "brglmFit",
 #'                         type = "correction")
+#' endometrialBR_median <- update(endometrialML, method = "brglmFit",
+#'                                type = "AS_median")
 #' summary(endometrialML)
 #' summary(endometrialBC)
-#' summary(endometrialBR)
+#' summary(endometrialBR_mean)
+#' summary(endometrialBR_median)
 #'
 #' @export
 brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
@@ -371,7 +389,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
-    ## Implementation by Eugene Clovis Kenne Pagui, 20 April 2017 (kept here for testing)
+    ## Implementation by Euloge Clovis Kenne Pagui, 20 April 2017 (kept here for testing)
     ## AS_median_adjustment <- function(pars, level = 0, fit = NULL) {
     ##     if (is.null(fit)) {
     ##         fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
