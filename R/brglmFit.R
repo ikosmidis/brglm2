@@ -1,5 +1,5 @@
 # Copyright (C) 2016, 2017 Ioannis Kosmidis
-# function `AS_median_adjustment`: Copyright (C) 2017, Eugene Clovis Kenne Pagui, Ioannis Kosmidis
+# function `AS_median_adjustment`: Copyright (C) 2017, Euloge Clovis Kenne Pagui, Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@
 #'
 #' \code{brglm_fit} is an alias to \code{brglmFit}.
 #'
-#' @author Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Eugene Clovis Kenne Pagui [ctb] \email{kenne@stats.unipd.it}
+#' @author Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stats.unipd.it}
 #'
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
 #'
@@ -116,12 +116,17 @@
 #' lizardsML <- glm(cbind(grahami, opalinus) ~ height + diameter +
 #'                      light + time, family = binomial(logit), data = lizards,
 #'                  method = "glm.fit")
-#' # Now the bias-reduced fit:
+#' # Mean bias-reduced fit:
 #' lizardsBR <- glm(cbind(grahami, opalinus) ~ height + diameter +
 #'                      light + time, family = binomial(logit), data = lizards,
 #'                  method = "brglmFit")
+#' # Median bias-reduced fit:
+#' lizardsMBR <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                      light + time, family = binomial(logit), data = lizards,
+#'                  method = "brglmFit",type = "AS_median")
 #' summary(lizardsML)
 #' summary(lizardsBR)
+#' summary(lizardsMBR)
 #'
 #'
 #' ## Another example from
@@ -133,10 +138,12 @@
 #' data("coalition", package = "brglm2")
 #' # The maximum likelihood fit with log link
 #' coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
-#' # The bias-reduced fit
+#' # The mean bias-reduced fit
 #' coalitionBR <- update(coalitionML, method = "brglmFit")
 #' # The bias-corrected fit
 #' coalitionBC <- update(coalitionML, method = "brglmFit", type = "correction")
+#' # The median bias-corrected fit
+#' coalitionMBR <- update(coalitionML, method = "brglmFit", type = "AS_median")
 #' }
 #'
 #' \dontrun{
@@ -145,17 +152,19 @@
 #'
 #' anorexML <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
 #'                 family = gaussian, data = anorexia)
-#' anorexBR <- update(anorexML, method = "brglmFit")
 #' anorexBC <- update(anorexML, method = "brglmFit", type = "correction")
+#' anorexBR <- update(anorexML, method = "brglmFit")
+#' anorexMBR <- update(anorexML, method = "brglmFit", type = "AS_median")
 #'
 #' ## The outputs are identical, because the maximum likelihood
 #' ## estimators of the regression parameters are unbiased when family
 #' ## is Gaussian, and the bias-reduced estimator of the dispersion is
 #' ## the unbiased, by degree of freedom adjustment, estimator of the
-#' ## residual variance.
+#' ## residual variance. 
 #' summary(anorexML)
-#' summary(anorexBR)
 #' summary(anorexBC)
+#' summary(anorexBR)
+#' summary(anorexMBR)
 #' }
 #'
 #' ## endometrial data from Heinze \& Schemper (2002) (see ?endometrial)
@@ -166,9 +175,12 @@
 #'                         type = "AS_mean")
 #' endometrialBC <- update(endometrialML, method = "brglmFit",
 #'                         type = "correction")
+#' endometrialMBR <- update(endometrialML, method = "brglmFit",
+#'                         type = "AS_median")                         
 #' summary(endometrialML)
 #' summary(endometrialBC)
 #' summary(endometrialBR)
+#' summary(endometrialMBR)
 #'
 #' @export
 brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
@@ -371,7 +383,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
-    ## Implementation by Eugene Clovis Kenne Pagui, 20 April 2017 (kept here for testing)
+    ## Implementation by Euloge Clovis Kenne Pagui, 20 April 2017 (kept here for testing)
     ## AS_median_adjustment <- function(pars, level = 0, fit = NULL) {
     ##     if (is.null(fit)) {
     ##         fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
