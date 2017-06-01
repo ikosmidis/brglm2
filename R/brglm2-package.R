@@ -11,18 +11,19 @@
 #' McCullagh (1991),
 #'
 #'
-#' In the special case of generalized linear models for binomial and
-#' multinomial responses, the adjusted score equations approach
-#' returns estimates with improved frequentist properties, that are
-#' also always finite, even in cases where the maximum likelihood
-#' estimates are infinite (e.g. complete and quasi-complete
-#' separation; see also `?detect_separation` and
-#' `?check_infinite_estimates` for pre-fit and post-fit methods for
-#' the detection of infinite estimates in binomial response
-#' generalized linear models). Estimation in all cases takes place
-#' via a modified Fisher scoring algorithm, and S3 methods for the
-#' construction of confidence intervals for the reduced-bias estimates
-#' are provided.
+#' In the special case of generalized linear models for binomial,
+#' Poisson and multinomial responses, the adjusted score equations
+#' approaches return estimates with improved frequentist properties,
+#' that are also always finite, even in cases where the maximum
+#' likelihood estimates are infinite (e.g. complete and quasi-complete
+#' separation in multinomial regression; see also
+#' \code{\link{detect_separation}} and
+#' \code{\link{check_infinite_estimates}} for pre-fit and post-fit
+#' methods for the detection of infinite estimates in binomial
+#' response generalized linear models). Estimation in all cases takes
+#' place via a modified Fisher scoring algorithm, and S3 methods for
+#' the construction of confidence intervals for the reduced-bias
+#' estimates are provided.
 #'
 #' @details
 #'
