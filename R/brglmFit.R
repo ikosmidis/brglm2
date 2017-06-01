@@ -20,14 +20,15 @@
 #'
 #' \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
 #' that fits generalized linear models using implicit and explicit
-#' bias reduction methods. Currently supported methods include the
-#' mean bias-reducing adjusted scores approach in Firth (1993) and
-#' Kosmidis \& Firth (2009), the median bias-reduction adjusted scores
-#' approach in Kenne et al. (2016), the correction of the asymptotic
-#' bias in Cordeiro & McCullagh (1991), and maximum likelihood.
-#' Estimation is performed using a quasi Fisher scoring iteration,
-#' which in the case of mean-bias reduction resembles an iterative
-#' correction of the asymptotic bias of the Fisher scoring iterates.
+#' bias reduction methods (Kosmidis, 2014). Currently supported
+#' methods include the mean bias-reducing adjusted scores approach in
+#' Firth (1993) and Kosmidis \& Firth (2009), the median
+#' bias-reduction adjusted scores approach in Kenne et al. (2016), the
+#' correction of the asymptotic bias in Cordeiro & McCullagh (1991),
+#' and maximum likelihood. Estimation is performed using a quasi
+#' Fisher scoring iteration, which, in the case of mean-bias
+#' reduction, resembles an iterative correction of the asymptotic bias
+#' of the Fisher scoring iterates.
 #'
 #' @inheritParams stats::glm.fit
 #' @aliases brglm_fit
@@ -55,18 +56,31 @@
 #'
 #' @details
 #'
-#' Implicit and explicit bias reduction methods are described in
-#' detail in Kosmidis (2014). The quasi (or modified) Fisher scoring
-#' iteration is described in Kosmidis and Firth (2010) and is based on the
-#' iterative correction of the asymptotic bias of the Fisher scoring
-#' iterates. A mathematical description of the supported adjustments
-#' and the quasi Fisher scoring iteration is provided in the iteration
-#' vignette (see,
+#' A detailed description of the supported adjustments and the quasi
+#' Fisher scoring iteration is given in the iteration vignette (see,
 #' \url{https://cran.r-project.org/package=brglm2/vignettes/iteration.pdf}).
-#' A quick description of the quasi Fisher scoring iteration is also
+#' A shorter description of the quasi Fisher scoring iteration is also
 #' given in one of the vignettes of the *enrichwith* R package (see,
 #' \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
+#' Kosmidis and Firth (2010) describe a parallel quasi Newton-Raphson
+#' iteration with the same stationary point.
 #'
+#' In the special case of generalized linear models for binomial,
+#' Poisson and multinomial responses, the adjusted score equations
+#' approach returns estimates with improved frequentist properties,
+#' that are also always finite, even in cases where the maximum
+#' likelihood estimates are infinite (e.g. complete and quasi-complete
+#' separation in multinomial regression; see also
+#' \code{\link{detect_separation}} and
+#' \code{\link{check_infinite_estimates}} for pre-fit and post-fit
+#' methods for the detection of infinite estimates in binomial
+#' response generalized linear models).
+#'
+#' The type of the bias-reducing adjustment to be used is specified
+#' through the \code{type} argument (see \code{\link{brglmControl}}
+#' for details). The default is to use the mean bias-reducing
+#' adjustsments in Firth (1993) and Kosmidis \& Firth (2009)
+#' (\code{type = "AS_mean"}}.
 #'
 #' The null deviance is evaluated based on the fitted values using the
 #'     method specified by the \code{type} argument (see
