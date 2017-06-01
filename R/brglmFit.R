@@ -57,7 +57,7 @@
 #'
 #' Implicit and explicit bias reduction methods are described in
 #' detail in Kosmidis (2014). The quasi (or modified) Fisher scoring
-#' iteration is described in Kosmidis (2010) and is based on the
+#' iteration is described in Kosmidis and Firth (2010) and is based on the
 #' iterative correction of the asymptotic bias of the Fisher scoring
 #' iterates. A mathematical description of the supported adjustments
 #' and the quasi Fisher scoring iteration is provided in the iteration
@@ -460,6 +460,24 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
+    AS_mixed_adjustment <- function(pars, level = 0, fit = NULL) {
+        if (is.null(fit)) {
+            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
+        }
+        with(fit, {
+            if (level == 0) {
+                hatvalues <- hat_values(pars, fit = fit)
+                ## Use only observations with keep = TRUE to ensure that no division with zero takes place
+                return(.colSums(0.5 * hatvalues * d2mus/d1mus * x, nobs, nvars, TRUE))
+            }
+            if (level == 1) {
+                s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
+                s2 <- sum(weights^2 * d2afuns, na.rm = TRUE)
+                return(nvars/(2 * dispersion) + s1/(6 * dispersion^2 * s2))
+            }
+        })
+    }
+
     customTransformation <- is.list(control$transformation) & length(control$transformation) == 2
     if (customTransformation) {
         transformation0 <- control$transformation
@@ -472,6 +490,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                             "correction" = AS_mean_adjustment,
                             "AS_mean" = AS_mean_adjustment,
                             "AS_median" = AS_median_adjustment,
+                            "AS_mixed" = AS_mixed_adjustment,
                             "ML" = function(pars, ...) 0)
 
     ## compute_step_components does everything on the scale of the /transformed/ dispersion
