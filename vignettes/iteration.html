@@ -9,7 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="Ioannis Kosmidis, Eugene Clovis Kenne Pagui and Nicola Sartori" />
+<meta name="author" content="Ioannis Kosmidis, Euloge Clovis Kenne Pagui and Nicola Sartori" />
 
 <meta name="date" content="2017-04-29" />
 
@@ -118,7 +118,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Bias reduction in generalized linear models</h1>
-<h4 class="author"><em><a href="http://www.ucl.ac.uk/~ucakiko/">Ioannis Kosmidis</a>, <a href="http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home">Eugene Clovis Kenne Pagui</a> and <a href="https://homes.stat.unipd.it/nicolasartori/">Nicola Sartori</a></em></h4>
+<h4 class="author"><em><a href="http://www.ucl.ac.uk/~ucakiko/">Ioannis Kosmidis</a>, <a href="http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home">Euloge Clovis Kenne Pagui</a> and <a href="https://homes.stat.unipd.it/nicolasartori/">Nicola Sartori</a></em></h4>
 <h4 class="date"><em>29 April 2017</em></h4>
 
 </div>
@@ -190,7 +190,7 @@ i_{\beta\beta} &amp; 0_p \\
 </div>
 <div id="mean-bias-reducing-adjusted-score-functions" class="section level3">
 <h3>Mean bias-reducing adjusted score functions</h3>
-Let <span class="math inline">\(A_\beta = -i_\beta b_\beta\)</span> and <span class="math inline">\(A_\phi = -i_\phi b_\phi\)</span>, where <span class="math inline">\(b_\beta\)</span> and <span class="math inline">\(b_\phi\)</span> are the first terms in the expansion of the mean bias of the maximum likelihood estimator of the regression parameters <span class="math inline">\(\beta\)</span> and dispersion <span class="math inline">\(\phi\)</span>, respectively. The results in <span class="citation">Firth (1993)</span> can be used to show that the solution of the adjusted score equations
+Let <span class="math inline">\(A_\beta = -i_{\beta\beta} b_\beta\)</span> and <span class="math inline">\(A_\phi = -i_{\phi\phi} b_\phi\)</span>, where <span class="math inline">\(b_\beta\)</span> and <span class="math inline">\(b_\phi\)</span> are the first terms in the expansion of the mean bias of the maximum likelihood estimator of the regression parameters <span class="math inline">\(\beta\)</span> and dispersion <span class="math inline">\(\phi\)</span>, respectively. The results in <span class="citation">Firth (1993)</span> can be used to show that the solution of the adjusted score equations
 <span class="math display">\[\begin{align*}
 s_\beta + A_\beta &amp; = 0_p \\
 s_\phi + A_\phi &amp; = 0

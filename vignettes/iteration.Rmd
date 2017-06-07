@@ -98,7 +98,7 @@ The maximum likelihood estimators $\hat\beta$ and $\hat\phi$ of $\beta$ and $\ph
 
 ### Mean bias-reducing adjusted score functions
 
-Let $A_\beta = -i_\beta b_\beta$ and $A_\phi = -i_\phi b_\phi$, where $b_\beta$ and $b_\phi$ are the first terms in the expansion of the mean bias of the maximum likelihood estimator of the regression parameters $\beta$ and dispersion $\phi$, respectively. The results in @firth:93 can be used to show that the solution of the adjusted score equations
+Let $A_\beta = -i_{\beta\beta} b_\beta$ and $A_\phi = -i_{\phi\phi} b_\phi$, where $b_\beta$ and $b_\phi$ are the first terms in the expansion of the mean bias of the maximum likelihood estimator of the regression parameters $\beta$ and dispersion $\phi$, respectively. The results in @firth:93 can be used to show that the solution of the adjusted score equations
 \begin{align*}
 s_\beta + A_\beta & = 0_p \\
 s_\phi + A_\phi & = 0
