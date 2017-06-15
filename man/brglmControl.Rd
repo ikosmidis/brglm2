@@ -7,7 +7,7 @@
 \code{\link{brglmFit}} method.}
 \usage{
 brglmControl(epsilon = 1e-10, maxit = 100, trace = FALSE,
-  type = c("AS_mean", "AS_median", "correction", "ML"),
+  type = c("AS_mean", "AS_median", "AS_mixed", "correction", "ML"),
   transformation = "identity", slowit = 1, max_step_factor = 12)
 }
 \arguments{
@@ -22,6 +22,7 @@ each iteration}
 \item{type}{the type of fitting methodo to be used. The options are
 \code{AS_mean} (mean-bias reducing adjusted scores; default),
 \code{AS_median} (median-bias reducting adjusted scores),
+\code{AS_median} (bias reduction using mixed score adjustents),
 \code{correction} (asymptotic bias correction) and \code{ML}
 (maximum likelihood).}
 

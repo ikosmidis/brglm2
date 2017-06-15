@@ -63,41 +63,15 @@ argument if it is not supplied directly.}
 \description{
 \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
 that fits generalized linear models using implicit and explicit
-bias reduction methods. Currently supported methods include the
-mean bias-reducing adjusted scores approach in Firth (1993) and
-Kosmidis \& Firth (2009), the median bias-reduction adjusted scores
-approach in Kenne et al. (2016), the correction of the asymptotic
-bias in Cordeiro & McCullagh (1991), and maximum likelihood.
-Estimation is performed using a quasi Fisher scoring iteration,
-which in the case of mean-bias reduction resembles an iterative
-correction of the asymptotic bias of the Fisher scoring iterates.
-}
-\details{
-Implicit and explicit bias reduction methods are described in
-detail in Kosmidis (2014). The quasi (or modified) Fisher scoring
-iteration is described in Kosmidis (2010) and is based on the
-iterative correction of the asymptotic bias of the Fisher scoring
-iterates. A mathematical description of the supported adjustments
-and the quasi Fisher scoring iteration is provided in the iteration
-vignette (see,
-\url{https://cran.r-project.org/package=brglm2/vignettes/iteration.pdf}).
-A quick description of the quasi Fisher scoring iteration is also
-given in one of the vignettes of the *enrichwith* R package (see,
-\url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
-
-
-The null deviance is evaluated based on the fitted values using the
-    method specified by the \code{type} argument (see
-    \code{\link{brglmControl}}).
-
-The description of \code{method} argument and the \code{Fitting
-functions} section in \code{\link{glm}} gives information on
-supplying fitting methods to \code{\link{glm}}.
-
-\code{fixed_totals} can be used to constrain the means of a poisson
-model to add up to the corresponding observed counts according to
-
-\code{brglm_fit} is an alias to \code{brglmFit}.
+bias reduction methods (Kosmidis, 2014). Currently supported
+methods include the mean bias-reducing adjusted scores approach in
+Firth (1993) and Kosmidis \& Firth (2009), the median
+bias-reduction adjusted scores approach in Kenne et al. (2016), the
+correction of the asymptotic bias in Cordeiro & McCullagh (1991),
+and maximum likelihood. Estimation is performed using a quasi
+Fisher scoring iteration, which, in the case of mean-bias
+reduction, resembles an iterative correction of the asymptotic bias
+of the Fisher scoring iterates.
 }
 \examples{
 ## The lizards example from ?brglm::brglm

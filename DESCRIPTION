@@ -18,3 +18,5 @@ Suggests:
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Imports: MASS, stats, Matrix, graphics, nnet, enrichwith, lpSolveAPI
+URL: https://github.com/ikosmidis/brglm2
+BugReports: https://github.com/ikosmidis/brglm2/issues
