@@ -87,7 +87,7 @@
 #' coef(coalitionBRc, model = "dispersion")
 #'
 #' @export
-brglmControl <- function(epsilon = 1e-10, maxit = 100,
+brglmControl <- function(epsilon = 1e-08, maxit = 100,
                          trace = FALSE,
                          type = c("AS_mean", "AS_median", "AS_mixed", "correction", "ML"),
                          transformation = "identity",
