@@ -80,7 +80,7 @@
 #' through the \code{type} argument (see \code{\link{brglmControl}}
 #' for details). The default is to use the mean bias-reducing
 #' adjustsments in Firth (1993) and Kosmidis \& Firth (2009)
-#' (\code{type = "AS_mean"}}.
+#' (\code{type = "AS_mean"}).
 #'
 #' The null deviance is evaluated based on the fitted values using the
 #'     method specified by the \code{type} argument (see

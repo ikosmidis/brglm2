@@ -73,6 +73,46 @@ Fisher scoring iteration, which, in the case of mean-bias
 reduction, resembles an iterative correction of the asymptotic bias
 of the Fisher scoring iterates.
 }
+\details{
+A detailed description of the supported adjustments and the quasi
+Fisher scoring iteration is given in the iteration vignette (see,
+\url{https://cran.r-project.org/package=brglm2/vignettes/iteration.pdf}).
+A shorter description of the quasi Fisher scoring iteration is also
+given in one of the vignettes of the *enrichwith* R package (see,
+\url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
+Kosmidis and Firth (2010) describe a parallel quasi Newton-Raphson
+iteration with the same stationary point.
+
+In the special case of generalized linear models for binomial,
+Poisson and multinomial responses, the adjusted score equations
+approach returns estimates with improved frequentist properties,
+that are also always finite, even in cases where the maximum
+likelihood estimates are infinite (e.g. complete and quasi-complete
+separation in multinomial regression; see also
+\code{\link{detect_separation}} and
+\code{\link{check_infinite_estimates}} for pre-fit and post-fit
+methods for the detection of infinite estimates in binomial
+response generalized linear models).
+
+The type of the bias-reducing adjustment to be used is specified
+through the \code{type} argument (see \code{\link{brglmControl}}
+for details). The default is to use the mean bias-reducing
+adjustsments in Firth (1993) and Kosmidis \& Firth (2009)
+(\code{type = "AS_mean"}).
+
+The null deviance is evaluated based on the fitted values using the
+    method specified by the \code{type} argument (see
+    \code{\link{brglmControl}}).
+
+The description of \code{method} argument and the \code{Fitting
+functions} section in \code{\link{glm}} gives information on
+supplying fitting methods to \code{\link{glm}}.
+
+\code{fixed_totals} can be used to constrain the means of a poisson
+model to add up to the corresponding observed counts according to
+
+\code{brglm_fit} is an alias to \code{brglmFit}.
+}
 \examples{
 ## The lizards example from ?brglm::brglm
 data("lizards")
