@@ -6,7 +6,7 @@
 \title{Auxiliary function for \code{\link{glm}} fitting using the
 \code{\link{brglmFit}} method.}
 \usage{
-brglmControl(epsilon = 1e-10, maxit = 100, trace = FALSE,
+brglmControl(epsilon = 1e-08, maxit = 100, trace = FALSE,
   type = c("AS_mean", "AS_median", "AS_mixed", "correction", "ML"),
   transformation = "identity", slowit = 1, max_step_factor = 12)
 }
