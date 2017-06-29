@@ -62,25 +62,39 @@
 #' check_infinite_estimates(endometrialML)
 #'
 #' @export
-check_infinite_estimates.glm <- function (object, nsteps = 30, ...)
+check_infinite_estimates.glm <- function (object, nsteps = 15, ...)
 {
-    if (class(object)[1] != "glm") {
-        warning("ceheck_infinite_estimates has been designed for objects of class 'glm'")
+    is_brmultinom <- inherits(object, "brmultinom")
+
+    if ((class(object)[1] != "glm") & (!is_brmultinom)) {
+        warning("check_infinite_estimates has been designed for objects of class 'glm'")
     }
-    if (object$family$family != "binomial") {
+    if ((object$family$family != "binomial") & (!is_brmultinom)) {
         warning("check_infinite_estimates has been designed for binomial-response models")
     }
+
+    if (is_brmultinom) {
+        betas <- coef(object)
+        dims <- dim(betas)
+        betasNames <- paste(rep(colnames(betas), dims[1]), rownames(betas), sep = ":")
+        betas <- c(betas)
+        names(betas) <- betaNames
+    }
+    else {
+        betas <- coef(object)
+        betasNames <- names(betas)
+    }
     eps <- .Machine$double.eps
-    betasNames <- names(betas <- coef(object))
     noNA <- !is.na(betas)
     stdErrors <- matrix(0, nsteps, length(betas))
+    start <- NULL
     for (i in 1:nsteps) {
-        suppressWarnings(temp.object <- update(object, control = glm.control(maxit = i,
-            epsilon = eps)))
-        stdErrors[i, noNA] <- summary(temp.object)$coef[betasNames[noNA], "Std. Error"]
+        suppressWarnings(temp.object <- update(object, control = list(maxit = i, epsilon = eps), start = start))
+        stdErrors[i, noNA] <- if (is_brmultinom) sqrt(diag(vcov(temp.object))[noNA]) else summary(temp.object)$coef[betasNames[noNA], "Std. Error"]
+        start <- c(coef(temp.object))
     }
     res <- sweep(stdErrors, 2, stdErrors[1, ], "/")
-    colnames(res) <- names(coef(object))
+    colnames(res) <- betasNames
     res
 }
 
