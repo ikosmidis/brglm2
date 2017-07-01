@@ -2,7 +2,7 @@
 title: "Bias reduction in generalized linear models"
 author: "[Ioannis Kosmidis](http://www.ucl.ac.uk/~ucakiko/), [Euloge Clovis Kenne Pagui](http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home) and [Nicola Sartori](https://homes.stat.unipd.it/nicolasartori/)"
 date: "29 April 2017"
-output: rmarkdown::html_vignette
+output: rmarkdown::pdf_vignette
 bibliography: brglm2.bib
 vignette: >
   %\VignetteIndexEntry{Bias reduction in generalized linear models}
