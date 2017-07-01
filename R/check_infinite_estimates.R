@@ -61,8 +61,12 @@
 #' ## NV is infinite
 #' check_infinite_estimates(endometrialML)
 #'
+#'
+#' ## Aligator data
+#'
+#'
 #' @export
-check_infinite_estimates.glm <- function (object, nsteps = 15, ...)
+check_infinite_estimates.glm <- function(object, nsteps = 20, ...)
 {
     is_brmultinom <- inherits(object, "brmultinom")
 
@@ -78,7 +82,7 @@ check_infinite_estimates.glm <- function (object, nsteps = 15, ...)
         dims <- dim(betas)
         betasNames <- paste(rep(colnames(betas), dims[1]), rownames(betas), sep = ":")
         betas <- c(betas)
-        names(betas) <- betaNames
+        names(betas) <- betasNames
     }
     else {
         betas <- coef(object)
@@ -89,13 +93,19 @@ check_infinite_estimates.glm <- function (object, nsteps = 15, ...)
     stdErrors <- matrix(0, nsteps, length(betas))
     start <- NULL
     for (i in 1:nsteps) {
-        suppressWarnings(temp.object <- update(object, control = list(maxit = i, epsilon = eps), start = start))
-        stdErrors[i, noNA] <- if (is_brmultinom) sqrt(diag(vcov(temp.object))[noNA]) else summary(temp.object)$coef[betasNames[noNA], "Std. Error"]
+        if (is_brmultinom) {
+            suppressWarnings(temp.object <- update(object, control = list(maxit = i, epsilon = eps, type = "ML"), start = start))
+            stdErrors[i, noNA] <- sqrt(diag(vcov(temp.object))[noNA])
+        }
+        else {
+            suppressWarnings(temp.object <- update(object, control = list(maxit = i, epsilon = eps), start = start))
+
+            stdErrors[i, noNA] <- summary(temp.object)$coef[betasNames[noNA], "Std. Error"]
+        }
         start <- c(coef(temp.object))
     }
     res <- sweep(stdErrors, 2, stdErrors[1, ], "/")
     colnames(res) <- betasNames
-    res
 }
 
 

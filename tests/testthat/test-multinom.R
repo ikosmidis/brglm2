@@ -90,3 +90,52 @@ test_that("brmultinom fits are invariant to the value of ref  (ref1 vs ref3)'", 
     expect_equal(hepbr1$fitted.values, hepbr3$fitted.values, tolerance = 1e-04)
 })
 
+
+## Aligator data
+data("alligators", package = "brglm2")
+k <- 3
+all_ml <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
+                     data = alligators, type = "ML", ref = 1)
+
+all_mean <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
+                       data = alligators, type = "AS_mean", ref = 1)
+
+all_median <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
+                         data = alligators, type = "AS_median", ref = 1)
+
+
+library("ggplot2")
+
+pml <- data.frame(stack(data.frame(fitted(all_ml))), method = "ML")
+pmean <- data.frame(stack(data.frame(fitted(all_mean))), method = "AS_mean")
+pmedian <- data.frame(stack(data.frame(fitted(all_median))), method = "AS_median")
+probabilities <- rbind(pml, pmean, pmedian)
+names(probabilities) <- c("probability", "category", "method")
+probabilities1 <- NULL
+for (j in levels(probabilities$category)) {
+    cdat <- subset(probabilities, category == j)
+    cdat$id <- rep(seq.int(nrow(pml)/5), 3)
+    cdat <- reshape(cdat, timevar = "method", v.names = "probability", direction = "wide")
+    probabilities1 <- rbind(probabilities1, cdat)
+}
+
+## Shrinkage plots
+ggplot(probabilities1) +
+    geom_point(aes(x = probability.ML, y = probability.AS_mean)) +
+    geom_abline(aes(intercept = 0, slope = 1), alpha = 0.5) +
+    lims(x = c(0,1), y = c(0,1)) +
+    facet_grid(~ category) +
+    theme_bw()
+
+ggplot(probabilities1) +
+    geom_point(aes(x = probability.ML, y = probability.AS_median)) +
+    geom_abline(aes(intercept = 0, slope = 1), alpha = 0.5) +
+    lims(x = c(0,1), y = c(0,1)) +
+    facet_grid(~ category) +
+    theme_bw()
+
+
+
+
+
+
