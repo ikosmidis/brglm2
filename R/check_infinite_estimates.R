@@ -61,10 +61,16 @@
 #' ## NV is infinite
 #' check_infinite_estimates(endometrialML)
 #'
-#'
-#' ## Aligator data
-#'
-#'
+#' \dontrun{
+#' ## Aligator data (Agresti, 2002, Table~7.1)
+#' data("alligator", package = "brglm2")
+#' all_ml <- brmultinom(foodchoice ~ size + lake , weights = round(freq/3),
+#'                      data = alligators, type = "ML", ref = 1)
+#' ## Clearly some estimated standard errors diverge as the number of
+#' ## Fisher scoring iterations increases
+#' matplot(check_infinite_estimates(all_ml), type = "l", lty = 1,
+#'         ylim = c(0.5, 1.5))
+#' }
 #' @export
 check_infinite_estimates.glm <- function(object, nsteps = 20, ...)
 {
@@ -106,6 +112,7 @@ check_infinite_estimates.glm <- function(object, nsteps = 20, ...)
     }
     res <- sweep(stdErrors, 2, stdErrors[1, ], "/")
     colnames(res) <- betasNames
+    res
 }
 
 

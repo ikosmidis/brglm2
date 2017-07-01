@@ -6,7 +6,7 @@
 \title{A simple diagnostic of whether the maximum likelihood estimates are
 infinite}
 \usage{
-\method{check_infinite_estimates}{glm}(object, nsteps = 30, ...)
+\method{check_infinite_estimates}{glm}(object, nsteps = 20, ...)
 }
 \arguments{
 \item{object}{the result of a \code{\link{glm}} call}
@@ -47,6 +47,16 @@ endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
 ## NV is infinite
 check_infinite_estimates(endometrialML)
 
+\dontrun{
+## Aligator data (Agresti, 2002, Table~7.1)
+data("alligator", package = "brglm2")
+all_ml <- brmultinom(foodchoice ~ size + lake , weights = round(freq/3),
+                     data = alligators, type = "ML", ref = 1)
+## Clearly some estimated standard errors diverge as the number of
+## Fisher scoring iterations increases
+matplot(check_infinite_estimates(all_ml), type = "l", lty = 1,
+        ylim = c(0.5, 1.5))
+}
 }
 \references{
 Lesaffre, E., & Albert, A. (1989). Partial Separation in Logistic
