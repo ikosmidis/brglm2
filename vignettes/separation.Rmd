@@ -18,7 +18,7 @@ The key methods are `detect_separation` and `check_infinite_estimates` and this 
 # Checking for infinite estimates
 
 @heinze:02 used a logistic regression model to analyse data from a
-study on endometrial cancer. @agresti:15 [Section 5.7] provide details on the data set. Below, we
+study on endometrial cancer. @agresti:15[, Section 5.7] provide details on the data set. Below, we
 fit a probit regression model with the same linear predictor as the
 logistic regression model in @heinze:02.
 ```{r, echo = TRUE, eval = TRUE}
@@ -36,7 +36,7 @@ for the estimated standard error, and, hence the value `r
 round(coef(summary(modML))["NV", "z value"], 3)` for the $z$-statistic
 cannot be trusted for inference on the size of the effect for `NV`.
 
-‘@lessafre:89 [Section 4] describe a procedure that can hint on the occurrence of infinite estimates. In particular, the model is successively refitted, by increasing the maximum number of allowed IWLS iterations at east step. At east step the estimated asymptotic standard errors are divided to the corresponding ones from the first fit. If the sequence of ratios diverges, then the maximum likelihood estimate of the corresponding parameter is minus or plus infinity. The following code chunk applies this process to `modML`.
+‘@lesaffre:89[, Section 4] describe a procedure that can hint on the occurrence of infinite estimates. In particular, the model is successively refitted, by increasing the maximum number of allowed IWLS iterations at east step. At east step the estimated asymptotic standard errors are divided to the corresponding ones from the first fit. If the sequence of ratios diverges, then the maximum likelihood estimate of the corresponding parameter is minus or plus infinity. The following code chunk applies this process to `modML`.
 ```{r, echo = TRUE, eval = TRUE}
 check_infinite_estimates(modML)
 ```
