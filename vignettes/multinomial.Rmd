@@ -1,0 +1,112 @@
+---
+title: "Multinomial logistic regression using **brglm2**"
+author: "[Ioannis Kosmidis](http://www.ucl.ac.uk/~ucakiko/)"
+date: "01 July 2017"
+output: rmarkdown::html_vignette
+bibliography: brglm2.bib
+vignette: >
+  %\VignetteIndexEntry{Multinomial logistic regression using **brglm2**}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+# **brmultinom**
+The [**brglm2**](https://github.com/ikosmidis/brglm2) R package
+provides `brmultinom` which is a wrapper of `brglmFit` for fitting
+multinomial logistic regression models (a.k.a. baseline category
+logit models) using either maximum likelihood or any of the various
+bias reduction methods described in `brglmFit`. `brmultinom` uses the
+equivalent Poisson log-linear model, by appropriately re-scaling the
+Poisson means to match the multinomial totals (a.k.a. the "Poisson
+trick"). The mathematical details and algorithm on using the Poisson
+trick for mean-bias reduction are given in @kosmidis:11.
+
+This vignettes illustrates the use of `brmultinom` and of the associated methods, using the alligator food choice example in @agresti:02[, Section 7.1]
+
+# Alligator data
+
+The alligator data set ships with **brglm2**. @agresti:02[, Section 7.1] provides a detailed description of the variables recorded in the data set.
+```{r, echo = TRUE}
+library("brglm2")
+data("alligators", package = "brglm2")
+```
+
+## Maximum likelihood estimation
+
+The following chunk of code reproduces fit@agresti:02[, Table 7.4]. Note that in order to get the estimates and standard errors reported in latter table, we have to explicitly specify the contrasts that @agresti:02 uses.
+```{r, echo = TRUE}
+agresti_contrasts <- list(lake = contr.treatment(levels(alligators$lake), base = 4),
+                          size = contr.treatment(levels(alligators$size), base = 2))
+all_ml <- brmultinom(foodchoice ~ size + lake , weights = freq,
+                     data = alligators,
+                     contrasts = agresti_contrasts,
+                     ref = 1,
+                     type = "ML")
+all_ml_summary <- summary(all_ml)
+## Estimated regression parameters
+round(all_ml_summary$coefficients, 2)
+## Estimated standard errors
+round(all_ml_summary$standard.errors, 2)
+```
+
+## Mean and median bias reduction
+
+Fitting the model using mean-bias reducing adjusted score equations gives
+```{r, echo = TRUE}
+all_mean <- update(all_ml, type = "AS_mean")
+summary(all_mean)
+```
+The corresponding fit using median-bias reducing adjusted score equations is
+```{r, echo = TRUE}
+all_median <- update(all_ml, type = "AS_median")
+summary(all_median)
+```
+
+The estimates and the estimated standard errors from bias reduction
+are close to those for maximum likelihood. As a result, it is unlikely
+that either mean or median bias is of any real consequence for this
+particular model and data combination.
+
+# Infinite estimates and multinomial logistic regression
+
+Let's scale the frequencies in `alligators` by 3 in order to get a sparser data set. The differences between maximum likelihood and mean and median bias reduction should be more apparent on the resulting data set.
+```{r, echo = TRUE, error = TRUE}
+all_ml_sparse <- update(all_ml, weights = round(freq/3))
+```
+Here we have to "slow-down" the Fisher scoring iteration (by scaling the step-size), because otherwise the Fisher information matrix quickly gets numerically rank-deficient.
+```{r, echo = TRUE, error = TRUE}
+all_ml_sparse <- update(all_ml, weights = round(freq/3), slowit = 0.3)
+summary(all_ml_sparse)
+```
+The reason is data separation [@albert:84]. Specifically, judging from the estimated standard errors, the estimates for `(Intercept)`, `lakeHancock`, `lakeOklawaha` and `lakeTrafford` for `Reptile` and `lakeHancock` for `Bird` seem to be infinite.
+
+To quickly check if that's indeed the case we can use the `check_infinite_estimates` method (see, also the [`separation`](https://cran.r-project.org/package=brglm2/vignettes/separation.html) vignette).
+```{r, echo = TRUE}
+se_ratios <- check_infinite_estimates(all_ml_sparse)
+matplot(se_ratios, type = "l", lty = 1, ylim = c(0.5, 1.5), xlab = "Iteration")
+```
+
+Some of the estimated standard errors diverge as the number of Fisher scoring iterations increases, which is evidence of complete or quasi-complete separation [@lesaffre:89].
+
+In constrast, both mean and median bias reduction result in finite
+estimates
+```{r, echo = TRUE}
+all_mean_sparse <- update(all_ml_sparse, type = "AS_mean")
+summary(all_mean_sparse)
+
+all_median_sparse <- update(all_ml_sparse, type = "AS_median")
+summary(all_median_sparse)
+```
+
+
+
+# Relevant resources
+`?brglmFit` and `?brglm_control` contain quick descriptions of the various bias reduction methods supported in **brglm2**. The [`iteration`](https://cran.r-project.org/package=brglm2/brglm2.pdf) vignette describes the iteration and gives the mathematical details for the bias-reducing adjustments to the score functions for generalized linear models.
+
+# Citation
+If you found this vignette or **brglm2** in general useful, please consider citing **brglm2** using
+```{r, echo = TRUE}
+citation("brglm2")
+```
+
+# References
