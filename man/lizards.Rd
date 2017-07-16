@@ -3,7 +3,7 @@
 \docType{data}
 \name{lizards}
 \alias{lizards}
-\title{Habitat Preferences of Lizards}
+\title{Habitat preferences of lizards}
 \format{An object of class \code{data.frame} with 23 rows and 6 columns.}
 \source{
 McCullagh, P. and Nelder, J. A. (1989) _Generalized Linear

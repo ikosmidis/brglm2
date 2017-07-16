@@ -1,4 +1,4 @@
-#' Habitat Preferences of Lizards
+#' Habitat preferences of lizards
 #'
 #' The lizards data frame has 23 rows and 6 columns. Variables
 #' \code{grahami} and \code{opalinus} are counts of two lizard species
@@ -78,3 +78,34 @@
 #'  Publication Related Archive, 1115.
 #'
 "coalition"
+
+
+#' Alligator food choice data
+#'
+#' @format A data frame with 80 rows and 5 variables:
+#'
+#' \describe{
+#'
+#' \item{foodchoice}{primary food type, in volume, found in an alligator’s stomach, with levels \code{fish}, \code{invertebrate}, \code{reptile}, \code{bird}, \code{other}}
+#'
+#' \item{lake}{lake of capture with levels \code{Hancock}, \code{Oklawaha}, \code{Trafford}, \code{George}}
+#'
+#' \item{gender}{gender of the alligator with levels \code{Male} and \code{Female}}
+#'
+#' \item{size}{size of the alligator with levels \code{<=2.3} meters long and \code{>2.3} meters long}
+#'
+#' \item{freq}{number of alligators for each foodchoice, lake, gender and size combination}
+#'
+#' }
+#'
+#' @source
+#'
+#' The alligators data set is analysed in Agresti (2002, Subsection~7.1.2).
+#'
+#' @references
+#'
+#' Agresti, A. (2002). *Categorical Data Analysis*.  Wiley Series in
+#' Probability and Statistics. Wiley
+#'
+"alligators"
+
