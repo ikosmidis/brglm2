@@ -7,7 +7,7 @@ bibliography: brglm2.bib
 vignette: >
   %\VignetteIndexEntry{Multinomial logistic regression using **brglm2**}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
 
 # **brmultinom**

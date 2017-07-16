@@ -7,8 +7,12 @@ bibliography: brglm2.bib
 vignette: >
   %\VignetteIndexEntry{Bias reduction in generalized linear models}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = T, comment = "#")
+```
 
 # The **brglm2** package
 
