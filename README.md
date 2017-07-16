@@ -1,4 +1,5 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/brglm2)](https://cran.r-project.org/package=brglm2)
+[![Travis-CI Build Status](https://travis-ci.org/ikosmidis/brglm2.svg?branch=master)](https://travis-ci.org/ikosmidis/brglm2)
 
 brglm2
 ======
