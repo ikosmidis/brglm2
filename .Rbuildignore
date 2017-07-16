@@ -11,3 +11,4 @@ vignettes/iteration\[exported\].html
 vignettes/iteration\[exported\].pdf
 vignettes/iteration.html
 vignettes/iteration.pdf
+^\.travis\.yml$
