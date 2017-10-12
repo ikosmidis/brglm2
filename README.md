@@ -1,6 +1,6 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/brglm2)](https://cran.r-project.org/package=brglm2)
 [![Travis-CI Build Status](https://travis-ci.org/ikosmidis/brglm2.svg?branch=master)](https://travis-ci.org/ikosmidis/brglm2)
-[![Coverage Status](https://img.shields.io/codecov/c/github/ikosmidis/brglm2/master.svg)](https://codecov.io/github/ikosmidis/brglm2?branch=master)
+[![Coverage Status]([![codecov](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)](https://codecov.io/gh/ikosmidis/brglm2)](https://codecov.io/github/ikosmidis/brglm2?branch=master)
 
 brglm2
 ======
