@@ -12,3 +12,4 @@ vignettes/iteration\[exported\].pdf
 vignettes/iteration.html
 vignettes/iteration.pdf
 ^\.travis\.yml$
+^codecov\.yml$

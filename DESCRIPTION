@@ -15,7 +15,8 @@ LazyData: true
 Suggests:
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    covr
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Imports: MASS, stats, Matrix, graphics, nnet, enrichwith, lpSolveAPI
