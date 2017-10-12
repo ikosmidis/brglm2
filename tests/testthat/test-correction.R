@@ -11,14 +11,13 @@ clotting <- data.frame(
 mod <- glm(conc ~ lot*log(u), data = clotting, family = Gamma)
 emod <- enrich(mod, with = "all")
 
-bias_fun <- get_bias_function(emod)
-
 coefs <- coef(emod, model = "mean")
 disp <- coef(emod, model = "dispersion")
-coefs_bc <- c(coefs, disp) - bias_fun(coefs, disp)
+coefs_bc <- c(coefs, disp) - get_bias_function(emod)(coefs, disp)
+attributes(coefs_bc) <- NULL
 
 mod_bc <- glm(conc ~ lot*log(u), data = clotting, family = Gamma, method = "brglmFit", type = "correction")
 
 test_that("bias corrected estimates computed using enrichwith are the same as those when having type = 'correction' in brglmFit", {
-    expect_equal(coefs_bc, c(coef(mod_bc, model = "full")), check.attributes = FALSE, tolerance = 1e-10)
+    expect_equal(unname(coefs_bc), unname(coef(mod_bc, model = "full")), check.attributes = FALSE, tolerance = 1e-10)
 })
