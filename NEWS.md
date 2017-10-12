@@ -3,15 +3,16 @@
 ## Bug fixes
 
 ## New functionality
-* Added `type = AS_mixed` as an option to use **mean-bias reducing score functions** for the regression parameters and **median-bias reducing score functions** for the dispersion in models with uknown dispersion.
+* Added `type = AS_mixed` as an option to use **mean-bias reducing score functions** for the regression parameters and **median-bias reducing score functions** for the dispersion in models with uknown dispersion
 * `check_infinite_estimates` now accepts `brmultinom` objects
+* Added `singular.ok` argument to `brglmFit` and `detect_separation` methods in line with the update of `glm.fit`
 
 ## Other improvements, updates and addition
 * less strict tolerance in `brglm_control`
 * Updates to help files
 * Fixed typos in iteration vignette
 * Added URL and bugreports in Description
-
+* Added new tests
 
 # brglm2 0.1.4
 

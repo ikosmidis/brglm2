@@ -51,7 +51,8 @@
 #'     \code{poisson}. Either \code{NULL} (no effect) or a vector that
 #'     indicates which counts must be treated as a group. See Details
 #'     for more information and \code{\link{brmultinom}}.
-#' @param singular.ok logical. If ‘FALSE’, a singular model is an error.
+#' @param singular.ok logical. If \code{FALSE}, a singular model is an
+#'     error.
 #' @param ... arguments to be used to form the default 'control'
 #'     argument if it is not supplied directly.
 #'

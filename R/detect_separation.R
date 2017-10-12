@@ -37,6 +37,8 @@
 #' @param start currently not used
 #' @param mustart currently not used
 #' @param etastart currently not used
+#' @param singular.ok logical. If \code{FALSE}, a singular model is an
+#'     error.
 #' @param ... arguments to be used to form the default 'control'
 #'     argument if it is not supplied directly.
 #'
@@ -105,7 +107,7 @@
 detect_separation <- function (x, y, weights = rep(1, nobs),
                               start = NULL, etastart = NULL,  mustart = NULL,
                               offset = rep(0, nobs), family = gaussian(),
-                              control = list(), intercept = TRUE) {
+                              control = list(), intercept = TRUE, singular.ok = TRUE) {
     if (family$family != "binomial") {
         warning("detect_separation has been developed for use with binomial-response models")
     }
@@ -134,7 +136,12 @@ detect_separation <- function (x, y, weights = rep(1, nobs),
         ## Detect aliasing
         qrx <- qr(x)
         rank <- qrx$rank
-        is_full_rank <- all.equal(rank, nvars, tolerance = 1e-06)
+        is_full_rank <- rank == nvars
+
+        if (!singular.ok && !is_full_rank) {
+            stop("singular fit encountered")
+        }
+
         if (!isTRUE(is_full_rank)) {
             aliased <- qrx$pivot[seq.int(qrx$rank + 1, nvars)]
             X_all <- x
