@@ -8,7 +8,8 @@ estimation and inference}
 \usage{
 brglmFit(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
   mustart = NULL, offset = rep(0, nobs), family = gaussian(),
-  control = list(), intercept = TRUE, fixed_totals = NULL)
+  control = list(), intercept = TRUE, fixed_totals = NULL,
+  singular.ok = TRUE)
 }
 \arguments{
 \item{x}{\code{x} is a design matrix of dimension \code{n * p},}
@@ -56,6 +57,8 @@ process. See \code{\link{brglmControl}} for details.}
 \code{poisson}. Either \code{NULL} (no effect) or a vector that
 indicates which counts must be treated as a group. See Details
 for more information and \code{\link{brmultinom}}.}
+
+\item{singular.ok}{logical. If ‘FALSE’, a singular model is an error.}
 
 \item{...}{arguments to be used to form the default 'control'
 argument if it is not supplied directly.}

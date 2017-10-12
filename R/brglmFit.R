@@ -51,6 +51,7 @@
 #'     \code{poisson}. Either \code{NULL} (no effect) or a vector that
 #'     indicates which counts must be treated as a group. See Details
 #'     for more information and \code{\link{brmultinom}}.
+#' @param singular.ok logical. If ‘FALSE’, a singular model is an error.
 #' @param ... arguments to be used to form the default 'control'
 #'     argument if it is not supplied directly.
 #'
@@ -207,7 +208,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                       mustart = NULL, offset = rep(0, nobs), family = gaussian(),
                       control = list(), intercept = TRUE,
                       ## Arguments that glm will not use in its call to brglmFit (be wise with defaults!)
-                      fixed_totals = NULL)
+                      fixed_totals = NULL, singular.ok = TRUE)
 {
 
     trace_iteration <- function() {
@@ -650,7 +651,11 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## Detect aliasing
         qrx <- qr(x)
         rank <- qrx$rank
-        is_full_rank <- all.equal(rank, nvars, tolerance = 1e-06)
+        is_full_rank <- rank == nvars
+
+        if (!singular.ok && !is_full_rank) {
+            stop("singular fit encountered")
+        }
         if (!isTRUE(is_full_rank)) {
             aliased <- qrx$pivot[seq.int(qrx$rank + 1, nvars)]
             X_all <- x
