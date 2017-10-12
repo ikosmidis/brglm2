@@ -10,7 +10,8 @@ in generalized linear models with binomial responses}
 \usage{
 detect_separation(x, y, weights = rep(1, nobs), start = NULL,
   etastart = NULL, mustart = NULL, offset = rep(0, nobs),
-  family = gaussian(), control = list(), intercept = TRUE)
+  family = gaussian(), control = list(), intercept = TRUE,
+  singular.ok = TRUE)
 }
 \arguments{
 \item{x}{\code{x} is a design matrix of dimension \code{n * p},}
@@ -46,6 +47,9 @@ details.}
 
 \item{intercept}{logical. Should an intercept be included in the
     \emph{null} model?}
+
+\item{singular.ok}{logical. If \code{FALSE}, a singular model is an
+error.}
 
 \item{...}{arguments to be used to form the default 'control'
 argument if it is not supplied directly.}
