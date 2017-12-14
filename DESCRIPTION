@@ -1,6 +1,6 @@
 Package: brglm2
 Title: Bias Reduction in Generalized Linear Models
-Version: 0.1.5
+Version: 0.1.5.900
 Authors@R: c(person(given = "Ioannis", family = "Kosmidis", role = c("aut", "cre"), email = "i.kosmidis@ucl.ac.uk"),
 	     person(given = "Kjell", family = "Konis", role = "ctb", email = "kjell.konis@me.com"),
 	     person(given = "Euloge Clovis", family = "Kenne Pagui", role = "ctb", email = "kenne@stat.unipd.it"),
