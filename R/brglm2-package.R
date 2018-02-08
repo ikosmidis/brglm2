@@ -73,7 +73,6 @@
 #'
 #'
 NULL
-#> NULL
 
 ## Suggestion by Kurt Hornik to avoid a warning related to the binding
 ## of n which is evaluated by family$initialize
