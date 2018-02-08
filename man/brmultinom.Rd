@@ -149,5 +149,5 @@ Variables. *Biometrika*, **68**, 563-566.
 \code{\link[nnet]{multinom}}
 }
 \author{
-Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
+Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 }

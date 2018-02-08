@@ -97,7 +97,7 @@
 #'
 #' \code{brglm_fit} is an alias to \code{brglmFit}.
 #'
-#' @author Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}
+#' @author Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}
 #'
 #' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
 #'

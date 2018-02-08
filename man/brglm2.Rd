@@ -66,5 +66,5 @@ useful side-effects. *WIRE Computational Statistics*, **6**,
 185-196
 }
 \author{
-Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
+Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 }

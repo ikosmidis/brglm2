@@ -70,17 +70,18 @@ data("coalition", package = "brglm2")
 coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
 
 ## Bias reduced estimation of the dispersion parameter
-coalitionBRi <- update(coalitionML, method = "brglmFit")
+coalitionBRi <- glm(duration ~ fract + numst2, family = Gamma, data = coalition,
+                    method = "brglmFit")
 coef(coalitionBRi, model = "dispersion")
 
 ## Bias reduced estimation of log(dispersion)
-coalitionBRl <- update(coalitionML, method = "brglmFit",  transformation = "log")
+coalitionBRl <- glm(duration ~ fract + numst2, family = Gamma, data = coalition,
+                    method = "brglmFit", transformation = "log")
 coef(coalitionBRl, model = "dispersion")
 
 ## Just for illustration: Bias reduced estimation of dispersion^0.25
 my_transformation <- list(expression(dispersion^0.25), expression(transformed_dispersion^4))
-coalitionBRc <- update(coalitionML, method = "brglmFit",
-                       transformation = my_transformation)
+coalitionBRc <- update(coalitionBRi, transformation = my_transformation)
 coef(coalitionBRc, model = "dispersion")
 
 }
@@ -88,5 +89,5 @@ coef(coalitionBRc, model = "dispersion")
 \code{\link{brglmFit}} and \code{\link{glm.fit}}
 }
 \author{
-Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
+Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 }

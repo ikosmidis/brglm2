@@ -59,7 +59,7 @@
 #'
 #' \code{detectSeparation} is an alias for \code{detect_separation}.
 #'
-#' @author Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Kjell Konis [ctb] \email{kjell.konis@me.com}
+#' @author Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Kjell Konis [ctb] \email{kjell.konis@me.com}
 #'
 #' @seealso \code{\link{brglmFit}}, \code{\link{glm.fit}} and \code{\link{glm}}
 #'

@@ -1,3 +1,14 @@
+# brglm2 0.1.6
+
+## Bug fixes
+* Compatibility with new version of enrichwith
+
+## New functionality
+
+## Other improvements, updates and addition
+* New email for Ioannis Kosmidis
+
+
 # brglm2 0.1.5
 
 ## Bug fixes

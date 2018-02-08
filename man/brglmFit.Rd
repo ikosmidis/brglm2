@@ -224,5 +224,5 @@ useful side-effects. *WIRE Computational Statistics*, **6**,
 \code{\link{glm.fit}} and \code{\link{glm}}
 }
 \author{
-Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}
+Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}
 }

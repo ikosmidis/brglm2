@@ -122,5 +122,5 @@ package version 0.1-3.
 \code{\link{brglmFit}}, \code{\link{glm.fit}} and \code{\link{glm}}
 }
 \author{
-Ioannis Kosmidis [aut, cre] \email{i.kosmidis@ucl.ac.uk}, Kjell Konis [ctb] \email{kjell.konis@me.com}
+Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Kjell Konis [ctb] \email{kjell.konis@me.com}
 }

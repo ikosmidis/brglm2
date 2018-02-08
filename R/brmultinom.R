@@ -77,7 +77,7 @@
 #' either of \code{nrow(X)}, \code{ncol(X)} or the number of levels in
 #' the cateogrical response.
 #'
-#' @author Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
+#' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'
 #' @seealso \code{\link[nnet]{multinom}}
 #'

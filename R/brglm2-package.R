@@ -36,7 +36,7 @@
 #' incorporates all **brglm** functionality and gets an appropriate
 #' wrapper to the \code{brglm::brglm} function.
 #'
-#' @author Ioannis Kosmidis \email{i.kosmidis@ucl.ac.uk}
+#' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'
 #' @references
 #'
