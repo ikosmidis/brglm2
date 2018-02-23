@@ -1,3 +1,8 @@
+# brglm 0.1.7
+
+## Other improvements, updates and addition
+* Eliminated errors from markdown chunks in multinomial vignette
+
 # brglm2 0.1.6
 
 ## Bug fixes
