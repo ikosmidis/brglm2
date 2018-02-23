@@ -69,23 +69,18 @@ particular model and data combination.
 
 # Infinite estimates and multinomial logistic regression
 
-Let's scale the frequencies in `alligators` by 3 in order to get a sparser data set. The differences between maximum likelihood and mean and median bias reduction should be more apparent on the resulting data set.
+Let's scale the frequencies in `alligators` by 3 in order to get a sparser data set. The differences between maximum likelihood and mean and median bias reduction should be more apparent on the resulting data set. Here we have to "slow-down" the Fisher scoring iteration (by scaling the step-size), because otherwise the Fisher information matrix quickly gets numerically rank-deficient. The reason is data separation [@albert:84].
 ```{r, echo = TRUE, error = TRUE}
-all_ml_sparse <- update(all_ml, weights = round(freq/3))
-```
-Here we have to "slow-down" the Fisher scoring iteration (by scaling the step-size), because otherwise the Fisher information matrix quickly gets numerically rank-deficient.
-```{r, echo = TRUE, error = TRUE}
-all_ml_sparse <- update(all_ml, weights = round(freq/3), slowit = 0.3)
+all_ml_sparse <- update(all_ml, weights = round(freq/3), slowit = 0.2)
 summary(all_ml_sparse)
 ```
-The reason is data separation [@albert:84]. Specifically, judging from the estimated standard errors, the estimates for `(Intercept)`, `lakeHancock`, `lakeOklawaha` and `lakeTrafford` for `Reptile` and `lakeHancock` for `Bird` seem to be infinite.
+Specifically, judging from the estimated standard errors, the estimates for `(Intercept)`, `lakeHancock`, `lakeOklawaha` and `lakeTrafford` for `Reptile` and `lakeHancock` for `Bird` seem to be infinite.
 
 To quickly check if that's indeed the case we can use the `check_infinite_estimates` method (see, also the [`separation`](https://cran.r-project.org/package=brglm2/vignettes/separation.html) vignette).
 ```{r, echo = TRUE}
 se_ratios <- check_infinite_estimates(all_ml_sparse)
 matplot(se_ratios, type = "l", lty = 1, ylim = c(0.5, 1.5), xlab = "Iteration")
 ```
-
 Some of the estimated standard errors diverge as the number of Fisher scoring iterations increases, which is evidence of complete or quasi-complete separation [@lesaffre:89].
 
 In constrast, both mean and median bias reduction result in finite
