@@ -10,6 +10,16 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 6
+)
+```
+
+
 # The **brglm2** package
 
 Along with methods for improving the estimation of generalized linear models (see [`iteration`](https://cran.r-project.org/package=brglm2/brglm2.pdf) vignette), [**brglm2**](https://github.com/ikosmidis/brglm2) provides *pre-fit* and *post-fit* methods for the detection of separation and of infinite maximum likelihood estimates in binomial response generalized linear models.

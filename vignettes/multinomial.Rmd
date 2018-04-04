@@ -10,6 +10,16 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 6
+)
+```
+
+
 # **brmultinom**
 The [**brglm2**](https://github.com/ikosmidis/brglm2) R package
 provides `brmultinom` which is a wrapper of `brglmFit` for fitting
@@ -81,6 +91,7 @@ To quickly check if that's indeed the case we can use the `check_infinite_estima
 se_ratios <- check_infinite_estimates(all_ml_sparse)
 matplot(se_ratios, type = "l", lty = 1, ylim = c(0.5, 1.5), xlab = "Iteration")
 ```
+
 Some of the estimated standard errors diverge as the number of Fisher scoring iterations increases, which is evidence of complete or quasi-complete separation [@lesaffre:89].
 
 In constrast, both mean and median bias reduction result in finite
