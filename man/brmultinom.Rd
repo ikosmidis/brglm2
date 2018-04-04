@@ -122,7 +122,7 @@ all.equal(coef(houseML1nnet), coef(houseML1), tolerance = 1e-04)
 houseML3 <- brmultinom(Sat ~ Infl + Type + Cont, weights = Freq,
                       data = housing, type = "ML", ref = 3)
 # The fitted values are the same as houseML1
-all.equal(fitted(houseML1), fitted(houseML1), tolerance = 1e-10)
+all.equal(fitted(houseML3), fitted(houseML1), tolerance = 1e-10)
 
 # Bias reduction
 houseBR3 <- update(houseML3, type = "AS_mean")

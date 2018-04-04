@@ -113,7 +113,7 @@
 #' houseML3 <- brmultinom(Sat ~ Infl + Type + Cont, weights = Freq,
 #'                       data = housing, type = "ML", ref = 3)
 #' # The fitted values are the same as houseML1
-#' all.equal(fitted(houseML1), fitted(houseML1), tolerance = 1e-10)
+#' all.equal(fitted(houseML3), fitted(houseML1), tolerance = 1e-10)
 #'
 #' # Bias reduction
 #' houseBR3 <- update(houseML3, type = "AS_mean")
@@ -181,9 +181,9 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
 
     keep <- w > 0
 
-    if (any(!keep)) {
-        warning("Observations with non-positive weights have been omited from the computations")
-    }
+    ## if (any(!keep)) {
+    ##     warning("Observations with non-positive weights have been omited from the computations")
+    ## }
 
     nkeep <- sum(keep)
     ## Set up the model matrix for the poisson fit
@@ -210,10 +210,18 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     ## + na.action
     ## + control
 
+    ## Fitted values
+    coefs <- matrix(fit$coefficients[ofInterest], ncol = ncat - 1)
+    fitted <- matrix(1, nrow(X), ncat)
+    fitted[, -ref] <- apply(coefs, 2, function(b) exp(X %*% b))
+    fitted <- fitted/rowSums(fitted)
+    rownames(fitted) <- rownames(X)
+    colnames(fitted) <- lev
+    fit$fitted.values <- fitted
     fit$call <- call
-    fit$fitted.values <- matrix(fit$fitted.values, ncol = ncat)/w[keep]
-    rownames(fit$fitted.values) <- rownames(X)[keep]
-    colnames(fit$fitted.values) <- lev
+    ## fit$fitted.values <- matrix(fit$fitted.values, ncol = ncat)/w[keep]
+    ## rownames(fit$fitted.values) <- rownames(X)[keep]
+    ## colnames(fit$fitted.values) <- lev
     class(fit) <- c("brmultinom", fit$class, "glm")
     fit$ofInterest <- ofInterest
     fit$ncat <- ncat
@@ -226,16 +234,16 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
 #' @method coef brmultinom
 #' @export
 coef.brmultinom <- function(object, ...) {
-    ncat <- object$ncat
     if (length(object$ofInterest)) {
-        coefficients <- object$coefficients[object$ofInterest]
-        coefs <- matrix(coefficients, nrow = ncat - 1, byrow = TRUE)
-        dimnames(coefs) <- with(object, list(lev[-object$ref], coefNames))
+        with(object, {
+            coefs <- matrix(coefficients[ofInterest], nrow = ncat - 1, byrow = TRUE)
+            dimnames(coefs) <- list(lev[-object$ref], coefNames)
+            coefs
+        })
     }
     else {
-        coefs <- NULL
+        NULL
     }
-    coefs
 }
 
 #' @method print brmultinom

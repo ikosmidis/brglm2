@@ -1,3 +1,11 @@
+# brglm 0.1.8
+## Other improvements, updates and addition
+* Improved documentation examples
+* Removed warning about observations with non-positive weights from brmultinom
+
+## Bug fixes
+* brmultinom returns a fitted values matrix that respects the dimension of data
+
 # brglm 0.1.7
 
 ## Other improvements, updates and addition
