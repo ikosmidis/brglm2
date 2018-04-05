@@ -217,7 +217,7 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     fitted <- fitted/rowSums(fitted)
     rownames(fitted) <- rownames(X)
     colnames(fitted) <- lev
-    fit$fitted.values <- fitted
+    fit$fitted_values_matrix <- fitted
     fit$call <- call
     ## fit$fitted.values <- matrix(fit$fitted.values, ncol = ncat)/w[keep]
     ## rownames(fit$fitted.values) <- rownames(X)[keep]
@@ -229,6 +229,12 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     fit$ref <- ref
     fit$coefNames <- colnames(X)
     fit
+}
+
+#' @method fitted brmultinom
+#' @export
+fitted.brmultinom <- function(object, ...) {
+    object$fitted_values_matrix
 }
 
 #' @method coef brmultinom
