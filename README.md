@@ -45,8 +45,8 @@ implicit is as given in [Kosmidis
 **brglm2** was presented by [Ioannis Kosmidis](https://www.ucl.ac.uk/~ucakiko/) at the [useR! 2016 international R User conference](http://user2016.org) at University of Stanford on 16 June 2016. The presentation was titled "Reduced-bias inference in generalized linear models" and can be watched online at this [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
 
 
-The paper
+Motivation, details and discussion on the methods that **brglm2** implements are provided in
 
 Kosmidis, I, Kenne Pagui, E C, Sartori N. (2017). Mean and median bias reduction in generalized linear models. *arXiv*, [**arXiv:1710.11217**](http://arxiv.org/abs/1804.04085)
 
-provides details on the methods that **brglm2** implements.
+
