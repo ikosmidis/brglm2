@@ -2,9 +2,11 @@
 ## Other improvements, updates and addition
 * Improved documentation examples
 * Removed warning about observations with non-positive weights from brmultinom
+* Updated email adrress for Ioannis Kosmidis in brglmFit
 
 ## Bug fixes
 * brmultinom returns a fitted values matrix that respects the dimension of data
+* Fixed bug on condition for NA dispersion for models with 0 df resid
 
 # brglm 0.1.7
 
@@ -20,7 +22,6 @@
 
 ## Other improvements, updates and addition
 * New email for Ioannis Kosmidis
-
 
 # brglm2 0.1.5
 

@@ -950,7 +950,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                 boundary <- TRUE
             }
         }
-        if (df_residual == 0) dispersion <- NA_real_
+        if (df_residual == 0 & !no_dispersion) {
+            dispersion <- NA_real_
+        }
 
         ## ## Estimate of first-order bias from the last iteration (so
         ## ## not at the final value for the coefficients)
