@@ -598,6 +598,9 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         offset <- rep.int(0, nobs)
     }
 
+    ## Add support for user specified links
+    ## if family$link is not in the supported link then check if the family object has d2mu.deta and extract all linkglm objects from the family object. Else do the below
+
     ## Enrich the family object with the required derivatives
     linkglm <- make.link(family$link)
     family <- enrichwith::enrich(family, with = c("d1afun", "d2afun", "d3afun", "d1variance"))
