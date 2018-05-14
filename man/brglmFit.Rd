@@ -80,9 +80,9 @@ of the Fisher scoring iterates.
 \details{
 A detailed description of the supported adjustments and the quasi
 Fisher scoring iteration is given in the iteration vignette (see,
-\url{https://cran.r-project.org/package=brglm2/vignettes/iteration.pdf}).
-A shorter description of the quasi Fisher scoring iteration is also
-given in one of the vignettes of the *enrichwith* R package (see,
+Kosmidis et al, 2018).  A shorter description of the quasi Fisher
+scoring iteration is also given in one of the vignettes of the
+*enrichwith* R package (see,
 \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
 Kosmidis and Firth (2010) describe a parallel quasi Newton-Raphson
 iteration with the same stationary point.
