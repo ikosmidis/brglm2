@@ -2,7 +2,7 @@
 % Please edit documentation in R/mis-link.R
 \name{mis}
 \alias{mis}
-\title{A \code{\link{link-glm}} for misclassified responses in binomial regression models}
+\title{A \code{link-glm} object for misclassified responses in binomial regression models}
 \usage{
 mis(link = "logit", sensitivity = 1, specificity = 1)
 }
@@ -14,7 +14,7 @@ mis(link = "logit", sensitivity = 1, specificity = 1)
 \item{specificity}{the probability of observing a failure given that a failure actually took place given any covariate values}
 }
 \description{
-\code{\link{mis}} is a \code{\link{link-glm}} object that specifies the link function in Neuhaus (1999, expression~(8)) for handling misclassified responses in binomial regression models using maximum likelihood. A prior specification of the sensitivity and specificity is required.
+\code{\link{mis}} is a \code{link-glm} object that specifies the link function in Neuhaus (1999, expression~(8)) for handling misclassified responses in binomial regression models using maximum likelihood. A prior specification of the sensitivity and specificity is required.
 }
 \details{
 \code{sensitivity} + \code{specificity} should be greater or equal
