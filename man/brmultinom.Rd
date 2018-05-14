@@ -132,13 +132,14 @@ houseBC3 <- update(houseML3, type = "correction")
 
 }
 \references{
-Agrest A (2002). Categorical data analysis (2nd Edition). Wiley. New York.
+Agresti A. (2002). Categorical data analysis (2nd
+Edition). Wiley. New York.
 
-Albert A and Anderson J A (1984). On the Existence of Maximum
+Albert A. and Anderson J. A. (1984). On the Existence of Maximum
 Likelihood Estimates in Logistic Regression Models. *Biometrika*,
 **71** 1--10.
 
-Kosmidis I and Firth D (2011). Multinomial logit bias reduction via
+Kosmidis I. and Firth D. (2011). Multinomial logit bias reduction via
 the Poisson log-linear model. *Biometrika*, **98**, 755-759.
 
 Palmgren, J. (1981). The Fisher Information Matrix for Log Linear

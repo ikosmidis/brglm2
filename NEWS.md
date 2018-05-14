@@ -1,5 +1,16 @@
+# brglm 0.1.9
+## Bug fixes
+* brglmFit now works properly with custom link functions (mean and median bias reduction)
+
+## New functionality
+* Added the `mis` link functions for accounting for misclassification in binomial response models (Newuhaus, 1999, Biometrika)
+
+## Other improvements, updates and additions
+* Added references to [arxiv:1804.04085](https://arxiv.org/abs/1804.04085) in documentation
+* Updated Kenne Pagui et al (2017) reference
+
 # brglm 0.1.8
-## Other improvements, updates and addition
+## Other improvements, updates and additions
 * Improved documentation examples
 * Removed warning about observations with non-positive weights from brmultinom
 * Updated email adrress for Ioannis Kosmidis in brglmFit
@@ -10,7 +21,7 @@
 
 # brglm 0.1.7
 
-## Other improvements, updates and addition
+## Other improvements, updates and additions
 * Eliminated errors from markdown chunks in multinomial vignette
 
 # brglm2 0.1.6
@@ -18,9 +29,7 @@
 ## Bug fixes
 * Compatibility with new version of enrichwith
 
-## New functionality
-
-## Other improvements, updates and addition
+## Other improvements, updates and additions
 * New email for Ioannis Kosmidis
 
 # brglm2 0.1.5
@@ -32,7 +41,7 @@
 * `check_infinite_estimates` now accepts `brmultinom` objects
 * Added `singular.ok` argument to `brglmFit` and `detect_separation` methods in line with the update of `glm.fit`
 
-## Other improvements, updates and addition
+## Other improvements, updates and additions
 * less strict tolerance in `brglm_control`
 * Updates to help files
 * Fixed typos in iteration vignette

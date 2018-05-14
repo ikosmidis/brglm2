@@ -103,6 +103,10 @@
 #'
 #' @references
 #'
+#' Kosmidis I., Kenne Pagui E. C. and Sartori N. (2018). Mean and
+#' median bias reduction in generalized linear models. *arxiv*,
+#' **arxiv:1804.04085**
+#'
 #' Cordeiro G. M. & McCullagh, P. (1991). Bias correction in generalized
 #' linear models. *Journal of the Royal Statistical Society. Series B
 #' (Methodological)*, **53**, 629-643
@@ -110,9 +114,9 @@
 #' Firth D. (1993). Bias reduction of maximum likelihood estimates,
 #' Biometrika, **80**, 27-38
 #'
-#' Kenne Pagui E C, Salvan A and Sartori N (2016). Median bias
-#' reduction of maximum likelihood estimates. *arXiv*,
-#' **arXiv:1604.04768**
+#' Kenne Pagui, E. C., A. Salvan, and N. Sartori (2017). Median bias
+#' reduction of maximum likelihood estimates. *Biometrika*, **104**,
+#' 923–938
 #'
 #' Kosmidis I and Firth D (2009). Bias reduction in exponential family
 #' nonlinear models. *Biometrika*, **96**, 793-804

@@ -109,12 +109,12 @@ update(murder_glm, method = "brglm_fit")
 }
 }
 \references{
-Kjell Konis (2007). *Linear Programming Algorithms for Detecting
+Kjell K. (2007). *Linear Programming Algorithms for Detecting
 Separated Data in Binary Logistic Regression
 Models*. DPhil. University of Oxford.
 \url{https://ora.ox.ac.uk/objects/uuid:8f9ee0d0-d78e-4101-9ab4-f9cbceed2a2a}
 
-Kjell Konis (2013). safeBinaryRegression: Safe Binary Regression. R
+Kjell K. (2013). safeBinaryRegression: Safe Binary Regression. R
 package version 0.1-3.
 \url{https://CRAN.R-project.org/package=safeBinaryRegression}
 }
