@@ -44,6 +44,7 @@ update(lizardsML_mis, method = "brglmFit", type = "AS_mean",
 
 update(lizardsML_mis, method = "brglmFit", type = "AS_median",
        start = coef(lizardsML))
+
 }
 \references{
 Neuhaus J. M. (1999). Bias and efficiency loss due to misclassified

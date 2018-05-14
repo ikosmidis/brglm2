@@ -42,6 +42,8 @@
 #'
 #' update(lizardsML_mis, method = "brglmFit", type = "AS_median",
 #'        start = coef(lizardsML))
+#'
+#' @export
 mis <- function(link = "logit", sensitivity = 1, specificity = 1) {
     link <- make.link(link)
     linkfun <- function(mu) {
