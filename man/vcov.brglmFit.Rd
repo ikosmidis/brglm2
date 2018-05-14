@@ -18,8 +18,7 @@ in a \code{\link{brglmFit}} object}
 \item{...}{
     additional arguments for method functions.  For the
     \code{\link{glm}} method this can be used to pass a
-    \code{dispersion} parameter.
-  }
+    \code{dispersion} parameter.}
 }
 \description{
 Return the variance-covariance matrix for the regression parameters

@@ -598,26 +598,48 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         offset <- rep.int(0, nobs)
     }
 
-    ## Add support for user specified links
-    ## if family$link is not in the supported link then check if the family object has d2mu.deta and extract all linkglm objects from the family object. Else do the below
+    ok_links <- c("logit", "probit", "cauchit",
+                  "cloglog", "identity", "log",
+                  "sqrt", "inverse")
 
-    ## Enrich the family object with the required derivatives
-    linkglm <- make.link(family$link)
+    ## Enrich family
     family <- enrichwith::enrich(family, with = c("d1afun", "d2afun", "d3afun", "d1variance"))
-    linkglm <- enrichwith::enrich(linkglm, with = "d2mu.deta")
+    if ((family$link %in% ok_links) | (grepl("mu\\^", family$link))) {
+        ## Enrich the link object with d2mu.deta and update family object
+        linkglm <- make.link(family$link)
+        linkglm <- enrichwith::enrich(linkglm, with = "d2mu.deta")
+        ## Put everything into the family object
+        family[names(linkglm)] <- linkglm
+    }
+    ## Annoying thing is that link-glm components other than the
+    ## standard ones disappear when extra arguments are passed to a
+    ## family functions... Anyway, we only require d2mu.deta here.
 
     ## Extract functions from the enriched family object
     variance <- family$variance
     d1variance <- family$d1variance
-    linkinv <- linkglm$linkinv
-    linkfun <- linkglm$linkfun
+    linkinv <- family$linkinv
+    linkfun <- family$linkfun
     if (!is.function(variance) || !is.function(linkinv))
         stop("'family' argument seems not to be a valid family object",
              call. = FALSE)
     dev.resids <- family$dev.resids
     aic <- family$aic
-    mu.eta <- linkglm$mu.eta
-    d2mu.deta <- linkglm$d2mu.deta
+    mu.eta <- family$mu.eta
+    ## If the family is custom then d2mu.deta cannot survive when
+    ## passing throguh current family functions. But mu.eta does; so
+    ## we compute d2mu.deta numerically; this allows also generality,
+    ## as the users can then keep their custom link implementations
+    ## unaltered. Issue is scalability, due to the need of evaluating
+    ## n numerical derivatives
+    if (is.null(family$d2mu.deta)) {
+        d2mu.deta <- function(eta) {
+            numDeriv::grad(mu.eta, eta)
+        }
+    }
+    else {
+        d2mu.deta <- family$d2mu.deta
+    }
     d1afun <- family$d1afun
     d2afun <- family$d2afun
     d3afun <- family$d3afun
