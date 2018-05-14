@@ -69,7 +69,7 @@
 #' @import enrichwith
 #' @importFrom graphics plot
 #' @importFrom nnet class.ind
-#' @importFrom mnumDeriv grad
+#' @importFrom numDeriv grad
 #' @import Matrix
 #'
 #'

@@ -904,6 +904,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
         }
 
+
+
         adjusted_grad_all[betas_names] <- adjusted_grad_beta
         adjusted_grad_all["Transformed dispersion"] <- adjusted_grad_zeta
         betas_all[betas_names] <- betas
@@ -1016,7 +1018,8 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     if (intercept & missing_offset) {
         nullFit <- brglmFit(x = x[, "(Intercept)"], y = y, weights = weights,
                             offset = rep(0, nobs), family = family, intercept = TRUE,
-                            control = control0[c("epsilon", "maxit", "type", "transformation", "slowit")])
+                            control = control0[c("epsilon", "maxit", "type", "transformation", "slowit")],
+                            start = 0)
         nullmus <- nullFit$fitted
     }
     ## If there is an offset but not an intercept then the fitted
