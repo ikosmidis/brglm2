@@ -4,7 +4,7 @@ data("anorexia", package = "MASS")
 
 anorexML <- glm(Postwt ~ Prewt + Treat+ offset(Prewt),
                 family = gaussian, data = anorexia)
-anorexBR <- update(anorexML, method = "brglmFit")
+anorexBR <- update(anorexML, method = "brglmFit", type = "AS_mean")
 
 tol <- sqrt(.Machine$double.eps)
 test_that("dispersion_ML is the usual biased estimate for the residual variance",
