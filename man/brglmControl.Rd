@@ -19,7 +19,7 @@ allowed}
 \item{trace}{logical indicating if output should be produced for
 each iteration}
 
-\item{type}{the type of fitting methodo to be used. The options are
+\item{type}{the type of fitting method to be used. The options are
 \code{AS_mean} (mean-bias reducing adjusted scores),
 \code{AS_median} (median-bias reducting adjusted scores),
 \code{AS_mixed} (bias reduction using mixed score adjustents; default),
