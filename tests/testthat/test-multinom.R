@@ -19,8 +19,10 @@ contrasts(hepat$type) <- contr.treatment(3, base = 1)
 heppmlr <- pmlr(type ~ group * time,
                 data = hepat, weights = counts, method = "wald",
                 penalized = TRUE)
-hepbr <- brmultinom(type ~ group * time,
-                    data = hepat, weights = counts)
+expect_warning(
+    hepbr <- brmultinom(type ~ group * time,
+                        data = hepat, weights = counts)
+)
 
 tol <- 1e-05
 test_that("brmultinom returns the same estimates as pmlr", {
@@ -28,8 +30,10 @@ test_that("brmultinom returns the same estimates as pmlr", {
 })
 
 ##############
-hepbr_mat <- brmultinom(counts*nnet::class.ind(type) ~ group * time,
-                        data = hepat)
+expect_warning(
+    hepbr_mat <- brmultinom(counts*nnet::class.ind(type) ~ group * time,
+                            data = hepat)
+)
 
 test_that("brmultinom returns the same estimates if counts are supplied as a matrix", {
     expect_equal(coef(hepbr), coef(hepbr_mat), tolerance = tol)
@@ -55,7 +59,9 @@ enzymes$Group <- factor(enzymes$Group, levels=c("2","1","3"))
 enzymes$counts <- rep(1, nrow(enzymes))
 ## enzpmlr <- pmlr(Group ~ AST + GLDH, weights = counts, data = enzymes, method = "wald")
 ## enzbrmultinom <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes)
-enzbrmultinom_ml <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes, type = "ML")
+expect_warning(
+    enzbrmultinom_ml <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes, type = "ML")
+)
 enzmultinom <- nnet::multinom(Group ~ AST + GLDH, weights = counts, data = enzymes, trace = FALSE)
 
 ###############
@@ -76,12 +82,14 @@ test_that("brmultinom returns the same standard errors as nnet::multinom if type
 })
 
 
-hepbr1 <- brmultinom(type ~ group * time,
-                    data = hepat, weights = counts, ref = 1)
-hepbr2 <- brmultinom(type ~ group * time,
-                    data = hepat, weights = counts, ref = 2)
-hepbr3 <- brmultinom(type ~ group * time,
-                     data = hepat, weights = counts, ref = 3)
+expect_warning({
+    hepbr1 <- brmultinom(type ~ group * time,
+                         data = hepat, weights = counts, ref = 1)
+    hepbr2 <- brmultinom(type ~ group * time,
+                         data = hepat, weights = counts, ref = 2)
+    hepbr3 <- brmultinom(type ~ group * time,
+                         data = hepat, weights = counts, ref = 3)
+})
 test_that("brmultinom fits are invariant to the value of ref (ref1 vs ref2)'", {
     expect_equal(hepbr1$fitted.values, hepbr2$fitted.values, tolerance = 1e-04)
 })
@@ -92,16 +100,16 @@ test_that("brmultinom fits are invariant to the value of ref  (ref1 vs ref3)'", 
 
 
 ## Aligator data
-data("alligators", package = "brglm2")
-k <- 3
-all_ml <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
-                     data = alligators, type = "ML", ref = 1)
+## data("alligators", package = "brglm2")
+## k <- 3
+## all_ml <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
+##                      data = alligators, type = "ML", ref = 1)
 
-all_mean <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
-                       data = alligators, type = "AS_mean", ref = 1)
+## all_mean <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
+##                        data = alligators, type = "AS_mean", ref = 1)
 
-all_median <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
-                         data = alligators, type = "AS_median", ref = 1)
+## all_median <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
+##                          data = alligators, type = "AS_median", ref = 1)
 
 ## library("ggplot2")
 
@@ -133,9 +141,5 @@ all_median <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
 ##     lims(x = c(0,1), y = c(0,1)) +
 ##     facet_grid(~ category) +
 ##     theme_bw()
-
-
-
-
 
 

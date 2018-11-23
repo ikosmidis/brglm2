@@ -261,11 +261,11 @@ print.brmultinom <- function(x, digits = max(5L, getOption("digits") - 3L), ...)
         dput(cl, control = NULL)
      }
      cat("\nCoefficients:\n")
-     if (is.null(coef.brmultinom(x))) {
+     if (is.null(coef(x))) {
          print("No coefficients")
      }
      else {
-         print(format(coef.brmultinom(x), digits = digits), print.gap = 2, quote = FALSE)
+         print(format(coef(x), digits = digits), print.gap = 2, quote = FALSE)
      }
      cat("\nResidual Deviance:", format(x$deviance, digits = digits), "\n")
 }

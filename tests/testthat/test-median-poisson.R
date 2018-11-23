@@ -15,14 +15,16 @@ dobson <- data.frame(counts, outcome, treatment)
 tol <- sqrt(.Machine$double.eps)
 
 test_that("MBR estimates and std. errors from brglmFit and from mbrpr are the same for poisson", {
-  br1 <- summary(fit<-glm(counts ~ outcome + treatment, family = poisson(), method = "brglmFit",
-                     type="AS_median"))
-  X <- model.matrix(fit)
-  y <- fit$y
-  br2 <- mbrpr(par=rep(0,ncol(X)),y=y,X=X,eps = 1e-10,maxit=500)
-  c1 <- coef(br1)[,c(1,2)]
-  dimnames(c1)=NULL
-  c2 <- cbind(br2$coefficients,sqrt(diag(br2$InfoInv)))
-  expect_equal(c1,c2, tolerance = tol)
+    expect_warning(
+        br1 <- summary(fit<-glm(counts ~ outcome + treatment, family = poisson(), method = "brglmFit",
+                                type="AS_median"))
+    )
+    X <- model.matrix(fit)
+    y <- fit$y
+    br2 <- mbrpr(par=rep(0,ncol(X)),y=y,X=X,eps = 1e-10,maxit=500)
+    c1 <- coef(br1)[,c(1,2)]
+    dimnames(c1)=NULL
+    c2 <- cbind(br2$coefficients,sqrt(diag(br2$InfoInv)))
+    expect_equal(c1,c2, tolerance = tol)
 })
 

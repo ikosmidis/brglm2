@@ -7,7 +7,7 @@
 \format{A data frame with 79 rows and 4 variables:
 \describe{
 
-\item{NV}{neovasculation with coding 0 for absent and 1 for present}
+\item{NV}{neovasculization with coding 0 for absent and 1 for present}
 
 \item{PI}{pulsality index of arteria uterina}
 

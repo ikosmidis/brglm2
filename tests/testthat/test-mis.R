@@ -8,9 +8,9 @@ lizards_f <- cbind(grahami, opalinus) ~ height + diameter + light + time
 lizards_logit <- glm(lizards_f, family = binomial(logit), data = lizards)
 lizards_probit <- glm(lizards_f, family = binomial(probit), data = lizards)
 
-lizards_logit_mis <- update(lizardsML, family = binomial(logit_mis),
+lizards_logit_mis <- update(lizards_logit, family = binomial(logit_mis),
                             start = coef(lizards_logit))
-lizards_probit_mis <- update(lizardsML, family = binomial(probit_mis),
+lizards_probit_mis <- update(lizards_probit, family = binomial(probit_mis),
                              start = coef(lizards_probit))
 
 test_that("mis link with sensitivity and specificity 1 are the same as original links", {

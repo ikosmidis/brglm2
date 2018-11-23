@@ -4,8 +4,8 @@
 \alias{summary.brglmFit}
 \title{\code{summary} method for \code{\link{brglmFit}} objects}
 \usage{
-\method{summary}{brglmFit}(object, dispersion = NULL, correlation = FALSE,
-  symbolic.cor = FALSE, ...)
+\method{summary}{brglmFit}(object, dispersion = NULL,
+  correlation = FALSE, symbolic.cor = FALSE, ...)
 }
 \arguments{
 \item{object}{an object of class \code{"glm"}, usually, a result of a

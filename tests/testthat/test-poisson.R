@@ -10,8 +10,10 @@ dobson <- data.frame(counts, outcome, treatment)
 
 tol <- sqrt(.Machine$double.eps)
 test_that("BR estimates and std. errors from brglmFit and from brpr are the same for poisson", {
-    br1 <- summary(glm(counts ~ outcome + treatment, family = poisson(), method = "brglmFit"))
-    br2 <- summary(brpr(counts ~ outcome + treatment, data = dobson))
+    expect_warning({
+        br1 <- summary(glm(counts ~ outcome + treatment, family = poisson(), method = "brglmFit"))
+        br2 <- summary(brpr(counts ~ outcome + treatment, data = dobson))
+    })
     c1 <- coef(br1)
     c2 <- coef(br2)
     c2 <- c2[rownames(c1), ]

@@ -5,7 +5,8 @@
 \title{Return the variance-covariance matrix for the regression parameters
 in a \code{\link{brglmFit}} object}
 \usage{
-\method{vcov}{brglmFit}(object, model = c("mean", "full", "dispersion"), ...)
+\method{vcov}{brglmFit}(object, model = c("mean", "full", "dispersion"),
+  ...)
 }
 \arguments{
 \item{object}{
