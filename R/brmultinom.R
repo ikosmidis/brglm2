@@ -181,12 +181,9 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     }
 
     keep <- w > 0
-
-    ## if (any(!keep)) {
-    ##     warning("Observations with non-positive weights have been omited from the computations")
-    ## }
-
     nkeep <- sum(keep)
+    fixed_totals <- rep(seq.int(nkeep), ncat)
+
     ## Set up the model matrix for the poisson fit
     Xnuisance <- Matrix::Diagonal(nkeep)
     Xextended <- cbind(Matrix::kronecker(rep(1, ncat), Xnuisance),
@@ -203,7 +200,7 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
 
     fit <- brglmFit(x = Xextended, y = Yextended,
                     start = NULL,
-                    family = poisson("log"), control = control, intercept = TRUE, fixed_totals = rep(seq.int(nkeep), ncat))
+                    family = poisson("log"), control = control, intercept = TRUE, fixed_totals = fixed_totals)
 
     ## TODO:
     ## + starting values
@@ -212,13 +209,10 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     ## + control
 
     ## Fitted values
-    coefs <- matrix(fit$coefficients[ofInterest], ncol = ncat - 1)
-    fitted <- matrix(1, nrow(X), ncat)
-    fitted[, -ref] <- apply(coefs, 2, function(b) exp(X %*% b))
-    fitted <- fitted/rowSums(fitted)
+    fitted <- do.call("rbind", tapply(fit$fitted, fixed_totals, function(x) x/sum(x)))
     rownames(fitted) <- rownames(X)
     colnames(fitted) <- lev
-    fit$fitted_values_matrix <- fitted
+    fit$fitted.values <- fitted
     fit$call <- call
     ## fit$fitted.values <- matrix(fit$fitted.values, ncol = ncat)/w[keep]
     ## rownames(fit$fitted.values) <- rownames(X)[keep]
@@ -235,7 +229,7 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
 #' @method fitted brmultinom
 #' @export
 fitted.brmultinom <- function(object, ...) {
-    object$fitted_values_matrix
+    object$fitted.values
 }
 
 #' @method coef brmultinom
