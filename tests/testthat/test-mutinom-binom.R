@@ -27,3 +27,4 @@ tolerance <- 1e-06
 test_that("coefficients from the binomial fit match those from the multinomial model with the poisson trick", {
     expect_equal(coef(model1), coef(model2)[1,], tol = tolerance)
 })
+
