@@ -6,7 +6,7 @@
 Poisson trick.}
 \usage{
 brmultinom(formula, data, weights, subset, na.action, contrasts = NULL,
-  ref = 1, control = list(...), ...)
+  ref = 1, model = TRUE, x = TRUE, control = list(...), ...)
 }
 \arguments{
 \item{formula}{
@@ -48,6 +48,11 @@ the factors appearing as variables in the model formula.
 regression. Either an integer, in which case
 levels(response)[ref] is used as a baseline, or a character
 string. Default is 1.}
+
+\item{model}{
+  logical. If true, the model frame is saved as component \code{model}
+  of the returned object.
+}
 
 \item{control}{a list of parameters for controlling the fitting
 process. See \code{\link{brglmControl}} for details.}

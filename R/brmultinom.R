@@ -123,7 +123,10 @@
 #'
 #'
 #' @export
-brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NULL, ref = 1, control = list(...), ...) {
+brmultinom <- function(formula, data, weights, subset, na.action,
+                       contrasts = NULL, ref = 1,
+                       model = TRUE, x = TRUE,
+                       control = list(...), ...) {
     call <- match.call()
     if (missing(data)) {
         data <- environment(formula)
@@ -222,6 +225,15 @@ brmultinom <- function(formula, data, weights, subset, na.action, contrasts = NU
     fit$ncat <- ncat
     fit$lev <- lev
     fit$ref <- ref
+    if (model) {
+        fit$model  <- mf
+    }
+    if (x) {
+        fit$x  <- X
+    }
+    fit$contrasts <- attr(X, "contrasts")
+    fit$xlevels = .getXlevels(Terms, mf)
+    fit$terms <- Terms
     fit$coefNames <- colnames(X)
     fit
 }
@@ -268,7 +280,7 @@ print.brmultinom <- function(x, digits = max(5L, getOption("digits") - 3L), ...)
 #' @export
 logLik.brmultinom <- function(object, ...) {
     structure(-object$deviance/2,
-              df = sum(!is.na(coef.brmultinom(object))),
+              df = sum(!is.na(coef(object))),
               nobs = sum(object$weights),
               class = "logLik")
 }

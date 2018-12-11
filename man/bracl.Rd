@@ -6,7 +6,8 @@
 Poisson trick.}
 \usage{
 bracl(formula, data, weights, subset, na.action, parallel = FALSE,
-  contrasts = NULL, control = list(...), ...)
+  contrasts = NULL, model = TRUE, x = TRUE, control = list(...),
+  ...)
 }
 \arguments{
 \item{formula}{
@@ -42,6 +43,11 @@ a function to filter missing data.
 \item{contrasts}{
 a list of contrasts to be used for some or all of
 the factors appearing as variables in the model formula.
+}
+
+\item{model}{
+  logical. If true, the model frame is saved as component \code{model}
+  of the returned object.
 }
 
 \item{control}{a list of parameters for controlling the fitting

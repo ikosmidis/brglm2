@@ -58,6 +58,7 @@
 bracl <- function(formula, data, weights, subset, na.action,
                   parallel = FALSE,
                   contrasts = NULL,
+                  model = TRUE, x= TRUE,
                   control = list(...), ...) {
     call <- match.call()
     if (missing(data)) {
@@ -152,6 +153,15 @@ bracl <- function(formula, data, weights, subset, na.action,
     fit$ncat <- ncat
     fit$lev <- lev
     fit$ref <- ncat
+    if (model) {
+        fit$model  <- mf
+    }
+    if (x) {
+        fit$x  <- X
+    }
+    fit$contrasts <- attr(X, "contrasts")
+    fit$xlevels = .getXlevels(Terms, mf)
+    fit$terms <- Terms
     fit$coefNames <- colnames(X)
     fit
 }
