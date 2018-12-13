@@ -110,7 +110,9 @@ bracl <- function(formula, data, weights, subset, na.action,
     nvar <- ncol(X)
     keep <- w > 0
     nkeep <- sum(keep)
-    cats <- rep(seq.int(ncat), each = nrow(Y))
+
+    cats0 <- apply(Y, 1, function(x) which(x == 1))
+    cats <- rep(seq.int(ncat), each = nrow(X))
 
     fixed_totals <- rep(seq.int(nkeep), ncat)
 
@@ -121,7 +123,7 @@ bracl <- function(formula, data, weights, subset, na.action,
     if (parallel) {
         Xextended <- cbind(Matrix::kronecker(rep(1, ncat), Xnuisance),
                            Matrix::kronecker(Matrix::Diagonal(ncat)[, -ncat, drop = FALSE], X[keep, xint]),
-                           (ncat - cats) * Matrix::kronecker(c(rep(1, ncat - 1), 0), X[keep, -xint]))
+        (ncat - cats) * Matrix::kronecker(c(rep(1, ncat - 1), 0), X[keep, -xint]))
         ofInterest <- c(paste(lev[-ncat], rep("(Intercept)", ncat - 1), sep = ":"), colnames(X)[-xint])
     }
     else {
@@ -133,9 +135,10 @@ bracl <- function(formula, data, weights, subset, na.action,
     colnames(Xextended) <- c(paste0(".nuisance", sprintf(nd, int)),
                              ofInterest)
 
-
     ## Set up the extended response
     Yextended <- c(Y[keep] * w[keep])
+
+
 
     fit <- brglmFit(x = Xextended, y = Yextended,
                     start = NULL,
@@ -196,7 +199,14 @@ coef.bracl <- function(object, ...) {
 }
 
 vcov.bracl <- function(object, ...) {
+    vc <- vcov.brglmFit(object, ...)
+    vc <- vc[object$ofInterest, object$ofInterest]
+    if (object$parallel) {
 
+    }
+    else {
+
+    }
 }
 
 summary.bracl <- function (object, correlation = FALSE, digits = options()$digits,

@@ -25,13 +25,13 @@ library("VGAM")
 ## With proportional odds
 fit_adj_p <- vglm(cbind(ff[1, ], ff[2, ], ff[3, ], ff[4, ]) ~ re + ge, family = acat(reverse = TRUE, parallel = TRUE))
 expect_warning(
-    fit_acl_p <- bracl(research ~ as.numeric(religion) + gender, weights = freq, data = stemcell, type = "ML", parallel = TRUE)
+    fit_acl_p <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell, type = "ML", parallel = TRUE)
 )
 
 ## Without proportional odds
 fit_adj <- vglm(cbind(ff[1, ], ff[2, ], ff[3, ], ff[4, ]) ~ re + ge, family = acat(reverse = TRUE, parallel = FALSE))
 expect_warning(
-    fit_acl <- bracl(research ~ as.numeric(religion) + gender, weights = freq, data = stemcell, type = "ML")
+    fit_acl <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell, type = "ML")
 )
 
 tol <- 1e-06
@@ -40,20 +40,39 @@ test_that("VGAM::vglm and bracl return the same coefficients", {
     expect_equal(unname(coef(fit_adj_p)), unname(coef(fit_acl_p)), tolerance = tol)
 })
 
-test_that("Difference in deviance is the same with VGAM::vglm and brmultinom", {
+test_that("Difference in deviance is the same with VGAM::vglm and bracl", {
     expect_equal(logLik(fit_adj) - logLik(fit_adj_p),
                  unclass(logLik(fit_acl) - logLik(fit_acl_p)), tolerance = tol,
                  check.attributes = FALSE)
 })
 
-test_that("logLik returns the correct df", {
+test_that("logLik returns the correct df for cracl", {
     expect_identical(attr(logLik(fit_acl), "df"), as.integer(9))
     expect_identical(attr(logLik(fit_acl_p), "df"), as.integer(5))
 })
 
-test_that("brmultinom returns the correct fitted values", {
+test_that("bracl returns the correct fitted values", {
     expect_equal(fitted(fit_acl)[1:6, ], fit_adj@fitted.values, tolerance = tol,
                  check.attributes = FALSE)
     expect_equal(fitted(fit_acl_p)[1:6, ], fit_adj_p@fitted.values, tolerance = tol,
                  check.attributes = FALSE)
+})
+
+shu <- function(dat)  dat[sample(seq.int(nrow(dat)), nrow(dat)), ]
+
+test_that("bracl results is invariance to shuffling of the data", {
+    for (j in 1:10) {
+
+        expect_warning(
+            fit_acl_p_r <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = TRUE)
+        )
+
+        expect_warning(
+            fit_acl_r <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = FALSE)
+        )
+
+        expect_equal(coef(fit_acl), coef(fit_acl_r), tolerance = tol)
+        expect_equal(coef(fit_acl_p), coef(fit_acl_p_r), tolerance = tol)
+    }
+
 })
