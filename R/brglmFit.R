@@ -553,15 +553,15 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         out
     }
 
-
     ## Some useful quantities
     is_ML <- control$type == "ML"
     is_AS_median <- control$type == "AS_median"
+    is_AS_mixed <- control$type == "AS_mixed"
     is_correction <- control$type == "correction"
     no_dispersion <- family$family %in% c("poisson", "binomial")
 
 
-    if (is_AS_median) {
+    if (is_ML | is_AS_median | is_AS_mixed) {
         transformation1 <- control$transformation
         Trans1 <- control$Trans
         inverseTrans1 <- control$inverseTrans
@@ -953,14 +953,14 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
         if (!no_dispersion) {
             info_transformed_dispersion <- 1/step_components_zeta$inverse_info
-            if (is_AS_median) {
+            if (is_ML | is_AS_median | is_AS_mixed) {
                 transformed_dispersion <- eval(Trans1)
                 d1zeta <- eval(DD(Trans1, "dispersion", order = 1))
                 adjusted_grad_all["Transformed dispersion"] <- adjusted_grad_all["Transformed dispersion"] / d1zeta
                 info_transformed_dispersion <- info_transformed_dispersion / d1zeta^2
             }
         }
-        if (is_AS_median) {
+        if (is_ML | is_AS_median  | is_AS_mixed) {
             control$transformation <- transformation1
             control$trans <- Trans1
             control$inverseTrans <- inverseTrans1

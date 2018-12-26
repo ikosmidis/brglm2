@@ -200,13 +200,26 @@ coef.bracl <- function(object, ...) {
 
 vcov.bracl <- function(object, ...) {
     vc <- vcov.brglmFit(object, ...)
-    vc <- vc[object$ofInterest, object$ofInterest]
+    ofInterest <- object$ofInterest
+    vc <- vc[ofInterest, ofInterest]
+    intercept_names <- paste0(object$lev[-object$ref], ":", "(Intercept)")
     if (object$parallel) {
-
+        beta_names <- ofInterest[!(ofInterest %in% intercept_names)]
+        vint <- vc[intercept_names, intercept_names]
+        vintslo <- vc[intercept_names, beta_names]
+        ## vint <- apply(rbind(vint, 0), 2, diff)
+        ## vint <- apply(cbind(vint, 0), 1, diff)
+        ## vintslo <- -apply(rbind(vintslo, 0), 2, diff)
+        vint <- diff(rbind(vint, 0))
+        vint <- diff(rbind(t(vint), 0))
+        vintslo <- -diff(rbind(vintslo, 0))
+        vc <- rbind(cbind(vint, vintslo),
+                    cbind(t(vintslo), vc[beta_names, beta_names]))
     }
     else {
-
+        vc
     }
+    vc
 }
 
 summary.bracl <- function (object, correlation = FALSE, digits = options()$digits,
