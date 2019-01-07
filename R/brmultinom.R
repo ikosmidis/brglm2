@@ -213,7 +213,8 @@ brmultinom <- function(formula, data, weights, subset, na.action,
 
     ## Fitted values
     fitted <- do.call("rbind", tapply(fit$fitted, fixed_totals, function(x) x/sum(x)))
-    rownames(fitted) <- rownames(X)
+
+    rownames(fitted) <- rownames(X)[keep]
     colnames(fitted) <- lev
     fit$fitted.values <- fitted
     fit$call <- call

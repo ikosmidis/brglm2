@@ -29,7 +29,7 @@
 #'
 #' @details
 #'
-#' Complete me
+#' COMPLETE ME
 #'
 #' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'
@@ -198,26 +198,40 @@ coef.bracl <- function(object, ...) {
     }
 }
 
+## Incomplete
 vcov.bracl <- function(object, ...) {
     vc <- vcov.brglmFit(object, ...)
     ofInterest <- object$ofInterest
     vc <- vc[ofInterest, ofInterest]
-    intercept_names <- paste0(object$lev[-object$ref], ":", "(Intercept)")
+    levs <- object$lev[-object$ref]
+    intercept_names <- paste0(levs, ":", "(Intercept)")
+    ddiff <- function(mat) {
+        mat <- diff(rbind(mat, 0))
+        diff(rbind(t(mat), 0))
+    }
     if (object$parallel) {
-        beta_names <- ofInterest[!(ofInterest %in% intercept_names)]
-        vint <- vc[intercept_names, intercept_names]
-        vintslo <- vc[intercept_names, beta_names]
-        ## vint <- apply(rbind(vint, 0), 2, diff)
-        ## vint <- apply(cbind(vint, 0), 1, diff)
-        ## vintslo <- -apply(rbind(vintslo, 0), 2, diff)
-        vint <- diff(rbind(vint, 0))
-        vint <- diff(rbind(t(vint), 0))
-        vintslo <- -diff(rbind(vintslo, 0))
+        beta_names <- ofInterest
+        beta_names <- beta_names[!(beta_names %in% intercept_names)]
+        vbeta <- vc[beta_names, beta_names]
+        vint <- ddiff(vc[intercept_names, intercept_names])
+        vintslo <- -diff(rbind(vc[intercept_names, beta_names], 0))
         vc <- rbind(cbind(vint, vintslo),
-                    cbind(t(vintslo), vc[beta_names, beta_names]))
+                    cbind(t(vintslo), vbeta))
+        rownames(vc) <- colnames(vc) <- c(intercept_names, beta_names)
     }
     else {
-        vc
+        coefs <- coef(object)
+        npar <- length(coefs)
+        ncat <- length(object$lev) - 1
+        betas <- colnames(coefs)
+        for (j in 1:npar) {
+            for (k in 1:npar) {
+                par_names1 <- paste(levs, betas[j], sep = ":")
+                par_names2 <- paste(levs, betas[k], sep = ":")
+                mat <- ddiff(vc[par_names1, par_names2])
+                vc[par_names1, par_names2] <- mat
+            }
+        }
     }
     vc
 }
