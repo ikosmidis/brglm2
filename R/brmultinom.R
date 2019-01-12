@@ -83,6 +83,10 @@
 #'
 #' @references
 #'
+#' Kosmidis I., Kenne Pagui E. C. and Sartori N. (2018). Mean and
+#' median bias reduction in generalized linear models. *arxiv*,
+#' **arxiv:1804.04085**
+#'
 #' Agresti A. (2002). Categorical data analysis (2nd
 #' Edition). Wiley. New York.
 #'

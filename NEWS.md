@@ -3,6 +3,7 @@
 * brglmFit now works properly with custom link functions (mean and median bias reduction)
 * brglmFit respects the specification of the transformation argument in brglmControl
 * various minor bug fixes and performance improvements
+* Various bug fixes
 
 ## New functionality
 * Added the `mis` link functions for accounting for misclassification in binomial response models (Newuhaus, 1999, Biometrika)
