@@ -6,12 +6,13 @@
 * Various bug fixes
 
 ## New functionality
+* Added `bracl` for fitting adjacent category logit models for ordinal responses using maximum likelihood, mean bias reduction, and median bias reduction
 * Added the `mis` link functions for accounting for misclassification in binomial response models (Newuhaus, 1999, Biometrika)
-* Added `bracl` for fitting adjacent category logit models for ordinal responses using maximum likelihood, mean bias reduction, and median bias reduction.
 
 ## Other improvements, updates and additions
+* Improved `summary` method for `brmultinom` objects
 * Added references to [arxiv:1804.04085](https://arxiv.org/abs/1804.04085) in documentation
-* Updated reference to Kenne Pagui et al (2017)
+* Updated reference to [Kenne Pagui et al (2017)](https://doi.org/10.1093/biomet/asx046)
 
 # brglm 0.1.8
 ## Other improvements, updates and additions
