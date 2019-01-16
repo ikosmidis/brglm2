@@ -23,38 +23,38 @@ ge <- c(1, 1, 1, 0, 0, 0)
 library("VGAM")
 
 ## With proportional odds
-fit_adj_p <- vglm(cbind(ff[1, ], ff[2, ], ff[3, ], ff[4, ]) ~ re + ge, family = acat(reverse = TRUE, parallel = TRUE))
+fit_vgam_p <- vglm(cbind(ff[1, ], ff[2, ], ff[3, ], ff[4, ]) ~ re + ge, family = acat(reverse = TRUE, parallel = TRUE))
 expect_warning(
-    fit_acl_p <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell, type = "ML", parallel = TRUE)
+    fit_bracl_p <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell, type = "ML", parallel = TRUE)
 )
 
 ## Without proportional odds
-fit_adj <- vglm(cbind(ff[1, ], ff[2, ], ff[3, ], ff[4, ]) ~ re + ge, family = acat(reverse = TRUE, parallel = FALSE))
+fit_vgam <- vglm(cbind(ff[1, ], ff[2, ], ff[3, ], ff[4, ]) ~ re + ge, family = acat(reverse = TRUE, parallel = FALSE))
 expect_warning(
-    fit_acl <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell, type = "ML")
+    fit_bracl <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell, type = "ML")
 )
 
 tol <- 1e-06
 test_that("VGAM::vglm and bracl return the same coefficients", {
-    expect_equal(unname(coef(fit_adj)), unname(coef(fit_acl)), tolerance = tol)
-    expect_equal(unname(coef(fit_adj_p)), unname(coef(fit_acl_p)), tolerance = tol)
+    expect_equal(unname(coef(fit_vgam)), unname(coef(fit_bracl)), tolerance = tol)
+    expect_equal(unname(coef(fit_vgam_p)), unname(coef(fit_bracl_p)), tolerance = tol)
 })
 
 test_that("Difference in deviance is the same with VGAM::vglm and bracl", {
-    expect_equal(logLik(fit_adj) - logLik(fit_adj_p),
-                 unclass(logLik(fit_acl) - logLik(fit_acl_p)), tolerance = tol,
+    expect_equal(logLik(fit_vgam) - logLik(fit_vgam_p),
+                 unclass(logLik(fit_bracl) - logLik(fit_bracl_p)), tolerance = tol,
                  check.attributes = FALSE)
 })
 
 test_that("logLik returns the correct df for cracl", {
-    expect_identical(attr(logLik(fit_acl), "df"), as.integer(9))
-    expect_identical(attr(logLik(fit_acl_p), "df"), as.integer(5))
+    expect_identical(attr(logLik(fit_bracl), "df"), as.integer(9))
+    expect_identical(attr(logLik(fit_bracl_p), "df"), as.integer(5))
 })
 
 test_that("bracl returns the correct fitted values", {
-    expect_equal(fitted(fit_acl)[1:6, ], fit_adj@fitted.values, tolerance = tol,
+    expect_equal(fitted(fit_bracl)[1:6, ], fit_vgam@fitted.values, tolerance = tol,
                  check.attributes = FALSE)
-    expect_equal(fitted(fit_acl_p)[1:6, ], fit_adj_p@fitted.values, tolerance = tol,
+    expect_equal(fitted(fit_bracl_p)[1:6, ], fit_vgam_p@fitted.values, tolerance = tol,
                  check.attributes = FALSE)
 })
 
@@ -64,22 +64,33 @@ test_that("bracl results is invariance to shuffling of the data", {
     for (j in 1:10) {
 
         expect_warning(
-            fit_acl_p_r <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = TRUE)
+            fit_bracl_p_r <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = TRUE)
         )
 
         expect_warning(
-            fit_acl_r <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = FALSE)
+            fit_bracl_r <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = FALSE)
         )
 
-        expect_equal(coef(fit_acl), coef(fit_acl_r), tolerance = tol)
-        expect_equal(coef(fit_acl_p), coef(fit_acl_p_r), tolerance = tol)
+        expect_equal(coef(fit_bracl), coef(fit_bracl_r), tolerance = tol)
+        expect_equal(coef(fit_bracl_p), coef(fit_bracl_p_r), tolerance = tol)
     }
 
 })
 
 tol  <-  1e-03
 test_that("vcov method for bracl returns the correct vcov matrix", {
-    expect_equal(vcov(fit_adj_p), vcov(fit_acl_p), tolerance = tol, check.attributes = FALSE)
-    inds <- c(1, 4, 7, 2, 5, 8, 3,6, 9)
-    expect_equal(vcov(fit_adj), vcov(fit_acl)[inds, inds], tolerance = tol, check.attributes = FALSE)
+    expect_equal(vcov(fit_vgam_p), vcov(fit_bracl_p), tolerance = tol, check.attributes = FALSE)
+    expect_equal(vcov(fit_vgam), vcov(fit_bracl), tolerance = tol, check.attributes = FALSE)
+})
+
+
+s1 <- summary(fit_bracl)
+s1p <- summary(fit_bracl_p)
+s2 <- summary(fit_vgam)
+s2p <- summary(fit_vgam_p)
+
+tol <- 1e-06
+test_that("summary method for bracl returns the correct coef mat", {
+    expect_equal(coef(s1), VGAM::coef(s2), tolerance = tol, check.attributes = FALSE)
+    expect_equal(coef(s1p), VGAM::coef(s2p), tolerance = tol, check.attributes = FALSE)
 })
