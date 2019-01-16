@@ -733,6 +733,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                                control = list(epsilon = control$epsilon,
                                               maxit = 10000, trace = FALSE),
                                intercept = intercept)
+
             ## Set warn to its original value
             options(warn = warn)
             betas <- coef(tempFit)
@@ -852,6 +853,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     theta <- c(betas, dispersion)
                     transformed_dispersion <- eval(control$Trans)
                     ## Mean quantities
+
                     quantities <- key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE)
                     step_components_beta <- compute_step_components(theta, level = 0, fit = quantities)
                     step_components_zeta <- compute_step_components(theta, level = 1, fit = quantities)
@@ -898,6 +900,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     step_factor <- step_factor + 1
                     ##  Trace here
                     if (control$trace) {
+
                         trace_iteration()
                     }
                 }
@@ -1021,7 +1024,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         nullFit <- brglmFit(x = x[, "(Intercept)", drop = FALSE], y = y, weights = weights,
                             offset = rep(0, nobs), family = family, intercept = TRUE,
                             control = control0[c("epsilon", "maxit", "type", "transformation", "slowit")],
-                            start = if (no_dispersion) 0 else NULL)
+                            start = if (no_dispersion) linkfun(mean(y)) else c(linkfun(mean(y)), 1))
         ## FIX: Starting values above are hard-coded. Change in future versions
         nullmus <- nullFit$fitted
     }

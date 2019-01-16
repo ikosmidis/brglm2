@@ -1,9 +1,9 @@
 # brglm 0.5
 ## Bug fixes
-* brglmFit now works properly with custom link functions (mean and median bias reduction)
-* brglmFit respects the specification of the transformation argument in brglmControl
-* various minor bug fixes and performance improvements
-* Various bug fixes
+* `brglmFit` now works as expected with custom link functions (mean and median bias reduction)
+* `brglmFit` respects the specification of the transformation argument in `brglmControl`
+* Fixed bug in the computation of the QR decomposition under aliasing in `brglmFit`
+* Other minor bug fixes and performance improvements
 
 ## New functionality
 * Added `bracl` for fitting adjacent category logit models for ordinal responses using maximum likelihood, mean bias reduction, and median bias reduction
@@ -11,6 +11,7 @@
 
 ## Other improvements, updates and additions
 * Improved `summary` method for `brmultinom` objects
+* Better starting values for null fits
 * Added references to [arxiv:1804.04085](https://arxiv.org/abs/1804.04085) in documentation
 * Updated reference to [Kenne Pagui et al (2017)](https://doi.org/10.1093/biomet/asx046)
 
