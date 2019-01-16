@@ -927,7 +927,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
 
         ## QR decomposition and fitted values are at the final value
         ## for the coefficients
-
         ## QR decomposition for cov.unscaled
         if (!isTRUE(is_full_rank)) {
             x <- X_all
@@ -940,6 +939,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## calculating QR decompositions, fitted values, etas,
         ## residuals and working_weights
 
+        quantities <- key_quantities(c(betas, dispersion), y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE)
         qr.Wx <- quantities$qr_decomposition
 
         mus <- quantities$mus
