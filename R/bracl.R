@@ -170,6 +170,7 @@ bracl <- function(formula, data, weights, subset, na.action,
     fit$xlevels = .getXlevels(Terms, mf)
     fit$terms <- Terms
     fit$coefNames <- colnames(X)
+    fit$null.deviance <- NULL
     fit
 }
 
@@ -190,9 +191,10 @@ coef.bracl <- function(object, ...) {
         }
         else {
             with(object, {
-                coefs <- matrix(coefficients[ofInterest], nrow = ncat - 1, byrow = TRUE)
-                coefs <- -apply(rbind(coefs, 0), 2, diff)
-                dimnames(coefs) <- list(lev[-ref], coefNames)
+                coefs <- matrix(coefficients[ofInterest], ncol = ncat - 1)
+                coefs <- -apply(cbind(coefs, 0), 1, diff)
+                coefs <- c(coefs)
+                names(coefs) <- c(sapply(coefNames, function(x) paste(object$lev[-ref], x, sep = ":")))
                 coefs
             })
         }
@@ -205,6 +207,7 @@ coef.bracl <- function(object, ...) {
 ## Incomplete
 vcov.bracl <- function(object, ...) {
     vc <- vcov.brglmFit(object, ...)
+    coefNames <- names(coefficients(object))
     ofInterest <- object$ofInterest
     vc <- vc[ofInterest, ofInterest]
     levs <- object$lev[-object$ref]
@@ -219,15 +222,13 @@ vcov.bracl <- function(object, ...) {
         vbeta <- vc[beta_names, beta_names]
         vint <- ddiff(vc[intercept_names, intercept_names])
         vintslo <- -diff(rbind(vc[intercept_names, beta_names], 0))
-        vc <- rbind(cbind(vint, vintslo),
-                    cbind(t(vintslo), vbeta))
-        rownames(vc) <- colnames(vc) <- c(intercept_names, beta_names)
+        par_names <- c(intercept_names, beta_names)
+        vc[par_names, par_names] <- rbind(cbind(vint, vintslo),
+                                          cbind(t(vintslo), vbeta))
     }
     else {
-        coefs <- coef(object)
-        npar <- length(coefs)
-        ncat <- length(object$lev) - 1
-        betas <- colnames(coefs)
+        betas <- object$coefNames
+        npar <- length(betas)
         for (j in 1:npar) {
             for (k in 1:npar) {
                 par_names1 <- paste(levs, betas[j], sep = ":")
@@ -236,11 +237,52 @@ vcov.bracl <- function(object, ...) {
                 vc[par_names1, par_names2] <- mat
             }
         }
+        ## re-order
+        vc <- vc[coefNames, coefNames]
     }
     vc
 }
 
-summary.bracl <- function (object, correlation = FALSE, digits = options()$digits,
-                                Wald.ratios = FALSE, ...) {
+summary.bracl <- function(object, correlation = FALSE, digits = 3, ...) {
+    object$digits <- digits
+    object$logLik <- logLik(object)
+    coefs <- coefficients(object)
+    aliased <- is.na(coefs)
+    vc <- vcov(object)
+    var_coef <- diag(vc)
+    s.err <- sqrt(var_coef)
+    tvalue <- coefs/s.err
+    dn <- c("Estimate", "Std. Error")
+    pvalue <- 2 * pnorm(-abs(tvalue))
+    coef_table <- cbind(coefs, s.err, tvalue, pvalue)
+    dimnames(coef_table) <- list(names(coefs), c(dn, "z value", "Pr(>|z|)"))
+    object$coefficients <- coef_table
+    if (correlation) {
+        object$correlation <- vc/outer(s.err, s.err)
+    }
+    class(object) <- "summary.bracl"
+    return(object)
+}
 
+print.summary.bracl <- function(x, digits = x$digits, ...) {
+    if (!is.null(cl <- x$call)) {
+        cat("Call:\n")
+        dput(cl, control = NULL)
+    }
+    cat("\nCoefficients:\n")
+    printCoefmat(x$coefficients, digits = digits)
+    cat("\nResidual Deviance:", format(x$deviance), "\n")
+    cat("Log-likelihood:", format(x$logLik), "\n")
+    cat("AIC:", format(x$aic), "\n")
+    if (!is.null(correl <- x$correlation)) {
+        p <- dim(correl)[2L]
+        if (p > 1) {
+            cat("\nCorrelation of Coefficients:\n")
+            ll <- lower.tri(correl)
+            correl[ll] <- format(round(correl[ll], digits))
+            correl[!ll] <- ""
+            print(correl[-1L, -p], quote = FALSE, ...)
+        }
+    }
+    invisible(x)
 }

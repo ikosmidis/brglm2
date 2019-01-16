@@ -240,6 +240,7 @@ brmultinom <- function(formula, data, weights, subset, na.action,
     fit$xlevels = .getXlevels(Terms, mf)
     fit$terms <- Terms
     fit$coefNames <- colnames(X)
+    fit$null.deviance <- NULL
     fit
 }
 
@@ -278,7 +279,7 @@ print.brmultinom <- function(x, digits = max(5L, getOption("digits") - 3L), ...)
      else {
          print(format(coef(x), digits = digits), print.gap = 2, quote = FALSE)
      }
-     cat("\nResidual Deviance:", format(x$deviance, digits = digits), "\n")
+     cat("\nResidual Deviance:", format(x$deviance), "\n")
 }
 
 #' @method logLik brmultinom
@@ -298,6 +299,7 @@ summary.brmultinom <- function (object, correlation = FALSE, digits = options()$
     coefficients <- coef.brmultinom(object)
     object$digits <- digits
     object$AIC <- AIC(object)
+    object$logLik <- logLik(object)
     if (is.null(coefficients)) {
         object$coefficients <- NULL
         object$standard.errors <- NULL
@@ -341,10 +343,6 @@ print.summary.brmultinom <- function (x, digits = x$digits, ...)
         dput(cl, control = NULL)
     }
     cat("\nCoefficients:\n")
-    ## if (x$is.binomial) {
-    ##     print(cbind(Values = x$coefficients, `Std. Err.` = x$standard.errors,
-    ##         `Value/SE` = x$Wald.ratios), digits = digits)
-    ## }
     print(x$coefficients, digits = digits)
     cat("\nStd. Errors:\n")
     print(x$standard.errors, digits = digits)
@@ -353,6 +351,7 @@ print.summary.brmultinom <- function (x, digits = x$digits, ...)
         print(x$coefficients/x$standard.errors, digits = digits)
     }
     cat("\nResidual Deviance:", format(x$deviance), "\n")
+    cat("Log-likelihood:", format(x$logLik), "\n")
     cat("AIC:", format(x$AIC), "\n")
     if (!is.null(correl <- x$correlation)) {
         p <- dim(correl)[2L]

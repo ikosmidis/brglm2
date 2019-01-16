@@ -36,7 +36,7 @@ expect_warning(
 
 tol <- 1e-06
 test_that("VGAM::vglm and bracl return the same coefficients", {
-    expect_equal(unname(coef(fit_adj)), c(coef(fit_acl)), tolerance = tol)
+    expect_equal(unname(coef(fit_adj)), unname(coef(fit_acl)), tolerance = tol)
     expect_equal(unname(coef(fit_adj_p)), unname(coef(fit_acl_p)), tolerance = tol)
 })
 
@@ -75,4 +75,11 @@ test_that("bracl results is invariance to shuffling of the data", {
         expect_equal(coef(fit_acl_p), coef(fit_acl_p_r), tolerance = tol)
     }
 
+})
+
+tol  <-  1e-03
+test_that("vcov method for bracl returns the correct vcov matrix", {
+    expect_equal(vcov(fit_adj_p), vcov(fit_acl_p), tolerance = tol, check.attributes = FALSE)
+    inds <- c(1, 4, 7, 2, 5, 8, 3,6, 9)
+    expect_equal(vcov(fit_adj), vcov(fit_acl)[inds, inds], tolerance = tol, check.attributes = FALSE)
 })

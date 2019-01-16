@@ -62,13 +62,17 @@ adjacent category logit models using implicit and explicit bias
 reduction methods. See Kosmidis & Firth (2011) for details.
 }
 \details{
-Complete me
+COMPLETE ME
 }
 \examples{
 
 
 }
 \references{
+Kosmidis I., Kenne Pagui E. C. and Sartori N. (2018). Mean and
+median bias reduction in generalized linear models. *arxiv*,
+**arxiv:1804.04085**
+
 Agresti A. (2002). Categorical data analysis (2nd
 Edition). Wiley. New York.
 
