@@ -391,8 +391,6 @@ predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
         fits1 <- apply(coefs, 1, function(b) X %*% b)
         fits[, rownames(coefs)] <- fits1
         Y1 <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
-
-        ## Y1 <- nnet:::predict.nnet(object, X)
         Y <- matrix(NA, nrow(newdata), ncol(Y1), dimnames = list(rn,
             colnames(Y1)))
         Y[keep, ] <- Y1
