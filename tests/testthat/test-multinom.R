@@ -102,6 +102,27 @@ test_that("brmultinom fits are invariant to the value of ref  (ref1 vs ref3)'", 
     expect_equal(hepbr1$fitted.values, hepbr3$fitted.values, tolerance = 1e-04)
 })
 
+newdata <- data.frame(group = c("no-withhold", "withhold", "no-withhold", "withhold"),
+                      time = c("pre", "pre", "post", "post"))
+
+hepnnet <- multinom(type ~ group * time, data = hepat, weights = counts, trace = FALSE)
+expect_warning({
+    hepml1 <- brmultinom(type ~ group * time,
+                         data = hepat, weights = counts, ref = 1, type = "ML", maxit = 5)
+    hepml2 <- brmultinom(type ~ group * time,
+                         data = hepat, weights = counts, ref = 2, type = "ML", maxit = 5)
+    hepml3 <- brmultinom(type ~ group * time,
+                         data = hepat, weights = counts, ref = 3, type = "ML", maxit = 5)
+})
+
+test_that("predict.brmultinom returns the right result", {
+    expect_equal(predict(hepnnet), predict(hepml1), tolerance = 1e-04)
+    expect_equal(predict(hepnnet), predict(hepml2), tolerance = 1e-04)
+    expect_equal(predict(hepnnet), predict(hepml3), tolerance = 1e-04)
+    expect_equal(predict(hepnnet, newdata = newdata), predict(hepml1, newdata = newdata), tolerance = 1e-04)
+    expect_equal(predict(hepml1, newdata = newdata), predict(hepml2, newdata = newdata), tolerance = 1e-04)
+    expect_equal(predict(hepml1, newdata = newdata), predict(hepml3, newdata = newdata), tolerance = 1e-04)
+})
 
 ## Aligator data
 ## data("alligators", package = "brglm2")
