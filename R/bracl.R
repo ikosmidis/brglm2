@@ -286,3 +286,4 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
     }
     invisible(x)
 }
+
