@@ -225,6 +225,7 @@ brmultinom <- function(formula, data, weights, subset, na.action,
     ## fit$fitted.values <- matrix(fit$fitted.values, ncol = ncat)/w[keep]
     ## rownames(fit$fitted.values) <- rownames(X)[keep]
     ## colnames(fit$fitted.values) <- lev
+
     class(fit) <- c("brmultinom", fit$class, "glm")
     fit$ofInterest <- ofInterest
     fit$ncat <- ncat
@@ -364,4 +365,46 @@ print.summary.brmultinom <- function (x, digits = x$digits, ...)
         }
     }
     invisible(x)
+}
+
+## Adapted from nnet:::predict.multinom
+predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
+{
+    if (!inherits(object, "brmultinom"))
+        stop("not a \"brmultinom\" fit")
+    type <- match.arg(type)
+    if (missing(newdata))
+        Y <- fitted(object)
+    else {
+        newdata <- as.data.frame(newdata)
+        rn <- row.names(newdata)
+        Terms <- delete.response(object$terms)
+        m <- model.frame(Terms, newdata, na.action = na.omit,
+            xlev = object$xlevels)
+        if (!is.null(cl <- attr(Terms, "dataClasses")))
+            .checkMFClasses(cl, m)
+        keep <- match(row.names(m), rn)
+        X <- model.matrix(Terms, m, contrasts = object$contrasts)
+
+        coefs <- coef(object)
+        fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn, object$lev))
+        fits1 <- apply(coefs, 1, function(b) X %*% b)
+        fits[, rownames(coefs)] <- fits1
+        Y1 <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
+
+        ## Y1 <- nnet:::predict.nnet(object, X)
+        Y <- matrix(NA, nrow(newdata), ncol(Y1), dimnames = list(rn,
+            colnames(Y1)))
+        Y[keep, ] <- Y1
+    }
+    switch(type, class = {
+        if (length(object$lev) > 2L) Y <- factor(max.col(Y),
+            levels = seq_along(object$lev), labels = object$lev)
+        if (length(object$lev) == 2L) Y <- factor(1 + (Y > 0.5),
+            levels = 1L:2L, labels = object$lev)
+        if (length(object$lev) == 0L) Y <- factor(max.col(Y),
+            levels = seq_along(object$lab), labels = object$lab)
+    }, probs = {
+    })
+    drop(Y)
 }
