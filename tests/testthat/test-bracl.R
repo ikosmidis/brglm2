@@ -94,3 +94,20 @@ test_that("summary method for bracl returns the correct coef mat", {
     expect_equal(coef(s1), VGAM::coef(s2), tolerance = tol, check.attributes = FALSE)
     expect_equal(coef(s1p), VGAM::coef(s2p), tolerance = tol, check.attributes = FALSE)
 })
+
+
+newdata <- data.frame(gender = c("male", "female"),  religion = c("moderate", "fundamentalist"))
+test_that("predict.bracl works as expected", {
+    expect_equal(predict(fit_vgam_p, type = "response"),
+                 predict(fit_bracl_p, newdata = stemcell, type = "prob")[19:24, ],
+                 tolerance = 1e-08, check.attributes = FALSE)
+    expect_equal(predict(fit_vgam, type = "response"),
+                 predict(fit_bracl, newdata = stemcell, type = "prob")[19:24, ],
+                 tolerance = 1e-08, check.attributes = FALSE)
+})
+
+test_that("no intercept returns warning", {
+    expect_warning(
+        fit_bracl_p_r <- bracl(research ~ -1 + as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = FALSE)
+    )
+})
