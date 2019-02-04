@@ -287,7 +287,58 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
     invisible(x)
 }
 
+#' Predict method for \code{bracl} fits
+#'
+#' Obtain class and probability predictions from a fitted adjacent
+#' category logits model.
+#'
+#' @param object a fitted object of class inherinting from
+#'     \code{"bracl"}
+#' @param newdata optionally, a data frame in which to look for
+#'     variables with which to predict.  If omitted, the fitted linear
+#'     predictors are used.
+#' @param type the type of prediction required. The default is
+#'     \code{"class"}, which produces predictions of the response
+#'     category at the covariate values supplied in \code{"newdata"},
+#'     selecting the cateogry with the largest probability; the
+#'     alternative \code{"probs"} returns all cateogry probabilities
+#'     at the covariate values supplied in \code{"newdata"}
+#' @param ... further arguments passed to or from other methods
+#'
+#'
+#' @details
+#'
+#' If \code{newdata} is omitted the predictions are based on the data
+#' used for the fit.
+#'
+#' @return
+#'
+#' If \code{type = "class"} a vector with the predicted response
+#' categories; if \code{type = "probs"} a matrix of probabilities for
+#' all response categories at \code{newdata}.
+#'
+#' @examples
+#'
+#' data("stemcell", package = "brglm2")
+#'
+#' # Adjacent category logit (non-proportional odds)
+#' fit_bracl <- bracl(research ~ as.numeric(religion) + gender, weights = frequency,
+#'                    data = stemcell, type = "ML")
+#' # Adjacent category logit (proportional odds)
+#' fit_bracl_p <- bracl(research ~ as.numeric(religion) + gender, weights = frequency,
+#'                     data = stemcell, type = "ML", parallel = TRUE)
+#'
+#' # New data
+#' newdata <- expand.grid(gender = c("male", "female"),
+#'                        religion = c("liberal", "moderate", "fundamentalist"))
+#'
+#' # Predictions
+#' sapply(c("class", "probs"), function(what) predict(fit_bracl, newdata, what))
+#' sapply(c("class", "probs"), function(what) predict(fit_bracl_p, newdata, what))
+#'
+#' @export
 predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
+    ## Adapted from nnet:::predict.multinom
     if (!inherits(object, "bracl"))
         stop("not a \"bracl\" fit")
     type <- match.arg(type)
@@ -298,7 +349,7 @@ predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
         rn <- row.names(newdata)
         Terms <- delete.response(object$terms)
         m <- model.frame(Terms, newdata, na.action = na.omit,
-            xlev = object$xlevels)
+                         xlev = object$xlevels)
         if (!is.null(cl <- attr(Terms, "dataClasses")))
             .checkMFClasses(cl, m)
         keep <- match(row.names(m), rn)
@@ -317,7 +368,7 @@ predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
             rownames(coefs) <- object$lev[-object$ref]
             coefs <- apply(coefs, 2, function(x) cumsum(rev(x)))
         }
-        fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn, object$lev))
+        fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn[keep], object$lev))
         fits1 <- apply(coefs, 1, function(b) X %*% b)
 
         fits[, rownames(coefs)] <- fits1

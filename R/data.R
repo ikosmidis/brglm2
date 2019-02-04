@@ -118,8 +118,7 @@
 #' stem cell research and the fundamentalism/liberalism of one’s
 #' religious beliefs, stratified by gender.
 #'
-#' @format A data frame with 24 rows and 4 variables
-#'
+#' @format A data frame with 24 rows and 4 variables:
 #' \describe{
 #'
 #' \item{research}{opinion about funding stem cell research with levels \code{definitely}, \code{probably}, \code{probably not}, \code{definitely not}}
@@ -128,7 +127,7 @@
 #'
 #' \item{religion}{the fundamentalism/liberalism of one’s religious
 #' beliefs with levels \code{fundamentalist}, \code{moderate},
-#' \code{liberal}
+#' \code{liberal}}
 #'
 #' \item{frequency}{the number of times a respondent fell in each of the combinations of levels for \code{research}, \code{religion} and \code{gender}}
 #'

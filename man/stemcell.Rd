@@ -4,7 +4,20 @@
 \name{stemcell}
 \alias{stemcell}
 \title{Opinion on Stem Cell Research and Religious Fundamentalism}
-\format{An object of class \code{data.frame} with 24 rows and 4 columns.}
+\format{A data frame with 24 rows and 4 variables:
+\describe{
+
+\item{research}{opinion about funding stem cell research with levels \code{definitely}, \code{probably}, \code{probably not}, \code{definitely not}}
+
+\item{gender}{the gender of the respondent with levels \code{female} and \code{male}}
+
+\item{religion}{the fundamentalism/liberalism of one’s religious
+beliefs with levels \code{fundamentalist}, \code{moderate},
+\code{liberal}}
+
+\item{frequency}{the number of times a respondent fell in each of the combinations of levels for \code{research}, \code{religion} and \code{gender}}
+
+}}
 \source{
 The \code{stemcell} data set is analysed in Agresti (2010, Subsection~4.1.5).
 }

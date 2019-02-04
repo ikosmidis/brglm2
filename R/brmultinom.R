@@ -366,10 +366,56 @@ print.summary.brmultinom <- function (x, digits = x$digits, ...)
     }
     invisible(x)
 }
-
-## Adapted from nnet:::predict.multinom
+#' Predict method for \code{brmultinom} fits
+#'
+#' Obtain class and probability predictions from a fitted baseline
+#' category logits model.
+#'
+#' @param object a fitted object of class inherinting from
+#'     \code{"brmultinom"}
+#' @param newdata optionally, a data frame in which to look for
+#'     variables with which to predict.  If omitted, the fitted linear
+#'     predictors are used.
+#' @param type the type of prediction required. The default is
+#'     \code{"class"}, which produces predictions of the response
+#'     category at the covariate values supplied in \code{"newdata"},
+#'     selecting the cateogry with the largest probability; the
+#'     alternative \code{"probs"} returns all cateogry probabilities
+#'     at the covariate values supplied in \code{"newdata"}
+#' @param ... further arguments passed to or from other methods
+#'
+#'
+#' @details
+#'
+#' If \code{newdata} is omitted the predictions are based on the data
+#' used for the fit.
+#'
+#' @return
+#'
+#' If \code{type = "class"} a vector with the predicted response
+#' categories; if \code{type = "probs"} a matrix of probabilities for
+#' all response categories at \code{newdata}.
+#'
+#' @examples
+#'
+#' data("housing", package = "MASS")
+#'
+#' # Maximum likelihood using brmultinom with baseline category 'Low'
+#' houseML1 <- brmultinom(Sat ~ Infl + Type + Cont, weights = Freq,
+#'                        data = housing, type = "ML", ref = 1)
+#'
+#' # New data
+#' newdata <- expand.grid(Infl = c("Low", "Medium"),
+#'                        Type = c("Tower", "Atrium", "Terrace"),
+#'                        Cont = c("Low", NA, "High"))
+#'
+#' ## Predictions
+#' sapply(c("class", "probs"), function(what) predict(houseML1, newdata, what))
+#'
+#' @export
 predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
 {
+    ## Adapted from nnet:::predict.multinom
     if (!inherits(object, "brmultinom"))
         stop("not a \"brmultinom\" fit")
     type <- match.arg(type)
@@ -387,12 +433,11 @@ predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
         X <- model.matrix(Terms, m, contrasts = object$contrasts)
 
         coefs <- coef(object)
-        fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn, object$lev))
+        fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn[keep], object$lev))
         fits1 <- apply(coefs, 1, function(b) X %*% b)
         fits[, rownames(coefs)] <- fits1
         Y1 <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
-        Y <- matrix(NA, nrow(newdata), ncol(Y1), dimnames = list(rn,
-            colnames(Y1)))
+        Y <- matrix(NA, nrow(newdata), ncol(Y1), dimnames = list(rn, colnames(Y1)))
         Y[keep, ] <- Y1
     }
     switch(type, class = {

@@ -96,13 +96,15 @@ test_that("summary method for bracl returns the correct coef mat", {
 })
 
 
-newdata <- data.frame(gender = c("male", "female"),  religion = c("moderate", "fundamentalist"))
+newdata <- expand.grid(gender = c("male", "female"),  religion = c("moderate", "fundamentalist"))
 test_that("predict.bracl works as expected", {
+    pp <- predict(fit_bracl_p, newdata = stemcell, type = "probs")
+    p <- predict(fit_bracl, newdata = stemcell, type = "probs")
     expect_equal(predict(fit_vgam_p, type = "response"),
-                 predict(fit_bracl_p, newdata = stemcell, type = "prob")[19:24, ],
+                 pp[19:24, ],
                  tolerance = 1e-08, check.attributes = FALSE)
     expect_equal(predict(fit_vgam, type = "response"),
-                 predict(fit_bracl, newdata = stemcell, type = "prob")[19:24, ],
+                 p[19:24, ],
                  tolerance = 1e-08, check.attributes = FALSE)
 })
 
@@ -111,3 +113,12 @@ test_that("no intercept returns warning", {
         fit_bracl_p_r <- bracl(research ~ -1 + as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = FALSE)
     )
 })
+
+test_that("prediction with NAs works", {
+    newd <- newdata
+    newd[3, 2] <- NA
+    expect_true(is.na(predict(fit_bracl_p, newd, "class")[3]))
+    expect_true(all(is.na(predict(fit_bracl_p, newd, "probs")[3, ])))
+})
+
+
