@@ -6,8 +6,8 @@
 * Other minor bug fixes and performance improvements
 
 ## New functionality
-* Added `bracl` for fitting adjacent category logit models for ordinal responses using maximum likelihood, mean bias reduction, and median bias reduction
-* Added predict functions for `brmultinom` and `bracl`
+* Added `bracl` for fitting adjacent category logit models for ordinal responses using maximum likelihood, mean bias reduction, and median bias reduction and associated methods (`logLik`, `summary` and so on)
+* Added `predict` functions for `brmultinom` and `bracl`
 * Added the `mis` link functions for accounting for misclassification in binomial response models (Newuhaus, 1999, Biometrika)
 
 ## Other improvements, updates and additions

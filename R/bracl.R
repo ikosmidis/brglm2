@@ -1,4 +1,4 @@
-# Copyright (C) 2016, 2017 Ioannis Kosmidis
+# Copyright (C) 2016-2019 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,26 +14,44 @@
 #  http://www.r-project.org/Licenses/
 
 
-#' Bias reduction for adjcacent category logit models using the
-#' Poisson trick.
+#' Bias reduction for adjcacent category logit models for ordinal
+#' responses using the Poisson trick.
 #'
 #' \code{bracl} is a wrapper of \code{\link{brglmFit}} that fits
-#' adjacent category logit models using implicit and explicit bias
-#' reduction methods. See Kosmidis & Firth (2011) for details.
+#' adjacent category logit models with or without proportional odds
+#' using implicit and explicit bias reduction methods. See Kosmidis &
+#' Firth (2011) for details.
 #'
-#' @inheritParams nnet::multinom
+#' @inheritParams MASS::polr
 #' @param control a list of parameters for controlling the fitting
 #'     process. See \code{\link{brglmControl}} for details.
+#' @param parallel if \code{FALSE} (default), then a non-proportional
+#'     odds adjacent category model is fit, assumming different
+#'     effects per category; if \code{TRUE} then a proportional odds
+#'     adjacent category model is fit. See Details.
+#' @param x should the model matrix be included with in the result
+#'     (default is \code{TRUE})
 #' @param ... arguments to be used to form the default 'control'
 #'     argument if it is not supplied directly.
 #'
 #' @details
 #'
-#' COMPLETE ME
+#' The \code{bracl} function fits adjacent category models, which
+#' assume multinomial observations with probabilities with
+#' proportional odds of the form
+#'
+#' \deqn{\log\frac{\pi_{ij}}{\pi_{ij + 1}} = \alpha_j + \beta^T x_i}{log(pi[i, j]/pi[i, j+1]) = alpha[j] + sum(beta * x[i, ])}
+#'
+#' or with non-proportional odds of the form
+#'
+#' \deqn{\log\frac{\pi_{ij}}{\pi_{ij + 1}} = \alpha_j + \beta_j^T x_i}{log(pi[i, j]/pi[i, j+1]) = alpha[j] + sum(beta[j, ] * x[i, ])}
+#'
+#' where \eqn{x_i}{x[i, ]} is a vector of covariates and \eqn{\pi_{ij}}{pi[i, j]} is the
+#' probability that category \eqn{j} is observed at the covariate setting \eqn{i}.
 #'
 #' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'
-#' @seealso \code{\link[nnet]{multinom}}, \code{\link[nnet]{brmultinom}}
+#' @seealso \code{\link[nnet]{multinom}}, \code{\link{brmultinom}}
 #'
 #' @references
 #'
@@ -41,8 +59,8 @@
 #' median bias reduction in generalized linear models. *arxiv*,
 #' **arxiv:1804.04085**
 #'
-#' Agresti A. (2002). Categorical data analysis (2nd
-#' Edition). Wiley. New York.
+#' Agresti, A. (2010). *Analysis of Ordinal Categorical Data* (2nd
+#' edition).  Wiley Series in Probability and Statistics. Wiley.
 #'
 #' Albert A. and Anderson J. A. (1984). On the Existence of Maximum
 #' Likelihood Estimates in Logistic Regression Models. *Biometrika*,
@@ -56,6 +74,15 @@
 #' Variables. *Biometrika*, **68**, 563-566.
 #'
 #' @examples
+#'
+#' data("stemcell", package = "brglm2")
+#'
+#' # Adjacent category logit (non-proportional odds)
+#' fit_bracl <- bracl(research ~ as.numeric(religion) + gender, weights = frequency,
+#'                    data = stemcell, type = "ML")
+#' # Adjacent category logit (proportional odds)
+#' fit_bracl_p <- bracl(research ~ as.numeric(religion) + gender, weights = frequency,
+#'                     data = stemcell, type = "ML", parallel = TRUE)
 #'
 #'
 #' @export
@@ -264,6 +291,7 @@ summary.bracl <- function(object, correlation = FALSE, digits = 3, ...) {
     return(object)
 }
 
+#' @method print summary.bracl
 print.summary.bracl <- function(x, digits = x$digits, ...) {
     if (!is.null(cl <- x$call)) {
         cat("Call:\n")

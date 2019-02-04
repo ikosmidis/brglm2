@@ -2,8 +2,8 @@
 % Please edit documentation in R/bracl.R
 \name{bracl}
 \alias{bracl}
-\title{Bias reduction for adjcacent category logit models using the
-Poisson trick.}
+\title{Bias reduction for adjcacent category logit models for ordinal
+responses using the Poisson trick.}
 \usage{
 bracl(formula, data, weights, subset, na.action, parallel = FALSE,
   contrasts = NULL, model = TRUE, x = TRUE, control = list(...),
@@ -11,44 +11,49 @@ bracl(formula, data, weights, subset, na.action, parallel = FALSE,
 }
 \arguments{
 \item{formula}{
-a formula expression as for regression models, of the form
-\code{response ~ predictors}. The response should be a factor or a
-matrix with K columns, which will be interpreted as counts for each of
-K classes.
-A log-linear model is fitted, with coefficients zero for the first
-class. An offset can be included: it should be a numeric matrix with K columns
-if the response is either a matrix with K columns or a factor with K >= 2
-classes, or a numeric vector for a response factor with 2 levels.
-See the documentation of \code{\link{formula}()} for other details.
-}
+    a formula expression as for regression models, of the form
+    \code{response ~ predictors}. The response should be a factor
+    (preferably an ordered factor), which will be interpreted as an
+    ordinal response, with levels ordered as in the factor.  
+    The model must have an intercept: attempts to remove one will
+    lead to a warning and be ignored.  An offset may be used.  See the
+    documentation of \code{\link{formula}} for other details.
+  }
 
 \item{data}{
-an optional data frame in which to interpret the variables occurring
-in \code{formula}.
-}
+    an optional data frame in which to interpret the variables occurring
+    in \code{formula}.
+  }
 
 \item{weights}{
-optional case weights in fitting.
-}
+    optional case weights in fitting.  Default to 1.
+  }
 
 \item{subset}{
-expression saying which subset of the rows of the data should  be used
-in the fit. All observations are included by default.
-}
+    expression saying which subset of the rows of the data should  be used
+    in the fit.  All observations are included by default.
+  }
 
 \item{na.action}{
-a function to filter missing data.
-}
+    a function to filter missing data.
+  }
+
+\item{parallel}{if \code{FALSE} (default), then a non-proportional
+odds adjacent category model is fit, assumming different
+effects per category; if \code{TRUE} then a proportional odds
+adjacent category model is fit. See Details.}
 
 \item{contrasts}{
-a list of contrasts to be used for some or all of
-the factors appearing as variables in the model formula.
-}
+    a list of contrasts to be used for some or all of
+    the factors appearing as variables in the model formula.
+  }
 
 \item{model}{
-  logical. If true, the model frame is saved as component \code{model}
-  of the returned object.
-}
+    logical for whether the model matrix should be returned.
+  }
+
+\item{x}{should the model matrix be included with in the result
+(default is \code{TRUE})}
 
 \item{control}{a list of parameters for controlling the fitting
 process. See \code{\link{brglmControl}} for details.}
@@ -58,13 +63,34 @@ argument if it is not supplied directly.}
 }
 \description{
 \code{bracl} is a wrapper of \code{\link{brglmFit}} that fits
-adjacent category logit models using implicit and explicit bias
-reduction methods. See Kosmidis & Firth (2011) for details.
+adjacent category logit models with or without proportional odds
+using implicit and explicit bias reduction methods. See Kosmidis &
+Firth (2011) for details.
 }
 \details{
-COMPLETE ME
+The \code{bracl} function fits adjacent category models, which
+assume multinomial observations with probabilities with
+proportional odds of the form
+
+\deqn{\log\frac{\pi_{ij}}{\pi_{ij + 1}} = \alpha_j + \beta^T x_i}{log(pi[i, j]/pi[i, j+1]) = alpha[j] + sum(beta * x[i, ])}
+
+or with non-proportional odds of the form
+
+\deqn{\log\frac{\pi_{ij}}{\pi_{ij + 1}} = \alpha_j + \beta_j^T x_i}{log(pi[i, j]/pi[i, j+1]) = alpha[j] + sum(beta[j, ] * x[i, ])}
+
+where \eqn{x_i}{x[i, ]} is a vector of covariates and \eqn{\pi_{ij}}{pi[i, j]} is the
+probability that category \eqn{j} is observed at the covariate setting \eqn{i}.
 }
 \examples{
+
+data("stemcell", package = "brglm2")
+
+# Adjacent category logit (non-proportional odds)
+fit_bracl <- bracl(research ~ as.numeric(religion) + gender, weights = frequency,
+                   data = stemcell, type = "ML")
+# Adjacent category logit (proportional odds)
+fit_bracl_p <- bracl(research ~ as.numeric(religion) + gender, weights = frequency,
+                    data = stemcell, type = "ML", parallel = TRUE)
 
 
 }
@@ -73,8 +99,8 @@ Kosmidis I., Kenne Pagui E. C. and Sartori N. (2018). Mean and
 median bias reduction in generalized linear models. *arxiv*,
 **arxiv:1804.04085**
 
-Agresti A. (2002). Categorical data analysis (2nd
-Edition). Wiley. New York.
+Agresti, A. (2010). *Analysis of Ordinal Categorical Data* (2nd
+edition).  Wiley Series in Probability and Statistics. Wiley.
 
 Albert A. and Anderson J. A. (1984). On the Existence of Maximum
 Likelihood Estimates in Logistic Regression Models. *Biometrika*,
@@ -88,7 +114,7 @@ Models Arguing Conditionally on Observed Explanatory
 Variables. *Biometrika*, **68**, 563-566.
 }
 \seealso{
-\code{\link[nnet]{multinom}}, \code{\link[nnet]{brmultinom}}
+\code{\link[nnet]{multinom}}, \code{\link{brmultinom}}
 }
 \author{
 Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}

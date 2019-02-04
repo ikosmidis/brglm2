@@ -1,4 +1,4 @@
-# Copyright (C) 2016, 2017 Ioannis Kosmidis
+# Copyright (C) 2016-2019 Ioannis Kosmidis
 # function `AS_median_adjustment`: Copyright (C) 2017, Euloge Clovis Kenne Pagui, Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify

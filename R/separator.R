@@ -1,7 +1,7 @@
 #  Port of the separator function from the safeBinaryRegression
 #  (version 0.1-3) R package (see safeBinaryRegression/R/separator.q)
 #
-#  Copyright (C) 2017 Ioannis Kosmidis
+#  Copyright (C) 2017-2019 Ioannis Kosmidis
 #  Copyright (C) 2009-2013 Kjell Konis
 #
 #  This program is free software; you can redistribute it and/or modify

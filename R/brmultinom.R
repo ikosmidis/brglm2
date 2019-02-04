@@ -1,4 +1,4 @@
-# Copyright (C) 2016, 2017 Ioannis Kosmidis
+# Copyright (C) 2016-2019 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -24,12 +24,14 @@
 #' @inheritParams nnet::multinom
 #' @param control a list of parameters for controlling the fitting
 #'     process. See \code{\link{brglmControl}} for details.
-#' @param ... arguments to be used to form the default 'control'
-#'     argument if it is not supplied directly.
 #' @param ref the reference category to use for multinomial
 #'     regression. Either an integer, in which case
 #'     levels(response)[ref] is used as a baseline, or a character
 #'     string. Default is 1.
+#' @param x should the model matrix be included with in the result
+#'     (default is \code{TRUE})
+#' @param ... arguments to be used to form the default 'control'
+#'     argument if it is not supplied directly.
 #'
 #' @details
 #'
@@ -87,8 +89,8 @@
 #' median bias reduction in generalized linear models. *arxiv*,
 #' **arxiv:1804.04085**
 #'
-#' Agresti A. (2002). Categorical data analysis (2nd
-#' Edition). Wiley. New York.
+#' Agresti A. (2002). *Categorical data analysis* (2nd edition). Wiley
+#' Series in Probability and Statistics. Wiley.
 #'
 #' Albert A. and Anderson J. A. (1984). On the Existence of Maximum
 #' Likelihood Estimates in Logistic Regression Models. *Biometrika*,
@@ -267,7 +269,6 @@ coef.brmultinom <- function(object, ...) {
 }
 
 #' @method print brmultinom
-#' @export
 print.brmultinom <- function(x, digits = max(5L, getOption("digits") - 3L), ...) {
      if (!is.null(cl <- x$call)) {
         cat("Call:\n")
@@ -294,8 +295,8 @@ logLik.brmultinom <- function(object, ...) {
 
 #' @method summary brmultinom
 #' @export
-summary.brmultinom <- function (object, correlation = FALSE, digits = options()$digits,
-                                Wald.ratios = FALSE, ...) {
+summary.brmultinom <- function(object, correlation = FALSE, digits = options()$digits,
+                               Wald.ratios = FALSE, ...) {
     ncat <- object$ncat
     coefficients <- coef.brmultinom(object)
     object$digits <- digits
@@ -336,8 +337,7 @@ vcov.brmultinom <- function(object, ...) {
 
 
 #' @method print summary.brmultinom
-#' @export
-print.summary.brmultinom <- function (x, digits = x$digits, ...)
+print.summary.brmultinom <- function(x, digits = x$digits, ...)
 {
     if (!is.null(cl <- x$call)) {
         cat("Call:\n")

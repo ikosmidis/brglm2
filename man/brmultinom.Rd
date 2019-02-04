@@ -54,6 +54,9 @@ string. Default is 1.}
   of the returned object.
 }
 
+\item{x}{should the model matrix be included with in the result
+(default is \code{TRUE})}
+
 \item{control}{a list of parameters for controlling the fitting
 process. See \code{\link{brglmControl}} for details.}
 
@@ -141,8 +144,8 @@ Kosmidis I., Kenne Pagui E. C. and Sartori N. (2018). Mean and
 median bias reduction in generalized linear models. *arxiv*,
 **arxiv:1804.04085**
 
-Agresti A. (2002). Categorical data analysis (2nd
-Edition). Wiley. New York.
+Agresti A. (2002). *Categorical data analysis* (2nd edition). Wiley
+Series in Probability and Statistics. Wiley.
 
 Albert A. and Anderson J. A. (1984). On the Existence of Maximum
 Likelihood Estimates in Logistic Regression Models. *Biometrika*,

@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Ioannis Kosmidis
+# Copyright (C) 2018-2019 Ioannis Kosmidis
 
 #' A \code{link-glm} object for misclassified responses in binomial regression models
 #'
