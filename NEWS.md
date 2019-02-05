@@ -4,11 +4,12 @@
 * `brglmFit` respects the specification of the transformation argument in `brglmControl`
 * Fixed bug in the computation of the QR decomposition under aliasing in `brglmFit`
 * Other minor bug fixes and performance improvements
+* Protection against use of `quasi`, `quasibinomial` and `quasibinomial` families and documentation update.
 
 ## New functionality
 * Added `bracl` for fitting adjacent category logit models for ordinal responses using maximum likelihood, mean bias reduction, and median bias reduction and associated methods (`logLik`, `summary` and so on)
 * Added `predict` functions for `brmultinom` and `bracl`
-* Added the `mis` link functions for accounting for misclassification in binomial response models (Newuhaus, 1999, Biometrika)
+* Added the `mis` link functions for accounting for misclassification in binomial response models (Neuhaus, 1999, Biometrika)
 
 ## Other improvements, updates and additions
 * Improved `summary` method for `brmultinom` objects
