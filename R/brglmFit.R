@@ -88,6 +88,13 @@
 #'     method specified by the \code{type} argument (see
 #'     \code{\link{brglmControl}}).
 #'
+#' The \code{family} argument of the current version of
+#' \code{brglmFit} can accept any combination of \code{\link{family}}
+#' objects and link functions (including ones with user-specified link
+#' functions, \code{\link{mis}} links, and \code{\link{power}} links),
+#' except the \code{\link{quasi}}, \code{\link{quasipoisson}} and
+#' \code{\link{quasibinomial}} families.
+#'
 #' The description of \code{method} argument and the \code{Fitting
 #' functions} section in \code{\link{glm}} gives information on
 #' supplying fitting methods to \code{\link{glm}}.
@@ -502,20 +509,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
-    customTransformation <- is.list(control$transformation) & length(control$transformation) == 2
-    if (customTransformation) {
-        transformation0 <- control$transformation
-    }
-
-    control <- do.call("brglmControl", control)
-
-    ## FIXME: Add IBLA
-    adjustment_function <- switch(control$type,
-                            "correction" = AS_mean_adjustment,
-                            "AS_mean" = AS_mean_adjustment,
-                            "AS_median" = AS_median_adjustment,
-                            "AS_mixed" = AS_mixed_adjustment,
-                            "ML" = function(pars, ...) 0)
 
     ## compute_step_components does everything on the scale of the /transformed/ dispersion
     compute_step_components <- function(pars, level = 0, fit = NULL) {
@@ -552,6 +545,21 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                     failed_inversion = failed_inversion)
         out
     }
+
+    customTransformation <- is.list(control$transformation) & length(control$transformation) == 2
+    if (customTransformation) {
+        transformation0 <- control$transformation
+    }
+
+    control <- do.call("brglmControl", control)
+
+    ## FIXME: Add IBLA
+    adjustment_function <- switch(control$type,
+                            "correction" = AS_mean_adjustment,
+                            "AS_mean" = AS_mean_adjustment,
+                            "AS_median" = AS_median_adjustment,
+                            "AS_mixed" = AS_mixed_adjustment,
+                            "ML" = function(pars, ...) 0)
 
     ## Some useful quantities
     is_ML <- control$type == "ML"
@@ -605,6 +613,11 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ok_links <- c("logit", "probit", "cauchit",
                   "cloglog", "identity", "log",
                   "sqrt", "inverse")
+
+
+    if (isTRUE(family$family %in% c("quasi", "quasibinomial", "quasipoisson"))) {
+        stop("`brglmFit` does not currently support the `quasi`, `quasipoisson` and `quasibinomial` families.")
+    }
 
     ## Enrich family
     family <- enrichwith::enrich(family, with = c("d1afun", "d2afun", "d3afun", "d1variance"))

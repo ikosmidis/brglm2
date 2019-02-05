@@ -108,6 +108,13 @@ The null deviance is evaluated based on the fitted values using the
     method specified by the \code{type} argument (see
     \code{\link{brglmControl}}).
 
+The \code{family} argument of the current version of
+\code{brglmFit} can accept any combination of \code{\link{family}}
+objects and link functions (including ones with user-specified link
+functions, \code{\link{mis}} links, and \code{\link{power}} links),
+except the \code{\link{quasi}}, \code{\link{quasipoisson}} and
+\code{\link{quasibinomial}} families.
+
 The description of \code{method} argument and the \code{Fitting
 functions} section in \code{\link{glm}} gives information on
 supplying fitting methods to \code{\link{glm}}.
