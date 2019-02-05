@@ -1,5 +1,5 @@
 ---
-title: "Multinomial logistic regression using **brglm2**"
+title: "Multinomial logistic regression using brglm2"
 author: "[Ioannis Kosmidis](http://www.ucl.ac.uk/~ucakiko/)"
 date: "01 July 2017"
 output: rmarkdown::html_vignette
