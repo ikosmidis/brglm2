@@ -1,0 +1,19 @@
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+
+c(bibentry(bibtype = "Manual",
+           title = "{brglm2}: Bias Reduction in Generalized Linear Models",
+           author = c(person(given = "Ioannis", family = "Kosmidis")),
+           year = year,
+           note = note,
+           url = "https://CRAN.R-project.org/package=brglm2"),
+  bibentry(bibtype = "article",
+           title = "Mean and median bias reduction in generalized linear models",
+           author = c(person(given = "Ioannis", family = "Kosmidis"),
+                      person(given = c("Euloge", "Clovis"), family = c("Kenne Pagui")),
+                      person(given = "Nicola", family = "Sartori")),
+           year = 2019,
+           journal = "arXiv e-prints",
+           volume = "arXiv:1804.04085",
+           note = "To appear in Statistics and Computing",
+           url = "https://arxiv.org/abs/1804.04085"))

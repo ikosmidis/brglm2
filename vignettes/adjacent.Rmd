@@ -1,0 +1,98 @@
+---
+title: "Adjustacent category logit models using brglm2"
+author: "[Ioannis Kosmidis](http://www.ucl.ac.uk/~ucakiko/)"
+date: "05 February 2019"
+output: rmarkdown::html_vignette
+bibliography: brglm2.bib
+vignette: >
+  %\VignetteIndexEntry{Multinomial logistic regression using **brglm2**}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 6
+)
+```
+
+# **bracl**
+The [**brglm2**](https://github.com/ikosmidis/brglm2) R package
+provides `bracl` which is a wrapper of `brglmFit` for fitting adjacent
+category models for orginal responses using either maximum likelihood
+or any of the various bias reduction methods described in
+`brglmFit`. There is a formal equivalence between adjacent category
+logit models for orginal responses and multinomial logistic regression
+models (see, e.g. the [Multinomial logistic regression using
+brglm2](https://cran.r-project.org/package=brglm2/vignettes/multinomial.html)
+vignette and the `brmultinom` function). `bracl` utilised that
+equivalence and fits the corresponding Poisson log-linear model, by
+appropriately re-scaling the Poisson means to match the multinomial
+totals (a.k.a. the "Poisson trick"). The mathematical details and
+algorithm on using the Poisson trick for mean-bias reduction are given
+in @kosmidis:11.
+
+
+
+# Citation
+If you found this vignette or **brglm2**, in general, useful, please consider citing **brglm2** and the associated paper. You can find information on how to do this by typing `citation("brglm2")`.
+
+# Opinion on stem cell research and religious fundamentalism
+
+The `stemcell` data set ships with **brglm2**. @agresti:15[, Section 4.1] provides a detailsed description of the variables recorded in this data set (see also `?stemcell`).
+```{r, echo = TRUE}
+library("brglm2")
+data("stemcell", package = "brglm2")
+```
+## Maximum likelihood estimation
+The following chunk of code fits an adjacent category logit model with proportional odds and reproduces @agresti:10[, Table 4.2]. Note that the intercept parameters are different because @agressti:10[, Table 4.2] uses different contrasts for the intercept parameters.
+```{r, echo = TRUE}
+stemcells_ml <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell,
+                      parallel = TRUE, type = "ML")
+summary(stemcells_ml)
+```
+`stemcells_ml` is an object inheriting from
+```{r, echo = TRUE}
+class(stemcells_ml)
+```
+**brglm2** implements `print`, `coef`, `fitted`, `predict`, `summary`, `vcov` and `logLik` methods for
+
+
+We can check if a model with non-proportional odds fits the data equally well by fitting it and carrying out a likelihood ration test.
+```{r, echo = TRUE}
+stemcells_ml_full <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell,
+                           parallel = FALSE, type = "ML")
+summary(stemcells_ml_full)
+```
+The value of the log likelihood ratio statistic here is
+```{r, echo = TRUE}
+(lrt <- deviance(stemcells_ml) - deviance(stemcells_ml_full))
+```
+and has an asymptotic chi-squared distribution with
+```{r, echo = TRUE}
+(df1 <- df.residual(stemcells_ml) - df.residual(stemcells_ml_full))
+```
+The p-value from testing the hypothesis that `stemcells_ml_full` is an as good fit as `stemcells_ml` is
+```{r, echo = TRUE}
+pchisq(lrt, df1, lower.tail = FALSE)
+```
+hence, the simpler model is found to be as adequate as the full model is.
+
+# Mean and median bias reduction
+We can use `bracl` to fit the adjacent category model using estiamtors with smaller mean or median bias. For mean bias reduction we do
+```{r, echo = TRUE}
+summary(update(stemcells_ml, type = "AS_mean"))
+```
+and for median
+```{r, echo = TRUE}
+summary(update(stemcells_ml, type = "AS_median"))
+```
+The estimates from mean and median bias reduction are similar to the maximum likelihood ones, indicating that estimation bias is not a major issue here.
+
+# Prediction
+We can predict the category probabilities using the `predict` method on
+
+# References
