@@ -4,7 +4,7 @@ inst/demos
 inst/mbrpr
 inst/other
 inst/useR!2016
-inst/glmbias_code+results
+inst/glmbias_code\+results
 inst/dev_resids.R
 inst/TODO.org
 src/hats.c
