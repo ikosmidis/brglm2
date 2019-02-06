@@ -1,4 +1,4 @@
-# brglm 0.5
+# brglm 0.5.0
 ## Bug fixes
 * `brglmFit` now works as expected with custom link functions (mean and median bias reduction)
 * `brglmFit` respects the specification of the transformation argument in `brglmControl`
@@ -8,7 +8,8 @@
 
 ## New functionality
 * Added `bracl` for fitting adjacent category logit models for ordinal responses using maximum likelihood, mean bias reduction, and median bias reduction and associated methods (`logLik`, `summary` and so on)
-* Added `predict` functions for `brmultinom` and `bracl`
+* Added `predict` methods for `brmultinom` and `bracl`
+@ Added `residuals` methods for `brmultinom` and `bracl` (residuals of the equivalent Poisson log-linear model)
 * Added the `mis` link functions for accounting for misclassification in binomial response models (Neuhaus, 1999, Biometrika)
 
 ## Other improvements, updates and additions
