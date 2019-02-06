@@ -4,6 +4,8 @@ author: "[Ioannis Kosmidis](http://www.ucl.ac.uk/~ucakiko/)"
 date: "05 February 2019"
 output: rmarkdown::html_vignette
 bibliography: brglm2.bib
+nocite: |
+  @kosmidis:2019
 vignette: >
   %\VignetteIndexEntry{Multinomial logistic regression using **brglm2**}
   %\VignetteEngine{knitr::rmarkdown}
@@ -93,6 +95,17 @@ summary(update(stemcells_ml, type = "AS_median"))
 The estimates from mean and median bias reduction are similar to the maximum likelihood ones, indicating that estimation bias is not a major issue here.
 
 # Prediction
-We can predict the category probabilities using the `predict` method on
+We can predict the category probabilities using the `predict` method
+```{r, echo = TRUE}
+predict(stemcells_ml, type = "probs")
+```
+
+# Relevant resources
+`?brglmFit` and `?brglm_control` contain quick descriptions of the various bias reduction methods supported in **brglm2**. The [`iteration`](https://cran.r-project.org/package=brglm2/brglm2.pdf) vignette describes the iteration and gives the mathematical details for the bias-reducing adjustments to the score functions for generalized linear models.
+
+
+# Citation
+If you found this vignette or **brglm2**, in general, useful, please consider citing **brglm2** and the associated paper. You can find information on how to do this by typing `citation("brglm2")`.
+
 
 # References
