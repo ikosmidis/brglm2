@@ -219,7 +219,6 @@ brmultinom <- function(formula, data, weights, subset, na.action,
 
     ## Fitted values
     fitted <- do.call("rbind", tapply(fit$fitted, fixed_totals, function(x) x/sum(x)))
-
     rownames(fitted) <- rownames(X)[keep]
     colnames(fitted) <- lev
     fit$fitted.values <- fitted
@@ -251,6 +250,40 @@ brmultinom <- function(formula, data, weights, subset, na.action,
 #' @export
 fitted.brmultinom <- function(object, ...) {
     object$fitted.values
+}
+
+#' Residuals for multinomial logistic regression and adjacent category logit models
+#'
+#' @param object the object coming out of \code{\link{bracl}} and
+#'     \code{\link{brmultinom}}
+#' @param type the type of residuals which should be returned.  The
+#'     options are: \code{"pearson"} (default), \code{"response"},
+#'     \code{"deviance"}, \code{"working"}. See Details.
+#'
+#' @details
+#'
+#' The residuals computed are the residuals from the equivalent
+#' Poisson log-linear model fit, organised in a form that matches the
+#' output of \code{fitted(object, type = "probs")}. As a result, the
+#' output is residuals defined in terms of the object and expected
+#' multinomial counts.
+#'
+#' @seealso brmultinom bracl
+#'
+#' @export
+residuals.brmultinom <- function(object, type = c("pearson", "response", "deviance", "working"), ...) {
+    type <- match.arg(type)
+    ## This is a Poisson log-linear models, so the working weights are
+    ## the fitted counts
+    fitted <- weights(object, type = "working")
+    ## The poisson responses
+    y <- object$y
+    out <- switch(type,
+                  "pearson" = (y - fitted)/sqrt(fitted),
+                  "response" = (y - fitted),
+                  "working" = object$residuals,
+                  "deviance" = object$family$dev.resids(y, fitted, 1))
+    matrix(out, ncol = object$ncat, dimnames = dimnames(fitted(object)))
 }
 
 #' @method coef brmultinom
@@ -366,6 +399,7 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
     }
     invisible(x)
 }
+
 #' Predict method for \code{brmultinom} fits
 #'
 #' Obtain class and probability predictions from a fitted baseline

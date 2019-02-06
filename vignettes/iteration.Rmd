@@ -268,9 +268,6 @@ where $[A]_j$ denotes the $j$th row of matrix $A$ as a column vector, $v'_i = V'
 The first version of the vignette has been written by Ioannis Kosmidis. Eugene Clovis Kenne Pagui and Nicola Sartori contributed the first version of the section "Median bias-reducing adjusted score functions", and Ioannis Kosmidis brought the expressions for the median bias-reducing adjustments in the reduced form that is shown above and is implemented in `brglmFit`.
 
 # Citation
-If you found this vignette or **brglm2** in general useful, please consider citing **brglm2** using
-```{r, echo = TRUE}
-citation("brglm2")
-```
+If you found this vignette or **brglm2**, in general, useful, please consider citing **brglm2** and the associated paper. You can find information on how to do this by typing `citation("brglm2")`.
 
 # References

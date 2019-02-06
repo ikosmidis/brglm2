@@ -77,9 +77,6 @@ coef(summary(modML))[, "Std. Error"] + abs(endometrial_sep$betas)
 ```
 
 # Citation
-If you found this vignette or **brglm2** in general useful, please consider citing **brglm2** using
-```{r, echo = TRUE}
-citation("brglm2")
-```
+If you found this vignette or **brglm2**, in general, useful, please consider citing **brglm2** and the associated paper. You can find information on how to do this by typing `citation("brglm2")`.
 
 # References

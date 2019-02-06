@@ -202,10 +202,13 @@ bracl <- function(formula, data, weights, subset, na.action,
     fit
 }
 
+#' @method fitted bracl
+#' @export
 fitted.bracl <- function(object, ...) {
     object$fitted.values
 }
 
+#' @export
 coef.bracl <- function(object, ...) {
     if (length(object$ofInterest)) {
         if (object$parallel) {
@@ -232,6 +235,7 @@ coef.bracl <- function(object, ...) {
     }
 }
 
+#' @export
 vcov.bracl <- function(object, ...) {
     vc <- vcov.brglmFit(object, ...)
     coefNames <- names(coefficients(object))
@@ -270,6 +274,7 @@ vcov.bracl <- function(object, ...) {
     vc
 }
 
+#' @export
 summary.bracl <- function(object, correlation = FALSE, digits = 3, ...) {
     object$digits <- digits
     object$logLik <- logLik(object)
