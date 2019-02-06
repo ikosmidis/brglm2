@@ -5,6 +5,7 @@ inst/mbrpr
 inst/other
 inst/useR!2016
 inst/glmbias_code+results
+inst/dev_resids.R
 inst/TODO.org
 src/hats.c
 tests/
@@ -14,3 +15,7 @@ vignettes/iteration.html
 vignettes/iteration.pdf
 ^\.travis\.yml$
 ^codecov\.yml$
+^\.gitignore
+^\._*
+^.*\.Rproj$
+^\.Rproj\.user$
