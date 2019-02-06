@@ -1,5 +1,5 @@
 ---
-title: "Adjustacent category logit models using **brglm2**"
+title: "Adjacent category logit models using **brglm2**"
 author: "[Ioannis Kosmidis](http://www.ucl.ac.uk/~ucakiko/)"
 date: "05 February 2019"
 output: rmarkdown::html_vignette
@@ -7,7 +7,7 @@ bibliography: brglm2.bib
 nocite: |
   @kosmidis:2019
 vignette: >
-  %\VignetteIndexEntry{Adjustacent category logit models using brglm2}
+  %\VignetteIndexEntry{Adjacent category logit models using brglm2}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -24,10 +24,10 @@ knitr::opts_chunk$set(
 # **bracl**
 The [**brglm2**](https://github.com/ikosmidis/brglm2) R package
 provides `bracl` which is a wrapper of `brglmFit` for fitting adjacent
-category models for orginal responses using either maximum likelihood
+category models for ordinal responses using either maximum likelihood
 or any of the various bias reduction methods described in
 `brglmFit`. There is a formal equivalence between adjacent category
-logit models for orginal responses and multinomial logistic regression
+logit models for ordinal responses and multinomial logistic regression
 models (see, e.g. the [Multinomial logistic regression using
 brglm2](https://cran.r-project.org/package=brglm2/vignettes/multinomial.html)
 vignette and the `brmultinom` function). `bracl` utilised that
@@ -44,7 +44,7 @@ If you found this vignette or **brglm2**, in general, useful, please consider ci
 
 # Opinion on stem cell research and religious fundamentalism
 
-The `stemcell` data set ships with **brglm2**. @agresti:15[, Section 4.1] provides a detailsed description of the variables recorded in this data set (see also `?stemcell`).
+The `stemcell` data set ships with **brglm2**. @agresti:15[, Section 4.1] provides a detailed description of the variables recorded in this data set (see also `?stemcell`).
 ```{r, echo = TRUE}
 library("brglm2")
 data("stemcell", package = "brglm2")
@@ -84,7 +84,7 @@ pchisq(lrt, df1, lower.tail = FALSE)
 hence, the simpler model is found to be as adequate as the full model is.
 
 # Mean and median bias reduction
-We can use `bracl` to fit the adjacent category model using estiamtors with smaller mean or median bias. For mean bias reduction we do
+We can use `bracl` to fit the adjacent category model using estimators with smaller mean or median bias. For mean bias reduction we do
 ```{r, echo = TRUE}
 summary(update(stemcells_ml, type = "AS_mean"))
 ```
