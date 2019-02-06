@@ -19,18 +19,18 @@ detectSeparation(x, y, weights = rep(1, nobs), start = NULL,
   singular.ok = TRUE)
 }
 \arguments{
-\item{x}{\code{x} is a design matrix of dimension \code{n * p},}
+\item{x}{\code{x} is a design matrix of dimension \code{n * p}.}
 
-\item{y}{\code{y} is a vector of observations of length \code{n}}
+\item{y}{\code{y} is a vector of observations of length \code{n}.}
 
 \item{weights}{an optional vector of \sQuote{prior weights} to be used
     in the fitting process.  Should be \code{NULL} or a numeric vector.}
 
-\item{start}{currently not used}
+\item{start}{currently not used.}
 
-\item{etastart}{currently not used}
+\item{etastart}{currently not used.}
 
-\item{mustart}{currently not used}
+\item{mustart}{currently not used.}
 
 \item{offset}{this can be used to specify an \emph{a priori} known
     component to be included in the linear predictor during fitting.

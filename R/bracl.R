@@ -30,7 +30,7 @@
 #'     effects per category; if \code{TRUE} then a proportional odds
 #'     adjacent category model is fit. See Details.
 #' @param x should the model matrix be included with in the result
-#'     (default is \code{TRUE})
+#'     (default is \code{TRUE}).
 #' @param ... arguments to be used to form the default 'control'
 #'     argument if it is not supplied directly.
 #'
@@ -55,9 +55,9 @@
 #'
 #' @references
 #'
-#' Kosmidis I., Kenne Pagui E. C. and Sartori N. (2018). Mean and
-#' median bias reduction in generalized linear models. *arxiv*,
-#' **arxiv:1804.04085**
+#' Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
+#' reduction in generalized linear models. *arXiv e-prints*,
+#' arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
 #'
 #' Agresti, A. (2010). *Analysis of Ordinal Categorical Data* (2nd
 #' edition).  Wiley Series in Probability and Statistics. Wiley.
@@ -208,6 +208,7 @@ fitted.bracl <- function(object, ...) {
     object$fitted.values
 }
 
+#' @method coef bracl
 #' @export
 coef.bracl <- function(object, ...) {
     if (length(object$ofInterest)) {
@@ -235,6 +236,7 @@ coef.bracl <- function(object, ...) {
     }
 }
 
+#' @method vcov bracl
 #' @export
 vcov.bracl <- function(object, ...) {
     vc <- vcov.brglmFit(object, ...)
@@ -274,6 +276,7 @@ vcov.bracl <- function(object, ...) {
     vc
 }
 
+#' @method summary bracl
 #' @export
 summary.bracl <- function(object, correlation = FALSE, digits = 3, ...) {
     object$digits <- digits
@@ -297,6 +300,7 @@ summary.bracl <- function(object, correlation = FALSE, digits = 3, ...) {
 }
 
 #' @method print summary.bracl
+#' @export
 print.summary.bracl <- function(x, digits = x$digits, ...) {
     if (!is.null(cl <- x$call)) {
         cat("Call:\n")
@@ -326,7 +330,7 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
 #' category logits model.
 #'
 #' @param object a fitted object of class inherinting from
-#'     \code{"bracl"}
+#'     \code{"bracl"}.
 #' @param newdata optionally, a data frame in which to look for
 #'     variables with which to predict.  If omitted, the fitted linear
 #'     predictors are used.
@@ -335,8 +339,8 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
 #'     category at the covariate values supplied in \code{"newdata"},
 #'     selecting the cateogry with the largest probability; the
 #'     alternative \code{"probs"} returns all cateogry probabilities
-#'     at the covariate values supplied in \code{"newdata"}
-#' @param ... further arguments passed to or from other methods
+#'     at the covariate values supplied in \code{"newdata"}.
+#' @param ... further arguments passed to or from other methods.
 #'
 #'
 #' @details
@@ -369,6 +373,7 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
 #' sapply(c("class", "probs"), function(what) predict(fit_bracl, newdata, what))
 #' sapply(c("class", "probs"), function(what) predict(fit_bracl_p, newdata, what))
 #'
+#' @method predict bracl
 #' @export
 predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
     ## Adapted from nnet:::predict.multinom

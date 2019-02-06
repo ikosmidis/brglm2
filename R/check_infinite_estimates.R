@@ -19,11 +19,11 @@
 #'
 #' @aliases checkInfiniteEstimates
 #'
-#' @param object the result of a \code{\link{glm}} call
+#' @param object the result of a \code{\link{glm}} call.
 #' @param nsteps starting from \code{maxit = 1}, the GLM is refitted
 #'     for \code{maxit = 2}, \code{maxit = 3}, \ldots, \code{maxit =
 #'     nsteps}. Default value is 30.
-#' @param ... currently not used#'
+#' @param ... currently not used.
 #'
 #'
 #' @details

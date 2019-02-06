@@ -13,11 +13,13 @@
 }
 \arguments{
 \item{object}{the object coming out of \code{\link{bracl}} and
-\code{\link{brmultinom}}}
+\code{\link{brmultinom}}.}
 
 \item{type}{the type of residuals which should be returned.  The
 options are: \code{"pearson"} (default), \code{"response"},
 \code{"deviance"}, \code{"working"}. See Details.}
+
+\item{...}{Currently not used.}
 }
 \description{
 Residuals for multinomial logistic regression and adjacent category logit models

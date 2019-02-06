@@ -24,7 +24,7 @@ separation detection?}
 parameters are infinite?}
 
 \item{beta_tolerance}{maximum absolute variable value from the
-linear program, before separation is declared}
+linear program, before separation is declared.}
 }
 \description{
 Typically only used internally by \code{\link{detect_separation}}

@@ -4,9 +4,9 @@
 #'
 #' \code{\link{mis}} is a \code{link-glm} object that specifies the link function in Neuhaus (1999, expression~(8)) for handling misclassified responses in binomial regression models using maximum likelihood. A prior specification of the sensitivity and specificity is required.
 #'
-#' @param link the baseline link to be used
-#' @param sensitivity the probability of observing a success given that a success actually took place given any covariate values
-#' @param specificity the probability of observing a failure given that a failure actually took place given any covariate values
+#' @param link the baseline link to be used.
+#' @param sensitivity the probability of observing a success given that a success actually took place given any covariate values.
+#' @param specificity the probability of observing a failure given that a failure actually took place given any covariate values.
 #'
 #' @details
 #'

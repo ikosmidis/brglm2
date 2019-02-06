@@ -15,13 +15,13 @@ brglm_control(epsilon = 1e-08, maxit = 100, trace = FALSE,
   transformation = "identity", slowit = 1, max_step_factor = 12)
 }
 \arguments{
-\item{epsilon}{positive convergence tolerance epsilon}
+\item{epsilon}{positive convergence tolerance epsilon.}
 
 \item{maxit}{integer giving the maximal number of iterations
-allowed}
+allowed.}
 
 \item{trace}{logical indicating if output should be produced for
-each iteration}
+each iteration.}
 
 \item{type}{the type of fitting method to be used. The options are
 \code{AS_mean} (mean-bias reducing adjusted scores),
@@ -34,10 +34,10 @@ each iteration}
 estimated. Default is \code{identity}. See Details.}
 
 \item{slowit}{a positive real used as a multiplier for the
-stepsize. The smaller it is the smaller the steps are}
+stepsize. The smaller it is the smaller the steps are.}
 
 \item{max_step_factor}{the maximum number of step halving steps to
-consider}
+consider.}
 }
 \value{
 a list with components named as the arguments, including

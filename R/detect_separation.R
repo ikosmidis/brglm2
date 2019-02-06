@@ -29,14 +29,14 @@
 #'
 #' @aliases detectSeparation print.detect_separation
 #'
-#' @param x \code{x} is a design matrix of dimension \code{n * p},
-#' @param y \code{y} is a vector of observations of length \code{n}
+#' @param x \code{x} is a design matrix of dimension \code{n * p}.
+#' @param y \code{y} is a vector of observations of length \code{n}.
 #' @param control a list of parameters controlling separation
 #'     detection. See \code{\link{detect_separation_control}} for
 #'     details.
-#' @param start currently not used
-#' @param mustart currently not used
-#' @param etastart currently not used
+#' @param start currently not used.
+#' @param mustart currently not used.
+#' @param etastart currently not used.
 #' @param singular.ok logical. If \code{FALSE}, a singular model is an
 #'     error.
 #' @param ... arguments to be used to form the default 'control'
@@ -203,7 +203,7 @@ detect_separation <- function (x, y, weights = rep(1, nobs),
 #'     \code{"test"} for separation or also \code{"find"} which
 #'     parameters are infinite?
 #' @param beta_tolerance maximum absolute variable value from the
-#'     linear program, before separation is declared
+#'     linear program, before separation is declared.
 #'
 #' @export
 detect_separation_control <- function(linear_program = c("primal", "dual"),

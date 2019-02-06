@@ -32,13 +32,13 @@
 #'
 #' @inheritParams stats::glm.fit
 #' @aliases brglm_fit
-#' @param x \code{x} is a design matrix of dimension \code{n * p},
-#' @param y \code{y} is a vector of observations of length \code{n}
+#' @param x \code{x} is a design matrix of dimension \code{n * p}.
+#' @param y \code{y} is a vector of observations of length \code{n}.
 #' @param control a list of parameters controlling the fitting
 #'     process. See \code{\link{brglmControl}} for details.
 #' @param start starting values for the parameters in the linear
 #'     predictor. If \code{NULL} (default) then the maximum likelihood
-#'     estimates are caluclated and used as starting values
+#'     estimates are caluclated and used as starting values.
 #' @param mustart applied only when start is not \code{NULL}. Starting
 #'     values for the vector of means to be passed to
 #'     \code{\link{glm.fit}} when computing starting values using
@@ -110,9 +110,9 @@
 #'
 #' @references
 #'
-#' Kosmidis I., Kenne Pagui E. C. and Sartori N. (2018). Mean and
-#' median bias reduction in generalized linear models. *arxiv*,
-#' **arxiv:1804.04085**
+#' Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
+#' reduction in generalized linear models. *arXiv e-prints*,
+#' arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
 #'
 #' Cordeiro G. M. & McCullagh, P. (1991). Bias correction in generalized
 #' linear models. *Journal of the Royal Statistical Society. Series B
@@ -1175,7 +1175,7 @@ confint.brglmFit <- function(object, parm, level = 0.95, ...) {
 #' in a \code{\link{brglmFit}} object
 #'
 #' @inheritParams stats::vcov
-#' @param model character specyfying for which component of the model coefficients shoould be extracted
+#' @param model character specyfying for which component of the model coefficients shoould be extracted.
 #'
 #' @method vcov brglmFit
 #' @export

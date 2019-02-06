@@ -29,7 +29,7 @@
 #'     levels(response)[ref] is used as a baseline, or a character
 #'     string. Default is 1.
 #' @param x should the model matrix be included with in the result
-#'     (default is \code{TRUE})
+#'     (default is \code{TRUE}).
 #' @param ... arguments to be used to form the default 'control'
 #'     argument if it is not supplied directly.
 #'
@@ -85,9 +85,9 @@
 #'
 #' @references
 #'
-#' Kosmidis I., Kenne Pagui E. C. and Sartori N. (2018). Mean and
-#' median bias reduction in generalized linear models. *arxiv*,
-#' **arxiv:1804.04085**
+#' Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
+#' reduction in generalized linear models. *arXiv e-prints*,
+#' arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
 #'
 #' Agresti A. (2002). *Categorical data analysis* (2nd edition). Wiley
 #' Series in Probability and Statistics. Wiley.
@@ -255,10 +255,11 @@ fitted.brmultinom <- function(object, ...) {
 #' Residuals for multinomial logistic regression and adjacent category logit models
 #'
 #' @param object the object coming out of \code{\link{bracl}} and
-#'     \code{\link{brmultinom}}
+#'     \code{\link{brmultinom}}.
 #' @param type the type of residuals which should be returned.  The
 #'     options are: \code{"pearson"} (default), \code{"response"},
 #'     \code{"deviance"}, \code{"working"}. See Details.
+#' @param ... Currently not used.
 #'
 #' @details
 #'
@@ -270,6 +271,7 @@ fitted.brmultinom <- function(object, ...) {
 #'
 #' @seealso brmultinom bracl
 #'
+#' @method residuals brmultinom
 #' @export
 residuals.brmultinom <- function(object, type = c("pearson", "response", "deviance", "working"), ...) {
     type <- match.arg(type)
@@ -370,6 +372,7 @@ vcov.brmultinom <- function(object, ...) {
 
 
 #' @method print summary.brmultinom
+#' @export
 print.summary.brmultinom <- function(x, digits = x$digits, ...)
 {
     if (!is.null(cl <- x$call)) {
@@ -406,7 +409,7 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
 #' category logits model.
 #'
 #' @param object a fitted object of class inherinting from
-#'     \code{"brmultinom"}
+#'     \code{"brmultinom"}.
 #' @param newdata optionally, a data frame in which to look for
 #'     variables with which to predict.  If omitted, the fitted linear
 #'     predictors are used.
@@ -415,8 +418,8 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
 #'     category at the covariate values supplied in \code{"newdata"},
 #'     selecting the cateogry with the largest probability; the
 #'     alternative \code{"probs"} returns all cateogry probabilities
-#'     at the covariate values supplied in \code{"newdata"}
-#' @param ... further arguments passed to or from other methods
+#'     at the covariate values supplied in \code{"newdata"}.
+#' @param ... further arguments passed to or from other methods.
 #'
 #'
 #' @details
@@ -446,6 +449,7 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
 #' ## Predictions
 #' sapply(c("class", "probs"), function(what) predict(houseML1, newdata, what))
 #'
+#' @method predict brmultinom
 #' @export
 predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
 {

@@ -22,11 +22,11 @@
 #'
 #' @inheritParams stats::glm.control
 #' @aliases brglm_control
-#' @param epsilon positive convergence tolerance epsilon
+#' @param epsilon positive convergence tolerance epsilon.
 #' @param maxit integer giving the maximal number of iterations
-#'     allowed
+#'     allowed.
 #' @param trace logical indicating if output should be produced for
-#'     each iteration
+#'     each iteration.
 #' @param type the type of fitting method to be used. The options are
 #'     \code{AS_mean} (mean-bias reducing adjusted scores),
 #'     \code{AS_median} (median-bias reducting adjusted scores),
@@ -36,9 +36,9 @@
 #' @param transformation the transformation of the dispersion to be
 #'     estimated. Default is \code{identity}. See Details.
 #' @param slowit a positive real used as a multiplier for the
-#'     stepsize. The smaller it is the smaller the steps are
+#'     stepsize. The smaller it is the smaller the steps are.
 #' @param max_step_factor the maximum number of step halving steps to
-#'     consider
+#'     consider.
 #'
 #' @details \code{\link{brglmControl}} provides default values and
 #'     sanity checking for the various constants that control the

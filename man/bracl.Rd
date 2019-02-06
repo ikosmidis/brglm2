@@ -53,7 +53,7 @@ adjacent category model is fit. See Details.}
   }
 
 \item{x}{should the model matrix be included with in the result
-(default is \code{TRUE})}
+(default is \code{TRUE}).}
 
 \item{control}{a list of parameters for controlling the fitting
 process. See \code{\link{brglmControl}} for details.}
@@ -95,9 +95,9 @@ fit_bracl_p <- bracl(research ~ as.numeric(religion) + gender, weights = frequen
 
 }
 \references{
-Kosmidis I., Kenne Pagui E. C. and Sartori N. (2018). Mean and
-median bias reduction in generalized linear models. *arxiv*,
-**arxiv:1804.04085**
+Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
+reduction in generalized linear models. *arXiv e-prints*,
+arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
 
 Agresti, A. (2010). *Analysis of Ordinal Categorical Data* (2nd
 edition).  Wiley Series in Probability and Statistics. Wiley.

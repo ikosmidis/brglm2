@@ -9,13 +9,13 @@ infinite}
 \method{check_infinite_estimates}{glm}(object, nsteps = 20, ...)
 }
 \arguments{
-\item{object}{the result of a \code{\link{glm}} call}
+\item{object}{the result of a \code{\link{glm}} call.}
 
 \item{nsteps}{starting from \code{maxit = 1}, the GLM is refitted
 for \code{maxit = 2}, \code{maxit = 3}, \ldots, \code{maxit =
 nsteps}. Default value is 30.}
 
-\item{...}{currently not used#'}
+\item{...}{currently not used.}
 }
 \description{
 A simple diagnostic of whether the maximum likelihood estimates are

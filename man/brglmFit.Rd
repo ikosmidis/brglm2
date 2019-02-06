@@ -17,16 +17,16 @@ brglm_fit(x, y, weights = rep(1, nobs), start = NULL,
   fixed_totals = NULL, singular.ok = TRUE)
 }
 \arguments{
-\item{x}{\code{x} is a design matrix of dimension \code{n * p},}
+\item{x}{\code{x} is a design matrix of dimension \code{n * p}.}
 
-\item{y}{\code{y} is a vector of observations of length \code{n}}
+\item{y}{\code{y} is a vector of observations of length \code{n}.}
 
 \item{weights}{an optional vector of \sQuote{prior weights} to be used
     in the fitting process.  Should be \code{NULL} or a numeric vector.}
 
 \item{start}{starting values for the parameters in the linear
 predictor. If \code{NULL} (default) then the maximum likelihood
-estimates are caluclated and used as starting values}
+estimates are caluclated and used as starting values.}
 
 \item{etastart}{applied only when start is not
 \code{NULL}. Starting values for the linear predictor to be
@@ -210,9 +210,9 @@ summary(endometrialBR_median)
 
 }
 \references{
-Kosmidis I., Kenne Pagui E. C. and Sartori N. (2018). Mean and
-median bias reduction in generalized linear models. *arxiv*,
-**arxiv:1804.04085**
+Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
+reduction in generalized linear models. *arXiv e-prints*,
+arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
 
 Cordeiro G. M. & McCullagh, P. (1991). Bias correction in generalized
 linear models. *Journal of the Royal Statistical Society. Series B

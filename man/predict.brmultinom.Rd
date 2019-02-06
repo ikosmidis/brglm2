@@ -9,7 +9,7 @@
 }
 \arguments{
 \item{object}{a fitted object of class inherinting from
-\code{"brmultinom"}}
+\code{"brmultinom"}.}
 
 \item{newdata}{optionally, a data frame in which to look for
 variables with which to predict.  If omitted, the fitted linear
@@ -20,9 +20,9 @@ predictors are used.}
 category at the covariate values supplied in \code{"newdata"},
 selecting the cateogry with the largest probability; the
 alternative \code{"probs"} returns all cateogry probabilities
-at the covariate values supplied in \code{"newdata"}}
+at the covariate values supplied in \code{"newdata"}.}
 
-\item{...}{further arguments passed to or from other methods}
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 If \code{type = "class"} a vector with the predicted response
