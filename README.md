@@ -21,7 +21,7 @@ Install the development version from github:
 devtools::install_github("ikosmidis/brglm2")
 ```
 
-### Solving adjusted score equations quasi-Fisher scoring
+### Solving adjusted score equations using quasi-Fisher scoring
 
 The workhorse function in **brglm2** is
 [`brglmFit`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R),
