@@ -2,7 +2,7 @@
 % Please edit documentation in R/bracl.R
 \name{bracl}
 \alias{bracl}
-\title{Bias reduction for adjcacent category logit models for ordinal
+\title{Bias reduction for adjacent category logit models for ordinal
 responses using the Poisson trick.}
 \usage{
 bracl(formula, data, weights, subset, na.action, parallel = FALSE,
@@ -39,7 +39,7 @@ bracl(formula, data, weights, subset, na.action, parallel = FALSE,
   }
 
 \item{parallel}{if \code{FALSE} (default), then a non-proportional
-odds adjacent category model is fit, assumming different
+odds adjacent category model is fit, assuming different
 effects per category; if \code{TRUE} then a proportional odds
 adjacent category model is fit. See Details.}
 

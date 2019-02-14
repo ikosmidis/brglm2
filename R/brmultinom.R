@@ -77,7 +77,7 @@
 #' multinomial regression models, the current implementation is more
 #' of a 'proof of concept' and is not expected to scale well with
 #' either of \code{nrow(X)}, \code{ncol(X)} or the number of levels in
-#' the cateogrical response.
+#' the categorical response.
 #'
 #' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'

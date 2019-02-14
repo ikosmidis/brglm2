@@ -257,7 +257,7 @@ where $[A]_j$ denotes the $j$th row of matrix $A$ as a column vector, $v'_i = V'
 
 + The mean-bias reducing adjusted score functions are solved when the `brglmFit` method is used with `type = "AS_mean"`, and the median-bias reducing adjusted score functions with `type = AS_median` (see `?brglmFit`).
 
-+ The steps where $\phi$ and the $\phi$ direction are updated are ignored for generalized linear models with known dispersion parameter, like in models with binomial and poisson responses. Also, in that case, $v_\phi^{(.)}$ and $\upsilon_\phi^{(.)}$ in steps 9, 14 and 16 are set to zero.
++ The steps where $\phi$ and the $\phi$ direction are updated are ignored for generalized linear models with known dispersion parameter, like in models with binomial and Poisson responses. Also, in that case, $v_\phi^{(.)}$ and $\upsilon_\phi^{(.)}$ in steps 9, 14 and 16 are set to zero.
 
 + The implementation of the adjusted score functions requires ready implementations of $d^2\mu_i/d\eta_i^2$, $a'(.)$, $a''(.)$ and $a'''(.)$. The [**enrichwith**](https://cran.r-project.org/package=enrichwith) R package is used internally to enrich the base `family` and `link-glm` objects with implementations of those functions (see `?enrich.family` and `?enrich.link-glm`).
 

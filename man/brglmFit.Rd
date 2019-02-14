@@ -26,7 +26,7 @@ brglm_fit(x, y, weights = rep(1, nobs), start = NULL,
 
 \item{start}{starting values for the parameters in the linear
 predictor. If \code{NULL} (default) then the maximum likelihood
-estimates are caluclated and used as starting values.}
+estimates are calculated and used as starting values.}
 
 \item{etastart}{applied only when start is not
 \code{NULL}. Starting values for the linear predictor to be

@@ -94,7 +94,7 @@ matplot(se_ratios, type = "l", lty = 1, ylim = c(0.5, 1.5), xlab = "Iteration")
 
 Some of the estimated standard errors diverge as the number of Fisher scoring iterations increases, which is evidence of complete or quasi-complete separation [@lesaffre:89].
 
-In constrast, both mean and median bias reduction result in finite
+In contrast, both mean and median bias reduction result in finite
 estimates
 ```{r, echo = TRUE}
 all_mean_sparse <- update(all_ml_sparse, type = "AS_mean")

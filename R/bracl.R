@@ -14,7 +14,7 @@
 #  http://www.r-project.org/Licenses/
 
 
-#' Bias reduction for adjcacent category logit models for ordinal
+#' Bias reduction for adjacent category logit models for ordinal
 #' responses using the Poisson trick.
 #'
 #' \code{bracl} is a wrapper of \code{\link{brglmFit}} that fits
@@ -26,7 +26,7 @@
 #' @param control a list of parameters for controlling the fitting
 #'     process. See \code{\link{brglmControl}} for details.
 #' @param parallel if \code{FALSE} (default), then a non-proportional
-#'     odds adjacent category model is fit, assumming different
+#'     odds adjacent category model is fit, assuming different
 #'     effects per category; if \code{TRUE} then a proportional odds
 #'     adjacent category model is fit. See Details.
 #' @param x should the model matrix be included with in the result
@@ -329,7 +329,7 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
 #' Obtain class and probability predictions from a fitted adjacent
 #' category logits model.
 #'
-#' @param object a fitted object of class inherinting from
+#' @param object a fitted object of class inheriting from
 #'     \code{"bracl"}.
 #' @param newdata optionally, a data frame in which to look for
 #'     variables with which to predict.  If omitted, the fitted linear
@@ -337,8 +337,8 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
 #' @param type the type of prediction required. The default is
 #'     \code{"class"}, which produces predictions of the response
 #'     category at the covariate values supplied in \code{"newdata"},
-#'     selecting the cateogry with the largest probability; the
-#'     alternative \code{"probs"} returns all cateogry probabilities
+#'     selecting the category with the largest probability; the
+#'     alternative \code{"probs"} returns all category probabilities
 #'     at the covariate values supplied in \code{"newdata"}.
 #' @param ... further arguments passed to or from other methods.
 #'

@@ -38,7 +38,7 @@
 #'     process. See \code{\link{brglmControl}} for details.
 #' @param start starting values for the parameters in the linear
 #'     predictor. If \code{NULL} (default) then the maximum likelihood
-#'     estimates are caluclated and used as starting values.
+#'     estimates are calculated and used as starting values.
 #' @param mustart applied only when start is not \code{NULL}. Starting
 #'     values for the vector of means to be passed to
 #'     \code{\link{glm.fit}} when computing starting values using

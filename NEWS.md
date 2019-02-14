@@ -1,3 +1,9 @@
+# brglm 0.5.1
+
+## Other improvements, updates and additions
+* Fixed typos in vignettes and documentation
+* Added ORCHID for Ioannis Kosmidis in DESCRIPTION
+
 # brglm 0.5.0
 ## Bug fixes
 * `brglmFit` now works as expected with custom link functions (mean and median bias reduction)
