@@ -1,6 +1,6 @@
 # brglm 0.5.2
 ## Bug fixes
-* `print.brmultinom` is now exported
+* `print.brmultinom` is now exported, so `bracl` and `brmultinom` fits print correctly
 
 # brglm 0.5.1
 
