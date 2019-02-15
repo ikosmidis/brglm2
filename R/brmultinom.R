@@ -304,6 +304,7 @@ coef.brmultinom <- function(object, ...) {
 }
 
 #' @method print brmultinom
+#' @export
 print.brmultinom <- function(x, digits = max(5L, getOption("digits") - 3L), ...) {
      if (!is.null(cl <- x$call)) {
         cat("Call:\n")

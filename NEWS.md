@@ -1,3 +1,7 @@
+# brglm 0.5.2
+## Bug fixes
+* `print.brmultinom` is now exported
+
 # brglm 0.5.1
 
 ## Other improvements, updates and additions
