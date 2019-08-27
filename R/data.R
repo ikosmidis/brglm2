@@ -14,6 +14,10 @@
 #'   \item time. a factor with levels \code{early}, \code{midday}, \code{late}
 #' }
 #'
+#' @seealso
+#'
+#' \code{\link{brglm_fit}}
+
 #'
 #' @source
 #'
@@ -50,6 +54,11 @@
 #'     Schemper (2002), and was originally provided by Dr
 #'     E. Asseryanis from the Medical University of Vienna.
 #'
+#' @seealso
+#'
+#' \code{\link{brglm_fit}}
+#' 
+#'  
 #' @references
 #'
 #' Agresti, A. (2015). *Foundations of Linear and Generalized Linear
@@ -66,6 +75,10 @@
 #' @note
 #'
 #' Data is as provided in the Zeilig R package (\url{https://cran.r-project.org/package=Zelig})
+#'
+#' @seealso
+#'
+#' \code{\link{brglm_fit}}
 #'
 #' @references
 #'
@@ -102,6 +115,10 @@
 #'
 #' The alligators data set is analysed in Agresti (2002, Subsection~7.1.2).
 #'
+#' @seealso
+#'
+#' \code{\link{brmultinom}}
+#' 
 #' @references
 #'
 #' Agresti, A. (2002). *Categorical Data Analysis*.  Wiley Series in
@@ -133,6 +150,10 @@
 #'
 #' }
 #'
+#' @seealso
+#'
+#' \code{\link{bracl}}
+#' 
 #' @source
 #'
 #' The \code{stemcell} data set is analysed in Agresti (2010, Subsection~4.1.5).

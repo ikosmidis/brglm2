@@ -33,4 +33,7 @@ sun and in shade, at three times of day.
   \item time. a factor with levels \code{early}, \code{midday}, \code{late}
 }
 }
+\seealso{
+\code{\link{brglm_fit}}
+}
 \keyword{datasets}

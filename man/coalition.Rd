@@ -23,4 +23,7 @@ King, G., Alt, J. E., Burns, N. E. and Laver, M. (1990). A Unified
  King, G., Alt, J. E., Burns, N. E. and Laver, M. ICPSR
  Publication Related Archive, 1115.
 }
+\seealso{
+\code{\link{brglm_fit}}
+}
 \keyword{datasets}

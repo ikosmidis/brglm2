@@ -32,4 +32,7 @@ Alligator food choice data
 Agresti, A. (2002). *Categorical Data Analysis*.  Wiley Series in
 Probability and Statistics. Wiley
 }
+\seealso{
+\code{\link{brmultinom}}
+}
 \keyword{datasets}

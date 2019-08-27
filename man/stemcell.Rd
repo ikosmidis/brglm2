@@ -34,4 +34,7 @@ religious beliefs, stratified by gender.
 Agresti, A. (2010). *Analysis of Ordinal Categorical Data* (2nd edition).  Wiley Series in
 Probability and Statistics. Wiley
 }
+\seealso{
+\code{\link{bracl}}
+}
 \keyword{datasets}
