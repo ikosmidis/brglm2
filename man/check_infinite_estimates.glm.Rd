@@ -64,5 +64,5 @@ Discrimination. *Journal of the Royal Statistical Society. Series B
 (Methodological)*, **51**, 109-116
 }
 \seealso{
-\code{\link[nnet]{multinom}}
+\code{\link[nnet]{multinom}}, \code{\link{brmultinom}}
 }

@@ -8,15 +8,15 @@
 #' score equations in Kenne et al. (2016), or through the direct
 #' subtraction of an estimate of the bias of the maximum likelihood
 #' estimator from the maximum likelihood estimates as in Cordeiro and
-#' McCullagh (1991),
+#' McCullagh (1991).
 #'
 #'
 #' In the special case of generalized linear models for binomial,
-#' Poisson and multinomial responses, the adjusted score equations
-#' approaches return estimates with improved frequentist properties,
-#' that are also always finite, even in cases where the maximum
-#' likelihood estimates are infinite (e.g. complete and quasi-complete
-#' separation in multinomial regression; see also
+#' Poisson and multinomial responses (both nominal and ordinal), the
+#' adjusted score equations approaches return estimates with improved
+#' frequentist properties, that are also always finite, even in cases
+#' where the maximum likelihood estimates are infinite (e.g. complete
+#' and quasi-complete separation in multinomial regression; see also
 #' \code{\link{detect_separation}} and
 #' \code{\link{check_infinite_estimates}} for pre-fit and post-fit
 #' methods for the detection of infinite estimates in binomial
@@ -25,6 +25,12 @@
 #' the construction of confidence intervals for the reduced-bias
 #' estimates are provided.
 #'
+#' The core model fitters are implemented by the functions
+#' \code{\link{brglm_fit}} (univariate generalized linear models),
+#' \code{\link{brmultinom}} (baseline category logit models for
+#' nominal multinomial responses), and \code{\link{bracl}} (adjacent
+#' category logit models for ordinal multinomial responses).
+#' 
 #' @details
 #'
 #'
@@ -37,6 +43,10 @@
 #' wrapper to the \code{brglm::brglm} function.
 #'
 #' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+#'
+#' @seealso
+#'
+#' \code{\link{brglm_fit}}, \code{\link{brmultinom}}, \code{\link{bracl}}
 #'
 #' @references
 #'

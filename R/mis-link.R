@@ -19,6 +19,8 @@
 #' Neuhaus J. M. (1999). Bias and efficiency loss due to misclassified
 #' responses in binary regression. Biometrika, **86**, 843-855
 #'
+#' @seealso \code{\link[stats]{glm}}, \code{\link[stats]{brglm_fit}}
+#' 
 #' @examples
 #'
 #' ## Define a few links with some misclassification

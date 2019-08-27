@@ -90,7 +90,7 @@ coef(coalitionBRc, model = "dispersion")
 
 }
 \seealso{
-\code{\link{brglmFit}} and \code{\link{glm.fit}}
+\code{\link{brglm_fit}} and \code{\link{glm.fit}}
 }
 \author{
 Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}

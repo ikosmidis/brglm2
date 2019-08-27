@@ -81,7 +81,7 @@
 #'
 #' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'
-#' @seealso \code{\link[nnet]{multinom}}
+#' @seealso \code{\link[nnet]{multinom}}, \code{\link{bracl}} for adjacent category logit models for ordinal responses
 #'
 #' @references
 #'

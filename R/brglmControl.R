@@ -64,7 +64,7 @@
 #'
 #' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'
-#' @seealso \code{\link{brglmFit}} and \code{\link{glm.fit}}
+#' @seealso \code{\link{brglm_fit}} and \code{\link{glm.fit}}
 #'
 #' @examples
 #'

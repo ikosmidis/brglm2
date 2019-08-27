@@ -124,7 +124,7 @@ package version 0.1-3.
 \url{https://CRAN.R-project.org/package=safeBinaryRegression}
 }
 \seealso{
-\code{\link{brglmFit}}, \code{\link{glm.fit}} and \code{\link{glm}}
+\code{\link{brglm_fit}}, \code{\link{glm.fit}} and \code{\link{glm}}
 }
 \author{
 Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Kjell Konis [ctb] \email{kjell.konis@me.com}

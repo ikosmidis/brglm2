@@ -43,7 +43,7 @@
 #' estimate for the corresponding parameter has value minus or plus
 #' infinity.
 #'
-#' @seealso \code{\link[nnet]{multinom}}
+#' @seealso \code{\link[nnet]{multinom}}, \code{\link{brmultinom}}
 #'
 #' @references
 #'

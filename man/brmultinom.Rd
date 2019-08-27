@@ -159,7 +159,7 @@ Models Arguing Conditionally on Observed Explanatory
 Variables. *Biometrika*, **68**, 563-566.
 }
 \seealso{
-\code{\link[nnet]{multinom}}
+\code{\link[nnet]{multinom}}, \code{\link{bracl}} for adjacent category logit models for ordinal responses
 }
 \author{
 Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
