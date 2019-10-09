@@ -37,14 +37,10 @@ using the function `brmultinom`, and for adjacent category models
 (ordinal responses) using the function `bracl`. Both `brmultinom` and
 `bracl` rely on `brglmFit`.
 
-The iteration vignette and the paper
-[**arXiv:1710.11217**](http://arxiv.org/abs/1804.04085) present the
-iteration and give mathematical details for the bias-reducing
-adjustments to the score functions for generalized linear models.
+The [iteration vignette](https://cran.r-project.org/package=brglm2/vignettes/iteration.html) and [Kosmidis et al
+(2019)](https://doi.org/10.1007/s11222-019-09860-6) apresent the iteration and give mathematical details for the bias-reducing adjustments to the score functions for generalized linear models.
 
-The classification of bias reduction methods into explicit and
-implicit is as given in [Kosmidis
-(2014)](https://doi.org/10.1002/wics.1296).
+The classification of bias reduction methods into explicit and implicit is as given in [Kosmidis (2014)](https://doi.org/10.1002/wics.1296).
 
 ### References and resources
 
@@ -53,6 +49,6 @@ implicit is as given in [Kosmidis
 
 Motivation, details and discussion on the methods that **brglm2** implements are provided in
 
-Kosmidis, I, Kenne Pagui, E C, Sartori N. (2017). Mean and median bias reduction in generalized linear models. *arXiv*, [**arXiv:1710.11217**](http://arxiv.org/abs/1804.04085)
+Kosmidis, I, Kenne Pagui, E C, Sartori N. (2017). Mean and median bias reduction in generalized linear models. To appear in [*Statistics and Computing*](https://doi.org/10.1007/s11222-019-09860-6). *arXiv*, [arXiv:1710.11217](http://arxiv.org/abs/1804.04085). 
 
 
