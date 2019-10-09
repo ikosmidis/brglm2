@@ -44,7 +44,7 @@ The classification of bias reduction methods into explicit and implicit is as gi
 
 ### References and resources
 
-**brglm2** was presented by [Ioannis Kosmidis](https://www.ucl.ac.uk/~ucakiko/) at the [useR! 2016 international R User conference](http://user2016.org) at University of Stanford on 16 June 2016. The presentation was titled "Reduced-bias inference in generalized linear models" and can be watched online at this [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
+**brglm2** was presented by [Ioannis Kosmidis](http://www.ikosmidis.com) at the [useR! 2016 international R User conference](http://user2016.org) at University of Stanford on 16 June 2016. The presentation was titled "Reduced-bias inference in generalized linear models" and can be watched online at this [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
 
 
 Motivation, details and discussion on the methods that **brglm2** implements are provided in
