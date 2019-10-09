@@ -728,13 +728,17 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## If start is NULL then start at the ML estimator else use start
         if (is.null(start)) {
             ## Adjust counts if binomial or Poisson in order to avoid infinite estimates
+            adj <- control$response_adjustment
+            if (is.null(adj)) {
+                adj <- nvars/nobs
+            }
             if (family$family == "binomial") {
-                weights.adj <- weights + (!(is_correction)) * nvars/nobs
-                y.adj <- (weights * y + (!(is_correction)) * 0.5 * nvars/nobs)/weights.adj
+                weights.adj <- weights + (!(is_correction)) * adj
+                y.adj <- (weights * y + (!(is_correction)) * 0.5 * adj)/weights.adj                
             }
             else {
                 weights.adj <- weights
-                y.adj <- y + if (family$family == "poisson") (!(is_correction)) * 0.5 * nvars/nobs else 0
+                y.adj <- y + if (family$family == "poisson") (!(is_correction)) * 0.5 * adj else 0
             }
             ## ML fit to get starting values
             warn <- getOption("warn")

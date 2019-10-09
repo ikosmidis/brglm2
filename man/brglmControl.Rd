@@ -6,38 +6,43 @@
 \title{Auxiliary function for \code{\link{glm}} fitting using the
 \code{\link{brglmFit}} method.}
 \usage{
-brglmControl(epsilon = 1e-08, maxit = 100, trace = FALSE,
+brglmControl(epsilon = 1e-06, maxit = 100, trace = FALSE,
   type = c("AS_mixed", "AS_mean", "AS_median", "correction", "ML"),
-  transformation = "identity", slowit = 1, max_step_factor = 12)
+  transformation = "identity", slowit = 1,
+  response_adjustment = NULL, max_step_factor = 12)
 
-brglm_control(epsilon = 1e-08, maxit = 100, trace = FALSE,
+brglm_control(epsilon = 1e-06, maxit = 100, trace = FALSE,
   type = c("AS_mixed", "AS_mean", "AS_median", "correction", "ML"),
-  transformation = "identity", slowit = 1, max_step_factor = 12)
+  transformation = "identity", slowit = 1,
+  response_adjustment = NULL, max_step_factor = 12)
 }
 \arguments{
-\item{epsilon}{positive convergence tolerance epsilon.}
+\item{epsilon}{positive convergence tolerance epsilon. Default is \code{1e-06}.}
 
 \item{maxit}{integer giving the maximal number of iterations
-allowed.}
+allowed. Default is \code{100}.}
 
 \item{trace}{logical indicating if output should be produced for
-each iteration.}
+each iteration. Default is \code{FALSE}.}
 
 \item{type}{the type of fitting method to be used. The options are
 \code{AS_mean} (mean-bias reducing adjusted scores),
 \code{AS_median} (median-bias reducting adjusted scores),
-\code{AS_mixed} (bias reduction using mixed score adjustents; default),
-\code{correction} (asymptotic bias correction) and \code{ML}
-(maximum likelihood).}
+\code{AS_mixed} (bias reduction using mixed score adjustents;
+default), \code{correction} (asymptotic bias correction) and
+\code{ML} (maximum likelihood).}
 
 \item{transformation}{the transformation of the dispersion to be
 estimated. Default is \code{identity}. See Details.}
 
 \item{slowit}{a positive real used as a multiplier for the
-stepsize. The smaller it is the smaller the steps are.}
+stepsize. The smaller it is the smaller the steps are. Default is \code{1}.}
+
+\item{response_adjustment}{a (small) positive constant or a vector
+of such. Default is \code{NULL}. See Details.}
 
 \item{max_step_factor}{the maximum number of step halving steps to
-consider.}
+consider. Default is \code{12}.}
 }
 \value{
 a list with components named as the arguments, including
@@ -64,6 +69,21 @@ be used to construct a \code{control} argument.
      and "inverseSqrt". Custom transformations are accommodated by
      supplying a list of two expressions (transformation and
      inverse transformation). See the examples for more details.
+
+     The value of \code{response_adjustment} is only relevant if
+     \code{start = NULL}, and \code{family} is
+     \code{\link{binomial}} or \code{\link{poisson}} in
+     \code{\link{brglmFit}}. For those models, an initial maximum
+     likelihood fit is obtained on adjusted data to provide
+     starting values for the iteration in \code{brglmFit}. The
+     value of \code{response_adjustment} governs how the data is
+     adjusted. Specifically, if \code{family} is \code{binomial},
+     then the responses and totals are adjusted by and \code{2 *
+     response_adjustment}, respectively; if \code{family} is
+     \code{poisson}, then the responses are adjusted by and
+     \code{response_adjustment}. \code{response_adjustment =
+     NULL} (default) is equivalent to setting it to "number of parameters"/"number of observations".
+     
 
 \code{brglm_control} is an alias to \code{brglmControl}.
 }
