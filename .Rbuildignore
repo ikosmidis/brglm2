@@ -19,3 +19,5 @@ vignettes/iteration.pdf
 ^\._*
 ^.*\.Rproj$
 ^\.Rproj\.user$
+
+anova.R
