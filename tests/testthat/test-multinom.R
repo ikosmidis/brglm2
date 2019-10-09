@@ -1,5 +1,7 @@
 context("tests for brmultinom and its agreement with other methods")
 
+## pmlr needs to be installed from the archive
+## install.packages("https://cran.r-project.org/src/contrib/Archive/pmlr/pmlr_1.0.tar.gz", repos = NULL)
 library("pmlr")
 library("nnet")
 

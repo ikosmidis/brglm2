@@ -2,6 +2,10 @@
 ## Bug fixes
 * `print.brmultinom` is now exported, so `bracl` and `brmultinom` fits print correctly
 
+## Other improvements, updates and additions
+* Documentation updates and improvements
+* Added Kosmidis et al (2019) in the description file
+
 # brglm 0.5.1
 
 ## Other improvements, updates and additions
