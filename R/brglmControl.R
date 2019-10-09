@@ -59,9 +59,9 @@
 #'      inverse transformation). See the examples for more details.
 #'
 #'      The value of \code{response_adjustment} is only relevant if
-#'      \code{start = NULL}, and \code{family} is
-#'      \code{\link{binomial}} or \code{\link{poisson}} in
-#'      \code{\link{brglmFit}}. For those models, an initial maximum
+#'      \code{\link{brglmFit}} is called with \code{start = NULL}, and
+#'      \code{family} is \code{\link{binomial}} or
+#'      \code{\link{poisson}}. For those models, an initial maximum
 #'      likelihood fit is obtained on adjusted data to provide
 #'      starting values for the iteration in \code{brglmFit}. The
 #'      value of \code{response_adjustment} governs how the data is
@@ -69,8 +69,9 @@
 #'      then the responses and totals are adjusted by and \code{2 *
 #'      response_adjustment}, respectively; if \code{family} is
 #'      \code{poisson}, then the responses are adjusted by and
-#'      \code{response_adjustment}. \code{response_adjustment =
-#'      NULL} (default) is equivalent to setting it to "number of parameters"/"number of observations".
+#'      \code{response_adjustment}. \code{response_adjustment = NULL}
+#'      (default) is equivalent to setting it to
+#'      "number of parameters"/"number of observations". 
 #'      
 #'
 #' \code{brglm_control} is an alias to \code{brglmControl}.

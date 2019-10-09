@@ -935,7 +935,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## Convergence analysis
         if ((failed | iter >= control$maxit) & !(is_correction)) {
             warning("brglmFit: algorithm did not converge", call. = FALSE)
-            converged <- FALSE
+            converged <- FALSE            
         }
         else {
             converged <- TRUE

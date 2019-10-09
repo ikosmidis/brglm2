@@ -12,7 +12,7 @@ outcome <- gl(3,1,9)
 treatment <- gl(3,3)
 dobson <- data.frame(counts, outcome, treatment)
 
-tol <- sqrt(.Machine$double.eps)
+tol <- 1e-06
 
 test_that("MBR estimates and std. errors from brglmFit and from mbrpr are the same for poisson", {
     expect_warning(
