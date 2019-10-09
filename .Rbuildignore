@@ -21,3 +21,4 @@ vignettes/iteration.pdf
 ^\.Rproj\.user$
 
 anova.R
+^CRAN-RELEASE$
