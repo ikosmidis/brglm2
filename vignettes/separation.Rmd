@@ -1,6 +1,6 @@
 ---
 title: "Detecting separation and infinite estimates in binomial response GLMs"
-author: "[Ioannis Kosmidis](http://www.ucl.ac.uk/~ucakiko/)"
+author: "[Ioannis Kosmidis](http://www.ikosmidis.com)"
 date: "16 May 2017"
 output: rmarkdown::html_vignette
 bibliography: brglm2.bib

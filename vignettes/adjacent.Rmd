@@ -1,6 +1,6 @@
 ---
 title: "Adjacent category logit models using **brglm2**"
-author: "[Ioannis Kosmidis](http://www.ucl.ac.uk/~ucakiko/)"
+author: "[Ioannis Kosmidis](http://www.ikosmidis.com)"
 date: "05 February 2019"
 output: rmarkdown::html_vignette
 bibliography: brglm2.bib

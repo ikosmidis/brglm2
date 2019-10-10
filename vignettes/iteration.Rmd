@@ -1,6 +1,6 @@
 ---
 title: "Bias reduction in generalized linear models"
-author: "[Ioannis Kosmidis](http://www.ucl.ac.uk/~ucakiko/), [Euloge Clovis Kenne Pagui](http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home) and [Nicola Sartori](https://homes.stat.unipd.it/nicolasartori/)"
+author: "[Ioannis Kosmidis](http://www.ikosmidis.com), [Euloge Clovis Kenne Pagui](http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home) and [Nicola Sartori](https://homes.stat.unipd.it/nicolasartori/)"
 date: "29 April 2017"
 output: rmarkdown::html_vignette
 bibliography: brglm2.bib
@@ -49,7 +49,7 @@ package. @kosmidis:10 describe a parallel
 quasi [Newton-Raphson](https://en.wikipedia.org/wiki/Newton%27s_method)
 procedure.
 
-Most of the material in this vignette comes from a presentation by [Ioannis Kosmidis](https://www.ucl.ac.uk/~ucakiko/) at the [useR! 2016 international R User conference](http://user2016.org) at University of Stanford on 16 June 2016. The presentation was titled "Reduced-bias inference in generalized linear models" and can be watched online at this [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
+Most of the material in this vignette comes from a presentation by [Ioannis Kosmidis](http://www.ikosmidis.com) at the useR! 2016 international conference at University of Stanford on 16 June 2016. The presentation was titled "Reduced-bias inference in generalized linear models" and can be watched online at this [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
 
 # Generalized linear models
 
@@ -266,6 +266,9 @@ where $[A]_j$ denotes the $j$th row of matrix $A$ as a column vector, $v'_i = V'
 # Contributions to this vignette
 
 The first version of the vignette has been written by Ioannis Kosmidis. Eugene Clovis Kenne Pagui and Nicola Sartori contributed the first version of the section "Median bias-reducing adjusted score functions", and Ioannis Kosmidis brought the expressions for the median bias-reducing adjustments in the reduced form that is shown above and is implemented in `brglmFit`.
+
+@kosmidis:2019 provides more details about mean and median bias reduction in generalized linear models.
+
 
 # Citation
 If you found this vignette or **brglm2**, in general, useful, please consider citing **brglm2** and the associated paper. You can find information on how to do this by typing `citation("brglm2")`.
