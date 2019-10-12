@@ -9,12 +9,12 @@
 brglmControl(epsilon = 1e-06, maxit = 100, trace = FALSE,
   type = c("AS_mixed", "AS_mean", "AS_median", "correction",
   "MPL_Jeffreys", "ML"), transformation = "identity", slowit = 1,
-  response_adjustment = NULL, max_step_factor = 12)
+  response_adjustment = NULL, max_step_factor = 12, a = 1/2)
 
 brglm_control(epsilon = 1e-06, maxit = 100, trace = FALSE,
   type = c("AS_mixed", "AS_mean", "AS_median", "correction",
   "MPL_Jeffreys", "ML"), transformation = "identity", slowit = 1,
-  response_adjustment = NULL, max_step_factor = 12)
+  response_adjustment = NULL, max_step_factor = 12, a = 1/2)
 }
 \arguments{
 \item{epsilon}{positive convergence tolerance epsilon. Default is
@@ -90,6 +90,18 @@ be used to construct a \code{control} argument.
      (default) is equivalent to setting it to
      "number of parameters"/"number of observations". 
 
+. .  When \code{type = "AS_mixed"} (default), mean bias reduction is
+    used for the regression parameters, and median bias reduction
+    for the dispersion parameter, if that is not fixed. This
+    adjustment has been developed based on equivariance arguments
+    (see, Kosmidis et al, 2019, Section 4) in order to produce
+    regression parameter estimates that are invariant to arbitraty
+    contrasts, and estimates for the dispersion parameter that are
+    invariant to arbitrary non-linear transformations. \code{type =
+    "AS_mixed"} and \code{type = "AS_mean"} return the same results
+    if \code{brglmFit} is called with \code{family} \code{binomial}
+    or \code{poisson} (i.e. families with fixed dispersion). 
+
      When \code{type = "MPL_Jeffreys"}, \code{brglmFit} will
      maximize the penalized log-likelihood
      \deqn{l(\beta, \phi) + a\log \det i(\beta, \phi)}{l(beta, phi) + a log det i(beta, phi)} where \eqn{i(\beta, \phi)}{i(beta, phi)}
@@ -98,16 +110,16 @@ be used to construct a \code{control} argument.
      \eqn{\phi}. See, \code{vignette("iteration", "brglm2")} for more
      information. The argument $a$ controls the amount of
      penalization and its default value is \code{a = 1/2},
-     corresponding to maximum penalized likelihod using a
+     corresponding to maximum penalized likelihood using a
      Jeffreys-prior penalty. See, Kosmidis & Firth (2019) for
      proofs and discussion about the finiteness and shrinkage
      properties of the maximum penalized likelihood estimators for
      binomial-response generalized linear models.
 
      The estimates from \code{type = "AS_mean"} and \code{type =
-     "MPL_Jeffreys"} with \code{a = 1/2} are identical for Poisson
-     log-linear models and logistic regression models, i.e. for
-     binomial and poisson regression models with canonical
+     "MPL_Jeffreys"} with \code{a = 1/2} (default) are identical
+     for Poisson log-linear models and logistic regression models,
+     i.e. for binomial and Poisson regression models with canonical
      links. See, Firth (1993) for details.
      
 \code{brglm_control} is an alias to \code{brglmControl}.

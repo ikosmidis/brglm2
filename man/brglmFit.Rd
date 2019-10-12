@@ -107,15 +107,21 @@ response generalized linear models).
 
 The type of the bias-reducing adjustment to be used is specified
 through the \code{type} argument (see \code{\link{brglmControl}}
-for details). The default is to use the mean bias-reducing
-adjustsments in Firth (1993) and Kosmidis & Firth (2009)
-(\code{type = "AS_mean"}). The other possibilities for \code{type},
-as detailed in \code{\link{brglmControl}}, are \code{AS_median}
-(median-bias reducting adjusted scores), \code{AS_mixed} (bias
-reduction using mixed score adjustents; default), \code{correction}
-(asymptotic bias correction), \code{MPL_Jeffreys} (maximum
-penalized likelihood with Jeffreys-prior penalty), and\code{ML}
-(maximum likelihood).
+for details). The default is to use the mixed bias-reducing
+adjustment in Kosmidis et al (2019) (\code{type = "AS_mixed"}) that
+result in mean bias reduction for the regression parameters and
+median bias reduction for the dispersion parameter, if any. 
+
+The other possibilities for \code{type}, as detailed in
+\code{\link{brglmControl}}, are \code{type = "AS_mean"} (mean
+bias-reducing adjustments in Firth, 1993 and Kosmidis & Firth,
+2009; \code{type = "AS_mixed"} and \code{type = "AS_mean"} will
+return the same results when \code{family} is \code{binomial} or
+\code{poisson}, i.e. when the dispersion is fixed),
+\code{AS_median} (median-bias reducting adjusted scores),
+\code{correction} (asymptotic bias correction), \code{MPL_Jeffreys}
+(maximum penalized likelihood with Jeffreys-prior penalty),
+and \code{ML} (maximum likelihood).
 
 The null deviance is evaluated based on the fitted values using the
     method specified by the \code{type} argument (see
@@ -132,7 +138,7 @@ The description of \code{method} argument and the \code{Fitting
 functions} section in \code{\link{glm}} gives information on
 supplying fitting methods to \code{\link{glm}}.
 
-\code{fixed_totals} can be used to constrain the means of a poisson
+\code{fixed_totals} can be used to constrain the means of a Poisson
 model to add up to the corresponding observed counts according to
 
 \code{brglm_fit} is an alias to \code{brglmFit}.
@@ -156,6 +162,28 @@ summary(lizardsML)
 summary(lizardsBR_median)
 summary(lizardsBR_mean)
 
+# Maximum penalized likelihood with Jeffreys prior penatly
+lizards_Jeffreys <- glm(cbind(grahami, opalinus) ~ height + diameter +
+                        light + time, family = binomial(logit), data = lizards,
+                        method = "brglmFit", type = "MPL_Jeffreys")
+# lizards_Jeffreys is the same fit as lizardsBR_mean (see Firth, 1993)
+all.equal(coef(lizardsBR_mean), coef(lizards_Jeffreys))
+
+# Maximum penalized likelihood with powers of Jeffreys-prior
+# penalty, and shrinkage. See Kosmidis & Firth (2019) for the
+# finiteness and shrinkage properties of the maximum penalized
+# likelihood estimators in binomial response models
+a <- c(0, 1/2, 1, 2^(1:7))
+coefs <- sapply(a, function(a) {
+      out <- glm(cbind(grahami, opalinus) ~ height + diameter +
+             light + time, family = binomial(logit), data = lizards,
+             method = "brglmFit", type = "MPL_Jeffreys", a = a,
+             slowit = 0.5, start = coef(lizards_Jeffreys))
+      coef(out)
+})
+# Illustration of shrinkage as a grows
+matplot(log(a), t(coefs), type = "l", col = 1, lty = 1)
+abline(0, 0, col = "grey")
 
 ## Another example from
 ## King, Gary, James E. Alt, Nancy Elizabeth Burns and Michael Laver
