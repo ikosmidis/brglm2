@@ -7,17 +7,18 @@
 \code{\link{brglmFit}} method.}
 \usage{
 brglmControl(epsilon = 1e-06, maxit = 100, trace = FALSE,
-  type = c("AS_mixed", "AS_mean", "AS_median", "correction", "ML"),
-  transformation = "identity", slowit = 1,
+  type = c("AS_mixed", "AS_mean", "AS_median", "correction",
+  "MPL_Jeffreys", "ML"), transformation = "identity", slowit = 1,
   response_adjustment = NULL, max_step_factor = 12)
 
 brglm_control(epsilon = 1e-06, maxit = 100, trace = FALSE,
-  type = c("AS_mixed", "AS_mean", "AS_median", "correction", "ML"),
-  transformation = "identity", slowit = 1,
+  type = c("AS_mixed", "AS_mean", "AS_median", "correction",
+  "MPL_Jeffreys", "ML"), transformation = "identity", slowit = 1,
   response_adjustment = NULL, max_step_factor = 12)
 }
 \arguments{
-\item{epsilon}{positive convergence tolerance epsilon. Default is \code{1e-06}.}
+\item{epsilon}{positive convergence tolerance epsilon. Default is
+\code{1e-06}.}
 
 \item{maxit}{integer giving the maximal number of iterations
 allowed. Default is \code{100}.}
@@ -29,20 +30,24 @@ each iteration. Default is \code{FALSE}.}
 \code{AS_mean} (mean-bias reducing adjusted scores),
 \code{AS_median} (median-bias reducting adjusted scores),
 \code{AS_mixed} (bias reduction using mixed score adjustents;
-default), \code{correction} (asymptotic bias correction) and
-\code{ML} (maximum likelihood).}
+default), \code{correction} (asymptotic bias correction),
+\code{MPL_Jeffreys} (maximum penalized likelihood with
+Jeffreys-prior penalty) and\code{ML} (maximum likelihood).}
 
 \item{transformation}{the transformation of the dispersion to be
 estimated. Default is \code{identity}. See Details.}
 
 \item{slowit}{a positive real used as a multiplier for the
-stepsize. The smaller it is the smaller the steps are. Default is \code{1}.}
+stepsize. The smaller it is the smaller the steps are. Default
+is \code{1}.}
 
 \item{response_adjustment}{a (small) positive constant or a vector
 of such. Default is \code{NULL}. See Details.}
 
 \item{max_step_factor}{the maximum number of step halving steps to
 consider. Default is \code{12}.}
+
+\item{a}{power of the Jeffreys-prior penanlty. See Details.}
 }
 \value{
 a list with components named as the arguments, including
@@ -84,8 +89,27 @@ be used to construct a \code{control} argument.
      \code{response_adjustment}. \code{response_adjustment = NULL}
      (default) is equivalent to setting it to
      "number of parameters"/"number of observations". 
-     
 
+     When \code{type = "MPL_Jeffreys"}, \code{brglmFit} will
+     maximize the penalized log-likelihood
+     \deqn{l(\beta, \phi) + a\log \det i(\beta, \phi)}{l(beta, phi) + a log det i(beta, phi)} where \eqn{i(\beta, \phi)}{i(beta, phi)}
+     is the expected information matrix about the regression
+     parameters \eqn{\beta} and the dispersion parameter
+     \eqn{\phi}. See, \code{vignette("iteration", "brglm2")} for more
+     information. The argument $a$ controls the amount of
+     penalization and its default value is \code{a = 1/2},
+     corresponding to maximum penalized likelihod using a
+     Jeffreys-prior penalty. See, Kosmidis & Firth (2019) for
+     proofs and discussion about the finiteness and shrinkage
+     properties of the maximum penalized likelihood estimators for
+     binomial-response generalized linear models.
+
+     The estimates from \code{type = "AS_mean"} and \code{type =
+     "MPL_Jeffreys"} with \code{a = 1/2} are identical for Poisson
+     log-linear models and logistic regression models, i.e. for
+     binomial and poisson regression models with canonical
+     links. See, Firth (1993) for details.
+     
 \code{brglm_control} is an alias to \code{brglmControl}.
 }
 \examples{
@@ -109,6 +133,14 @@ my_transformation <- list(expression(dispersion^0.25), expression(transformed_di
 coalitionBRc <- update(coalitionBRi, transformation = my_transformation)
 coef(coalitionBRc, model = "dispersion")
 
+}
+\references{
+Firth D (1993). Bias reduction of maximum likelihood estimates.
+Biometrika, **80**, 27-38
+
+Kosmidis I and Firth D (2019). Jeffreys-prior penalty, finiteness
+and shrinkage in binomial-response generalized linear
+models. *arXiv e-prints*, arXiv:1812.01938
 }
 \seealso{
 \code{\link{brglm_fit}} and \code{\link{glm.fit}}

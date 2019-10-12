@@ -74,13 +74,15 @@ argument if it is not supplied directly.}
 that fits generalized linear models using implicit and explicit
 bias reduction methods (Kosmidis, 2014). Currently supported
 methods include the mean bias-reducing adjusted scores approach in
-Firth (1993) and Kosmidis \& Firth (2009), the median
-bias-reduction adjusted scores approach in Kenne et al. (2016), the
-correction of the asymptotic bias in Cordeiro & McCullagh (1991),
-and maximum likelihood. Estimation is performed using a quasi
-Fisher scoring iteration, which, in the case of mean-bias
-reduction, resembles an iterative correction of the asymptotic bias
-of the Fisher scoring iterates.
+Firth (1993) and Kosmidis & Firth (2009), the median bias-reduction
+adjusted scores approach in Kenne et al. (2016), the correction of
+the asymptotic bias in Cordeiro & McCullagh (1991), the mixed
+bias-reuction adjusted scores approach in Kosmidis et al (2019),
+maximum penalized likelihood with Jeffreys-prior penalties, and
+maximum likelihood. Estimation is performed using a quasi Fisher
+scoring iteration, which, in the case of mean-bias reduction,
+resembles an iterative correction of the asymptotic bias of the
+Fisher scoring iterates.
 }
 \details{
 A detailed description of the supported adjustments and the quasi
@@ -106,8 +108,14 @@ response generalized linear models).
 The type of the bias-reducing adjustment to be used is specified
 through the \code{type} argument (see \code{\link{brglmControl}}
 for details). The default is to use the mean bias-reducing
-adjustsments in Firth (1993) and Kosmidis \& Firth (2009)
-(\code{type = "AS_mean"}).
+adjustsments in Firth (1993) and Kosmidis & Firth (2009)
+(\code{type = "AS_mean"}). The other possibilities for \code{type},
+as detailed in \code{\link{brglmControl}}, are \code{AS_median}
+(median-bias reducting adjusted scores), \code{AS_mixed} (bias
+reduction using mixed score adjustents; default), \code{correction}
+(asymptotic bias correction), \code{MPL_Jeffreys} (maximum
+penalized likelihood with Jeffreys-prior penalty), and\code{ML}
+(maximum likelihood).
 
 The null deviance is evaluated based on the fitted values using the
     method specified by the \code{type} argument (see
@@ -193,7 +201,7 @@ summary(anorexBR_mean)
 summary(anorexBR_median)
 }
 
-## endometrial data from Heinze \\& Schemper (2002) (see ?endometrial)
+## endometrial data from Heinze & Schemper (2002) (see ?endometrial)
 data("endometrial", package = "brglm2")
 endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
                      family = binomial("probit"))
@@ -214,14 +222,14 @@ Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
 reduction in generalized linear models. *arXiv e-prints*,
 arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
 
-Cordeiro G. M. & McCullagh, P. (1991). Bias correction in generalized
+Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
 linear models. *Journal of the Royal Statistical Society. Series B
 (Methodological)*, **53**, 629-643
 
-Firth D. (1993). Bias reduction of maximum likelihood estimates,
-Biometrika, **80**, 27-38
+Firth D (1993). Bias reduction of maximum likelihood estimates,
+Biometrika. **80**, 27-38
 
-Kenne Pagui, E. C., A. Salvan, and N. Sartori (2017). Median bias
+Kenne Pagui EC, Salvan A, and Sartori N (2017). Median bias
 reduction of maximum likelihood estimates. *Biometrika*, **104**,
 923–938
 
