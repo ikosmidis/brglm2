@@ -121,12 +121,16 @@
 #'
 #' @references
 #' 
-#' Firth D (1993). Bias reduction of maximum likelihood estimates.
-#' Biometrika, **80**, 27-38
+#' Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
+#' reduction in generalized linear models. *arXiv e-prints*,
+#' arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
 #'
 #' Kosmidis I and Firth D (2019). Jeffreys-prior penalty, finiteness
 #' and shrinkage in binomial-response generalized linear
 #' models. *arXiv e-prints*, arXiv:1812.01938
+#'
+#' #' Firth D (1993). Bias reduction of maximum likelihood estimates.
+#' Biometrika, **80**, 27-38
 #' 
 #' @examples
 #'
