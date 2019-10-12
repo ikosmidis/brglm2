@@ -78,7 +78,7 @@ Firth (1993) and Kosmidis & Firth (2009), the median bias-reduction
 adjusted scores approach in Kenne et al. (2016), the correction of
 the asymptotic bias in Cordeiro & McCullagh (1991), the mixed
 bias-reuction adjusted scores approach in Kosmidis et al (2019),
-maximum penalized likelihood with Jeffreys-prior penalties, and
+maximum penalized likelihood with powers of the Jeffreys prior as penalty, and
 maximum likelihood. Estimation is performed using a quasi Fisher
 scoring iteration, which, in the case of mean-bias reduction,
 resembles an iterative correction of the asymptotic bias of the
@@ -120,7 +120,7 @@ return the same results when \code{family} is \code{binomial} or
 \code{poisson}, i.e. when the dispersion is fixed),
 \code{AS_median} (median-bias reducting adjusted scores),
 \code{correction} (asymptotic bias correction), \code{MPL_Jeffreys}
-(maximum penalized likelihood with Jeffreys-prior penalty),
+(maximum penalized likelihood with powers of the Jeffreys prior as penalty),
 and \code{ML} (maximum likelihood).
 
 The null deviance is evaluated based on the fitted values using the
@@ -169,10 +169,10 @@ lizards_Jeffreys <- glm(cbind(grahami, opalinus) ~ height + diameter +
 # lizards_Jeffreys is the same fit as lizardsBR_mean (see Firth, 1993)
 all.equal(coef(lizardsBR_mean), coef(lizards_Jeffreys))
 
-# Maximum penalized likelihood with powers of Jeffreys-prior
-# penalty, and shrinkage. See Kosmidis & Firth (2019) for the
-# finiteness and shrinkage properties of the maximum penalized
-# likelihood estimators in binomial response models
+# Maximum penalized likelihood with powers of the Jeffreys prior as
+# penalty. See Kosmidis & Firth (2019) for the finiteness and
+# shrinkage properties of the maximum penalized likelihood
+# estimators in binomial response models
 a <- seq(0, 20, 0.5)
 coefs <- sapply(a, function(a) {
       out <- glm(cbind(grahami, opalinus) ~ height + diameter +

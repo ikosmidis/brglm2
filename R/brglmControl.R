@@ -33,8 +33,8 @@
 #'     \code{AS_median} (median-bias reducting adjusted scores),
 #'     \code{AS_mixed} (bias reduction using mixed score adjustents;
 #'     default), \code{correction} (asymptotic bias correction),
-#'     \code{MPL_Jeffreys} (maximum penalized likelihood with
-#'     Jeffreys-prior penalty) and\code{ML} (maximum likelihood).
+#'     \code{MPL_Jeffreys} (maximum penalized likelihood with powers of the
+#'     Jeffreys prior as penalty) and\code{ML} (maximum likelihood).
 #' @param transformation the transformation of the dispersion to be
 #'     estimated. Default is \code{identity}. See Details.
 #' @param slowit a positive real used as a multiplier for the
@@ -44,7 +44,7 @@
 #'     consider. Default is \code{12}.
 #' @param response_adjustment a (small) positive constant or a vector
 #'     of such. Default is \code{NULL}. See Details.
-#' @param a power of the Jeffreys-prior penanlty. See Details. 
+#' @param a power of the Jeffreys prior penalty. See Details. 
 #'
 #' @details \code{\link{brglmControl}} provides default values and
 #'     sanity checking for the various constants that control the

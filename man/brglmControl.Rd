@@ -31,8 +31,8 @@ each iteration. Default is \code{FALSE}.}
 \code{AS_median} (median-bias reducting adjusted scores),
 \code{AS_mixed} (bias reduction using mixed score adjustents;
 default), \code{correction} (asymptotic bias correction),
-\code{MPL_Jeffreys} (maximum penalized likelihood with
-Jeffreys-prior penalty) and\code{ML} (maximum likelihood).}
+\code{MPL_Jeffreys} (maximum penalized likelihood with powers of the
+Jeffreys prior as penalty) and\code{ML} (maximum likelihood).}
 
 \item{transformation}{the transformation of the dispersion to be
 estimated. Default is \code{identity}. See Details.}
@@ -47,7 +47,7 @@ of such. Default is \code{NULL}. See Details.}
 \item{max_step_factor}{the maximum number of step halving steps to
 consider. Default is \code{12}.}
 
-\item{a}{power of the Jeffreys-prior penanlty. See Details.}
+\item{a}{power of the Jeffreys prior penalty. See Details.}
 }
 \value{
 a list with components named as the arguments, including
