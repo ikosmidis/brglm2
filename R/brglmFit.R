@@ -180,16 +180,15 @@
 #' # penalty, and shrinkage. See Kosmidis & Firth (2019) for the
 #' # finiteness and shrinkage properties of the maximum penalized
 #' # likelihood estimators in binomial response models
-#' a <- c(0, 1/2, 1, 2^(1:7))
+#' a <- seq(0, 20, 0.5)
 #' coefs <- sapply(a, function(a) {
 #'       out <- glm(cbind(grahami, opalinus) ~ height + diameter +
 #'              light + time, family = binomial(logit), data = lizards,
-#'              method = "brglmFit", type = "MPL_Jeffreys", a = a,
-#'              slowit = 0.5, start = coef(lizards_Jeffreys))
+#'              method = "brglmFit", type = "MPL_Jeffreys", a = a) 
 #'       coef(out)
 #' })
 #' # Illustration of shrinkage as a grows
-#' matplot(log(a), t(coefs), type = "l", col = 1, lty = 1)
+#' matplot(a, t(coefs), type = "l", col = 1, lty = 1)
 #' abline(0, 0, col = "grey")
 #'
 #' ## Another example from
