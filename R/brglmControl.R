@@ -108,7 +108,7 @@
 #' @export
 brglmControl <- function(epsilon = 1e-06, maxit = 100,
                          trace = FALSE,
-                         type = c("AS_mixed", "AS_mean", "AS_median", "correction", "ML"),
+                         type = c("AS_mixed", "AS_mean", "AS_median", "correction", "MPL_Jeffreys", "ML"),
                          transformation = "identity",
                          slowit = 1,
                          response_adjustment = NULL,

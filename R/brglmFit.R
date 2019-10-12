@@ -420,6 +420,25 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
+    AS_Jeffreys_adjustment <- function(pars, level = 0, fit = NULL) {
+        if (is.null(fit)) {
+            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
+        }
+        with(fit, {
+            if (level == 0) {
+                hatvalues <- hat_values(pars, fit = fit)
+                ## Use only observations with keep = TRUE to ensure that no division with zero takes place
+                return(.colSums(0.5 * hatvalues * (2 * d2mus/d1mus - d1varmus * d1mus / varmus) * x, nobs, nvars, TRUE))
+            }
+            if (level == 1) {
+                s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
+                s2 <- sum(weights^2 * d2afuns, na.rm = TRUE)
+                return( -(nvars + 4)/(2 * dispersion) + s1/(2 * dispersion^2 * s2))
+            }
+        })
+    }
+
+    
     ## Implementation by Euloge Clovis Kenne Pagui, 20 April 2017 (kept here for testing)
     ## AS_median_adjustment <- function(pars, level = 0, fit = NULL) {
     ##     if (is.null(fit)) {
@@ -559,6 +578,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                             "AS_mean" = AS_mean_adjustment,
                             "AS_median" = AS_median_adjustment,
                             "AS_mixed" = AS_mixed_adjustment,
+                            "MPL_Jeffreys" = AS_Jeffreys_adjustment,
                             "ML" = function(pars, ...) 0)
 
     ## Some useful quantities
