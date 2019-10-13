@@ -18,19 +18,21 @@
 #' Fitting function for \code{\link{glm}} for reduced-bias
 #' estimation and inference
 #'
-#' \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
+#' \code{\link{brglmFit}} is a fitting method for \code{\link{glm}}
 #' that fits generalized linear models using implicit and explicit
-#' bias reduction methods (Kosmidis, 2014). Currently supported
-#' methods include the mean bias-reducing adjusted scores approach in
-#' Firth (1993) and Kosmidis & Firth (2009), the median bias-reduction
-#' adjusted scores approach in Kenne et al. (2016), the correction of
-#' the asymptotic bias in Cordeiro & McCullagh (1991), the mixed
-#' bias-reuction adjusted scores approach in Kosmidis et al (2019),
-#' maximum penalized likelihood with powers of the Jeffreys prior as penalty, and
-#' maximum likelihood. Estimation is performed using a quasi Fisher
-#' scoring iteration, which, in the case of mean-bias reduction,
-#' resembles an iterative correction of the asymptotic bias of the
-#' Fisher scoring iterates.
+#' bias reduction methods (Kosmidis, 2014), and other penalized
+#' maximum likleihood methods. Currently supported methods include the
+#' mean bias-reducing adjusted scores approach in Firth (1993) and
+#' Kosmidis & Firth (2009), the median bias-reduction adjusted scores
+#' approach in Kenne et al. (2016), the correction of the asymptotic
+#' bias in Cordeiro & McCullagh (1991), the mixed bias-reduction
+#' adjusted scores approach in Kosmidis et al (2019), maximum
+#' penalized likelihood with powers of the Jeffreys prior as penalty,
+#' and maximum likelihood. Estimation is performed using a quasi
+#' Fisher scoring iteration (see \code{vignette("iteration",
+#' "brglm2")}), which, in the case of mean-bias reduction, resembles
+#' an iterative correction of the asymptotic bias of the Fisher
+#' scoring iterates.
 #'
 #' @inheritParams stats::glm.fit
 #' @aliases brglm_fit
@@ -62,9 +64,9 @@
 #'
 #' A detailed description of the supported adjustments and the quasi
 #' Fisher scoring iteration is given in the iteration vignette (see,
-#' Kosmidis et al, 2018).  A shorter description of the quasi Fisher
-#' scoring iteration is also given in one of the vignettes of the
-#' *enrichwith* R package (see,
+#' \code{vignette("iteration", "brglm2")} or Kosmidis et al, 2019).  A
+#' shorter description of the quasi Fisher scoring iteration is also
+#' given in one of the vignettes of the *enrichwith* R package (see,
 #' \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
 #' Kosmidis and Firth (2010) describe a parallel quasi Newton-Raphson
 #' iteration with the same stationary point.
@@ -74,18 +76,18 @@
 #' approach returns estimates with improved frequentist properties,
 #' that are also always finite, even in cases where the maximum
 #' likelihood estimates are infinite (e.g. complete and quasi-complete
-#' separation in multinomial regression; see also
+#' separation in multinomial regression). See, also,
 #' \code{\link{detect_separation}} and
 #' \code{\link{check_infinite_estimates}} for pre-fit and post-fit
 #' methods for the detection of infinite estimates in binomial
-#' response generalized linear models).
+#' response generalized linear models.
 #'
-#' The type of the bias-reducing adjustment to be used is specified
-#' through the \code{type} argument (see \code{\link{brglmControl}}
-#' for details). The default is to use the mixed bias-reducing
-#' adjustment in Kosmidis et al (2019) (\code{type = "AS_mixed"}) that
-#' result in mean bias reduction for the regression parameters and
-#' median bias reduction for the dispersion parameter, if any. 
+#' The type of score adjustment to be used is specified through the
+#' \code{type} argument (see \code{\link{brglmControl}} for
+#' details). The default is to use the mixed bias-reducing adjustment
+#' in Kosmidis et al (2019) (\code{type = "AS_mixed"}) that result in
+#' mean bias reduction for the regression parameters and median bias
+#' reduction for the dispersion parameter, if any.
 #'
 #' The other possibilities for \code{type}, as detailed in
 #' \code{\link{brglmControl}}, are \code{type = "AS_mean"} (mean
@@ -104,17 +106,22 @@
 #'
 #' The \code{family} argument of the current version of
 #' \code{brglmFit} can accept any combination of \code{\link{family}}
-#' objects and link functions (including ones with user-specified link
-#' functions, \code{\link{mis}} links, and \code{\link{power}} links),
-#' except the \code{\link{quasi}}, \code{\link{quasipoisson}} and
-#' \code{\link{quasibinomial}} families.
+#' objects and link functions, including families with user-specified
+#' link functions, \code{\link{mis}} links, and \code{\link{power}}
+#' links, but excluding \code{\link{quasi}},
+#' \code{\link{quasipoisson}} and \code{\link{quasibinomial}}
+#' families.
 #'
 #' The description of \code{method} argument and the \code{Fitting
 #' functions} section in \code{\link{glm}} gives information on
 #' supplying fitting methods to \code{\link{glm}}.
 #'
-#' \code{fixed_totals} can be used to constrain the means of a Poisson
-#' model to add up to the corresponding observed counts according to
+#' \code{fixed_totals} to specify groups of observations for which the
+#' sum of the means of a Poisson model will be held fixed to the
+#' observed count for each group. This argument is used internally in
+#' \code{\link{brmultinom}} and \code{\link{bracl}} for
+#' baseline-category logit models and adjacent category logit models,
+#' respectively.
 #'
 #' \code{brglm_fit} is an alias to \code{brglmFit}.
 #'
@@ -180,6 +187,7 @@
 #' # penalty. See Kosmidis & Firth (2019) for the finiteness and
 #' # shrinkage properties of the maximum penalized likelihood
 #' # estimators in binomial response models
+#' \donttest{
 #' a <- seq(0, 20, 0.5)
 #' coefs <- sapply(a, function(a) {
 #'       out <- glm(cbind(grahami, opalinus) ~ height + diameter +
@@ -190,13 +198,14 @@
 #' # Illustration of shrinkage as a grows
 #' matplot(a, t(coefs), type = "l", col = 1, lty = 1)
 #' abline(0, 0, col = "grey")
-#'
+#'}
+#' 
 #' ## Another example from
 #' ## King, Gary, James E. Alt, Nancy Elizabeth Burns and Michael Laver
 #' ## (1990).  "A Unified Model of Cabinet Dissolution in Parliamentary
 #' ## Democracies", _American Journal of Political Science_, **34**, 846-870
 #'
-#' \dontrun{
+#' \donttest{
 #' data("coalition", package = "brglm2")
 #' # The maximum likelihood fit with log link
 #' coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
@@ -208,7 +217,7 @@
 #' coalitionBR_median <- update(coalitionML, method = "brglmFit", type = "AS_median")
 #' }
 #'
-#' \dontrun{
+#' \donttest{
 #' ## An example with offsets from Venables & Ripley (2002, p.189)
 #' data("anorexia", package = "MASS")
 #'

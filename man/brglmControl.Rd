@@ -28,8 +28,8 @@ each iteration. Default is \code{FALSE}.}
 
 \item{type}{the type of fitting method to be used. The options are
 \code{AS_mean} (mean-bias reducing adjusted scores),
-\code{AS_median} (median-bias reducting adjusted scores),
-\code{AS_mixed} (bias reduction using mixed score adjustents;
+\code{AS_median} (median-bias reducing adjusted scores),
+\code{AS_mixed} (bias reduction using mixed score adjustments;
 default), \code{correction} (asymptotic bias correction),
 \code{MPL_Jeffreys} (maximum penalized likelihood with powers of the
 Jeffreys prior as penalty) and\code{ML} (maximum likelihood).}
@@ -95,7 +95,7 @@ be used to construct a \code{control} argument.
     for the dispersion parameter, if that is not fixed. This
     adjustment has been developed based on equivariance arguments
     (see, Kosmidis et al, 2019, Section 4) in order to produce
-    regression parameter estimates that are invariant to arbitraty
+    regression parameter estimates that are invariant to arbitrary
     contrasts, and estimates for the dispersion parameter that are
     invariant to arbitrary non-linear transformations. \code{type =
     "AS_mixed"} and \code{type = "AS_mean"} return the same results
@@ -122,7 +122,7 @@ be used to construct a \code{control} argument.
      i.e. for binomial and Poisson regression models with canonical
      links. See, Firth (1993) for details.
      
-\code{brglm_control} is an alias to \code{brglmControl}.
+     \code{brglm_control} is an alias to \code{brglmControl}.
 }
 \examples{
 
