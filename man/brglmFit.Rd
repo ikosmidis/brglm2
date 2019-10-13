@@ -76,7 +76,7 @@ bias reduction methods (Kosmidis, 2014), and other penalized
 maximum likleihood methods. Currently supported methods include the
 mean bias-reducing adjusted scores approach in Firth (1993) and
 Kosmidis & Firth (2009), the median bias-reduction adjusted scores
-approach in Kenne et al. (2016), the correction of the asymptotic
+approach in Kenne Pagui et al. (2017), the correction of the asymptotic
 bias in Cordeiro & McCullagh (1991), the mixed bias-reduction
 adjusted scores approach in Kosmidis et al (2019), maximum
 penalized likelihood with powers of the Jeffreys prior as penalty,
@@ -109,21 +109,34 @@ response generalized linear models.
 
 The type of score adjustment to be used is specified through the
 \code{type} argument (see \code{\link{brglmControl}} for
-details). The default is to use the mixed bias-reducing adjustment
-in Kosmidis et al (2019) (\code{type = "AS_mixed"}) that result in
-mean bias reduction for the regression parameters and median bias
-reduction for the dispersion parameter, if any.
+details). The available options are
 
-The other possibilities for \code{type}, as detailed in
-\code{\link{brglmControl}}, are \code{type = "AS_mean"} (mean
-bias-reducing adjustments in Firth, 1993 and Kosmidis & Firth,
-2009; \code{type = "AS_mixed"} and \code{type = "AS_mean"} will
-return the same results when \code{family} is \code{binomial} or
-\code{poisson}, i.e. when the dispersion is fixed),
-\code{AS_median} (median-bias reducting adjusted scores),
-\code{correction} (asymptotic bias correction), \code{MPL_Jeffreys}
-(maximum penalized likelihood with powers of the Jeffreys prior as penalty),
-and \code{ML} (maximum likelihood).
+\itemize{
+
+\item \code{type = "AS_mixed"}: the mixed bias-reducing score adjustments in
+Kosmidis et al (2019) that result in mean bias reduction for the
+regression parameters and median bias reduction for the dispersion
+parameter, if any; default.
+
+\item \code{type = "AS_mean"}: the mean bias-reducing score adjustments
+in Firth, 1993 and Kosmidis & Firth, 2009. \code{type = "AS_mixed"}
+and \code{type = "AS_mean"} will return the same results when
+\code{family} is \code{binomial} or \code{poisson}, i.e. when the
+dispersion is fixed)
+
+\item \code{type = "AS_median"}: the median-bias reducing score
+adjustments in Kenne Pagui et al. (2017)
+
+\item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
+with powers of the Jeffreys prior as penalty.
+
+\item \code{type = "ML"}: maximum likelihood
+
+\item \code{type = "correction"}: asymptotic bias correction, as in
+Cordeiro & McCullagh (1991).
+
+}
+
 
 The null deviance is evaluated based on the fitted values using the
     method specified by the \code{type} argument (see
