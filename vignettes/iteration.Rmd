@@ -275,9 +275,9 @@ where $\rho = (\rho_1, \ldots, \rho_n)^T$ with $\rho_i = h_i \{2 d_i'/(d_i w_i) 
 
 # Notes
 
-+ For $K = M = 1$, $\beta^{(0)} = \hat\beta$ and $\phi^{(0)} = \hat\phi$, the above iteration computes the bias-corrected estimates proposed in @cordeiro:91. This is achieved with the `brglmFit` method is used with `type = "correction"` (see `?brglmFit`).
++ For $K = M = 1$, $\beta^{(0)} = \hat\beta$ and $\phi^{(0)} = \hat\phi$, the above iteration computes the bias-corrected estimates proposed in @cordeiro:91. This is achieved with the `brglmFit` method is called with `type = "correction"` (see `?brglmFit`).
 
-+ The mean-bias reducing adjusted score functions are solved when the `brglmFit` method is used with `type = "AS_mean"`, and the median-bias reducing adjusted score functions with `type = "AS_median"` (see `?brglmFit`). Estimation using mixed adjustments is through `type = "AS_mixed"`. `type = "MPL_Jeffreys"` does maximum penalized likelihood with a power of the the Jeffreys prior as penalty.
++ The mean-bias reducing adjusted score functions are solved when the `brglmFit` method is used with `type = "AS_mean"`, and the median-bias reducing adjusted score functions with `type = "AS_median"` (see `?brglmFit`). Estimation using mixed adjustments is through `type = "AS_mixed"`. `type = "MPL_Jeffreys"` does maximum penalized likelihood with a power of the Jeffreys prior as penalty.
 
 + The steps where $\phi$ and the $\phi$ direction are updated are ignored for generalized linear models with known dispersion parameter, like in models with binomial and Poisson responses. Also, in that case, $v_\phi^{(.)}$ and $\upsilon_\phi^{(.)}$ in steps 9, 14 and 16 are set to zero.
 
