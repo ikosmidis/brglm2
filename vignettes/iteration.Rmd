@@ -21,16 +21,11 @@ knitr::opts_chunk$set(
 
 # The **brglm2** package
 
-[**brglm2**](https://github.com/ikosmidis/brglm2) provides tools for the estimation and inference from [generalized linear models](https://en.wikipedia.org/wiki/Generalized_linear_model) using various methods for bias reduction. Reduction of estimation bias is achieved either through the mean-bias reducing adjusted score equations in @firth:93 and @kosmidis:09, or through the direct subtraction of an estimate of the bias of the maximum likelihood estimator from the maximum likelihood estimates as prescribed in @cordeiro:91, or through the median-bias reducing adjusted score equations in @kenne:17.
+[**brglm2**](https://github.com/ikosmidis/brglm2) provides tools for the estimation and inference from [generalized linear models](https://en.wikipedia.org/wiki/Generalized_linear_model) using various methods for bias reduction or maximum penalized likelihood with powers of the Jeffreys prior as penalty. Reduction of estimation bias is achieved either through the mean-bias reducing adjusted score equations in @firth:93 and @kosmidis:09, or through the direct subtraction of an estimate of the bias of the maximum likelihood estimator from the maximum likelihood estimates as prescribed in @cordeiro:91, or through the median-bias reducing adjusted score equations in @kenne:17.
 
-In the special case of generalized linear models for binomial and multinomial responses, the adjusted score equations approach returns estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite, like in complete and quasi-complete separation as defined in @albert:84.
+In the special case of generalized linear models for binomial, Poisson and multinomial responses (both nominal and ordinal), mean and median bias reduction and maximum penalized likelihood return estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite, like in complete and quasi-complete separation as defined in @albert:84.
 
-The workhorse function is [`brglmFit`](https://cran.r-project.org/package=brglm2/brglm2.pdf), which can be passed directly to the `method` argument of the `glm` function. `brglmFit` implements a quasi
-[Fisher scoring](https://en.wikipedia.org/wiki/Scoring_algorithm)
-procedure, whose special cases result in various explicit and implicit
-bias reduction methods for generalized linear models [the
-classification of bias reduction methods into explicit and implicit is
-given in @kosmidis:14].
+The workhorse function is [`brglmFit`](https://cran.r-project.org/package=brglm2/brglm2.pdf), which can be passed directly to the `method` argument of the `glm` function. `brglmFit` implements a quasi-[Fisher scoring](https://en.wikipedia.org/wiki/Scoring_algorithm) procedure, whose special cases result in various explicit and implicit bias reduction methods for generalized linear models [the classification of bias reduction methods into explicit and implicit is given in @kosmidis:14].
 
 # This vignette
 
@@ -41,13 +36,7 @@ This vignette
 
 # Other resources
 
-The bias-reducing quasi Fisher scoring iteration is also described in
-detail in the
-[bias vignette](https://cran.r-project.org/package=enrichwith/vignettes/bias.html) of
-the [**enrichwith**](https://cran.r-project.org/package=enrichwith) R
-package. @kosmidis:10 describe a parallel
-quasi [Newton-Raphson](https://en.wikipedia.org/wiki/Newton%27s_method)
-procedure.
+The bias-reducing quasi Fisher scoring iteration is also described in detail in the [bias vignette](https://cran.r-project.org/package=enrichwith/vignettes/bias.html) of the [**enrichwith**](https://cran.r-project.org/package=enrichwith) R package. @kosmidis:10 describe a parallel quasi [Newton-Raphson](https://en.wikipedia.org/wiki/Newton%27s_method) procedure.
 
 Most of the material in this vignette comes from a presentation by [Ioannis Kosmidis](http://www.ikosmidis.com) at the useR! 2016 international conference at University of Stanford on 16 June 2016. The presentation was titled "Reduced-bias inference in generalized linear models" and can be watched online at this [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
 

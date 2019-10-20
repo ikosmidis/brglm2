@@ -21,15 +21,7 @@ knitr::opts_chunk$set(
 
 
 # **brmultinom**
-The [**brglm2**](https://github.com/ikosmidis/brglm2) R package
-provides `brmultinom` which is a wrapper of `brglmFit` for fitting
-multinomial logistic regression models (a.k.a. baseline category
-logit models) using either maximum likelihood or any of the various
-bias reduction methods described in `brglmFit`. `brmultinom` uses the
-equivalent Poisson log-linear model, by appropriately re-scaling the
-Poisson means to match the multinomial totals (a.k.a. the "Poisson
-trick"). The mathematical details and algorithm on using the Poisson
-trick for mean-bias reduction are given in @kosmidis:11.
+The [**brglm2**](https://github.com/ikosmidis/brglm2) R package provides `brmultinom` which is a wrapper of `brglmFit` for fitting multinomial logistic regression models (a.k.a. baseline category logit models) using either maximum likelihood or maximum penalized likelihood or any of the various bias reduction methods described in `brglmFit`. `brmultinom` uses the equivalent Poisson log-linear model, by appropriately re-scaling the Poisson means to match the multinomial totals (a.k.a. the "Poisson trick"). The mathematical details and algorithm on using the Poisson trick for mean-bias reduction are given in @kosmidis:11.
 
 This vignettes illustrates the use of `brmultinom` and of the associated methods, using the alligator food choice example in @agresti:02[, Section 7.1]
 
