@@ -1,5 +1,4 @@
 # Copyright (C) 2016-2019 Ioannis Kosmidis
-# function `AS_median_adjustment`: Copyright (C) 2017, Euloge Clovis Kenne Pagui, Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -21,7 +20,7 @@
 #' \code{\link{brglmFit}} is a fitting method for \code{\link{glm}}
 #' that fits generalized linear models using implicit and explicit
 #' bias reduction methods (Kosmidis, 2014), and other penalized
-#' maximum likleihood methods. Currently supported methods include the
+#' maximum likelihood methods. Currently supported methods include the
 #' mean bias-reducing adjusted scores approach in Firth (1993) and
 #' Kosmidis & Firth (2009), the median bias-reduction adjusted scores
 #' approach in Kenne Pagui et al. (2017), the correction of the asymptotic
