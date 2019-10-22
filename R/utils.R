@@ -22,3 +22,8 @@ unless_null <- function(x, if_null) {
     }
 }
 
+## named_list is the function namedList from utils.R of the ordinal R
+## package version 2019.4-25 by Rune Haubo Bojesen Christensen
+named_list <- function(...) {
+    setNames(list(...), nm=sapply(as.list(match.call()), deparse)[-1])
+}

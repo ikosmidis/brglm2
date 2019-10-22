@@ -272,7 +272,7 @@
 #' summary(endometrialBR_median)
 #'
 #' @export
-brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
+brglmFit2 <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
                       mustart = NULL, offset = rep(0, nobs), family = gaussian(),
                       control = list(), intercept = TRUE,
                       ## Arguments that glm will not use in its call to brglmFit (be wise with defaults!)
@@ -621,178 +621,15 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         out
     }
 
-    custom_transformation <- is.list(control$transformation) & length(control$transformation) == 2
-    if (custom_transformation) {
-        transformation0 <- control$transformation
-    }
-
-    control <- do.call("brglmControl", control)
-
-    ## FIXME: Add IBLA
-    adjustment_function <- switch(control$type,
-                            "correction" = AS_mean_adjustment,
-                            "AS_mean" = AS_mean_adjustment,
-                            "AS_median" = AS_median_adjustment,
-                            "AS_mixed" = AS_mixed_adjustment,
-                            "MPL_Jeffreys" = AS_Jeffreys_adjustment,
-                            "ML" = function(pars, ...) 0)
-
-    ## Some useful quantities
-    is_ML <- control$type == "ML"
-    is_AS_median <- control$type == "AS_median"
-    is_AS_mixed <- control$type == "AS_mixed"
-    is_correction <- control$type == "correction"
-    no_dispersion <- family$family %in% c("poisson", "binomial")
-
-
-    if (is_ML | is_AS_median | is_AS_mixed) {
-        transformation1 <- control$transformation
-        Trans1 <- control$Trans
-        inverseTrans1 <- control$inverseTrans
-        control$transformation <- "identity"
-        control$Trans <- expression(dispersion)
-        control$inverseTrans <- expression(transformed_dispersion)
-    }
-
-    has_fixed_totals <- FALSE
-    row_totals <- NULL 
-    if (isTRUE(family$family == "poisson" & !is.null(fixed_totals))) {
-        row_totals <-  as.vector(tapply(y, fixed_totals, sum))[fixed_totals]
-        has_fixed_totals <- TRUE
-    }
-        
-    ## Ensure x is a matrix, extract variable names, observation
-    ## names, nobs, nvars, and initialize weights and offsets if
-    ## needed
+    E <- set_brglmFit_env(y, x, weights, offset, family, fixed_totals, control)
     
-    x <- as.matrix(x)
-    betas_names <- dimnames(x)[[2L]]
-    ynames <- if (is.matrix(y)) rownames(y) else names(y)
-    converged <- FALSE
-    nobs <- NROW(y)
-    nvars <- ncol(x)
-    EMPTY <- nvars == 0
-    if (is.null(weights)) {
-        weights <- rep.int(1, nobs)
-    }
-    if (missing_offset <- is.null(offset)) {
-        offset <- rep.int(0, nobs)
-    }
-
-    ok_links <- c("logit", "probit", "cauchit",
-                  "cloglog", "identity", "log",
-                  "sqrt", "inverse")
-
-
-    if (isTRUE(family$family %in% c("quasi", "quasibinomial", "quasipoisson"))) {
-        stop("`brglmFit` does not currently support the `quasi`, `quasipoisson` and `quasibinomial` families.")
-    }
-
-    ## Enrich family
-    family <- enrichwith::enrich(family, with = c("d1afun", "d2afun", "d3afun", "d1variance"))
-    if ((family$link %in% ok_links) | (grepl("mu\\^", family$link))) {
-        ## Enrich the link object with d2mu.deta and update family object
-        linkglm <- make.link(family$link)
-        linkglm <- enrichwith::enrich(linkglm, with = "d2mu.deta")
-        ## Put everything into the family object
-        family[names(linkglm)] <- linkglm
-    }
-    ## Annoying thing is that link-glm components other than the
-    ## standard ones disappear when extra arguments are passed to a
-    ## family functions... Anyway, we only require d2mu.deta here.
-
-    ## Extract functions from the enriched family object
-    variance <- family$variance
-    d1variance <- family$d1variance
-    linkinv <- family$linkinv
-    linkfun <- family$linkfun
-    if (!is.function(variance) || !is.function(linkinv))
-        stop("'family' argument seems not to be a valid family object",
-             call. = FALSE)
-    dev.resids <- family$dev.resids
-    aic <- family$aic
-    mu.eta <- family$mu.eta
-    ## If the family is custom then d2mu.deta cannot survive when
-    ## passing throguh current family functions. But mu.eta does; so
-    ## we compute d2mu.deta numerically; this allows also generality,
-    ## as the users can then keep their custom link implementations
-    ## unaltered. Issue is scalability, due to the need of evaluating
-    ## n numerical derivatives
-    if (is.null(family$d2mu.deta)) {
-        d2mu.deta <- function(eta) {
-            numDeriv::grad(mu.eta, eta)
-        }
-    }
-    else {
-        d2mu.deta <- family$d2mu.deta
-    }
-    d1afun <- family$d1afun
-    d2afun <- family$d2afun
-    d3afun <- family$d3afun
-    simulate <- family$simulate
-    d1_transformed_dispersion <- DD(control$Trans, "dispersion", order = 1)
-    d2_transformed_dispersion <- DD(control$Trans, "dispersion", order = 2)
-
-
-    ## Check for invalid etas and mus
-    valid_eta <- unless_null(family$valideta, function(eta) TRUE)
-    valid_mu <- unless_null(family$validmu, function(mu) TRUE)
-
-    ## FIXME: mustart and etastart set to NULL by default
-    mustart <- NULL
-    etastart <- NULL
-
-    ## Initialize as prescribed in family
-    eval(family$initialize)
-
     ## If there are no covariates in the model then evaluate only the offset
-    if (EMPTY) {
-        etas <- rep.int(0, nobs) + offset
-        if (!valid_eta(etas))
-            stop("invalid linear predictor values in empty model", call. = FALSE)
-        mus <- linkinv(etas)
-        if (!valid_mu(mus))
-            stop("invalid fitted means in empty model", call. = FALSE)
-        ## deviance <- sum(dev.resids(y, mus, weights))
-        working_weights <- ((weights * mu.eta(etas)^2)/variance(mus))^0.5
-        residuals <- (y - mus)/mu.eta(etas)
-        keep <- rep(TRUE, length(residuals))
-        boundary <- converged <- TRUE
-        betas_all <- numeric()
-        rank <- 0
-        iter <- 0L
+    if (E$EMPTY) {
+        E <- prepare_empty_model(E)
     }
     else {
-        boundary <- converged <- FALSE
-        ## Detect aliasing
-        qrx <- qr(x)
-        rank <- qrx$rank
-        is_full_rank <- rank == nvars
-
-        if (!singular.ok && !is_full_rank) {
-            stop("singular fit encountered")
-        }
-        if (!isTRUE(is_full_rank)) {
-            aliased <- qrx$pivot[seq.int(qrx$rank + 1, nvars)]
-            X_all <- x
-            x <- x[, -aliased]
-            nvars_all <- nvars
-            nvars <- ncol(x)
-            betas_names_all <- betas_names
-            betas_names <- betas_names[-aliased]
-        }
-        else {
-            nvars_all <- nvars
-            betas_names_all <- betas_names
-        }
-        betas_all <- structure(rep(NA_real_, nvars_all), .Names = betas_names_all)
-        keep <- weights > 0
-        ## Check for zero weights
-        ## if (any(!keep)) {
-        ##     warning("Observations with non-positive weights have been omited from the computations")
-        ## }
-        nkeep <- sum(keep)
-        df_residual <- nkeep - rank
+        E <- check_aliasing(E)
+        
         ## Handle starting values
         ## If start is NULL then start at the ML estimator else use start
         if (is.null(start)) {
@@ -1023,9 +860,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             betas[is.na(betas)] <- 0
             nvars <- nvars_all
         }
-##:ess-bp-start::browser@nil:##
-browser(expr=is.null(.ESSBP.[["@10@"]]));##:ess-bp-end:##
-        
+
         ## If has_fixed_totals = TRUE, then scale fitted values before
         ## calculating QR decompositions, fitted values, etas,
         ## residuals and working_weights
