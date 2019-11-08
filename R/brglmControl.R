@@ -22,25 +22,29 @@
 #'
 #' @inheritParams stats::glm.control
 #' @aliases brglm_control
-#' @param epsilon positive convergence tolerance epsilon. Default is \code{1e-06}.
+#' @param epsilon positive convergence tolerance epsilon. Default is
+#'     \code{1e-06}.
 #' @param maxit integer giving the maximal number of iterations
 #'     allowed. Default is \code{100}.
 #' @param trace logical indicating if output should be produced for
 #'     each iteration. Default is \code{FALSE}.
 #' @param type the type of fitting method to be used. The options are
 #'     \code{AS_mean} (mean-bias reducing adjusted scores),
-#'     \code{AS_median} (median-bias reducting adjusted scores),
-#'     \code{AS_mixed} (bias reduction using mixed score adjustents;
-#'     default), \code{correction} (asymptotic bias correction) and
-#'     \code{ML} (maximum likelihood).
+#'     \code{AS_median} (median-bias reducing adjusted scores),
+#'     \code{AS_mixed} (bias reduction using mixed score adjustments;
+#'     default), \code{correction} (asymptotic bias correction),
+#'     \code{MPL_Jeffreys} (maximum penalized likelihood with powers of the
+#'     Jeffreys prior as penalty) and\code{ML} (maximum likelihood).
 #' @param transformation the transformation of the dispersion to be
 #'     estimated. Default is \code{identity}. See Details.
 #' @param slowit a positive real used as a multiplier for the
-#'     stepsize. The smaller it is the smaller the steps are. Default is \code{1}.
+#'     stepsize. The smaller it is the smaller the steps are. Default
+#'     is \code{1}.
 #' @param max_step_factor the maximum number of step halving steps to
 #'     consider. Default is \code{12}.
 #' @param response_adjustment a (small) positive constant or a vector
 #'     of such. Default is \code{NULL}. See Details.
+#' @param a power of the Jeffreys prior penalty. See Details. 
 #'
 #' @details \code{\link{brglmControl}} provides default values and
 #'     sanity checking for the various constants that control the
@@ -72,9 +76,40 @@
 #'      \code{response_adjustment}. \code{response_adjustment = NULL}
 #'      (default) is equivalent to setting it to
 #'      "number of parameters"/"number of observations". 
-#'      
 #'
-#' \code{brglm_control} is an alias to \code{brglmControl}.
+#'. .  When \code{type = "AS_mixed"} (default), mean bias reduction is
+#'     used for the regression parameters, and median bias reduction
+#'     for the dispersion parameter, if that is not fixed. This
+#'     adjustment has been developed based on equivariance arguments
+#'     (see, Kosmidis et al, 2019, Section 4) in order to produce
+#'     regression parameter estimates that are invariant to arbitrary
+#'     contrasts, and estimates for the dispersion parameter that are
+#'     invariant to arbitrary non-linear transformations. \code{type =
+#'     "AS_mixed"} and \code{type = "AS_mean"} return the same results
+#'     if \code{brglmFit} is called with \code{family} \code{binomial}
+#'     or \code{poisson} (i.e. families with fixed dispersion). 
+#' 
+#'      When \code{type = "MPL_Jeffreys"}, \code{brglmFit} will
+#'      maximize the penalized log-likelihood
+#'      \deqn{l(\beta, \phi) + a\log \det i(\beta, \phi)}{l(beta, phi) + a log det i(beta, phi)} where \eqn{i(\beta, \phi)}{i(beta, phi)}
+#'      is the expected information matrix about the regression
+#'      parameters \eqn{\beta} and the dispersion parameter
+#'      \eqn{\phi}. See, \code{vignette("iteration", "brglm2")} for more
+#'      information. The argument $a$ controls the amount of
+#'      penalization and its default value is \code{a = 1/2},
+#'      corresponding to maximum penalized likelihood using a
+#'      Jeffreys-prior penalty. See, Kosmidis & Firth (2019) for
+#'      proofs and discussion about the finiteness and shrinkage
+#'      properties of the maximum penalized likelihood estimators for
+#'      binomial-response generalized linear models.
+#' 
+#'      The estimates from \code{type = "AS_mean"} and \code{type =
+#'      "MPL_Jeffreys"} with \code{a = 1/2} (default) are identical
+#'      for Poisson log-linear models and logistic regression models,
+#'      i.e. for binomial and Poisson regression models with canonical
+#'      links. See, Firth (1993) for details.
+#'      
+#'      \code{brglm_control} is an alias to \code{brglmControl}.
 #'
 #' @return a list with components named as the arguments, including
 #'     symbolic expressions for the dispersion transformation
@@ -84,6 +119,19 @@
 #'
 #' @seealso \code{\link{brglm_fit}} and \code{\link{glm.fit}}
 #'
+#' @references
+#' 
+#' Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
+#' reduction in generalized linear models. *arXiv e-prints*,
+#' arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
+#'
+#' Kosmidis I and Firth D (2019). Jeffreys-prior penalty, finiteness
+#' and shrinkage in binomial-response generalized linear
+#' models. *arXiv e-prints*, arXiv:1812.01938
+#'
+#' #' Firth D (1993). Bias reduction of maximum likelihood estimates.
+#' Biometrika, **80**, 27-38
+#' 
 #' @examples
 #'
 #' data("coalition", package = "brglm2")
@@ -108,11 +156,12 @@
 #' @export
 brglmControl <- function(epsilon = 1e-06, maxit = 100,
                          trace = FALSE,
-                         type = c("AS_mixed", "AS_mean", "AS_median", "correction", "ML"),
+                         type = c("AS_mixed", "AS_mean", "AS_median", "correction", "MPL_Jeffreys", "ML"),
                          transformation = "identity",
                          slowit = 1,
                          response_adjustment = NULL,
-                         max_step_factor = 12) {
+                         max_step_factor = 12,
+                         a = 1/2) {
     type <- match.arg(type)
 
     if (is.character(transformation)) {
@@ -149,6 +198,7 @@ brglmControl <- function(epsilon = 1e-06, maxit = 100,
          inverseTrans = inverseTrans,
          transformation = transformation,
          slowit = slowit,
-         max_step_factor = max_step_factor)
+         max_step_factor = max_step_factor,
+         a = a)
 }
 

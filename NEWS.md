@@ -1,3 +1,12 @@
+## brglm 0.6
+## New functionality
+* `brglmFit` can now do maximum penalized likelihood with powers of the Jeffreys prior as penalty (`type = "MPL_Jeffreys`) for all supported generalized linear models. See `brglmControl` and `brglmFit` for details.
+
+## Other improvements, updates and additions
+* Documentation updates and improvements
+* Updated vignettes to include maximum penalized likelihood with powers of the Jeffreys prior as penalty
+* New examples in `?brglmFit`
+
 # brglm 0.5.2
 ## Bug fixes
 * `print.brmultinom` is now exported, so `bracl` and `brmultinom` fits print correctly

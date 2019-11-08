@@ -1,24 +1,25 @@
 #' brglm2: Bias Reduction in Generalized Linear Models
 #'
-#' Estimation and inference from generalized linear models based on
-#' implicit methods for bias reduction (see Kosmidis, 2014). brglm2
-#' can achieve reduction of estimation bias by solving either the
-#' mean-bias reducing adjusted score equations in Firth (1993) and
-#' Kosmidis and Firth (2009), or the median-bias reducing adjusted
-#' score equations in Kenne et al. (2016), or through the direct
-#' subtraction of an estimate of the bias of the maximum likelihood
-#' estimator from the maximum likelihood estimates as in Cordeiro and
-#' McCullagh (1991).
+#' Estimation and inference from generalized linear models using
+#' implicit and explicit bias reduction methods (Kosmidis, 2014), and
+#' other penalized maximum likelihood methods. Currently supported
+#' methods include the mean bias-reducing adjusted scores approach in
+#' Firth (1993) and Kosmidis & Firth (2009), the median bias-reduction
+#' adjusted scores approach in Kenne Pagui et al. (2017), the
+#' correction of the asymptotic bias in Cordeiro & McCullagh (1991),
+#' the mixed bias-reduction adjusted scores approach in Kosmidis et al
+#' (2019), maximum penalized likelihood with powers of the Jeffreys
+#' prior as penalty, and maximum likelihood.
 #'
 #'
 #' In the special case of generalized linear models for binomial,
-#' Poisson and multinomial responses (both nominal and ordinal), the
-#' adjusted score equations approaches return estimates with improved
-#' frequentist properties, that are also always finite, even in cases
-#' where the maximum likelihood estimates are infinite (e.g. complete
-#' and quasi-complete separation in multinomial regression; see also
-#' \code{\link{detect_separation}} and
-#' \code{\link{check_infinite_estimates}} for pre-fit and post-fit
+#' Poisson and multinomial responses (both nominal and ordinal), mean
+#' and median bias reduction and maximum penalized likelihood return
+#' estimates with improved frequentist properties, that are also
+#' always finite, even in cases where the maximum likelihood estimates
+#' are infinite (e.g. complete and quasi-complete separation in
+#' multinomial regression; see also \code{\link{detect_separation}}
+#' and \code{\link{check_infinite_estimates}} for pre-fit and post-fit
 #' methods for the detection of infinite estimates in binomial
 #' response generalized linear models). Estimation in all cases takes
 #' place via a modified Fisher scoring algorithm, and S3 methods for
@@ -38,9 +39,9 @@
 #' linear models with binomial responses. Special care has been taken
 #' when developing **brglm2** in order not to have conflicts when the
 #' user loads **brglm2** and **brglm** simultaneously. The development
-#' and maintenance of the two packages will continue, until **brglm2**
-#' incorporates all **brglm** functionality and gets an appropriate
-#' wrapper to the \code{brglm::brglm} function.
+#' and maintenance of the two packages will continue in parallel,
+#' until **brglm2** incorporates all **brglm** functionality and gets
+#' an appropriate wrapper to the \code{brglm::brglm} function.
 #'
 #' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'

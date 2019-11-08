@@ -1,5 +1,4 @@
 # Copyright (C) 2016-2019 Ioannis Kosmidis
-# function `AS_median_adjustment`: Copyright (C) 2017, Euloge Clovis Kenne Pagui, Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,17 +17,21 @@
 #' Fitting function for \code{\link{glm}} for reduced-bias
 #' estimation and inference
 #'
-#' \code{\link{brglmFit}} is a fitting function for \code{\link{glm}}
+#' \code{\link{brglmFit}} is a fitting method for \code{\link{glm}}
 #' that fits generalized linear models using implicit and explicit
-#' bias reduction methods (Kosmidis, 2014). Currently supported
-#' methods include the mean bias-reducing adjusted scores approach in
-#' Firth (1993) and Kosmidis \& Firth (2009), the median
-#' bias-reduction adjusted scores approach in Kenne et al. (2016), the
-#' correction of the asymptotic bias in Cordeiro & McCullagh (1991),
+#' bias reduction methods (Kosmidis, 2014), and other penalized
+#' maximum likelihood methods. Currently supported methods include the
+#' mean bias-reducing adjusted scores approach in Firth (1993) and
+#' Kosmidis & Firth (2009), the median bias-reduction adjusted scores
+#' approach in Kenne Pagui et al. (2017), the correction of the asymptotic
+#' bias in Cordeiro & McCullagh (1991), the mixed bias-reduction
+#' adjusted scores approach in Kosmidis et al (2019), maximum
+#' penalized likelihood with powers of the Jeffreys prior as penalty,
 #' and maximum likelihood. Estimation is performed using a quasi
-#' Fisher scoring iteration, which, in the case of mean-bias
-#' reduction, resembles an iterative correction of the asymptotic bias
-#' of the Fisher scoring iterates.
+#' Fisher scoring iteration (see \code{vignette("iteration",
+#' "brglm2")}), which, in the case of mean-bias reduction, resembles
+#' an iterative correction of the asymptotic bias of the Fisher
+#' scoring iterates.
 #'
 #' @inheritParams stats::glm.fit
 #' @aliases brglm_fit
@@ -60,9 +63,9 @@
 #'
 #' A detailed description of the supported adjustments and the quasi
 #' Fisher scoring iteration is given in the iteration vignette (see,
-#' Kosmidis et al, 2018).  A shorter description of the quasi Fisher
-#' scoring iteration is also given in one of the vignettes of the
-#' *enrichwith* R package (see,
+#' \code{vignette("iteration", "brglm2")} or Kosmidis et al, 2019).  A
+#' shorter description of the quasi Fisher scoring iteration is also
+#' given in one of the vignettes of the *enrichwith* R package (see,
 #' \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
 #' Kosmidis and Firth (2010) describe a parallel quasi Newton-Raphson
 #' iteration with the same stationary point.
@@ -72,17 +75,42 @@
 #' approach returns estimates with improved frequentist properties,
 #' that are also always finite, even in cases where the maximum
 #' likelihood estimates are infinite (e.g. complete and quasi-complete
-#' separation in multinomial regression; see also
+#' separation in multinomial regression). See, also,
 #' \code{\link{detect_separation}} and
 #' \code{\link{check_infinite_estimates}} for pre-fit and post-fit
 #' methods for the detection of infinite estimates in binomial
-#' response generalized linear models).
+#' response generalized linear models.
 #'
-#' The type of the bias-reducing adjustment to be used is specified
-#' through the \code{type} argument (see \code{\link{brglmControl}}
-#' for details). The default is to use the mean bias-reducing
-#' adjustsments in Firth (1993) and Kosmidis \& Firth (2009)
-#' (\code{type = "AS_mean"}).
+#' The type of score adjustment to be used is specified through the
+#' \code{type} argument (see \code{\link{brglmControl}} for
+#' details). The available options are
+#' 
+#' \itemize{
+#'
+#' \item \code{type = "AS_mixed"}: the mixed bias-reducing score adjustments in
+#' Kosmidis et al (2019) that result in mean bias reduction for the
+#' regression parameters and median bias reduction for the dispersion
+#' parameter, if any; default.
+#'
+#' \item \code{type = "AS_mean"}: the mean bias-reducing score adjustments
+#' in Firth, 1993 and Kosmidis & Firth, 2009. \code{type = "AS_mixed"}
+#' and \code{type = "AS_mean"} will return the same results when
+#' \code{family} is \code{binomial} or \code{poisson}, i.e. when the
+#' dispersion is fixed)
+#'
+#' \item \code{type = "AS_median"}: the median-bias reducing score
+#' adjustments in Kenne Pagui et al. (2017)
+#'
+#' \item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
+#' with powers of the Jeffreys prior as penalty.
+#'
+#' \item \code{type = "ML"}: maximum likelihood
+#'
+#' \item \code{type = "correction"}: asymptotic bias correction, as in
+#' Cordeiro & McCullagh (1991).
+#' 
+#' }
+#'
 #'
 #' The null deviance is evaluated based on the fitted values using the
 #'     method specified by the \code{type} argument (see
@@ -90,17 +118,22 @@
 #'
 #' The \code{family} argument of the current version of
 #' \code{brglmFit} can accept any combination of \code{\link{family}}
-#' objects and link functions (including ones with user-specified link
-#' functions, \code{\link{mis}} links, and \code{\link{power}} links),
-#' except the \code{\link{quasi}}, \code{\link{quasipoisson}} and
-#' \code{\link{quasibinomial}} families.
+#' objects and link functions, including families with user-specified
+#' link functions, \code{\link{mis}} links, and \code{\link{power}}
+#' links, but excluding \code{\link{quasi}},
+#' \code{\link{quasipoisson}} and \code{\link{quasibinomial}}
+#' families.
 #'
 #' The description of \code{method} argument and the \code{Fitting
 #' functions} section in \code{\link{glm}} gives information on
 #' supplying fitting methods to \code{\link{glm}}.
 #'
-#' \code{fixed_totals} can be used to constrain the means of a poisson
-#' model to add up to the corresponding observed counts according to
+#' \code{fixed_totals} to specify groups of observations for which the
+#' sum of the means of a Poisson model will be held fixed to the
+#' observed count for each group. This argument is used internally in
+#' \code{\link{brmultinom}} and \code{\link{bracl}} for
+#' baseline-category logit models and adjacent category logit models,
+#' respectively.
 #'
 #' \code{brglm_fit} is an alias to \code{brglmFit}.
 #'
@@ -110,18 +143,21 @@
 #'
 #' @references
 #'
+#' Kosmidis I and Firth D (2019). Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models. *arXiv e-prints*,
+#' arXiv:1812.01938 <URL: http://arxiv.org/abs/1812.01938>.
+#' 
 #' Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
 #' reduction in generalized linear models. *arXiv e-prints*,
 #' arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
 #'
-#' Cordeiro G. M. & McCullagh, P. (1991). Bias correction in generalized
+#' Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
 #' linear models. *Journal of the Royal Statistical Society. Series B
 #' (Methodological)*, **53**, 629-643
 #'
-#' Firth D. (1993). Bias reduction of maximum likelihood estimates,
-#' Biometrika, **80**, 27-38
+#' Firth D (1993). Bias reduction of maximum likelihood estimates,
+#' Biometrika. **80**, 27-38
 #'
-#' Kenne Pagui, E. C., A. Salvan, and N. Sartori (2017). Median bias
+#' Kenne Pagui EC, Salvan A, and Sartori N (2017). Median bias
 #' reduction of maximum likelihood estimates. *Biometrika*, **104**,
 #' 923–938
 #'
@@ -155,13 +191,36 @@
 #' summary(lizardsBR_median)
 #' summary(lizardsBR_mean)
 #'
+#' # Maximum penalized likelihood with Jeffreys prior penatly
+#' lizards_Jeffreys <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                         light + time, family = binomial(logit), data = lizards,
+#'                         method = "brglmFit", type = "MPL_Jeffreys")
+#' # lizards_Jeffreys is the same fit as lizardsBR_mean (see Firth, 1993)
+#' all.equal(coef(lizardsBR_mean), coef(lizards_Jeffreys))
 #'
+#' # Maximum penalized likelihood with powers of the Jeffreys prior as
+#' # penalty. See Kosmidis & Firth (2019) for the finiteness and
+#' # shrinkage properties of the maximum penalized likelihood
+#' # estimators in binomial response models
+#' \donttest{
+#' a <- seq(0, 20, 0.5)
+#' coefs <- sapply(a, function(a) {
+#'       out <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'              light + time, family = binomial(logit), data = lizards,
+#'              method = "brglmFit", type = "MPL_Jeffreys", a = a) 
+#'       coef(out)
+#' })
+#' # Illustration of shrinkage as a grows
+#' matplot(a, t(coefs), type = "l", col = 1, lty = 1)
+#' abline(0, 0, col = "grey")
+#'}
+#' 
 #' ## Another example from
 #' ## King, Gary, James E. Alt, Nancy Elizabeth Burns and Michael Laver
 #' ## (1990).  "A Unified Model of Cabinet Dissolution in Parliamentary
 #' ## Democracies", _American Journal of Political Science_, **34**, 846-870
 #'
-#' \dontrun{
+#' \donttest{
 #' data("coalition", package = "brglm2")
 #' # The maximum likelihood fit with log link
 #' coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
@@ -173,7 +232,7 @@
 #' coalitionBR_median <- update(coalitionML, method = "brglmFit", type = "AS_median")
 #' }
 #'
-#' \dontrun{
+#' \donttest{
 #' ## An example with offsets from Venables & Ripley (2002, p.189)
 #' data("anorexia", package = "MASS")
 #'
@@ -200,7 +259,7 @@
 #' summary(anorexBR_median)
 #' }
 #'
-#' ## endometrial data from Heinze \& Schemper (2002) (see ?endometrial)
+#' ## endometrial data from Heinze & Schemper (2002) (see ?endometrial)
 #' data("endometrial", package = "brglm2")
 #' endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
 #'                      family = binomial("probit"))
@@ -371,7 +430,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     }
 
     ## Estimate the ML of the dispersion parameter for gaussian, gamma and inverse Gaussian
-    ## Set the dispersion to 1 if poisson or binomial
+    ## Set the dispersion to 1 if Poisson or binomial
     ## betas is only the regression parameters
     estimate_dispersion <- function(betas, y) {
         if (no_dispersion) {
@@ -420,6 +479,25 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         })
     }
 
+    AS_Jeffreys_adjustment <- function(pars, level = 0, fit = NULL) {
+        if (is.null(fit)) {
+            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
+        }
+        with(fit, {
+            if (level == 0) {
+                hatvalues <- hat_values(pars, fit = fit)
+                ## Use only observations with keep = TRUE to ensure that no division with zero takes place
+                return(2 * control$a * .colSums(0.5 * hatvalues * (2 * d2mus/d1mus - d1varmus * d1mus / varmus) * x, nobs, nvars, TRUE))
+            }
+            if (level == 1) {
+                s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
+                s2 <- sum(weights^2 * d2afuns, na.rm = TRUE)
+                return(2 * control$a * (-(nvars + 4)/(2 * dispersion) + s1/(2 * dispersion^2 * s2)))
+            }
+        })
+    }
+
+    
     ## Implementation by Euloge Clovis Kenne Pagui, 20 April 2017 (kept here for testing)
     ## AS_median_adjustment <- function(pars, level = 0, fit = NULL) {
     ##     if (is.null(fit)) {
@@ -559,6 +637,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
                             "AS_mean" = AS_mean_adjustment,
                             "AS_median" = AS_median_adjustment,
                             "AS_mixed" = AS_mixed_adjustment,
+                            "MPL_Jeffreys" = AS_Jeffreys_adjustment,
                             "ML" = function(pars, ...) 0)
 
     ## Some useful quantities

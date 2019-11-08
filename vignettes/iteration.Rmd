@@ -21,16 +21,11 @@ knitr::opts_chunk$set(
 
 # The **brglm2** package
 
-[**brglm2**](https://github.com/ikosmidis/brglm2) provides tools for the estimation and inference from [generalized linear models](https://en.wikipedia.org/wiki/Generalized_linear_model) using various methods for bias reduction. Reduction of estimation bias is achieved either through the mean-bias reducing adjusted score equations in @firth:93 and @kosmidis:09, or through the direct subtraction of an estimate of the bias of the maximum likelihood estimator from the maximum likelihood estimates as prescribed in @cordeiro:91, or through the median-bias reducing adjusted score equations in @kenne:17.
+[**brglm2**](https://github.com/ikosmidis/brglm2) provides tools for the estimation and inference from [generalized linear models](https://en.wikipedia.org/wiki/Generalized_linear_model) using various methods for bias reduction or maximum penalized likelihood with powers of the Jeffreys prior as penalty. Reduction of estimation bias is achieved either through the mean-bias reducing adjusted score equations in @firth:93 and @kosmidis:09, or through the direct subtraction of an estimate of the bias of the maximum likelihood estimator from the maximum likelihood estimates as prescribed in @cordeiro:91, or through the median-bias reducing adjusted score equations in @kenne:17.
 
-In the special case of generalized linear models for binomial and multinomial responses, the adjusted score equations approach returns estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite, like in complete and quasi-complete separation as defined in @albert:84.
+In the special case of generalized linear models for binomial, Poisson and multinomial responses (both nominal and ordinal), mean and median bias reduction and maximum penalized likelihood return estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite, like in complete and quasi-complete separation as defined in @albert:84.
 
-The workhorse function is [`brglmFit`](https://cran.r-project.org/package=brglm2/brglm2.pdf), which can be passed directly to the `method` argument of the `glm` function. `brglmFit` implements a quasi
-[Fisher scoring](https://en.wikipedia.org/wiki/Scoring_algorithm)
-procedure, whose special cases result in various explicit and implicit
-bias reduction methods for generalized linear models [the
-classification of bias reduction methods into explicit and implicit is
-given in @kosmidis:14].
+The workhorse function is [`brglmFit`](https://cran.r-project.org/package=brglm2/brglm2.pdf), which can be passed directly to the `method` argument of the `glm` function. `brglmFit` implements a quasi-[Fisher scoring](https://en.wikipedia.org/wiki/Scoring_algorithm) procedure, whose special cases result in various explicit and implicit bias reduction methods for generalized linear models [the classification of bias reduction methods into explicit and implicit is given in @kosmidis:14].
 
 # This vignette
 
@@ -41,13 +36,7 @@ This vignette
 
 # Other resources
 
-The bias-reducing quasi Fisher scoring iteration is also described in
-detail in the
-[bias vignette](https://cran.r-project.org/package=enrichwith/vignettes/bias.html) of
-the [**enrichwith**](https://cran.r-project.org/package=enrichwith) R
-package. @kosmidis:10 describe a parallel
-quasi [Newton-Raphson](https://en.wikipedia.org/wiki/Newton%27s_method)
-procedure.
+The bias-reducing quasi Fisher scoring iteration is also described in detail in the [bias vignette](https://cran.r-project.org/package=enrichwith/vignettes/bias.html) of the [**enrichwith**](https://cran.r-project.org/package=enrichwith) R package. @kosmidis:10 describe a parallel quasi [Newton-Raphson](https://en.wikipedia.org/wiki/Newton%27s_method) procedure.
 
 Most of the material in this vignette comes from a presentation by [Ioannis Kosmidis](http://www.ikosmidis.com) at the useR! 2016 international conference at University of Stanford on 16 June 2016. The presentation was titled "Reduced-bias inference in generalized linear models" and can be watched online at this [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
 
@@ -145,6 +134,28 @@ then the solution of the adjusted score equations $s_\beta + A_\beta = 0_p$ and 
 	\right]
 \end{align*}
 where $[A]_j$ denotes the $j$th row of matrix $A$ as a column vector, $v'_i = V'(\mu_i)$, and $\tilde{h}_{j,i}$ is the $i$th diagonal element of $X K_j X^T W$, with $K_j = [(X^\top W X)^{-1}]_{j} [(X^\top W X)^{-1}]_{j}^\top / [(X^\top W X)^{-1}]_{jj}$\.
+
+### Mixed adjustments
+The results in @kosmidis:2019 can be used to show that if
+\begin{align*}
+ A_\beta & = X^\top W \xi \,, \\
+ A_\phi & = \frac{p}{2\phi}+\frac{ \sum_{i = 1}^n m_i^3
+                   a'''_i}{6\phi^2\sum_{i = 1}^n m_i^2 a''_i} \, ,
+\end{align*}
+then the solution of the adjusted score equations $s_\beta + A_\beta = 0_p$ and $s_\phi + A_\phi = 0$ results in estimators $\tilde\beta$ with mean bias of small asymptotic order than the maximum likelihood esitmator and $\tilde\phi$ with median bias of smaller asymptotic order than the maximum likelihood estimator.
+
+### Maximum penalized likelihood with powers of Jefreys prior as penalty
+The likelihood penalized by a power of the Jeffreys prior
+\[
+|i_{\beta\beta}|^a |i_{\phi\phi}|^a \quad a > 0
+\]
+can be maximized by solving the adjusted score equations $s_\beta + A_\beta = 0_p$ and $s_\phi + A_\phi = 0$  with
+\begin{align*}
+ A_\beta & = X^\top W \rho \,, \\
+ A_\phi & = -\frac{p + 4}{2\phi}+\frac{ \sum_{i = 1}^n m_i^3
+                   a'''_i}{6\phi^2\sum_{i = 1}^n m_i^2 a''_i} \, ,
+\end{align*}
+where $\rho = (\rho_1, \ldots, \rho_n)^T$ with $\rho_i = h_i \{2 d_i'/(d_i w_i) - v_i' d_i/(v_i w_i)\}$.
 
 <!-- The results in @kenne:17 can be used to show that if -->
 <!-- \begin{align*} -->
@@ -253,9 +264,9 @@ where $[A]_j$ denotes the $j$th row of matrix $A$ as a column vector, $v'_i = V'
 
 # Notes
 
-+ For $K = M = 1$, $\beta^{(0)} = \hat\beta$ and $\phi^{(0)} = \hat\phi$, the above iteration computes the bias-corrected estimates proposed in @cordeiro:91. This is achieved with the `brglmFit` method is used with `type = "correction"` (see `?brglmFit`).
++ For $K = M = 1$, $\beta^{(0)} = \hat\beta$ and $\phi^{(0)} = \hat\phi$, the above iteration computes the bias-corrected estimates proposed in @cordeiro:91. This is achieved with the `brglmFit` method is called with `type = "correction"` (see `?brglmFit`).
 
-+ The mean-bias reducing adjusted score functions are solved when the `brglmFit` method is used with `type = "AS_mean"`, and the median-bias reducing adjusted score functions with `type = AS_median` (see `?brglmFit`).
++ The mean-bias reducing adjusted score functions are solved when the `brglmFit` method is used with `type = "AS_mean"`, and the median-bias reducing adjusted score functions with `type = "AS_median"` (see `?brglmFit`). Estimation using mixed adjustments is through `type = "AS_mixed"`. `type = "MPL_Jeffreys"` does maximum penalized likelihood with a power of the Jeffreys prior as penalty.
 
 + The steps where $\phi$ and the $\phi$ direction are updated are ignored for generalized linear models with known dispersion parameter, like in models with binomial and Poisson responses. Also, in that case, $v_\phi^{(.)}$ and $\upsilon_\phi^{(.)}$ in steps 9, 14 and 16 are set to zero.
 
