@@ -1,4 +1,9 @@
-## brglm 0.6
+# brglm 0.6.1
+## Bug fixes
+* Fixed bug in AIC reported by `print.summary` for `brmultinom` and `bracl`
+* `detect_separation` now handles one-column model matrices correctly
+
+# brglm 0.6
 ## New functionality
 * `brglmFit` can now do maximum penalized likelihood with powers of the Jeffreys prior as penalty (`type = "MPL_Jeffreys`) for all supported generalized linear models. See `brglmControl` and `brglmFit` for details.
 
