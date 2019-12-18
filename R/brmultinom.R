@@ -210,7 +210,7 @@ brmultinom <- function(formula, data, weights, subset, na.action,
     fit <- brglmFit(x = Xextended, y = Yextended,
                     start = NULL,
                     family = poisson("log"), control = control, intercept = TRUE, fixed_totals = fixed_totals)
-
+    
     ## TODO:
     ## + starting values
     ## + subset
@@ -336,7 +336,7 @@ summary.brmultinom <- function(object, correlation = FALSE, digits = options()$d
     ncat <- object$ncat
     coefficients <- coef.brmultinom(object)
     object$digits <- digits
-    object$AIC <- AIC(object)
+    object$AIC <- AIC(object)    
     object$logLik <- logLik(object)
     if (is.null(coefficients)) {
         object$coefficients <- NULL
@@ -350,10 +350,10 @@ summary.brmultinom <- function(object, correlation = FALSE, digits = options()$d
         vc <- vcov.brglmFit(object)
         vc <- vc[object$ofInterest, object$ofInterest]
         se <- sqrt(diag(vc))
-        ses <- matrix(se, nrow = ncat - 1, byrow = TRUE, dimnames = dimnames(coefficients))
+        ses <- matrix(se, nrow = ncat - 1, byrow = TRUE, dimnames = dimnames(coefficients))        
         object$coefficients <- coefficients
         object$standard.errors <- ses
-        object$AIC <- AIC(object)
+        ## object$AIC <- AIC(object)
         if (Wald.ratios)
             object$Wald.ratios <- coef/ses
         if (correlation)

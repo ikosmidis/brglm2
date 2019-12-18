@@ -310,7 +310,7 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
     printCoefmat(x$coefficients, digits = digits)
     cat("\nResidual Deviance:", format(x$deviance), "\n")
     cat("Log-likelihood:", format(x$logLik), "\n")
-    cat("AIC:", format(x$aic), "\n")
+    cat("AIC:", format(AIC(x)), "\n")
     if (!is.null(correl <- x$correlation)) {
         p <- dim(correl)[2L]
         if (p > 1) {

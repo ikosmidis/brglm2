@@ -26,6 +26,7 @@ expect_warning(
                         data = hepat, weights = counts)
 )
 
+
 tol <- 1e-05
 test_that("brmultinom returns the same estimates as pmlr", {
     expect_equal(coef(hepbr), t(drop(coef(heppmlr))), tolerance = tol)
@@ -65,6 +66,20 @@ expect_warning(
     enzbrmultinom_ml <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes, type = "ML")
 )
 enzmultinom <- nnet::multinom(Group ~ AST + GLDH, weights = counts, data = enzymes, trace = FALSE)
+
+aic1 <- AIC(enzbrmultinom_ml)
+aic2 <- AIC(enzmultinom)
+aic3 <- -2 * logLik(enzbrmultinom_ml) + 2 * length(coef(enzbrmultinom_ml))
+aic4 <- summary(hepml2)$AIC
+
+###
+test_that("AIC with brmultino", {
+    expect_equal(aic1, aic2, tolerance = 1e-06)
+    expect_equal(aic1, unclass(aic3), tolerance = 1e-06, check.attributes = FALSE)
+    expect_equal(aic1, aic4, tolerance = 1e-06)
+})
+
+
 
 ###############
 test_that("brmultinom returns the same estimates as nnet::multinom if type = 'ML'", {
