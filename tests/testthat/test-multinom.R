@@ -70,7 +70,7 @@ enzmultinom <- nnet::multinom(Group ~ AST + GLDH, weights = counts, data = enzym
 aic1 <- AIC(enzbrmultinom_ml)
 aic2 <- AIC(enzmultinom)
 aic3 <- -2 * logLik(enzbrmultinom_ml) + 2 * length(coef(enzbrmultinom_ml))
-aic4 <- summary(hepml2)$AIC
+aic4 <- summary(enzbrmultinom_ml)$AIC
 
 ###
 test_that("AIC with brmultino", {
