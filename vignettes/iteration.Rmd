@@ -142,7 +142,7 @@ The results in @kosmidis:2019 can be used to show that if
  A_\phi & = \frac{p}{2\phi}+\frac{ \sum_{i = 1}^n m_i^3
                    a'''_i}{6\phi^2\sum_{i = 1}^n m_i^2 a''_i} \, ,
 \end{align*}
-then the solution of the adjusted score equations $s_\beta + A_\beta = 0_p$ and $s_\phi + A_\phi = 0$ results in estimators $\tilde\beta$ with mean bias of small asymptotic order than the maximum likelihood esitmator and $\tilde\phi$ with median bias of smaller asymptotic order than the maximum likelihood estimator.
+then the solution of the adjusted score equations $s_\beta + A_\beta = 0_p$ and $s_\phi + A_\phi = 0$ results in estimators $\tilde\beta$ with mean bias of small asymptotic order than the maximum likelihood estimator and $\tilde\phi$ with median bias of smaller asymptotic order than the maximum likelihood estimator.
 
 ### Maximum penalized likelihood with powers of Jefreys prior as penalty
 The likelihood penalized by a power of the Jeffreys prior

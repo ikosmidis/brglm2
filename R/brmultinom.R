@@ -409,7 +409,7 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
 #' Obtain class and probability predictions from a fitted baseline
 #' category logits model.
 #'
-#' @param object a fitted object of class inherinting from
+#' @param object a fitted object of class inheriting from
 #'     \code{"brmultinom"}.
 #' @param newdata optionally, a data frame in which to look for
 #'     variables with which to predict.  If omitted, the fitted linear
@@ -417,7 +417,7 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
 #' @param type the type of prediction required. The default is
 #'     \code{"class"}, which produces predictions of the response
 #'     category at the covariate values supplied in \code{"newdata"},
-#'     selecting the cateogry with the largest probability; the
+#'     selecting the category with the largest probability; the
 #'     alternative \code{"probs"} returns all cateogry probabilities
 #'     at the covariate values supplied in \code{"newdata"}.
 #' @param ... further arguments passed to or from other methods.

@@ -14,7 +14,7 @@ in a \code{\link{brglmFit}} object}
     \code{\link{summary}()} object of such a fitted model.
   }
 
-\item{model}{character specyfying for which component of the model coefficients shoould be extracted.}
+\item{model}{character specifying for which component of the model coefficients should be extracted.}
 
 \item{...}{
     additional arguments for method functions.  For the

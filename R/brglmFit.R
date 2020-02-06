@@ -1256,7 +1256,7 @@ confint.brglmFit <- function(object, parm, level = 0.95, ...) {
 #' in a \code{\link{brglmFit}} object
 #'
 #' @inheritParams stats::vcov
-#' @param model character specyfying for which component of the model coefficients shoould be extracted.
+#' @param model character specifying for which component of the model coefficients should be extracted.
 #'
 #' @method vcov brglmFit
 #' @export

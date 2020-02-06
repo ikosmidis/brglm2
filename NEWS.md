@@ -57,7 +57,7 @@
 ## Other improvements, updates and additions
 * Improved documentation examples
 * Removed warning about observations with non-positive weights from brmultinom
-* Updated email adrress for Ioannis Kosmidis in brglmFit
+* Updated email address for Ioannis Kosmidis in brglmFit
 
 ## Bug fixes
 * brmultinom returns a fitted values matrix that respects the dimension of data
