@@ -81,7 +81,7 @@
 ## Bug fixes
 
 ## New functionality
-* Added `type = AS_mixed` as an option to use **mean-bias reducing score functions** for the regression parameters and **median-bias reducing score functions** for the dispersion in models with uknown dispersion
+* Added `type = AS_mixed` as an option to use **mean-bias reducing score functions** for the regression parameters and **median-bias reducing score functions** for the dispersion in models with unknown dispersion
 * `check_infinite_estimates` now accepts `brmultinom` objects
 * Added `singular.ok` argument to `brglmFit` and `detect_separation` methods in line with the update of `glm.fit`
 
