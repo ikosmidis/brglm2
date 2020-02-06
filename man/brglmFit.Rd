@@ -65,9 +65,6 @@ for more information and \code{\link{brmultinom}}.}
 
 \item{singular.ok}{logical. If \code{FALSE}, a singular model is an
 error.}
-
-\item{...}{arguments to be used to form the default 'control'
-argument if it is not supplied directly.}
 }
 \description{
 \code{\link{brglmFit}} is a fitting method for \code{\link{glm}}
