@@ -4,7 +4,7 @@
 * `detect_separation` now handles one-column model matrices correctly
 
 ## Other improvements, updates and additions
-* Documentation improvements
+* Documentation improvements and typo fixes
 
 # brglm 0.6
 ## New functionality
