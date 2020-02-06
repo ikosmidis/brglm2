@@ -5,8 +5,19 @@
 \title{Bias reduction for multinomial response models using the
 Poisson trick.}
 \usage{
-brmultinom(formula, data, weights, subset, na.action, contrasts = NULL,
-  ref = 1, model = TRUE, x = TRUE, control = list(...), ...)
+brmultinom(
+  formula,
+  data,
+  weights,
+  subset,
+  na.action,
+  contrasts = NULL,
+  ref = 1,
+  model = TRUE,
+  x = TRUE,
+  control = list(...),
+  ...
+)
 }
 \arguments{
 \item{formula}{

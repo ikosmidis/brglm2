@@ -4,8 +4,7 @@
 \alias{predict.brmultinom}
 \title{Predict method for \code{brmultinom} fits}
 \usage{
-\method{predict}{brmultinom}(object, newdata, type = c("class", "probs"),
-  ...)
+\method{predict}{brmultinom}(object, newdata, type = c("class", "probs"), ...)
 }
 \arguments{
 \item{object}{a fitted object of class inheriting from

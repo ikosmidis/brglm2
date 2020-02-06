@@ -6,13 +6,17 @@
 \title{Auxiliary function for the \code{\link{glm}} interface when
 \code{method} is \code{\link{detect_separation}}.}
 \usage{
-detect_separation_control(linear_program = c("primal", "dual"),
+detect_separation_control(
+  linear_program = c("primal", "dual"),
   purpose = c("find", "test"),
-  beta_tolerance = sqrt(.Machine$double.eps))
+  beta_tolerance = sqrt(.Machine$double.eps)
+)
 
-detectSeparationControl(linear_program = c("primal", "dual"),
+detectSeparationControl(
+  linear_program = c("primal", "dual"),
   purpose = c("find", "test"),
-  beta_tolerance = sqrt(.Machine$double.eps))
+  beta_tolerance = sqrt(.Machine$double.eps)
+)
 }
 \arguments{
 \item{linear_program}{should \code{\link{detect_separation}} solve
