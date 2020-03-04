@@ -20,7 +20,6 @@
 #' Typically only used internally by \code{\link{brglmFit}}, but may
 #' be used to construct a \code{control} argument.
 #'
-#' @inheritParams stats::glm.control
 #' @aliases brglm_control
 #' @param epsilon positive convergence tolerance epsilon. Default is
 #'     \code{1e-06}.

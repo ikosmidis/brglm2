@@ -37,6 +37,13 @@ quasi-complete separation occurs and the maximum likelihood
 estimate for the corresponding parameter has value minus or plus
 infinity.
 }
+\note{
+\code{check_infinite_estimates} will be removed from \pkg{brglm2}
+at version 0.7. An improved version of
+\code{check_infinite_estimates} is now provided by the
+\pkg{detectseparation} R package at
+\url{https://cran.r-project.org/package=detectseparation}.
+}
 \examples{
 
 ## endometrial data from Heinze \& Schemper (2002) (see ?endometrial)

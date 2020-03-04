@@ -96,5 +96,6 @@ if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 #' @param ... other options to be passed to the method.
 #' @export
 check_infinite_estimates <- function(object, ...) {
+    .Deprecated(msg = "'check_infinite_estimates' will be removed in the brglm2 version 0.8. A more extensible version of 'check_infinite_estimates' is provided by the 'detectseparation' package.", package = "detectseparation")
     UseMethod("check_infinite_estimates")
 }

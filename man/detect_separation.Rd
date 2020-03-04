@@ -98,6 +98,12 @@ permission of Kjell Konis.
 
 \code{detectSeparation} is an alias for \code{detect_separation}.
 }
+\note{
+\code{detect_separation} will be removed from \pkg{brglm2} at
+version 0.7. An improved version of \code{detect_separation} is now
+provided by the \pkg{detectseparation} R package at
+\url{https://cran.r-project.org/package=detectseparation}.
+}
 \examples{
 
 ## endometrial data from Heinze \& Schemper (2002) (see ?endometrial)
