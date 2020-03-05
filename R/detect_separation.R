@@ -114,7 +114,7 @@ detect_separation <- function(x, y, weights = rep(1, nobs),
                              offset = rep(0, nobs), family = gaussian(),
                              control = list(), intercept = TRUE, singular.ok = TRUE) {
 
-    .Deprecated(msg = "'detect_separation' will be removed in the brglm2 version 0.8. A more extensible version of 'detect_separation' is provided by the 'detectseparation' package.", package = "detectseparation")
+    .Deprecated(msg = "'detect_separation' will be removed from brglm2 at version 0.8. A more extensible version of 'detect_separation' is now provided by the 'detectseparation' package.", package = "detectseparation")
     
     if (family$family != "binomial") {
         warning("detect_separation has been developed for use with binomial-response models")
