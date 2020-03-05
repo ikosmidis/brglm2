@@ -60,8 +60,8 @@
 #' @note
 #' 
 #' \code{detect_separation} will be removed from \pkg{brglm2} at
-#' version 0.7. An improved version of \code{detect_separation} is now
-#' provided by the \pkg{detectseparation} R package at
+#' version 0.7. A new version of \code{detect_separation} is now
+#' maintained in the \pkg{detectseparation} R package at
 #' \url{https://cran.r-project.org/package=detectseparation}.
 #'
 #' @author Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Kjell Konis [ctb] \email{kjell.konis@me.com}
@@ -114,7 +114,10 @@ detect_separation <- function(x, y, weights = rep(1, nobs),
                              offset = rep(0, nobs), family = gaussian(),
                              control = list(), intercept = TRUE, singular.ok = TRUE) {
 
-    .Deprecated(msg = "'detect_separation' will be removed from brglm2 at version 0.7. A more extensible version of 'detect_separation' is now provided by the 'detectseparation' package.", package = "detectseparation")
+    function_moves_to_new_package(gsub("\\(|\\)", "", deparse(match.call()[1])),
+                                  "0.7",
+                                  "brglm2",
+                                  "detectseparation")
     
     if (family$family != "binomial") {
         warning("detect_separation has been developed for use with binomial-response models")

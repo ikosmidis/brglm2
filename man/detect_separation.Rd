@@ -100,8 +100,8 @@ permission of Kjell Konis.
 }
 \note{
 \code{detect_separation} will be removed from \pkg{brglm2} at
-version 0.7. An improved version of \code{detect_separation} is now
-provided by the \pkg{detectseparation} R package at
+version 0.7. A new version of \code{detect_separation} is now
+maintained in the \pkg{detectseparation} R package at
 \url{https://cran.r-project.org/package=detectseparation}.
 }
 \examples{
