@@ -46,7 +46,7 @@
 #' @note
 #' 
 #' \code{check_infinite_estimates} will be removed from \pkg{brglm2}
-#' at version 0.7. An new version of
+#' at version 0.8. An new version of
 #' \code{check_infinite_estimates} is now maintained in the
 #' \pkg{detectseparation} R package at
 #' \url{https://cran.r-project.org/package=detectseparation}.

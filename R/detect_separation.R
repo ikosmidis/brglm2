@@ -60,7 +60,7 @@
 #' @note
 #' 
 #' \code{detect_separation} will be removed from \pkg{brglm2} at
-#' version 0.7. A new version of \code{detect_separation} is now
+#' version 0.8. A new version of \code{detect_separation} is now
 #' maintained in the \pkg{detectseparation} R package at
 #' \url{https://cran.r-project.org/package=detectseparation}.
 #'
@@ -115,7 +115,7 @@ detect_separation <- function(x, y, weights = rep(1, nobs),
                              control = list(), intercept = TRUE, singular.ok = TRUE) {
 
     function_moves_to_new_package(gsub("\\(|\\)", "", deparse(match.call()[1])),
-                                  "0.7",
+                                  "0.8",
                                   "brglm2",
                                   "detectseparation")
     

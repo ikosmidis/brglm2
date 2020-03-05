@@ -100,7 +100,7 @@ if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 #'
 #' 
 #' \code{check_infinite_estimates} will be removed from \pkg{brglm2}
-#' at version 0.7. An new version of
+#' at version 0.8. An new version of
 #' \code{check_infinite_estimates} is now maintained in the
 #' \pkg{detectseparation} R package at
 #' \url{https://cran.r-project.org/package=detectseparation}.
@@ -110,7 +110,7 @@ if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 #' @export
 check_infinite_estimates <- function(object, ...) {
     function_moves_to_new_package(gsub("\\(|\\)", "", deparse(match.call()[1])),
-                                  "0.7",
+                                  "0.8",
                                   "brglm2",
                                   "detectseparation")
     UseMethod("check_infinite_estimates")

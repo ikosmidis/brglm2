@@ -1,7 +1,7 @@
 # brglm2 0.6.2
 ## Other improvements, updates and additions
 * Deprecated `detect_sepration` and `check_infinite_estimates`, which
-  will be removed from **brglm2** at version 0.7. New versions of
+  will be removed from **brglm2** at version 0.8. New versions of
   `detect_sepration` and `check_infinite_estimates` are now maintained
   in the
   [**detectseparation**](https://cran.r-project.org/package=detectseparation)
