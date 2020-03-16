@@ -22,7 +22,7 @@ A simple diagnostic of whether the maximum likelihood estimates are
 infinite
 }
 \details{
-\code{check_infinite_estimates} attempts to identify the occurence
+\code{check_infinite_estimates} attempts to identify the occurrence
 of infinite estimates in GLMs with binomial responses by
 successively refitting the model. At each iteration the maximum
 number of allowed IWLS iterations is fixed starting from 1 to

@@ -40,7 +40,7 @@
 #'
 #' \item{PI}{pulsality index of arteria uterina}
 #'
-#' \item{EH}{endometrium heigh}
+#' \item{EH}{endometrium height}
 #'
 #' \item{HG}{histology grade with coding 0 for low grade and 1 for high grade}
 #'
