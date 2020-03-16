@@ -20,7 +20,7 @@
 
 }}
 \source{
-The alligators data set is analysed in Agresti (2002, Subsection~7.1.2).
+The alligators data set is analyzed in Agresti (2002, Subsection~7.1.2).
 }
 \usage{
 alligators

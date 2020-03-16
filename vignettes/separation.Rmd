@@ -28,7 +28,7 @@ The key methods are `detect_separation` and `check_infinite_estimates` and this 
 
 # Checking for infinite estimates
 
-@heinze:02 used a logistic regression model to analyse data from a
+@heinze:02 used a logistic regression model to analyze data from a
 study on endometrial cancer. @agresti:15[, Section 5.7] provide details on the data set. Below, we
 fit a probit regression model with the same linear predictor as the
 logistic regression model in @heinze:02.

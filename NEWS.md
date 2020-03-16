@@ -6,6 +6,7 @@
   in the
   [**detectseparation**](https://cran.r-project.org/package=detectseparation)
   R package.
+* Fixed typos in NEWS.
 
 # brglm2 0.6.1
 ## Bug fixes

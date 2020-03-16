@@ -91,7 +91,7 @@ The maximum likelihood estimates for the parameters of
 baseline-category logit models have infinite components with
 positive probability, which can result in problems in their
 estimation and the use of inferential procedures (e.g. Wad
-tests). Albert and Andreson (1984) have categorised the possible
+tests). Albert and Andreson (1984) have categorized the possible
 data patterns for such models into the exclusive and exhaustive
 categories of complete separation, quasi-complete separation and
 overlap, and showed that infinite maximum likelihood estimates

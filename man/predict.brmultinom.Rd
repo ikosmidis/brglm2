@@ -18,7 +18,7 @@ predictors are used.}
 \code{"class"}, which produces predictions of the response
 category at the covariate values supplied in \code{"newdata"},
 selecting the category with the largest probability; the
-alternative \code{"probs"} returns all cateogry probabilities
+alternative \code{"probs"} returns all category probabilities
 at the covariate values supplied in \code{"newdata"}.}
 
 \item{...}{further arguments passed to or from other methods.}
