@@ -5,8 +5,7 @@
 \title{Return the variance-covariance matrix for the regression parameters
 in a \code{\link{brglmFit}} object}
 \usage{
-\method{vcov}{brglmFit}(object, model = c("mean", "full", "dispersion"),
-  ...)
+\method{vcov}{brglmFit}(object, model = c("mean", "full", "dispersion"), ...)
 }
 \arguments{
 \item{object}{
@@ -14,11 +13,11 @@ in a \code{\link{brglmFit}} object}
     \code{\link{summary}()} object of such a fitted model.
   }
 
-\item{model}{character specyfying for which component of the model coefficients shoould be extracted.}
+\item{model}{character specifying for which component of the model coefficients should be extracted.}
 
 \item{...}{
     additional arguments for method functions.  For the
-    \code{\link{glm}} method this can be used to pass a
+    \code{\link[stats]{glm}} method this can be used to pass a
     \code{dispersion} parameter.}
 }
 \description{

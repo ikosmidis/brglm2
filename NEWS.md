@@ -1,4 +1,12 @@
-## brglm 0.6
+# brglm 0.6.1
+## Bug fixes
+* Fixed bug in AIC reported by `print.summary` for `brmultinom` and `bracl`
+* `detect_separation` now handles one-column model matrices correctly
+
+## Other improvements, updates and additions
+* Documentation improvements and typo fixes
+
+# brglm 0.6
 ## New functionality
 * `brglmFit` can now do maximum penalized likelihood with powers of the Jeffreys prior as penalty (`type = "MPL_Jeffreys`) for all supported generalized linear models. See `brglmControl` and `brglmFit` for details.
 
@@ -49,7 +57,7 @@
 ## Other improvements, updates and additions
 * Improved documentation examples
 * Removed warning about observations with non-positive weights from brmultinom
-* Updated email adrress for Ioannis Kosmidis in brglmFit
+* Updated email address for Ioannis Kosmidis in brglmFit
 
 ## Bug fixes
 * brmultinom returns a fitted values matrix that respects the dimension of data
@@ -73,7 +81,7 @@
 ## Bug fixes
 
 ## New functionality
-* Added `type = AS_mixed` as an option to use **mean-bias reducing score functions** for the regression parameters and **median-bias reducing score functions** for the dispersion in models with uknown dispersion
+* Added `type = AS_mixed` as an option to use **mean-bias reducing score functions** for the regression parameters and **median-bias reducing score functions** for the dispersion in models with unknown dispersion
 * `check_infinite_estimates` now accepts `brmultinom` objects
 * Added `singular.ok` argument to `brglmFit` and `detect_separation` methods in line with the update of `glm.fit`
 

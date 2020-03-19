@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2019 Ioannis Kosmidis
+# Copyright (C) 2016-2020 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -56,8 +56,6 @@
 #'     for more information and \code{\link{brmultinom}}.
 #' @param singular.ok logical. If \code{FALSE}, a singular model is an
 #'     error.
-#' @param ... arguments to be used to form the default 'control'
-#'     argument if it is not supplied directly.
 #'
 #' @details
 #'
@@ -496,7 +494,6 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
         })
     }
-
     
     ## Implementation by Euloge Clovis Kenne Pagui, 20 April 2017 (kept here for testing)
     ## AS_median_adjustment <- function(pars, level = 0, fit = NULL) {
@@ -1258,7 +1255,7 @@ confint.brglmFit <- function(object, parm, level = 0.95, ...) {
 #' in a \code{\link{brglmFit}} object
 #'
 #' @inheritParams stats::vcov
-#' @param model character specyfying for which component of the model coefficients shoould be extracted.
+#' @param model character specifying for which component of the model coefficients should be extracted.
 #'
 #' @method vcov brglmFit
 #' @export

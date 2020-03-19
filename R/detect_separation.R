@@ -1,4 +1,4 @@
-# Copyright (C) 2017-2019 Ioannis Kosmidis
+# Copyright (C) 2017-2020 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -39,8 +39,6 @@
 #' @param etastart currently not used.
 #' @param singular.ok logical. If \code{FALSE}, a singular model is an
 #'     error.
-#' @param ... arguments to be used to form the default 'control'
-#'     argument if it is not supplied directly.
 #'
 #' @details
 #'
@@ -158,14 +156,14 @@ detect_separation <- function (x, y, weights = rep(1, nobs),
         betas_all <- structure(rep(NA_real_, nvars_all), .Names = betas_names_all)
         ## Observations with zero weight do not enter calculations so ignore
         keep <- weights > 0
-        x <- x[keep, ]
+        x <- x[keep, , drop = FALSE]
         y <- y[keep]
         ## Reshape data set: keep 0 and 1, and replace anything in (0,
         ## 1) with one zero and one 1
         ones <- y == 1
         zeros <- y == 0
-        non_boundary <- !(ones | zeros)
-        x <- x[c(which(ones), which(zeros), rep(which(non_boundary), 2)), ]
+        non_boundary <- !(ones | zeros)        
+        x <- x[c(which(ones), which(zeros), rep(which(non_boundary), 2)), , drop = FALSE]
         y <- c(y[ones], y[zeros], rep(c(0., 1.), each = sum(non_boundary)))
         ## Run linear program
         out <- separator(x = x, y = y, linear_program = control$linear_program, purpose = control$purpose, beta_tolerance = control$beta_tolerance)

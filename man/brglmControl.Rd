@@ -6,15 +6,29 @@
 \title{Auxiliary function for \code{\link{glm}} fitting using the
 \code{\link{brglmFit}} method.}
 \usage{
-brglmControl(epsilon = 1e-06, maxit = 100, trace = FALSE,
-  type = c("AS_mixed", "AS_mean", "AS_median", "correction",
-  "MPL_Jeffreys", "ML"), transformation = "identity", slowit = 1,
-  response_adjustment = NULL, max_step_factor = 12, a = 1/2)
+brglmControl(
+  epsilon = 1e-06,
+  maxit = 100,
+  trace = FALSE,
+  type = c("AS_mixed", "AS_mean", "AS_median", "correction", "MPL_Jeffreys", "ML"),
+  transformation = "identity",
+  slowit = 1,
+  response_adjustment = NULL,
+  max_step_factor = 12,
+  a = 1/2
+)
 
-brglm_control(epsilon = 1e-06, maxit = 100, trace = FALSE,
-  type = c("AS_mixed", "AS_mean", "AS_median", "correction",
-  "MPL_Jeffreys", "ML"), transformation = "identity", slowit = 1,
-  response_adjustment = NULL, max_step_factor = 12, a = 1/2)
+brglm_control(
+  epsilon = 1e-06,
+  maxit = 100,
+  trace = FALSE,
+  type = c("AS_mixed", "AS_mean", "AS_median", "correction", "MPL_Jeffreys", "ML"),
+  transformation = "identity",
+  slowit = 1,
+  response_adjustment = NULL,
+  max_step_factor = 12,
+  a = 1/2
+)
 }
 \arguments{
 \item{epsilon}{positive convergence tolerance epsilon. Default is

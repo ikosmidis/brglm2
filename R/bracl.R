@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2019 Ioannis Kosmidis
+# Copyright (C) 2016-2020 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -281,6 +281,7 @@ vcov.bracl <- function(object, ...) {
 summary.bracl <- function(object, correlation = FALSE, digits = 3, ...) {
     object$digits <- digits
     object$logLik <- logLik(object)
+    object$AIC <- AIC(object)
     coefs <- coefficients(object)
     aliased <- is.na(coefs)
     vc <- vcov(object)
@@ -305,12 +306,12 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
     if (!is.null(cl <- x$call)) {
         cat("Call:\n")
         dput(cl, control = NULL)
-    }
+    }    
     cat("\nCoefficients:\n")
     printCoefmat(x$coefficients, digits = digits)
     cat("\nResidual Deviance:", format(x$deviance), "\n")
     cat("Log-likelihood:", format(x$logLik), "\n")
-    cat("AIC:", format(x$aic), "\n")
+    cat("AIC:", format(x$AIC), "\n")
     if (!is.null(correl <- x$correlation)) {
         p <- dim(correl)[2L]
         if (p > 1) {

@@ -5,9 +5,19 @@
 \title{Bias reduction for adjacent category logit models for ordinal
 responses using the Poisson trick.}
 \usage{
-bracl(formula, data, weights, subset, na.action, parallel = FALSE,
-  contrasts = NULL, model = TRUE, x = TRUE, control = list(...),
-  ...)
+bracl(
+  formula,
+  data,
+  weights,
+  subset,
+  na.action,
+  parallel = FALSE,
+  contrasts = NULL,
+  model = TRUE,
+  x = TRUE,
+  control = list(...),
+  ...
+)
 }
 \arguments{
 \item{formula}{

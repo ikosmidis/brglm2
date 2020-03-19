@@ -4,11 +4,10 @@
 \alias{predict.brmultinom}
 \title{Predict method for \code{brmultinom} fits}
 \usage{
-\method{predict}{brmultinom}(object, newdata, type = c("class", "probs"),
-  ...)
+\method{predict}{brmultinom}(object, newdata, type = c("class", "probs"), ...)
 }
 \arguments{
-\item{object}{a fitted object of class inherinting from
+\item{object}{a fitted object of class inheriting from
 \code{"brmultinom"}.}
 
 \item{newdata}{optionally, a data frame in which to look for
@@ -18,7 +17,7 @@ predictors are used.}
 \item{type}{the type of prediction required. The default is
 \code{"class"}, which produces predictions of the response
 category at the covariate values supplied in \code{"newdata"},
-selecting the cateogry with the largest probability; the
+selecting the category with the largest probability; the
 alternative \code{"probs"} returns all cateogry probabilities
 at the covariate values supplied in \code{"newdata"}.}
 

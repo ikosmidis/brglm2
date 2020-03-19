@@ -5,11 +5,9 @@
 \alias{residuals.bracl}
 \title{Residuals for multinomial logistic regression and adjacent category logit models}
 \usage{
-\method{residuals}{brmultinom}(object, type = c("pearson", "response",
-  "deviance", "working"), ...)
+\method{residuals}{brmultinom}(object, type = c("pearson", "response", "deviance", "working"), ...)
 
-\method{residuals}{bracl}(object, type = c("pearson", "response",
-  "deviance", "working"), ...)
+\method{residuals}{bracl}(object, type = c("pearson", "response", "deviance", "working"), ...)
 }
 \arguments{
 \item{object}{the object coming out of \code{\link{bracl}} and

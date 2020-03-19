@@ -1,6 +1,6 @@
 Package: brglm2
 Title: Bias Reduction in Generalized Linear Models
-Version: 0.6.0
+Version: 0.6.1
 Authors@R: c(person(given = "Ioannis", family = "Kosmidis", role = c("aut", "cre"), email = "ioannis.kosmidis@warwick.ac.uk", comment = c(ORCID = "0000-0003-1556-0302")),
 	     person(given = "Kjell", family = "Konis", role = "ctb", email = "kjell.konis@me.com"),
 	     person(given = c("Euloge", "Clovis"), family = c("Kenne Pagui"), role = "ctb", email = "kenne@stat.unipd.it"),
@@ -13,6 +13,6 @@ Imports: MASS, stats, Matrix, graphics, nnet, enrichwith, lpSolveAPI, numDeriv
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Suggests: testthat, knitr, rmarkdown, covr
 VignetteBuilder: knitr

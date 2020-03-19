@@ -4,12 +4,17 @@
 \alias{summary.brglmFit}
 \title{\code{summary} method for \code{\link{brglmFit}} objects}
 \usage{
-\method{summary}{brglmFit}(object, dispersion = NULL,
-  correlation = FALSE, symbolic.cor = FALSE, ...)
+\method{summary}{brglmFit}(
+  object,
+  dispersion = NULL,
+  correlation = FALSE,
+  symbolic.cor = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{an object of class \code{"glm"}, usually, a result of a
-    call to \code{\link{glm}}.}
+    call to \code{\link[stats]{glm}}.}
 
 \item{dispersion}{the dispersion parameter for the family used.
     Either a single numerical value or \code{NULL} (the default), when
@@ -19,7 +24,7 @@
     the estimated parameters is returned and printed.}
 
 \item{symbolic.cor}{logical. If \code{TRUE}, print the correlations in
-    a symbolic form (see \code{\link{symnum}}) rather than as numbers.}
+    a symbolic form (see \code{\link[stats]{symnum}}) rather than as numbers.}
 
 \item{...}{further arguments passed to or from other methods.}
 }

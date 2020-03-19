@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2019 Ioannis Kosmidis
+# Copyright (C) 2016-2020 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -210,7 +210,7 @@ brmultinom <- function(formula, data, weights, subset, na.action,
     fit <- brglmFit(x = Xextended, y = Yextended,
                     start = NULL,
                     family = poisson("log"), control = control, intercept = TRUE, fixed_totals = fixed_totals)
-
+    
     ## TODO:
     ## + starting values
     ## + subset
@@ -336,7 +336,7 @@ summary.brmultinom <- function(object, correlation = FALSE, digits = options()$d
     ncat <- object$ncat
     coefficients <- coef.brmultinom(object)
     object$digits <- digits
-    object$AIC <- AIC(object)
+    object$AIC <- AIC(object)    
     object$logLik <- logLik(object)
     if (is.null(coefficients)) {
         object$coefficients <- NULL
@@ -350,10 +350,10 @@ summary.brmultinom <- function(object, correlation = FALSE, digits = options()$d
         vc <- vcov.brglmFit(object)
         vc <- vc[object$ofInterest, object$ofInterest]
         se <- sqrt(diag(vc))
-        ses <- matrix(se, nrow = ncat - 1, byrow = TRUE, dimnames = dimnames(coefficients))
+        ses <- matrix(se, nrow = ncat - 1, byrow = TRUE, dimnames = dimnames(coefficients))        
         object$coefficients <- coefficients
         object$standard.errors <- ses
-        object$AIC <- AIC(object)
+        ## object$AIC <- AIC(object)
         if (Wald.ratios)
             object$Wald.ratios <- coef/ses
         if (correlation)
@@ -409,7 +409,7 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
 #' Obtain class and probability predictions from a fitted baseline
 #' category logits model.
 #'
-#' @param object a fitted object of class inherinting from
+#' @param object a fitted object of class inheriting from
 #'     \code{"brmultinom"}.
 #' @param newdata optionally, a data frame in which to look for
 #'     variables with which to predict.  If omitted, the fitted linear
@@ -417,7 +417,7 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
 #' @param type the type of prediction required. The default is
 #'     \code{"class"}, which produces predictions of the response
 #'     category at the covariate values supplied in \code{"newdata"},
-#'     selecting the cateogry with the largest probability; the
+#'     selecting the category with the largest probability; the
 #'     alternative \code{"probs"} returns all cateogry probabilities
 #'     at the covariate values supplied in \code{"newdata"}.
 #' @param ... further arguments passed to or from other methods.

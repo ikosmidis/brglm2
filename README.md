@@ -38,7 +38,7 @@ using the function `brmultinom`, and for adjacent category models
 `bracl` rely on `brglmFit`.
 
 The [iteration vignette](https://cran.r-project.org/package=brglm2/vignettes/iteration.html) and [Kosmidis et al
-(2019)](https://doi.org/10.1007/s11222-019-09860-6) apresent the iteration and give mathematical details for the bias-reducing adjustments to the score functions for generalized linear models.
+(2019)](https://doi.org/10.1007/s11222-019-09860-6) present the iteration and give mathematical details for the bias-reducing adjustments to the score functions for generalized linear models.
 
 The classification of bias reduction methods into explicit and implicit is as given in [Kosmidis (2014)](https://doi.org/10.1002/wics.1296).
 
