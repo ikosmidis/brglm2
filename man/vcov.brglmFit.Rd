@@ -5,7 +5,7 @@
 \title{Return the variance-covariance matrix for the regression parameters
 in a \code{\link{brglmFit}} object}
 \usage{
-\method{vcov}{brglmFit}(object, model = c("mean", "full", "dispersion"), ...)
+\method{vcov}{brglmFit}(object, model = c("mean", "full", "dispersion"), complete = TRUE, ...)
 }
 \arguments{
 \item{object}{
@@ -15,6 +15,14 @@ in a \code{\link{brglmFit}} object}
 
 \item{model}{character specifying for which component of the model coefficients should be extracted.}
 
+\item{complete}{for the \code{aov}, \code{lm}, \code{glm}, \code{mlm}, and where
+    applicable \code{summary.lm} etc methods: logical indicating if the
+    full variance-covariance matrix should be returned also in case of
+    an over-determined system where some coefficients are undefined and
+    \code{\link[stats]{coef}(.)} contains \code{NA}s correspondingly.   When
+    \code{complete = TRUE},  \code{vcov()} is compatible with
+    \code{coef()} also in this singular case.}
+
 \item{...}{
     additional arguments for method functions.  For the
     \code{\link[stats]{glm}} method this can be used to pass a
@@ -23,4 +31,11 @@ in a \code{\link{brglmFit}} object}
 \description{
 Return the variance-covariance matrix for the regression parameters
 in a \code{\link{brglmFit}} object
+}
+\details{
+The options for \code{model} are \code{"mean"} for mean regression
+parameters only (default), \code{"dispersion"} for the dispersion
+parameter (or the transformed dispersion; see
+\code{\link{brglm_control}}), and \code{"mean"} for both the mean
+regression and the (transformed) dispersion parameters.
 }
