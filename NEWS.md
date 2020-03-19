@@ -12,7 +12,6 @@
   R package.
 * Fixed typos in NEWS.
 
-
 # brglm2 0.6.1
 ## Bug fixes
 * Fixed bug in AIC reported by `print.summary` for `brmultinom` and `bracl`

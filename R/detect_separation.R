@@ -62,7 +62,10 @@
 #' \code{detect_separation} will be removed from \pkg{brglm2} at
 #' version 0.8. A new version of \code{detect_separation} is now
 #' maintained in the \pkg{detectseparation} R package at
-#' \url{https://cran.r-project.org/package=detectseparation}.
+#' \url{https://cran.r-project.org/package=detectseparation}. In order
+#' to use the version in \code{detect_separation} load first
+#' \pkg{brglm2} and then \pkg{detectseparation}, i.e. 
+#' \code{library(brglm2); library(detectseparation)}.
 #'
 #' @author Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Kjell Konis [ctb] \email{kjell.konis@me.com}
 #'
