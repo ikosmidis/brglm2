@@ -1,5 +1,9 @@
 # brglm2 0.6.2
+
 ## Other improvements, updates and additions
+* `vcov.brglmFit` objects now uses `vcov.summary.glm` and supports the
+  `complete` argument for controlling whether the variance covariance
+  matrix should include rows and columns for aliased parameters.
 * Deprecated `detect_sepration` and `check_infinite_estimates`, which
   will be removed from **brglm2** at version 0.8. New versions of
   `detect_sepration` and `check_infinite_estimates` are now maintained
@@ -7,6 +11,7 @@
   [**detectseparation**](https://cran.r-project.org/package=detectseparation)
   R package.
 * Fixed typos in NEWS.
+
 
 # brglm2 0.6.1
 ## Bug fixes
