@@ -2,15 +2,15 @@ context("test that detect_separation works as expected")
 
 ## endometrial data from Heinze \& Schemper (2002) (see ?endometrial)
 data("endometrial", package = "brglm2")
-endometrial_separation <- glm(HG ~ I(-NV) + PI + EH, data = endometrial,
-                              family = binomial("cloglog"),
-                              method = "detect_separation")
+expect_warning(endometrial_separation <- glm(HG ~ I(-NV) + PI + EH, data = endometrial,
+                                             family = binomial("cloglog"),
+                                             method = "detect_separation"))
 
 ## The lizards example from ?brglm::brglm
 data("lizards", package = "brglm2")
-lizards_separation <- glm(cbind(grahami, opalinus) ~ height + diameter +
-                              light + time, family = binomial(logit), data = lizards,
-                          method = "detect_separation")
+expect_warning(lizards_separation <- glm(cbind(grahami, opalinus) ~ height + diameter +
+                                             light + time, family = binomial(logit), data = lizards,
+                                         method = "detect_separation"))
 
 
 test_that("infinte estimates have been found as expected", {

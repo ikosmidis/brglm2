@@ -40,7 +40,7 @@
 #'
 #' \item{PI}{pulsality index of arteria uterina}
 #'
-#' \item{EH}{endometrium heigh}
+#' \item{EH}{endometrium height}
 #'
 #' \item{HG}{histology grade with coding 0 for low grade and 1 for high grade}
 #'
@@ -50,7 +50,7 @@
 #'     from \url{http://www.stat.ufl.edu/~aa/glm/data}. The latter
 #'     link provides the data sets used in Agresti (2015).
 #'
-#'     The endometrial data set was first analysed in Heinze and
+#'     The endometrial data set was first analyzed in Heinze and
 #'     Schemper (2002), and was originally provided by Dr
 #'     E. Asseryanis from the Medical University of Vienna.
 #'
@@ -113,7 +113,7 @@
 #'
 #' @source
 #'
-#' The alligators data set is analysed in Agresti (2002, Subsection~7.1.2).
+#' The alligators data set is analyzed in Agresti (2002, Subsection~7.1.2).
 #'
 #' @seealso
 #'
@@ -156,7 +156,7 @@
 #' 
 #' @source
 #'
-#' The \code{stemcell} data set is analysed in Agresti (2010, Subsection~4.1.5).
+#' The \code{stemcell} data set is analyzed in Agresti (2010, Subsection~4.1.5).
 #'
 #' @references
 #'

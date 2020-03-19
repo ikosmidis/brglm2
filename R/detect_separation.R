@@ -57,18 +57,28 @@
 #'
 #' \code{detectSeparation} is an alias for \code{detect_separation}.
 #'
+#' @note
+#' 
+#' \code{detect_separation} will be removed from \pkg{brglm2} at
+#' version 0.8. A new version of \code{detect_separation} is now
+#' maintained in the \pkg{detectseparation} R package at
+#' \url{https://cran.r-project.org/package=detectseparation}. In order
+#' to use the version in \code{detect_separation} load first
+#' \pkg{brglm2} and then \pkg{detectseparation}, i.e. 
+#' \code{library(brglm2); library(detectseparation)}.
+#'
 #' @author Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Kjell Konis [ctb] \email{kjell.konis@me.com}
 #'
 #' @seealso \code{\link{brglm_fit}}, \code{\link{glm.fit}} and \code{\link{glm}}
 #'
 #' @references
 #'
-#' Kjell K. (2007). *Linear Programming Algorithms for Detecting
+#' Konis K. (2007). *Linear Programming Algorithms for Detecting
 #' Separated Data in Binary Logistic Regression
 #' Models*. DPhil. University of Oxford.
 #' \url{https://ora.ox.ac.uk/objects/uuid:8f9ee0d0-d78e-4101-9ab4-f9cbceed2a2a}
 #'
-#' Kjell K. (2013). safeBinaryRegression: Safe Binary Regression. R
+#' Konis K. (2013). safeBinaryRegression: Safe Binary Regression. R
 #' package version 0.1-3.
 #' \url{https://CRAN.R-project.org/package=safeBinaryRegression}
 #'
@@ -102,10 +112,16 @@
 #' update(murder_glm, method = "brglm_fit")
 #' }
 #' @export
-detect_separation <- function (x, y, weights = rep(1, nobs),
-                              start = NULL, etastart = NULL,  mustart = NULL,
-                              offset = rep(0, nobs), family = gaussian(),
-                              control = list(), intercept = TRUE, singular.ok = TRUE) {
+detect_separation <- function(x, y, weights = rep(1, nobs),
+                             start = NULL, etastart = NULL,  mustart = NULL,
+                             offset = rep(0, nobs), family = gaussian(),
+                             control = list(), intercept = TRUE, singular.ok = TRUE) {
+
+    function_moves_to_new_package(gsub("\\(|\\)", "", deparse(match.call()[1])),
+                                  "0.8",
+                                  "brglm2",
+                                  "detectseparation")
+    
     if (family$family != "binomial") {
         warning("detect_separation has been developed for use with binomial-response models")
     }

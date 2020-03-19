@@ -10,7 +10,7 @@ brglm2
 
 Reduction of estimation bias is achieved by solving either the mean-bias reducing adjusted score equations in [Firth (1993)](https://doi.org/10.1093/biomet/80.1.27) and [Kosmidis & Firth (2009)](https://doi.org/10.1093/biomet/asp055) or the median-bias reducing adjusted score equations in [Kenne et al (2016)](https://arxiv.org/abs/1604.04768), or through the direct subtraction of an estimate of the bias of the maximum likelihood estimator from the maximum likelihood estimates as prescribed in [Cordeiro and McCullagh (1991)](http://www.jstor.org/stable/2345592). [Kosmidis et al (2019)](https://doi.org/10.1007/s11222-019-09860-6) provides a unifying framework and algorithms for mean and median bias reduction for the estimation of generalized linear models. 
 
-In the special case of generalized linear models for binomial and multinomial responses (both ordinal and nomial), the adjusted score equations return estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite (e.g. complete and quasi-complete separation). See, [Kosmidis & Firth (2019)](http://arxiv.org/abs/1812.01938) for the proof of the latter result in the case of mean bias reduction for logistic regression (and, for more general binomial-response models where the likelihood is penalized by a power of the Jeffreys invariant prior).
+In the special case of generalized linear models for binomial and multinomial responses (both ordinal and nominal), the adjusted score equations return estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite (e.g. complete and quasi-complete separation). See, [Kosmidis & Firth (2019)](http://arxiv.org/abs/1812.01938) for the proof of the latter result in the case of mean bias reduction for logistic regression (and, for more general binomial-response models where the likelihood is penalized by a power of the Jeffreys invariant prior).
 
 **brglm2** also provides *pre-fit* and *post-fit* methods for the detection of separation and of infinite maximum likelihood estimates in binomial response generalized linear models (see `?detect_separation` and `?check_infinite_estimates`).
 
@@ -49,6 +49,5 @@ The classification of bias reduction methods into explicit and implicit is as gi
 
 Motivation, details and discussion on the methods that **brglm2** implements are provided in
 
-Kosmidis, I, Kenne Pagui, E C, Sartori N. (2017). Mean and median bias reduction in generalized linear models. To appear in [*Statistics and Computing*](https://doi.org/10.1007/s11222-019-09860-6). *arXiv*, [arXiv:1710.11217](http://arxiv.org/abs/1804.04085). 
-
+Kosmidis, I, Kenne Pagui, E C, Sartori N. (2017). Mean and median bias reduction in generalized linear models. [*Statistics and Computing*](https://doi.org/10.1007/s11222-019-09860-6) *30*, 43–59. *arXiv*, [arXiv:1710.11217](http://arxiv.org/abs/1804.04085). 
 

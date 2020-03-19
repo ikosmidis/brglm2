@@ -28,7 +28,7 @@
 #'
 #' @details
 #'
-#' \code{check_infinite_estimates} attempts to identify the occurence
+#' \code{check_infinite_estimates} attempts to identify the occurrence
 #' of infinite estimates in GLMs with binomial responses by
 #' successively refitting the model. At each iteration the maximum
 #' number of allowed IWLS iterations is fixed starting from 1 to
@@ -42,6 +42,16 @@
 #' quasi-complete separation occurs and the maximum likelihood
 #' estimate for the corresponding parameter has value minus or plus
 #' infinity.
+#'
+#' @note
+#' 
+#' \code{check_infinite_estimates} will be removed from \pkg{brglm2}
+#' at version 0.8. An new version of \code{check_infinite_estimates}
+#' is now maintained in the \pkg{detectseparation} R package at
+#' \url{https://cran.r-project.org/package=detectseparation}. In order
+#' to use the version in \code{detect_separation} load first
+#' \pkg{brglm2} and then \pkg{detectseparation}, i.e.
+#' \code{library(brglm2); library(detectseparation)}.
 #'
 #' @seealso \code{\link[nnet]{multinom}}, \code{\link{brmultinom}}
 #'
@@ -73,7 +83,7 @@
 #' }
 #' @export
 check_infinite_estimates.glm <- function(object, nsteps = 20, ...)
-{
+{   
     is_brmultinom <- inherits(object, "brmultinom")
 
     if ((class(object)[1] != "glm") & (!is_brmultinom)) {

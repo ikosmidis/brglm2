@@ -19,7 +19,7 @@ beliefs with levels \code{fundamentalist}, \code{moderate},
 
 }}
 \source{
-The \code{stemcell} data set is analysed in Agresti (2010, Subsection~4.1.5).
+The \code{stemcell} data set is analyzed in Agresti (2010, Subsection~4.1.5).
 }
 \usage{
 stemcell

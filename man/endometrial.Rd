@@ -11,7 +11,7 @@
 
 \item{PI}{pulsality index of arteria uterina}
 
-\item{EH}{endometrium heigh}
+\item{EH}{endometrium height}
 
 \item{HG}{histology grade with coding 0 for low grade and 1 for high grade}
 
@@ -21,7 +21,7 @@ The packaged data set was downloaded in \code{.dat} format
     from \url{http://www.stat.ufl.edu/~aa/glm/data}. The latter
     link provides the data sets used in Agresti (2015).
 
-    The endometrial data set was first analysed in Heinze and
+    The endometrial data set was first analyzed in Heinze and
     Schemper (2002), and was originally provided by Dr
     E. Asseryanis from the Medical University of Vienna.
 }

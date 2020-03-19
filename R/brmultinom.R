@@ -46,7 +46,7 @@
 #' baseline-category logit models have infinite components with
 #' positive probability, which can result in problems in their
 #' estimation and the use of inferential procedures (e.g. Wad
-#' tests). Albert and Andreson (1984) have categorised the possible
+#' tests). Albert and Andreson (1984) have categorized the possible
 #' data patterns for such models into the exclusive and exhaustive
 #' categories of complete separation, quasi-complete separation and
 #' overlap, and showed that infinite maximum likelihood estimates
@@ -264,7 +264,7 @@ fitted.brmultinom <- function(object, ...) {
 #' @details
 #'
 #' The residuals computed are the residuals from the equivalent
-#' Poisson log-linear model fit, organised in a form that matches the
+#' Poisson log-linear model fit, organized in a form that matches the
 #' output of \code{fitted(object, type = "probs")}. As a result, the
 #' output is residuals defined in terms of the object and expected
 #' multinomial counts.
@@ -418,7 +418,7 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
 #'     \code{"class"}, which produces predictions of the response
 #'     category at the covariate values supplied in \code{"newdata"},
 #'     selecting the category with the largest probability; the
-#'     alternative \code{"probs"} returns all cateogry probabilities
+#'     alternative \code{"probs"} returns all category probabilities
 #'     at the covariate values supplied in \code{"newdata"}.
 #' @param ... further arguments passed to or from other methods.
 #'

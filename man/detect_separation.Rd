@@ -98,6 +98,15 @@ permission of Kjell Konis.
 
 \code{detectSeparation} is an alias for \code{detect_separation}.
 }
+\note{
+\code{detect_separation} will be removed from \pkg{brglm2} at
+version 0.8. A new version of \code{detect_separation} is now
+maintained in the \pkg{detectseparation} R package at
+\url{https://cran.r-project.org/package=detectseparation}. In order
+to use the version in \code{detect_separation} load first
+\pkg{brglm2} and then \pkg{detectseparation}, i.e. 
+\code{library(brglm2); library(detectseparation)}.
+}
 \examples{
 
 ## endometrial data from Heinze \& Schemper (2002) (see ?endometrial)
@@ -129,12 +138,12 @@ update(murder_glm, method = "brglm_fit")
 }
 }
 \references{
-Kjell K. (2007). *Linear Programming Algorithms for Detecting
+Konis K. (2007). *Linear Programming Algorithms for Detecting
 Separated Data in Binary Logistic Regression
 Models*. DPhil. University of Oxford.
 \url{https://ora.ox.ac.uk/objects/uuid:8f9ee0d0-d78e-4101-9ab4-f9cbceed2a2a}
 
-Kjell K. (2013). safeBinaryRegression: Safe Binary Regression. R
+Konis K. (2013). safeBinaryRegression: Safe Binary Regression. R
 package version 0.1-3.
 \url{https://CRAN.R-project.org/package=safeBinaryRegression}
 }

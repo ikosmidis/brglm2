@@ -24,7 +24,7 @@ Residuals for multinomial logistic regression and adjacent category logit models
 }
 \details{
 The residuals computed are the residuals from the equivalent
-Poisson log-linear model fit, organised in a form that matches the
+Poisson log-linear model fit, organized in a form that matches the
 output of \code{fitted(object, type = "probs")}. As a result, the
 output is residuals defined in terms of the object and expected
 multinomial counts.

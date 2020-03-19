@@ -7,6 +7,8 @@ expect_warning({
                           family = binomial("cloglog"))
 })
 
+expect_warning(cie <- check_infinite_estimates(endometrial_ml))
+
 test_that("infinte estimates have been found as expected", {
-    expect_true(any(check_infinite_estimates(endometrial_ml)[, "I(-NV)"] > 1e+06))
+    expect_true(any(cie[, "I(-NV)"] > 1e+06))
 })

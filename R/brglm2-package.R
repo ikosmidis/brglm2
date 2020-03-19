@@ -94,7 +94,24 @@ if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 #' @param object a fitted model object (e.g. the result of a
 #'     \code{\link{glm}} call).
 #' @param ... other options to be passed to the method.
+#'
+#'
+#' @note
+#'
+#' 
+#' \code{check_infinite_estimates} will be removed from \pkg{brglm2}
+#' at version 0.8. An new version of
+#' \code{check_infinite_estimates} is now maintained in the
+#' \pkg{detectseparation} R package at
+#' \url{https://cran.r-project.org/package=detectseparation}.
+#'
+#' @seealso check_infinite_estimates.glm
+#' 
 #' @export
 check_infinite_estimates <- function(object, ...) {
+    function_moves_to_new_package(gsub("\\(|\\)", "", deparse(match.call()[1])),
+                                  "0.8",
+                                  "brglm2",
+                                  "detectseparation")
     UseMethod("check_infinite_estimates")
 }
