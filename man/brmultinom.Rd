@@ -151,9 +151,9 @@ houseBC3 <- update(houseML3, type = "correction")
 
 }
 \references{
-Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
-reduction in generalized linear models. *arXiv e-prints*,
-arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
+Kosmidis I, Kenne Pagui EC, Sartori N (2020). Mean and median bias
+reduction in generalized linear models. *Statistics and Computing*,
+**30**, 43-59
 
 Agresti A. (2002). *Categorical data analysis* (2nd edition). Wiley
 Series in Probability and Statistics. Wiley.

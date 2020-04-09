@@ -12,8 +12,8 @@ c(bibentry(bibtype = "Manual",
            author = c(person(given = "Ioannis", family = "Kosmidis"),
                       person(given = c("Euloge", "Clovis"), family = c("Kenne Pagui")),
                       person(given = "Nicola", family = "Sartori")),
-           year = 2019,
-           journal = "arXiv e-prints",
-           volume = "arXiv:1804.04085",
-           note = "To appear in Statistics and Computing",
-           url = "https://arxiv.org/abs/1804.04085"))
+           year = 2020,
+           journal = "Statistics and Computing",
+           volume = "30",
+           pages = "43-59",
+           url = "https://doi.org/10.1007/s11222-019-09860-6"))

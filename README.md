@@ -49,5 +49,5 @@ The classification of bias reduction methods into explicit and implicit is as gi
 
 Motivation, details and discussion on the methods that **brglm2** implements are provided in
 
-Kosmidis, I, Kenne Pagui, E C, Sartori N. (2017). Mean and median bias reduction in generalized linear models. [*Statistics and Computing*](https://doi.org/10.1007/s11222-019-09860-6) *30*, 43–59. *arXiv*, [arXiv:1710.11217](http://arxiv.org/abs/1804.04085). 
+Kosmidis, I, Kenne Pagui, E C, Sartori N. (2020). Mean and median bias reduction in generalized linear models. [*Statistics and Computing*](https://doi.org/10.1007/s11222-019-09860-6) *30*, 43–59. *arXiv*, [arXiv:1710.11217](http://arxiv.org/abs/1804.04085). 
 
