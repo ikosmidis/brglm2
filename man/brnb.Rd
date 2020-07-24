@@ -14,7 +14,7 @@ brnb(
   start = NULL,
   etastart = NULL,
   mustart = NULL,
-  init.phi,
+  init_dispersion,
   control = list(...),
   na.action,
   model = TRUE,
@@ -60,7 +60,7 @@ or \code{identity}.}
 
 \item{mustart}{starting values for the vector of means.}
 
-\item{init.phi}{optional initial value for the theta parameter.  If omitted a maximum
+\item{init_dispersion}{optional initial value for the dispersion parameter.  If omitted a maximum
 likelihood estimator after an initial fit using a Poisson GLM is used.}
 
 \item{control}{a list of parameters for controlling the fitting
@@ -113,16 +113,13 @@ process. See \code{\link{brglmControl}} for details.}
   }
 }
 \value{
-A fitted model object of class \code{brnb} inheriting from \code{negbin}, \code{glm}
-and \code{lm}.  The object is like the output of \code{brglmFit} but contains
-seven additional components, namely \code{theta} for the ML estimate of
-dispersion parameter as in \code{glm.nb}, \code{dispersion} for the ML estimate of 
-dispersion parameter in a given parameterizzation as in \code{brnb}, \code{se.dispersion}
-for its approximate standard error (using the expected information), \code{vcov.mean} for
+A fitted model object of class \code{brnb} inheriting from \code{negbin} and \code{brglmFit}.
+  The object is like the output of \code{brglmFit} but contains
+four additional components, namely \code{theta} for the ML estimate of
+dispersion parameter as in \code{glm.nb}, \code{vcov.mean} for
 the estimated variance covariance matrix of the regression coefficients while \code{vcov.dispersion}
-for the estimated variance of the dispersion parameter in a chosen parameterizzation, 
-\code{transformation} for the parameterizzation used and \code{se} for the estimated standard
- errors of the whole parameter vector.
+for the estimated variance of the dispersion parameter in a chosen parameterization (using the expected information) 
+and  \code{twologlik} for  twice the log-likelihood function.
 }
 \description{
 \code{brnb} is a function that fits
@@ -130,14 +127,12 @@ negative regression model using implicit and explicit bias
 reduction methods. Reference needed.
 }
 \details{
-Exploiting the orthogonality between coefficients and dispersion parameter,  
- an alternating iteration process is used. For given \code{dispersion} parameter 
-a quasi-Fisher scoring is adopted using score/adjusted score and information
-iterations.  For fixed coefficients the same procedure is used for
-the \code{phi} dispersion parameter. 
- The two are alternated until convergence of both. 
+Thanks to  the orthogonality between coefficients and dispersion parameter,
+the alternate  quasi Fisher scoring iteration is used. A detailed description of the
+procedure is given in the iteration vignette (see,
+\code{vignette("iteration", "brglm2")} or Kosmidis et al, 2020).   
 (The number of alternations and the number of iterations when estimating
-\code{phi} are controlled by the \code{maxit} parameter of  \code{brglmControl}.)
+parameters are controlled by the \code{maxit} argument of  \code{brglmControl}.)
 
 The type of score adjustment to be used is specified through the 
 \code{type} argument (see \code{\link{brglmControl}} for details). 
@@ -158,7 +153,7 @@ with powers of the Jeffreys prior as penalty.
 Cordeiro & McCullagh (1991).
 }
 
-The choice of the parameterizzation for the dispersion is controlled by 
+The choice of the parameterization for the dispersion is controlled by 
 the  \code{transformation} argument (see \code{\link{brglmControl}} for details). 
 The default is \code{identity} but using option  \code{inverse} produces
 the results as in \code{glm.nb}.
@@ -194,11 +189,11 @@ transformation ="inverse",type = "AS_mixed")
 fitBC_mean<- brnb(freq~dose+log(dose+10),link="log", 
 transformation ="inverse",type = "correction")
 # summary of methods
-res=round(cbind(coef(fitmle.brnb,"full"),fitmle.brnb$se,
-coef(fitBC_mean,"full"),fitBC_mean$se,
-coef(fitBR_mean,"full"),fitBR_mean$se,
-coef(fitBR_median,"full"),fitBR_median$se,
-coef(fitBR_mixed,"full"),fitBR_mixed$se),3)
+res=round(cbind(coef(fitmle.brnb,"full"),sqrt(diag(vcov(fitmle.brnb,"full"))),
+coef(fitBC_mean,"full"),sqrt(diag(vcov(fitBC_mean,"full"))),
+coef(fitBR_mean,"full"),sqrt(diag(vcov(fitBR_mean,"full"))),
+coef(fitBR_median,"full"),sqrt(diag(vcov(fitBR_median,"full"))),
+coef(fitBR_mixed,"full"),sqrt(diag(vcov(fitBR_mixed,"full")))),3)
 colnames(res)<-c("mle","semle","bc_mean","sebc_mean",
 "br_mean","sebr_mean","br_median","sebr_median","mixed","semixed")
 res
@@ -206,7 +201,7 @@ res
 # test with glm.nb
 # The parameter estimates are numerically the same for glm.nb and brnb
 all.equal(as.vector(c(coef(fitmle.glmnb),fitmle.glmnb$theta)),
-as.vector(coef(fitmle.brnb,"full")),tolerance = 1e-09)
+as.vector(coef(fitmle.brnb,"full")),tolerance = 1e-08)
 
 # check for invariance property of ML and median BR
 fitmle.brnb2<- brnb(freq~dose+log(dose+10),link="log",
@@ -214,10 +209,10 @@ transformation ="identity",type = "ML")
 fitBR_median2<- brnb(freq~dose+log(dose+10),link="log",
 transformation ="identity",type = "AS_median")
 # ML
-all.equal(fitmle.brnb2$dispersion,1/fitmle.brnb$dispersion,tolerance = 1e-06)
+all.equal(fitmle.brnb2$dispersion,1/fitmle.brnb$dispersion,tolerance = 1e-05)
 
 # median BR
-all.equal(fitBR_median2$dispersion,1/fitBR_median$dispersion,tolerance = 1e-06)
+all.equal(fitBR_median2$dispersion,1/fitBR_median$dispersion,tolerance = 1e-05)
 
 ## check for prior weights
 duptimes <- c(2,1,3,5,rep(1,14)) 

@@ -22,31 +22,26 @@
 #' @inheritParams stats::glm
 #' @param link   The link function.  Currently must be one of \code{log}, \code{sqrt} 
 #' or \code{identity}.
-#' @param init.phi optional initial value for the theta parameter.  If omitted a maximum
+#' @param init_dispersion optional initial value for the dispersion parameter.  If omitted a maximum
 #' likelihood estimator after an initial fit using a Poisson GLM is used.
 #' @param control a list of parameters for controlling the fitting
 #'  process. See \code{\link{brglmControl}} for details.
-#' @return A fitted model object of class \code{brnb} inheriting from \code{negbin}, \code{glm}
-#' and \code{lm}.  The object is like the output of \code{brglmFit} but contains
-#' seven additional components, namely \code{theta} for the ML estimate of
-#' dispersion parameter as in \code{glm.nb}, \code{dispersion} for the ML estimate of 
-#' dispersion parameter in a given parameterizzation as in \code{brnb}, \code{se.dispersion}
-#' for its approximate standard error (using the expected information), \code{vcov.mean} for
+#' @return A fitted model object of class \code{brnb} inheriting from \code{negbin} and \code{brglmFit}.
+#'   The object is like the output of \code{brglmFit} but contains
+#' four additional components, namely \code{theta} for the ML estimate of
+#' dispersion parameter as in \code{glm.nb}, \code{vcov.mean} for
 #' the estimated variance covariance matrix of the regression coefficients while \code{vcov.dispersion}
-#' for the estimated variance of the dispersion parameter in a chosen parameterizzation, 
-#' \code{transformation} for the parameterizzation used and \code{se} for the estimated standard
-#'  errors of the whole parameter vector.
+#' for the estimated variance of the dispersion parameter in a chosen parameterization (using the expected information) 
+#' and  \code{twologlik} for  twice the log-likelihood function.
 #' 
 #' @details 
 #'  
-#' Exploiting the orthogonality between coefficients and dispersion parameter,  
-#'  an alternating iteration process is used. For given \code{dispersion} parameter 
-#' a quasi-Fisher scoring is adopted using score/adjusted score and information
-#' iterations.  For fixed coefficients the same procedure is used for
-#' the \code{phi} dispersion parameter. 
-#'  The two are alternated until convergence of both. 
+#' Thanks to  the orthogonality between coefficients and dispersion parameter,
+#' the alternate  quasi Fisher scoring iteration is used. A detailed description of the
+#' procedure is given in the iteration vignette (see,
+#' \code{vignette("iteration", "brglm2")} or Kosmidis et al, 2020).   
 #' (The number of alternations and the number of iterations when estimating
-#'\code{phi} are controlled by the \code{maxit} parameter of  \code{brglmControl}.)
+#' parameters are controlled by the \code{maxit} argument of  \code{brglmControl}.)
 #'
 #'The type of score adjustment to be used is specified through the 
 #'\code{type} argument (see \code{\link{brglmControl}} for details). 
@@ -72,7 +67,7 @@
 #' Cordeiro & McCullagh (1991).
 #'}
 #'
-#'The choice of the parameterizzation for the dispersion is controlled by 
+#'The choice of the parameterization for the dispersion is controlled by 
 #' the  \code{transformation} argument (see \code{\link{brglmControl}} for details). 
 #'The default is \code{identity} but using option  \code{inverse} produces
 #' the results as in \code{glm.nb}.
@@ -127,11 +122,11 @@
 #' fitBC_mean<- brnb(freq~dose+log(dose+10),link="log", 
 #' transformation ="inverse",type = "correction")
 #' # summary of methods
-#' res=round(cbind(coef(fitmle.brnb,"full"),fitmle.brnb$se,
-#' coef(fitBC_mean,"full"),fitBC_mean$se,
-#' coef(fitBR_mean,"full"),fitBR_mean$se,
-#' coef(fitBR_median,"full"),fitBR_median$se,
-#' coef(fitBR_mixed,"full"),fitBR_mixed$se),3)
+#' res=round(cbind(coef(fitmle.brnb,"full"),sqrt(diag(vcov(fitmle.brnb,"full"))),
+#' coef(fitBC_mean,"full"),sqrt(diag(vcov(fitBC_mean,"full"))),
+#' coef(fitBR_mean,"full"),sqrt(diag(vcov(fitBR_mean,"full"))),
+#' coef(fitBR_median,"full"),sqrt(diag(vcov(fitBR_median,"full"))),
+#' coef(fitBR_mixed,"full"),sqrt(diag(vcov(fitBR_mixed,"full")))),3)
 #' colnames(res)<-c("mle","semle","bc_mean","sebc_mean",
 #' "br_mean","sebr_mean","br_median","sebr_median","mixed","semixed")
 #' res
@@ -191,15 +186,15 @@
 
 
 brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
-                     link="log", start=NULL, etastart = NULL, 
-                     mustart = NULL,init.phi,  control=list(...), na.action,
-                     model = TRUE, x = FALSE, y = TRUE, contrasts = NULL, 
-                      intercept = TRUE, singular.ok = TRUE ,...)
+                 link="log", start=NULL, etastart = NULL, 
+                 mustart = NULL,init_dispersion,  control=list(...), na.action,
+                 model = TRUE, x = FALSE, y = TRUE, contrasts = NULL, 
+                 intercept = TRUE, singular.ok = TRUE ,...)
 {
   
   ## log lik
-  # loglik <- function(n, th, mu, y, w) sum(w * (lgamma(th + y) - lgamma(th) - lgamma(y + 1) + th * log(th) + y * 
-  #                 log(mu + (y == 0)) - (th + y) * log(th + mu)))
+  loglik <- function(n, th, mu, y, w) sum(w * (lgamma(th + y) - lgamma(th) - lgamma(y + 1) + th * log(th) + y *
+                                                 log(mu + (y == 0)) - (th + y) * log(th + mu)))
   
   trace_iteration <- function() {
     if (control$trace) {
@@ -207,17 +202,17 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
       gr <- max(abs(adjusted_grad_beta), na.rm = TRUE)
       cat("Coefficients update:\t",sprintf("%03f", betas), "\n", sep = " ")
       cat("Outer/Inner iteration:\t", sprintf("%03d", iter),
-         "/", sprintf("%03d", step_factor), "\n", sep = "")
+          "/", sprintf("%03d", step_factor), "\n", sep = "")
       cat("max |step|:", format(round(st, 6), nsmall = 6,
                                 scientific = FALSE), "\t", "max |gradient|:",
           format(round(gr, 6), nsmall = 6, scientific = FALSE),
           "\n")
-     
+      
       st <- abs(step_dispersion)
       gr <- abs(adjusted_grad_dispersion)
       cat("Dispersion update:\t",sprintf("%03f", dispersion), "\n", sep = "")
       cat("Outer iteration:\t", sprintf("%03d", iter),
-        "\n")
+          "\n")
       
       cat("max |step|:", format(round(st, 6), nsmall = 6,
                                 scientific = FALSE), "\t", "max |gradient|:",
@@ -248,15 +243,18 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   if (missing_offset <- is.null(offset)) {
     offset <- rep.int(0, nobs)
   }
-  if(is.null(weights)) weights <- rep(1,nobs)
-  if(any(weights < 0))
+  if (is.null(weights)) weights <- rep(1,nobs)
+  if (any(weights < 0))
     stop("negative weights not allowed")
-  control <- do.call("brglmControl",control)
   
-  ok_links <- c("log","sqrt","identity")
+  control <- do.call("brglmControl", control)
+  if (control$type == "MPL_Jeffreys")
+    stop("maximum penalized likelihood with power Jeffreys
+         not yet available: implementation in progress")
+  ok_links <- c("log", "sqrt", "identity")
   if (!isTRUE(link %in% ok_links))
     stop(link, " is not one of the appropriate link function")
-  ok_transformations <- c("log","sqrt","identity","inverse")
+  ok_transformations <- c("log", "sqrt", "identity", "inverse")
   if (!isTRUE(control$transformation %in% ok_transformations))
     stop(transformation, " is not one of the implemented dispersion transformations")
   
@@ -272,26 +270,24 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   dkappa.dphi <- linkobj_disp$mu.eta
   d2kappa.dphi <- linkobj_disp$d2mu.deta
   
-  fam0 <- if (missing(init.phi))
+  fam0 <- if (missing(init_dispersion))
     do.call("poisson",list(link=link))
   else {
-    fam0 <- do.call("negative.binomial",list(theta=1/linkinv_disp(init.phi), link=link))
+    fam0 <- do.call("negative.binomial", list(theta=1/linkinv_disp(init_dispersion), link=link))
   } 
   
   is_ML <- control$type == "ML"
   is_AS_median <- control$type == "AS_median"
   is_AS_mixed <- control$type == "AS_mixed"
   is_correction <- control$type == "correction"
-
+  
   ## computation of y's functions
   
-  s1fun<- function(yy,k)
-  {
-    res<- 0
-    if(yy >0 )
-    {
-      j <- 0:(yy-1)
-      res <- sum(j/(k*j+1))
+  s1fun <- function(yy,k) {
+    res <- 0
+    if (yy > 0 ) {
+      j <- 0:(yy - 1)
+      res <- sum(j / (k * j + 1))
     }
     res
   }
@@ -299,37 +295,35 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   ## computation of needed expectations almost exactly
   ## still to be optimized
   
-  exp_quant<-function(mu,k, eps=control$epsilonExp)
-  {
-    if (k<0) stop("negative value of k")
-    ymax<-max(qnbinom(1-eps, mu=mu, size=1/k))
-    if (ymax>10000) stop("ymax too much large") ## to control with a flag
+  exp_quant <- function(mu, k, eps = control$epsilonExp) {
+    if (k < 0) stop("negative value of k")
+    ymax<-max(qnbinom(1 - eps, mu = mu, size = 1 / k))
+    if (ymax > 10000) stop("ymax too much large") ## to control with a flag
     yval<-0:ymax
-    pmat<-sapply(mu,function(x) dnbinom(yval,mu=x,size=1/k))
-    j<-c(0,0:(ymax-1))
-     E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- NULL
+    pmat<-sapply(mu, function(x) dnbinom(yval, mu = x, size = 1 / k))
+    j<-c(0, 0:(ymax - 1))
+    E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- NULL
     if (is_ML & is_correction) {
-      s2<-cumsum(j^2/(k*j+1)^2)
-      E_s2<-apply(pmat*s2,2,sum)
+      s2 <- cumsum(j^2 / (k * j + 1)^2)
+      E_s2 <- apply(pmat * s2, 2, sum)
     }
     else {
-      s1<-cumsum(j/(k*j+1))
-      s2<-cumsum(j^2/(k*j+1)^2)
-      s3<-cumsum(j^3/(k*j+1)^3)
-      E_s2<-apply(pmat*s2,2,sum)
-      E_s2y<-apply(pmat*s2*yval,2,sum)
-      E_s1s2<-apply(pmat*s1*s2,2,sum)
-      E_s3<-apply(pmat*s3,2,sum)
+      s1 <- cumsum(j / (k * j + 1))
+      s2 <- cumsum(j^2 / (k * j + 1)^2)
+      s3 <- cumsum(j^3 / (k * j + 1)^3)
+      E_s2 <- apply(pmat * s2, 2, sum)
+      E_s2y <- apply(pmat * s2 * yval, 2, sum)
+      E_s1s2 <- apply(pmat * s1 * s2, 2, sum)
+      E_s3 <- apply(pmat * s3, 2, sum)
     }
-    list( E_s2=E_s2, E_s2y=E_s2y, E_s1s2=E_s1s2, E_s3=E_s3) 
+    list( E_s2 = E_s2, E_s2y = E_s2y, E_s1s2 = E_s1s2, E_s3 = E_s3) 
   }
   
   ### required quantities ##
   
-  key_quantities <- function(pars)
-  {
+  key_quantities <- function(pars) {
     betas <- pars[1:nvars]
-    phi <- pars[nvars+1]
+    phi <- pars[nvars + 1]
     etas <- drop(x %*% betas + offset)
     mus <- linkinv(etas)
     d1 <- dmu.deta(etas)
@@ -337,63 +331,65 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
     k <- linkinv_disp(phi)
     d1phi <- dkappa.dphi(phi)
     d2phi <- d2kappa.dphi(phi)
-    varmus <- k*mus^2+mus  ## variance 
-    d1varmus <- 2*k*mus+1  ## derivative of variance
-    working_weights <- weights*d1^2/varmus
-    wx <- sqrt(working_weights)*x
+    varmus <- k * mus^2 + mus  ## variance 
+    d1varmus <- 2 * k * mus + 1  ## derivative of variance
+    working_weights <- weights * d1^2 / varmus
+    wx <- sqrt(working_weights) * x
     qr_decomposition <- qr(wx)
-    s1 <- sapply(y, function(t)s1fun(t,k))
-    expectations <- exp_quant(mus,k, control$epsilonExp)
-    out <- c(list(betas=betas, k=k, etas=etas,phi=phi, 
-                 mus=mus,d1=d1,d2=d2,d1phi=d1phi,d2phi=d2phi,
-                 working_weights=working_weights,varmus=varmus,d1varmus=d1varmus,
-                s1=s1,qr_decomposition=qr_decomposition),expectations)
+    s1 <- sapply(y, function(t) s1fun(t, k))
+    expectations <- exp_quant(mus, k, control$epsilonExp)
+    out <- c(list(betas = betas, 
+                  k = k, 
+                  etas = etas,
+                  phi = phi, 
+                  mus = mus,
+                  d1 = d1,
+                  d2 = d2,
+                  d1phi = d1phi,
+                  d2phi = d2phi,
+                  working_weights = working_weights,
+                  varmus = varmus,
+                  d1varmus = d1varmus,
+                  s1 = s1,
+                  qr_decomposition = qr_decomposition),expectations)
     out
   }
-
+  
   ## hat  values 
   hat_values <- function(pars, fit = NULL) {
     if (is.null(fit)) {
-      fit <-  fit <- key_quantities(pars)
+      fit <- key_quantities(pars)
     }
     with(fit, {
-     Qmat <- qr.Q(qr_decomposition)
-     .rowSums(Qmat*Qmat,nobs,nvars,TRUE)
+      Qmat <- qr.Q(qr_decomposition)
+      .rowSums(Qmat * Qmat, nobs, nvars, TRUE)
     })
   }
   
   # score function
-  score <- function(pars, level=0, fit=NULL)
-  {
-    if (is.null(fit))
-    {
+  score <- function(pars, level=0, fit=NULL) {
+    if (is.null(fit)) {
       fit <- key_quantities(pars)
     }
-    with(fit,{
-      if(level == 0)
-      {
-        return(.colSums(x*working_weights*(y-mus)/d1,nobs,nvars,TRUE))
+    with(fit, {
+      if (level == 0) {
+        return(.colSums(x * working_weights * (y - mus) / d1, nobs, nvars, TRUE))
       }
-      if(level == 1)
-      {
-        return(sum((s1-mus*y/(k*mus+1)+((k*mus+1)*log(k*mus+1)-k*mus)/(k^3*mus+k^2))*d1phi*weights, na.rm = TRUE))
+      if (level == 1) {
+        return(sum((s1 - mus * y / (k * mus + 1) + ((k * mus + 1) * log(k * mus + 1) - k * mus) / (k^3 * mus + k^2)) * d1phi * weights, na.rm = TRUE))
       }
     })
   }
   
   # information matrix
-  information <- function(pars, level=0, inverse=FALSE, fit= NULL)
-  {
-    if (is.null(fit))
-    {
+  information <- function(pars, level = 0, inverse = FALSE, fit = NULL) {
+    if (is.null(fit)) {
       fit <- key_quantities(pars)
     }
-    with(fit,{
-      if (level == 0)
-      {
+    with(fit, {
+      if (level == 0) {
         R_matrix <- qr.R(qr_decomposition)
-        if (inverse)
-        {
+        if (inverse) {
           return(chol2inv(R_matrix))
         }
         else
@@ -401,11 +397,9 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
           return(crossprod(R_matrix))
         }
       }
-      if (level == 1)
-      {
-        iphiphi <- sum( weights*(E_s2 + ((2*k*mus+2)*log((k*mus+1))-k^2*mus^2-2*k*mus)/(k^4*mus+k^3))*d1phi^2, na.rm = TRUE )
-        if (inverse)
-        {
+      if (level == 1) {
+        iphiphi <- sum( weights * (E_s2 + ((2 * k * mus + 2) * log((k * mus + 1)) - k^2 * mus^2 - 2 * k * mus) / (k^4 * mus + k^3)) * d1phi^2, na.rm = TRUE )
+        if (inverse) {
           return(1/iphiphi)
         }
         else
@@ -417,98 +411,83 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   }
   
   ## mean adjustment
-  mean_adjustment <- function(pars, level = 0, fit = NULL)
-  {
-    if (is.null(fit))
-    {
+  AS_mean_adjustment <- function(pars, level = 0, fit = NULL) {
+    if (is.null(fit)) {
       fit <- key_quantities(pars)
     }
-    with(fit,{
+    with(fit, {
       hatvalues <- hat_values(pars, fit = fit)
-      if (level == 0)
-      {
-        return(.colSums(0.5 * hatvalues * d2/d1 * x, nobs, nvars, TRUE))
+      if (level == 0) {
+        return(.colSums(0.5 * hatvalues * d2 / d1 * x, nobs, nvars, TRUE))
       }
-      if (level == 1)
-      {
-        iphiphi <- sum( weights*(E_s2 + ((2*k*mus+2)*log((k*mus+1))-k^2*mus^2-2*k*mus)/(k^4*mus+k^3))*d1phi^2, na.rm = TRUE )
-        pqphiphi<- (sum(weights*(-2*E_s3+(2*k^3*mus^3+9*k^2*mus^2+6*k*mus-6*(k*mus+1)^2*log(k*mus+1))/(k^4*(k*mus+1)^2)
-                   +2*E_s1s2-2*mus*E_s2y/(k*mus+1)-2*(k*mus-(k*mus+1)*log(k*mus+1))*E_s2/(k^2*(k*mus+1))), na.rm = TRUE)*d1phi^3
-                   +sum(weights*(E_s2 + ((2*k*mus+2)*log((k*mus+1))-k^2*mus^2-2*k*mus)/(k^4*mus+k^3)),na.rm = TRUE)*d1phi*d2phi)
-        return(0.5*d1phi*sum(weights*hatvalues*d1^2*mus^2/(working_weights*varmus^2), na.rm = TRUE)+0.5*pqphiphi/iphiphi)
+      if (level == 1) {
+        iphiphi <- sum( weights * (E_s2 + ((2 * k * mus + 2) * log((k * mus + 1)) - k^2 * mus^2 - 2 * k * mus) / (k^4 * mus + k^3)) * d1phi^2, na.rm = TRUE )
+        pqphiphi<- (sum(weights * (-2 * E_s3 + (2 * k^3 * mus^3 + 9 * k^2 * mus^2 + 6 * k * mus - 6 * (k * mus + 1)^2 * log(k * mus + 1)) / (k^4 * (k * mus + 1)^2)
+                                   + 2 * E_s1s2 - 2 * mus * E_s2y / (k * mus + 1) - 2 * (k * mus - (k * mus + 1) * log(k * mus + 1)) * E_s2 / (k^2 * (k * mus + 1))), na.rm = TRUE) * d1phi^3
+                    + sum(weights * (E_s2 + ((2 * k * mus + 2) * log((k * mus + 1)) - k^2 * mus^2 - 2 * k * mus) / (k^4 * mus + k^3)) , na.rm = TRUE) * d1phi * d2phi)
+        return(0.5 * d1phi * sum(weights * hatvalues * d1^2 * mus^2 / (working_weights * varmus^2), na.rm = TRUE) + 0.5 * pqphiphi / iphiphi)
       }
     })
   }
   
   ## median adjustment
-  median_adjustment <- function(pars, level = 0, fit = NULL)
-  {
-    if (is.null(fit))
-    {
+  AS_median_adjustment <- function(pars, level = 0, fit = NULL) {
+    if (is.null(fit)) {
       fit <- key_quantities(pars)
     }
-    with(fit,{
+    with(fit, {
       hatvalues <- hat_values(pars, fit = fit)
-      if (level == 0)
-      {
-        invInfo <- information(pars=pars, level=0, inverse = TRUE, fit=fit)
-        info <- information(pars=pars, level=0, inverse = FALSE, fit=fit)
+      if (level == 0) {
+        invInfo <- information(pars = pars, level = 0, inverse = TRUE, fit = fit)
+        info <- information(pars = pars, level = 0, inverse = FALSE, fit = fit)
         F2_tilde <- numeric(nvars)
-        for (j in seq.int(nvars))
-        {
+        for (j in seq.int(nvars)) {
           invInfo_j <- invInfo[j,] 
-          vcov_j <- tcrossprod(invInfo_j)/invInfo_j[j]   
+          vcov_j <- tcrossprod(invInfo_j) / invInfo_j[j]   
           hats_j <- .rowSums((x %*% vcov_j) * x, nobs, nvars, TRUE) * working_weights
-          F2_tilde[j] <- invInfo_j %*% 
-            .colSums(x * (hats_j *(d1*d1varmus/(6*varmus) - 0.5*d2/d1)), nobs, nvars, 
-                     TRUE)
+          F2_tilde[j] <- invInfo_j %*% .colSums(x * (hats_j * (d1 * d1varmus / (6 * varmus) - 0.5 * d2 / d1)), nobs, nvars,  TRUE)
         }
-        return( .colSums(0.5 * hatvalues * d2/d1 * x, nobs, nvars, TRUE)+
-                  info%*%F2_tilde)
+        return( .colSums(0.5 * hatvalues * d2 / d1 * x, nobs, nvars, TRUE) + info %*% F2_tilde)
       }
-      if (level == 1)
-      {
-        iphiphi <- sum( weights*(E_s2 + ((2*k*mus+2)*log((k*mus+1))-k^2*mus^2-2*k*mus)/(k^4*mus+k^3))*d1phi^2, na.rm = TRUE )
-        pqphiphi<- (sum(weights*(-2*E_s3+(2*k^3*mus^3+9*k^2*mus^2+6*k*mus-6*(k*mus+1)^2*log(k*mus+1))/(k^4*(k*mus+1)^2)
-                                 +2*E_s1s2-2*mus*E_s2y/(k*mus+1)-2*(k*mus-(k*mus+1)*log(k*mus+1))*E_s2/(k^2*(k*mus+1))), na.rm = TRUE)*d1phi^3
-                    +sum(weights*(E_s2 + ((2*k*mus+2)*log((k*mus+1))-k^2*mus^2-2*k*mus)/(k^4*mus+k^3)),na.rm = TRUE)*d1phi*d2phi)
+      if (level == 1) {
+        iphiphi <- sum( weights * (E_s2 + ((2 * k * mus + 2) * log((k * mus + 1)) - k^2 * mus^2 - 2 * k * mus) / (k^4 * mus + k^3)) * d1phi^2, na.rm = TRUE )
+        pqphiphi<- (sum(weights * (-2 * E_s3 + (2 * k^3 * mus^3 + 9 * k^2 * mus^2 + 6 * k * mus - 6 * (k * mus + 1)^2 * log(k * mus + 1)) / (k^4 * (k * mus + 1)^2)
+                                   + 2 * E_s1s2 - 2 * mus * E_s2y / (k * mus + 1) - 2 * (k * mus - (k * mus + 1) * log(k * mus + 1)) * E_s2 / (k^2 * (k * mus + 1))), na.rm = TRUE) * d1phi^3
+                    + sum(weights *(E_s2 + ((2 * k * mus + 2) * log((k * mus + 1)) - k^2 * mus^2 - 2 * k * mus) / (k^4 * mus + k^3)), na.rm = TRUE) * d1phi * d2phi)
         
-        pq2phiphi<- (sum(weights*(-2*E_s3/3+(2*k^3*mus^3+9*k^2*mus^2+6*k*mus-6*(k*mus+1)^2*log(k*mus+1))/(3*k^4*(k*mus+1)^2)
-                                  +E_s1s2/2-0.5*mus*E_s2y/(k*mus+1)-0.5*(k*mus-(k*mus+1)*log(k*mus+1))*E_s2/(k^2*(k*mus+1))),na.rm = TRUE)*d1phi^3
-                     +0.5*sum(weights*(E_s2 + ((2*k*mus+2)*log((k*mus+1))-k^2*mus^2-2*k*mus)/(k^4*mus+k^3)),na.rm = TRUE)*d1phi*d2phi)
-          
-        return((0.5*d1phi*sum(weights*hatvalues*d1^2*mus^2/(working_weights*varmus^2), na.rm = TRUE)+0.5*pqphiphi/iphiphi
-               -pq2phiphi/iphiphi))
+        pq2phiphi<- (sum(weights * (-2 * E_s3 / 3 + (2 * k^3 * mus^3 + 9 * k^2 * mus^2 + 6 * k * mus - 6 * (k * mus + 1)^2 * log(k * mus + 1)) / (3 * k^4 * (k * mus + 1)^2)
+                                    + E_s1s2 / 2 - 0.5 * mus * E_s2y / (k * mus + 1) - 0.5 * (k * mus-(k * mus + 1) * log(k * mus + 1)) * E_s2 / (k^2 * (k * mus + 1))), na.rm = TRUE) * d1phi^3
+                     + 0.5 * sum(weights * (E_s2 + ((2 * k * mus + 2) * log((k * mus + 1)) - k^2 * mus^2 - 2 * k * mus)/(k^4 * mus + k^3)), na.rm = TRUE) * d1phi * d2phi)
+        
+        return((0.5 * d1phi * sum(weights * hatvalues * d1^2 * mus^2 / (working_weights * varmus^2), na.rm = TRUE) + 0.5 * pqphiphi / iphiphi
+                - pq2phiphi / iphiphi))
       }
     })
   }
   
   ## mixed adjusment
-  mixed_adjustment <- function(pars, level = 0, fit = NULL)
-  {
-    if (is.null(fit))
-    {
+  AS_mixed_adjustment <- function(pars, level = 0, fit = NULL) {
+    if (is.null(fit)) {
       fit <- key_quantities(pars)
     }
-    with(fit,{
+    with(fit, {
       hatvalues <- hat_values(pars, fit = fit)
-      if (level == 0)
-      {
-        return(.colSums(0.5 * hatvalues * d2/d1 * x, nobs, nvars, TRUE))
+      if (level == 0) {
+        return(.colSums(0.5 * hatvalues * d2 / d1 * x, nobs, nvars, TRUE))
       }
       if (level == 1)
       {
-        iphiphi <- sum( weights*(E_s2 + ((2*k*mus+2)*log((k*mus+1))-k^2*mus^2-2*k*mus)/(k^4*mus+k^3))*d1phi^2, na.rm = TRUE )
-        pqphiphi<- (sum(weights*(-2*E_s3+(2*k^3*mus^3+9*k^2*mus^2+6*k*mus-6*(k*mus+1)^2*log(k*mus+1))/(k^4*(k*mus+1)^2)
-                                 +2*E_s1s2-2*mus*E_s2y/(k*mus+1)-2*(k*mus-(k*mus+1)*log(k*mus+1))*E_s2/(k^2*(k*mus+1))), na.rm = TRUE)*d1phi^3
-                    +sum(weights*(E_s2 + ((2*k*mus+2)*log((k*mus+1))-k^2*mus^2-2*k*mus)/(k^4*mus+k^3)),na.rm = TRUE)*d1phi*d2phi)
+        iphiphi <- sum( weights * (E_s2 + ((2 * k * mus + 2) * log((k * mus + 1)) - k^2 * mus^2 - 2 * k * mus) / (k^4 * mus + k^3)) * d1phi^2, na.rm = TRUE )
+        pqphiphi<- (sum(weights *( -2 * E_s3 + (2 * k^3 * mus^3 + 9 * k^2 * mus^2 + 6 * k * mus - 6 * (k * mus + 1)^2 * log(k * mus + 1)) / (k^4 * (k * mus + 1)^2)
+                                   + 2 * E_s1s2 - 2 * mus * E_s2y / (k * mus + 1) - 2 * (k * mus - (k * mus + 1) * log(k * mus + 1)) * E_s2 / (k^2 * (k * mus + 1))), na.rm = TRUE) * d1phi^3
+                    + sum(weights * (E_s2 + ((2 * k * mus + 2) * log((k * mus + 1)) - k^2 * mus^2 - 2 * k * mus) / (k^4 * mus + k^3)), na.rm = TRUE) * d1phi * d2phi)
         
-        pq2phiphi<- (sum(weights*(-2*E_s3/3+(2*k^3*mus^3+9*k^2*mus^2+6*k*mus-6*(k*mus+1)^2*log(k*mus+1))/(3*k^4*(k*mus+1)^2)
-                                  +E_s1s2/2-0.5*mus*E_s2y/(k*mus+1)-0.5*(k*mus-(k*mus+1)*log(k*mus+1))*E_s2/(k^2*(k*mus+1))),na.rm = TRUE)*d1phi^3
-                     +0.5*sum(weights*(E_s2 + ((2*k*mus+2)*log((k*mus+1))-k^2*mus^2-2*k*mus)/(k^4*mus+k^3)),na.rm = TRUE)*d1phi*d2phi)
+        pq2phiphi<- (sum(weights *(-2 * E_s3 / 3 + (2 * k^3 * mus^3 + 9 * k^2 * mus^2 + 6 * k * mus - 6 * (k * mus + 1)^2 * log(k * mus + 1)) / (3 * k^4 * (k * mus + 1)^2)
+                                   + E_s1s2 / 2 - 0.5 * mus * E_s2y / (k * mus + 1) - 0.5 * (k * mus - (k * mus + 1) * log(k * mus + 1)) * E_s2 / (k^2 * (k * mus + 1))), na.rm = TRUE) * d1phi^3
+                     + 0.5 * sum(weights * (E_s2 + ((2 * k * mus + 2) * log((k * mus + 1)) - k^2 * mus^2 - 2 * k * mus) / (k^4 * mus + k^3)), na.rm = TRUE) * d1phi * d2phi)
         
-        return((0.5*d1phi*sum(weights*hatvalues*d1^2*mus^2/(working_weights*varmus^2), na.rm = TRUE)+0.5*pqphiphi/iphiphi
-                -pq2phiphi/iphiphi))
+        return((0.5 * d1phi * sum(weights * hatvalues * d1^2 * mus^2 / (working_weights * varmus^2), na.rm = TRUE) + 0.5 * pqphiphi /iphiphi
+                -pq2phiphi / iphiphi))
       }
     })
   }
@@ -516,38 +495,36 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   ## adjustment term function ##
   
   adjustment_function <- switch(control$type, 
-                                AS_mean = mean_adjustment, 
-                                AS_median = median_adjustment,
-                                AS_mixed = mixed_adjustment,
+                                AS_mean = AS_mean_adjustment, 
+                                AS_median = AS_median_adjustment,
+                                AS_mixed = AS_mixed_adjustment,
                                 correction = function(pars, ...) 0,
                                 ML = function(pars, ...) 0)
   
   ## required components for computing the adjusted scores ##
   
-  compute_step_components <- function(pars, level = 0, fit = NULL)
-  {
-    if (is.null(fit))
-    {
+  compute_step_components <- function(pars, level = 0, fit = NULL) {
+    if (is.null(fit)) {
       fit <- key_quantities(pars)
     }
-    if (level == 0)
-    {
+    if (level == 0) {
       grad <- score(pars, level = 0, fit = fit)
       inverse_info <- try(information(pars, level = 0, inverse = TRUE,fit = fit))
       failed_inversion <- inherits(inverse_info, "try-error")
       adjustment <- adjustment_function(pars, level = 0, fit = fit)
       failed_adjustment <- any(is.na(adjustment))
     }
-    if ( level == 1)
-    {
+    if (level == 1) {
       grad <- score(pars, level = 1, fit=fit)
       inverse_info <- try(information(pars, level = 1, inverse = TRUE,fit = fit))
       failed_inversion <- inherits(inverse_info, "try-error")
       adjustment <- adjustment_function(pars, level = 1, fit = fit)
       failed_adjustment <- any(is.na(adjustment))
     }
-    out <- list(grad = grad,  inverse_info = inverse_info, 
-                adjustment = adjustment, failed_inversion = failed_inversion,
+    out <- list(grad = grad,  
+                inverse_info = inverse_info, 
+                adjustment = adjustment, 
+                failed_inversion = failed_inversion,
                 failed_adjustment=failed_adjustment)
     out
   }  
@@ -563,7 +540,7 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   eval(fam0$initialize)
   ## to be completed
   if (EMPTY) 
-  stop("invalid linear predictor values in empty model")
+    stop("invalid linear predictor values in empty model")
   
   qrx <- qr(x)
   rank <- qrx$rank
@@ -573,7 +550,7 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   }
   
   if (!isTRUE(is_full_rank)) {
-    aliased <- qrx$pivot[seq.int(qrx$rank+1,nvars)]
+    aliased <- qrx$pivot[seq.int(qrx$rank + 1,nvars)]
     X_all <- x
     x <- x[, -aliased]
     nvars_all <- nvars
@@ -592,20 +569,20 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   warn <- getOption("warn")
   options(warn = -1)
   
-  if (is.null(start) & missing(init.phi)){
+  if (is.null(start) & missing(init_dispersion)) {
     fit<- glm.fit(x = x, y = y, weights = weights, 
                   start = start, offset = offset, family =fam0, 
                   control = list(epsilon = control$epsilon, maxit = 100, 
                                  trace = FALSE), intercept =  intercept)
-    init.phi <- linkfun_disp(1/as.vector(MASS::theta.ml(y=y, mu=fitted(fit), n=nobs, weights=weights, 
-                                                  trace = control$trace > 2)))
+    init_dispersion <- linkfun_disp(1/as.vector(MASS::theta.ml(y = y, mu = fitted(fit), n = nobs, weights = weights, 
+                                                               trace = control$trace > 2)))
     options(warn = warn)
     betas <- coef(fit)
     names(betas) <- betas_names
-    dispersion <- init.phi
+    dispersion <- init_dispersion
   }
   
-  if (is.null(start) & !missing(init.phi)){
+  if (is.null(start) & !missing(init_dispersion)) {
     fit<- glm.fit(x = x, y = y, weights = weights, 
                   start = start, offset = offset, family =fam0, 
                   control = list(epsilon = control$epsilon, maxit = 100, 
@@ -614,10 +591,10 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
     options(warn = warn)
     betas <- coef(fit)
     names(betas) <- betas_names
-    dispersion <- init.phi
+    dispersion <- init_dispersion
   }
-
-  if ((length(start) == nvars_all) & is.numeric(start) & !missing(init.phi)) {
+  
+  if ((length(start) == nvars_all) & is.numeric(start) & !missing(init_dispersion)) {
     betas_all <- start
     names(betas_all) <- betas_names_all
     if (!isTRUE(is_full_rank)) {
@@ -627,10 +604,10 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
     else {
       betas <- betas_all
     }
-    dispersion <- init.phi
+    dispersion <- init_dispersion
   }
   
-  if ((length(start) == nvars_all) & is.numeric(start) & missing(init.phi)) {
+  if ((length(start) == nvars_all) & is.numeric(start) & missing(init_dispersion)) {
     betas_all <- start
     names(betas_all) <- betas_names_all
     if (!isTRUE(is_full_rank)) {
@@ -641,9 +618,9 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
       betas <- betas_all
     }
     etas <- drop(x %*% betas + offset)
-    init.phi <- linkfun_disp(1/as.vector(MASS::theta.ml(y=y, mu=linkinv(etas), n=nobs, weights=weights,
-                                                  trace = control$trace > 2)))
-    dispersion <- init.phi
+    init_dispersion <- linkfun_disp(1/as.vector(MASS::theta.ml(y = y, mu = linkinv(etas), n = nobs, weights = weights,
+                                                               trace = control$trace > 2)))
+    dispersion <- init_dispersion
   }
   
   if (length(start) > nvars_all ) {
@@ -654,61 +631,50 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   }
   adjusted_grad_all <- rep(NA_real_, nvars_all + 1)
   names(adjusted_grad_all) <- c(betas_names_all, "dispersion")
-
-  par <- c(betas,dispersion)
+  
+  par <- c(betas, dispersion)
   quantities <- key_quantities(par)
   step_components_beta <- compute_step_components(par, level = 0, fit = quantities)
   step_components_dispersion <- compute_step_components(par, level = 1, fit = quantities)
-  if (step_components_beta$failed_inversion) 
-  {
+  if (step_components_beta$failed_inversion) {
     warning("failed to invert the information matrix")
   }
-  if (step_components_beta$failed_adjustment) 
-  {
+  if (step_components_beta$failed_adjustment) {
     warning("failed to calculate score adjustment")
   }
   adjusted_grad_beta <- with(step_components_beta, {
     grad + adjustment
   })
-  step_beta <- drop(step_components_beta$inverse_info %*% 
-                      adjusted_grad_beta)
-  if (step_components_dispersion$failed_inversion) 
-  {
+  step_beta <- drop(step_components_beta$inverse_info %*% adjusted_grad_beta)
+  if (step_components_dispersion$failed_inversion)  {
     warning("failed to invert the information matrix")
   }
-  if (step_components_dispersion$failed_adjustment) 
-  {
+  if (step_components_dispersion$failed_adjustment) {
     warning("failed to calculate score adjustment")
   }
-  adjusted_grad_dispersion <- with(step_components_dispersion, 
-                             {
-                               grad + adjustment
-                             })
+  adjusted_grad_dispersion <- with(step_components_dispersion, {
+    grad + adjustment
+  })
   step_dispersion <- as.vector(adjusted_grad_dispersion * step_components_dispersion$inverse_info)
   
-  if (control$maxit == 0) 
-  {
+  if (control$maxit == 0) {
     iter <- 0
     failed <- FALSE
   }
   else 
   {
-    for (iter in seq.int(control$maxit)) 
-    {
+    for (iter in seq.int(control$maxit)) {
       step_factor <- 0
       testhalf <- TRUE
-      while (testhalf & step_factor < control$max_step_factor) 
-      {
+      while (testhalf & step_factor < control$max_step_factor) {
         step_beta_previous <- step_beta
         step_dispersion_previous <- step_dispersion
         betas <- betas + control$slowit * 2^(-step_factor) * step_beta
         dispersion <- dispersion + 2^(-step_factor) * step_dispersion
         par <- c(betas, dispersion)
         quantities <- key_quantities(par)
-        step_components_beta <- compute_step_components(par, 
-                                                        level = 0, fit = quantities)
-        step_components_dispersion<- compute_step_components(par, 
-                                                        level = 1, fit = quantities)
+        step_components_beta <- compute_step_components(par, level = 0, fit = quantities)
+        step_components_dispersion<- compute_step_components(par,  level = 1, fit = quantities)
         if (failed_inversion_beta <- step_components_beta$failed_inversion) {
           warning("failed to invert the information matrix")
           break
@@ -717,13 +683,11 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
           warning("failed to calculate score adjustment")
           break
         }
-        adjusted_grad_beta <- with(step_components_beta, 
-                                   {
-                                     grad + adjustment
-                                   })
-        step_beta <- drop(step_components_beta$inverse_info %*% 
-                            adjusted_grad_beta)
-       
+        adjusted_grad_beta <- with(step_components_beta, {
+          grad + adjustment
+        })
+        step_beta <- drop(step_components_beta$inverse_info %*%  adjusted_grad_beta)
+        
         if (failed_inversion_dispersion <- step_components_dispersion$failed_inversion) {
           warning("failed to invert the information matrix")
           break
@@ -732,13 +696,11 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
           warning("failed to calculate score adjustment")
           break
         }
-        adjusted_grad_dispersion <- with(step_components_dispersion, 
-                                   {
-                                     grad + adjustment
-                                   })
-        step_dispersion <- as.vector(adjusted_grad_dispersion * 
-                                 step_components_dispersion$inverse_info)
-      
+        adjusted_grad_dispersion <- with(step_components_dispersion, {
+          grad + adjustment
+        })
+        step_dispersion <- as.vector(adjusted_grad_dispersion * step_components_dispersion$inverse_info)
+        
         if (step_factor == 0 & iter == 1) {
           testhalf <- TRUE
         }
@@ -754,8 +716,7 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
       }
       failed <- failed_adjustment_beta | failed_inversion_beta | 
         failed_adjustment_dispersion| failed_inversion_dispersion
-      if (failed | sum(abs(c(step_beta, step_dispersion)),na.rm = TRUE) < control$epsilon) 
-      {
+      if (failed | sum(abs(c(step_beta, step_dispersion)),na.rm = TRUE) < control$epsilon) {
         break
       }
     }
@@ -764,8 +725,7 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   adjusted_grad_all["dispersion"] <- adjusted_grad_dispersion
   betas_all[betas_names] <- betas
   
-  if(iter >= control$maxit)
-  {
+  if(iter >= control$maxit) {
     convergence <- FALSE
     warning("optimization failed to converge")
   }
@@ -783,11 +743,11 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   par <- c(betas, dispersion)
   if (is_correction) 
   {
-    bias <- c(- step_components_beta$inverse_info%*%mean_adjustment(par, level = 0, fit =quantities),
-              - step_components_dispersion$inverse_info%*%mean_adjustment(par, level = 1, fit =quantities))
-    par <- par-bias
-    betas <- par[-(nvars+1)]
-    dispersion <-par[(nvars+1)]
+    bias <- c(- step_components_beta$inverse_info%*%AS_mean_adjustment(par, level = 0, fit = quantities),
+              - step_components_dispersion$inverse_info%*%AS_mean_adjustment(par, level = 1, fit = quantities))
+    par <- par - bias
+    betas <- par[-(nvars + 1)]
+    dispersion <-par[(nvars + 1)]
   }
   quantities <- key_quantities(par)
   step_components_beta <- compute_step_components(par, level = 0, fit = quantities)
@@ -796,77 +756,76 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   qr.Wx <- quantities$qr_decomposition
   mus <- quantities$mus
   etas <- quantities$etas
-  residuals <- with(quantities, (y - mus)/d1)
+  residuals <- with(quantities, (y - mus) / d1)
   working_weights <- quantities$working_weights
   wt <- rep.int(0, nobs)
   wt[keep] <- working_weights[keep]
   names(wt) <- names(residuals) <- names(mus) <- names(etas) <- names(weights) <- names(y) <- ynames
   
-   fam <- do.call("negative.binomial",list(theta=1/linkinv_disp(dispersion),
-                                            link=link))
+  fam <- do.call("negative.binomial",list(theta = 1 / linkinv_disp(dispersion),
+                                          link = link))
   
-   if (attr(Terms, "intercept") & missing_offset) {
-     nullFit <- glm.fit(x[, "(Intercept)", drop = FALSE], y, weights, 
-               offset = rep(0, nobs), family = fam, control = list(maxit = control$maxit, 
-               epsilon = control$epsilon, trace = control$trace > 1), intercept = TRUE)
-     nullmus <- nullFit$fitted
-   } 
-   if (!attr(Terms, "intercept")) {
-     nullmus <- linkinv(offset)
-   }
-   if (attr(Terms, "intercept") & !missing_offset) {
-     nullFit <- glm.fit(x[, "(Intercept)", drop = FALSE], y, weights, 
-                        offset = offset, family = fam, control = list(maxit = control$maxit, 
-                        epsilon = control$epsilon, trace = control$trace > 1), intercept = TRUE)
-     nullmus <- nullFit$fitted
-   }
-   
-   th <- 1/linkinv_disp(dispersion)
-   #Lm <- loglik(nobs, th, mus, y, weights)
-   dev.resids <- fam$dev.resids
-   aic <- fam$aic
-   nulldev <- sum(dev.resids(y, nullmus, weights))
-   nulldf <- nkeep - as.integer(attr(Terms, "intercept"))
-   deviance <- sum(dev.resids(y, mus, weights))
-   aic.model <- aic(y, nobs, mus, weights, deviance) + 2 * (rank+1)
-   
-   vcov.mean <-step_components_beta$inverse_info
-   rownames(vcov.mean) <- colnames(vcov.mean)  <-  betas_names
-                                      
-   vcov.dispersion <- step_components_dispersion$inverse_info
-   names(vcov.dispersion) <-  paste0(control$transformation, "(dispersion)")
-   se <- c(sqrt(diag(step_components_beta$inverse_info)),
-          sqrt(step_components_dispersion$inverse_info))
-  names(se) <-  c(betas_names, paste0(control$transformation, "(dispersion)"))
+  if (attr(Terms, "intercept") & missing_offset) {
+    nullFit <- glm.fit(x[, "(Intercept)", drop = FALSE], y, weights, 
+                       offset = rep(0, nobs), family = fam, control = list(maxit = control$maxit, 
+                                                                           epsilon = control$epsilon, trace = control$trace > 1), intercept = TRUE)
+    nullmus <- nullFit$fitted
+  } 
+  if (!attr(Terms, "intercept")) {
+    nullmus <- linkinv(offset)
+  }
+  if (attr(Terms, "intercept") & !missing_offset) {
+    nullFit <- glm.fit(x[, "(Intercept)", drop = FALSE], y, weights, 
+                       offset = offset, family = fam, control = list(maxit = control$maxit, 
+                                                                     epsilon = control$epsilon, trace = control$trace > 1), intercept = TRUE)
+    nullmus <- nullFit$fitted
+  }
+  
+  th <- 1 / linkinv_disp(dispersion)
+  Lm <- loglik(nobs, th, mus, y, weights)
+  dev.resids <- fam$dev.resids
+  aic <- fam$aic
+  nulldev <- sum(dev.resids(y, nullmus, weights))
+  nulldf <- nkeep - as.integer(attr(Terms, "intercept"))
+  deviance <- sum(dev.resids(y, mus, weights))
+  aic.model <- aic(y, nobs, mus, weights, deviance) + 2 * (rank + 1)
+  
+  vcov.mean <-step_components_beta$inverse_info
+  rownames(vcov.mean) <- colnames(vcov.mean)  <-  betas_names
+  
+  vcov.dispersion <- step_components_dispersion$inverse_info
+  names(vcov.dispersion) <-  paste0(control$transformation, "(dispersion)")
+  #se <- c(sqrt(diag(vcov.mean)),sqrt(vcov.dispersion))
+  #names(se) <-  c(betas_names, paste0(control$transformation, "(dispersion)"))
   out <- list(coefficients = betas,
-       vcov.mean = vcov.mean,
-       vcov.dispersion =  vcov.dispersion,
-       se = se,
-       se.dispersion = sqrt(vcov.dispersion),
-       residuals = residuals,
-       fitted.values = mus,
-       R = if (!EMPTY) qr.R(qr.Wx),
-       rank = rank,
-       qr = if (!EMPTY) structure(qr.Wx[c("qr", "rank", "qraux", "pivot", "tol")], class = "qr"),
-       family = fam,
-       
-       linear.predictors = etas,
-       deviance = deviance,
-       aic = aic.model,
-       link=link,
-       null.deviance = nulldev,
-       iter = iter,
-       weights = wt,
-       prior.weights = weights,
-       df.residual = df_residual,
-       df.null = nulldf,
-       y = y,
-       converged = convergence,
-       dispersion = dispersion,
-       grad = adjusted_grad_all,
-       transformation = control$transformation,
-       theta = as.vector(th), ## dispersion as in glm.nb
-       type = control$type)
+              vcov.mean = vcov.mean,
+              vcov.dispersion =  vcov.dispersion,
+              # se = se,
+              #  se.dispersion = sqrt(vcov.dispersion),
+              residuals = residuals,
+              fitted.values = mus,
+              R = if (!EMPTY) qr.R(qr.Wx),
+              rank = rank,
+              qr = if (!EMPTY) structure(qr.Wx[c("qr", "rank", "qraux", "pivot", "tol")], class = "qr"),
+              family = fam,
+              twologlik = as.vector(2 * Lm),
+              linear.predictors = etas,
+              deviance = deviance,
+              aic = aic.model,
+              link=link,
+              null.deviance = nulldev,
+              iter = iter,
+              weights = wt,
+              prior.weights = weights,
+              df.residual = df_residual,
+              df.null = nulldf,
+              y = y,
+              converged = convergence,
+              dispersion = dispersion,
+              grad = adjusted_grad_all,
+              transformation = control$transformation,
+              theta = as.vector(th), ## dispersion as in glm.nb
+              type = control$type)
   out$terms <- Terms
   out$formula <- as.vector(attr(Terms,"formula"))
   Call$link <- link
@@ -879,58 +838,69 @@ brnb <- function(formula,data ,subset,weights = NULL, offset = NULL,
   out$xlevels <- .getXlevels(Terms,mf)
   out$control <- control
   out$offset <- offset
-  class(out)<-c("brnb","negbin", "glm", "lm")
+  class(out)<-c("brnb","negbin")
   out
 }
 
 #' @method coef brnb
 #' @export
-coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
-  model <- match.arg(model)
-  switch(model,
-         "mean" = {
-           object$coefficients
-         },
-         "dispersion" = {
-           transDisp <- object$dispersion
-           names(transDisp) <- paste0(object$transformation, "(dispersion)")
-           transDisp
-           ## This will ALWAYS be on the scale of the TRANSFORMED dispersion
-         },
-         "full" = {
-           transDisp <- object$dispersion
-           ntd <- paste0(object$transformation, "(dispersion)")
-           names(transDisp) <- ntd
-           betas <- object$coefficients
-           thetaTrans <- c(betas, transDisp)
-           thetaTrans
-         })
+coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...){
+  object$transformed_dispersion <- object$dispersion
+  brglm2:::coef.brglmFit(object, model, ...)
 }
+# coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
+#   model <- match.arg(model)
+#   switch(model,
+#          "mean" = {
+#            object$coefficients
+#          },
+#          "dispersion" = {
+#            disp <- object$dispersion
+#            names(disp) <- paste0(object$transformation, "(dispersion)")
+#            disp
+#          },
+#          "full" = {
+#            disp <- object$dispersion
+#            ntd <- paste0(object$transformation, "(dispersion)")
+#            names(disp) <- ntd
+#            betas <- object$coefficients
+#            theta <- c(betas, disp)
+#            theta
+#          })
+# }
+
+
 
 #' @method vcov brnb
 #' @export
-vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
-  model <- match.arg(model)
-  switch(model,
-         mean = {
-           object$vcov.mean
-         },
-         dispersion = {
-           vtd <- object$vcov.dispersion
-           ntd <- paste0(object$transformation, "(dispersion)")
-           names(vtd) <- ntd
-           vtd
-         },
-         full = {
-           vbetas <- object$vcov.mean
-           vtd <- object$vcov.dispersion
-           nBetasAll <- c(colnames(vbetas), paste0(object$transformation, "(dispersion)"))
-           vBetasAll <- cbind(rbind(vbetas, 0),
-                              c(numeric(nrow(vbetas)), vtd))
-           dimnames(vBetasAll) <- list(nBetasAll, nBetasAll)
-           vBetasAll
-         })
+vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete = TRUE, ...){
+  object$info_transformed_dispersion <- 1/object$vcov.dispersion
+  object$dispersion <- 1
+  brglm2:::vcov.brglmFit(object, model , complete , ...)
 }
+# vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
+#   model <- match.arg(model)
+#   switch(model,
+#          mean = {
+#            object$vcov.mean
+#          },
+#          dispersion = {
+#            vtd <- object$vcov.dispersion
+#            ntd <- paste0(object$transformation, "(dispersion)")
+#            names(vtd) <- ntd
+#            vtd
+#          },
+#          full = {
+#            vbetas <- object$vcov.mean
+#            vtd <- object$vcov.dispersion
+#            nBetasAll <- c(colnames(vbetas), paste0(object$transformation, "(dispersion)"))
+#            vBetasAll <- cbind(rbind(vbetas, 0),
+#                               c(numeric(nrow(vbetas)), vtd))
+#            dimnames(vBetasAll) <- list(nBetasAll, nBetasAll)
+#            vBetasAll
+#          })
+# }
+
 
 #' @method summary brnb
 #' @export
@@ -972,17 +942,17 @@ summary.brnb <- function(object,   ...)
 print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
 {
   cat("\nCall:", deparse(x$call, width.cutoff = floor(getOption("width") * 0.85)), "", sep = "\n")
-
+  
   if(!x$converged) {
     cat("model did not converge\n")
   }
-
+  
   if(NROW(x$coefficients)) {
     cat(paste("\nCoefficients (mean model with ", x$link, " link):\n", sep = ""))
     printCoefmat(x$coefficients, digits = digits, signif.legend = FALSE)
   } else cat("\nNo coefficients (in mean model)\n")
-
-
+  
+  
   
   if(getOption("show.signif.stars") & any( x$coefficients[, 4L] < 0.1))
     cat("---\nSignif. codes: ", "0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1", "\n")
@@ -991,26 +961,26 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
     cat(paste("\nDispersion parameter ( with transformation ", x$transformation," function):\n", sep = ""))
     printCoefmat(x$coef.dispersion, digits = digits, signif.legend = FALSE)
   } else cat("\nNo coefficients (in precision model)\n")
-
+  
   cat("\n", apply(cbind(paste(format(c("Null",
-      "Residual"), justify = "right"), "deviance:"), format(unlist(x[c("null.deviance",
-                               "deviance")]), digits = max(5, digits + 1)), " on",                                                format(unlist(x[c("df.null", "df.residual")])), " degrees of freedom\n"),
-                                           1, paste, collapse = " "), sep = "")
-
+                                       "Residual"), justify = "right"), "deviance:"), format(unlist(x[c("null.deviance",
+                                                                                                        "deviance")]), digits = max(5, digits + 1)), " on",                                                format(unlist(x[c("df.null", "df.residual")])), " degrees of freedom\n"),
+                  1, paste, collapse = " "), sep = "")
+  
   cat("\nType of estimator:", x$type, switch(x$type,
-                                            "ML" = "(maximum likelihood)",
-                                            "correction" = "(bias-corrected)",
-                                            "AS_mean" = "(mean bias-reduced)",
-                                            "AS_median" = "(median bias-reduced)",
-                                            "AS_mixed" = "(mixed bias-reduced)"
-                                            ))
+                                             "ML" = "(maximum likelihood)",
+                                             "correction" = "(bias-corrected)",
+                                             "AS_mean" = "(mean bias-reduced)",
+                                             "AS_median" = "(median bias-reduced)",
+                                             "AS_mixed" = "(mixed bias-reduced)"
+  ))
   # cat("\nLog-likelihood:", formatC(x$loglik, digits = digits),
   #     "on", sum(sapply(x$coefficients, NROW)), "Df")
-
+  
   cat(paste("\nNumber of iterations in the quasi-Fisher scoring:", x$iter, "\n"))
   cat(paste("\nAIC:", round(x$aic,2), "\n"))
-
-
+  
+  
   invisible(x)
 }
 
@@ -1019,7 +989,7 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
 print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
 {
   cat("\nCall:", deparse(x$call, width.cutoff = floor(getOption("width") * 0.85)), "", sep = "\n")
-
+  
   if(!x$converged) {
     cat("model did not converge\n")
   } else {
@@ -1028,14 +998,12 @@ print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
       print.default(format(x$coefficients, digits = digits), print.gap = 2, quote = FALSE)
       cat("\n")
     } else cat("No coefficients (in mean model)\n\n")
-
+    
     if(length(x$dispersion)) {
       cat(paste("Dispersion parameter ( with transformation ", x$transformation, " function):\n", sep = ""))
       print.default(format(x$dispersion, digits = digits), print.gap = 2, quote = FALSE)
       cat("\n")
     } else cat("No coefficients (in precision model)\n\n")
-
+    
   }
 }
-
-
