@@ -14,7 +14,6 @@ brnb(
   start = NULL,
   etastart = NULL,
   mustart = NULL,
-  init_dispersion,
   control = list(...),
   na.action,
   model = TRUE,
@@ -59,9 +58,6 @@ or \code{identity}.}
 \item{etastart}{starting values for the linear predictor.}
 
 \item{mustart}{starting values for the vector of means.}
-
-\item{init_dispersion}{optional initial value for the dispersion parameter.  If omitted a maximum
-likelihood estimator after an initial fit using a Poisson GLM is used.}
 
 \item{control}{a list of parameters for controlling the fitting
 process. See \code{\link{brglmControl}} for details.}
@@ -111,6 +107,9 @@ process. See \code{\link{brglmControl}} for details.}
 
     For \code{weights}: further arguments passed to or from other methods.
   }
+
+\item{init_dispersion}{optional initial value for the dispersion parameter.  If omitted a maximum
+likelihood estimator after an initial fit using a Poisson GLM is used.}
 }
 \value{
 A fitted model object of class \code{brnb} inheriting from \code{negbin} and \code{brglmFit}.
@@ -188,14 +187,18 @@ transformation ="inverse",type = "AS_mixed")
  # Mean bias-corrected fit:
 fitBC_mean<- brnb(freq~dose+log(dose+10),link="log", 
 transformation ="inverse",type = "correction")
+ Modified penalized likelihood with Jeffreys fit:
+fitmplJ<- brnb(freq~dose+log(dose+10),link="log", 
+transformation ="inverse",type = "MPL_Jeffreys")
 # summary of methods
 res=round(cbind(coef(fitmle.brnb,"full"),sqrt(diag(vcov(fitmle.brnb,"full"))),
 coef(fitBC_mean,"full"),sqrt(diag(vcov(fitBC_mean,"full"))),
 coef(fitBR_mean,"full"),sqrt(diag(vcov(fitBR_mean,"full"))),
 coef(fitBR_median,"full"),sqrt(diag(vcov(fitBR_median,"full"))),
-coef(fitBR_mixed,"full"),sqrt(diag(vcov(fitBR_mixed,"full")))),3)
+coef(fitBR_mixed,"full"),sqrt(diag(vcov(fitBR_mixed,"full"))),
+coef(fitmplJ,"full"),sqrt(diag(vcov(fitmplJ,"full")))),3)
 colnames(res)<-c("mle","semle","bc_mean","sebc_mean",
-"br_mean","sebr_mean","br_median","sebr_median","mixed","semixed")
+"br_mean","sebr_mean","br_median","sebr_median","mixed","semixed","mplJ","semplJ")
 res
 
 # test with glm.nb
@@ -230,6 +233,8 @@ fitBR_mixed.ew <- brnb(freq~dose+log(dose+10),link="log",transformation ="identi
 type = "AS_mixed",data=dupsalmonella)
 fitBC_mean.ew<- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
 type = "correction",data=dupsalmonella)
+ fitmplJ.ew<- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
+type = "MPL_Jeffreys",data=dupsalmonella)
 
 ## fit using weights
 fitML.w <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
@@ -242,6 +247,8 @@ fitBR_mixed.w <- brnb(freq~dose+log(dose+10),link="log",transformation ="identit
 type = "AS_mixed",data=salmonella,weights = duptimes)
 fitBC_mean.w<- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
 type = "correction",data=salmonella,weights = duptimes)
+fitmplJ.w <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
+type = "MPL_Jeffreys",data=salmonella,weights = duptimes)
 
 ## all numerical results are the same
 all.equal(coef(fitML.ew,"full"), coef(fitML.w,"full"),tolerance = 1e-10)
@@ -249,6 +256,7 @@ all.equal(coef(fitBR_mean.ew,"full"), coef(fitBR_mean.w,"full"),tolerance = 1e-1
 all.equal(coef(fitBR_median.ew,"full"), coef(fitBR_median.w,"full"),tolerance = 1e-10)
 all.equal(coef(fitBR_mixed.ew,"full"), coef(fitBR_mixed.w,"full"),tolerance = 1e-10)
 all.equal(coef(fitBC_mean.ew,"full"), coef(fitBC_mean.w,"full"),tolerance = 1e-10)
+all.equal(coef(fitmplJ.ew,"full"), coef(fitmplJ.w,"full"),tolerance = 1e-10)
 }
 \references{
 Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
