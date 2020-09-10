@@ -184,7 +184,7 @@
 #' fitmplJ.w <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
 #' type = "MPL_Jeffreys",data=salmonella,weights = duptimes)
 #' 
-#' ## all numerical results are the same
+#' ## all results are the same
 #' all.equal(coef(fitML.ew,"full"), coef(fitML.w,"full"),tolerance = 1e-10)
 #' all.equal(coef(fitBR_mean.ew,"full"), coef(fitBR_mean.w,"full"),tolerance = 1e-10)
 #' all.equal(coef(fitBR_median.ew,"full"), coef(fitBR_median.w,"full"),tolerance = 1e-10)
