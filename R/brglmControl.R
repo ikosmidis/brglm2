@@ -23,6 +23,9 @@
 #' @aliases brglm_control
 #' @param epsilon positive convergence tolerance epsilon. Default is
 #'     \code{1e-06}.
+#' @param epsilonExp positive  epsilon used to individuate the maximum quantile value
+#' for which the probality mass of the negative binomial distribution sum to almost 1.
+#' Default is \code{1e-15}.
 #' @param maxit integer giving the maximal number of iterations
 #'     allowed. Default is \code{100}.
 #' @param trace logical indicating if output should be produced for
@@ -153,7 +156,7 @@
 #' coef(coalitionBRc, model = "dispersion")
 #'
 #' @export
-brglmControl <- function(epsilon = 1e-06, maxit = 100,
+brglmControl <- function(epsilon = 1e-06, epsilonExp = 10^(-15),maxit = 100,
                          trace = FALSE,
                          type = c("AS_mixed", "AS_mean", "AS_median", "correction", "MPL_Jeffreys", "ML"),
                          transformation = "identity",
@@ -190,7 +193,7 @@ brglmControl <- function(epsilon = 1e-06, maxit = 100,
     }
     if (!is.numeric(epsilon) || epsilon <= 0)
         stop("value of 'epsilon' must be > 0")
-    list(epsilon = epsilon, maxit = maxit, trace = trace,
+    list(epsilon = epsilon, epsilonExp = epsilonExp, maxit = maxit, trace = trace,
          response_adjustment = response_adjustment,
          type = type,
          Trans = Trans,

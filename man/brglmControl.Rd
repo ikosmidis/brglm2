@@ -8,6 +8,7 @@
 \usage{
 brglmControl(
   epsilon = 1e-06,
+  epsilonExp = 10^(-15),
   maxit = 100,
   trace = FALSE,
   type = c("AS_mixed", "AS_mean", "AS_median", "correction", "MPL_Jeffreys", "ML"),
@@ -20,6 +21,7 @@ brglmControl(
 
 brglm_control(
   epsilon = 1e-06,
+  epsilonExp = 10^(-15),
   maxit = 100,
   trace = FALSE,
   type = c("AS_mixed", "AS_mean", "AS_median", "correction", "MPL_Jeffreys", "ML"),
@@ -33,6 +35,10 @@ brglm_control(
 \arguments{
 \item{epsilon}{positive convergence tolerance epsilon. Default is
 \code{1e-06}.}
+
+\item{epsilonExp}{positive  epsilon used to individuate the maximum quantile value
+for which the probality mass of the negative binomial distribution sum to almost 1.
+Default is \code{1e-15}.}
 
 \item{maxit}{integer giving the maximal number of iterations
 allowed. Default is \code{100}.}
