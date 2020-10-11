@@ -31,7 +31,7 @@ alligators
 Alligator food choice data
 }
 \references{
-Agresti, A. (2002). *Categorical Data Analysis*.  Wiley Series in
+Agresti A (2002). *Categorical Data Analysis*.  Wiley Series in
 Probability and Statistics. Wiley
 }
 \seealso{

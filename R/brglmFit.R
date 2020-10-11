@@ -141,35 +141,35 @@
 #'
 #' @references
 #'
-#' Kosmidis, I. & Firth, D (2020). Jeffreys-prior penalty, finiteness
+#' Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
 #' and shrinkage in binomial-response generalized linear
-#' models. *Biometrika*. \url{https://doi.org/10.1093/biomet/asaa052}
+#' models. *Biometrika* \url{https://doi.org/10.1093/biomet/asaa052}
 #'
-#' Kosmidis I, Kenne Pagui EC, Sartori N (2020). Mean and median bias
+#' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 #' reduction in generalized linear models. *Statistics and Computing*,
-#' **30**, 43-59
+#' **30**, 43-59 \url{https://doi.org/10.1007/s11222-019-09860-6}
 #'
-#' Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
+#' Cordeiro G M, McCullagh P (1991). Bias correction in generalized
 #' linear models. *Journal of the Royal Statistical Society. Series B
-#' (Methodological)*, **53**, 629-643
+#' (Methodological)*, **53**, 629-643 \url{https://doi.org/10.1111/j.2517-6161.1991.tb01852.x}
 #'
-#' Firth D (1993). Bias reduction of maximum likelihood estimates,
-#' Biometrika. **80**, 27-38
+#' Firth D (1993). Bias reduction of maximum likelihood estimates.
+#' *Biometrika*. **80**, 27-38 \url{https://doi.org/10.2307/2336755}
 #'
-#' Kenne Pagui EC, Salvan A, and Sartori N (2017). Median bias
+#' Kenne Pagui E C, Salvan A, Sartori N (2017). Median bias
 #' reduction of maximum likelihood estimates. *Biometrika*, **104**,
-#' 923–938
+#' 923–938 \url{https://doi.org/10.1093/biomet/asx046}
 #'
-#' Kosmidis I and Firth D (2009). Bias reduction in exponential family
-#' nonlinear models. *Biometrika*, **96**, 793-804
+#' Kosmidis I, Firth D (2009). Bias reduction in exponential family
+#' nonlinear models. *Biometrika*, **96**, 793-804 \url{https://doi.org/10.1093/biomet/asp055}
 #'
-#' Kosmidis I and Firth D (2010). A generic algorithm for reducing
+#' Kosmidis I, Firth D (2010). A generic algorithm for reducing
 #' bias in parametric estimation. *Electronic Journal of Statistics*,
-#' **4**, 1097-1112
+#' **4**, 1097-1112 \url{https://doi.org/10.1214/10-EJS579}
 #'
 #' Kosmidis I (2014). Bias in parametric estimation: reduction and
 #' useful side-effects. *WIRE Computational Statistics*, **6**,
-#' 185-196
+#' 185-196 \url{http://doi.org/10.1002/wics.1296}
 #'
 #' @examples
 #' ## The lizards example from ?brglm::brglm

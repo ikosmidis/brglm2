@@ -33,7 +33,7 @@ stem cell research and the fundamentalism/liberalism of one’s
 religious beliefs, stratified by gender.
 }
 \references{
-Agresti, A. (2010). *Analysis of Ordinal Categorical Data* (2nd edition).  Wiley Series in
+Agresti A (2010). *Analysis of Ordinal Categorical Data* (2nd edition).  Wiley Series in
 Probability and Statistics. Wiley
 }
 \seealso{

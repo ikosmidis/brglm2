@@ -34,11 +34,16 @@ endometrial
 Histology grade and risk factors for 79 cases of endometrial cancer
 }
 \references{
-Agresti, A. (2015). *Foundations of Linear and Generalized Linear
+Agresti A (2015). *Foundations of Linear and Generalized Linear
 Models*.  Wiley Series in Probability and Statistics. Wiley
 
-Heinze, G., & Schemper, M. (2002). A Solution to the Problem of
-Separation in Logistic Regression. *Statistics in Medicine*, **21**, 2409–2419
+Heinze G, Schemper M (2002). A Solution to the Problem of
+Separation in Logistic Regression. *Statistics in Medicine*,
+**21**, 2409–2419 \url{https://doi.org/10.1002/sim.1047}
+
+Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+and shrinkage in binomial-response generalized linear
+models. *Biometrika* \url{https://doi.org/10.1093/biomet/asaa052}
 }
 \seealso{
 \code{\link{brglm_fit}}

@@ -55,23 +55,25 @@
 #'
 #' @references
 #'
-#' Kosmidis I, Kenne Pagui EC, Sartori N (2020). Mean and median bias
+#' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 #' reduction in generalized linear models. *Statistics and Computing*,
-#' **30**, 43-59
+#' **30**, 43-59 \url{https://doi.org/10.1007/s11222-019-09860-6}
 #'
-#' Agresti, A. (2010). *Analysis of Ordinal Categorical Data* (2nd
+#' Agresti, A (2010). *Analysis of Ordinal Categorical Data* (2nd
 #' edition).  Wiley Series in Probability and Statistics. Wiley.
 #'
-#' Albert A. and Anderson J. A. (1984). On the Existence of Maximum
+#' Albert A, Anderson J A (1984). On the Existence of Maximum
 #' Likelihood Estimates in Logistic Regression Models. *Biometrika*,
-#' **71** 1--10.
+#' **71**, 1--10 \url{https://doi.org/10.2307/2336390}
 #'
-#' Kosmidis I. and Firth D. (2011). Multinomial logit bias reduction via
-#' the Poisson log-linear model. *Biometrika*, **98**, 755-759.
+#' Kosmidis I, Firth D (2011). Multinomial logit bias reduction
+#' via the Poisson log-linear model. *Biometrika*, **98**,
+#' 755-759 \url{http://dx.doi.org/10.1093/biomet/asr026}
 #'
-#' Palmgren, J. (1981). The Fisher Information Matrix for Log Linear
+#' Palmgren J (1981). The Fisher Information Matrix for Log Linear
 #' Models Arguing Conditionally on Observed Explanatory
-#' Variables. *Biometrika*, **68**, 563-566.
+#' Variables. *Biometrika*, **68**,
+#' 563-566 \url{https://doi.org/10.1093/biomet/68.2.563}
 #'
 #' @examples
 #'
@@ -306,7 +308,7 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
     if (!is.null(cl <- x$call)) {
         cat("Call:\n")
         dput(cl, control = NULL)
-    }    
+    }
     cat("\nCoefficients:\n")
     printCoefmat(x$coefficients, digits = digits)
     cat("\nResidual Deviance:", format(x$deviance), "\n")

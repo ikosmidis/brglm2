@@ -85,23 +85,25 @@
 #'
 #' @references
 #'
-#' Kosmidis I, Kenne Pagui EC, Sartori N (2020). Mean and median bias
+#' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 #' reduction in generalized linear models. *Statistics and Computing*,
-#' **30**, 43-59
+#' **30**, 43-59 \url{https://doi.org/10.1007/s11222-019-09860-6}
 #'
-#' Agresti A. (2002). *Categorical data analysis* (2nd edition). Wiley
+#' Agresti A (2002). *Categorical data analysis* (2nd edition). Wiley
 #' Series in Probability and Statistics. Wiley.
 #'
-#' Albert A. and Anderson J. A. (1984). On the Existence of Maximum
+#' Albert A, Anderson J A (1984). On the Existence of Maximum
 #' Likelihood Estimates in Logistic Regression Models. *Biometrika*,
-#' **71** 1--10.
+#' **71** 1--10, \url{https://doi.org/10.2307/2336390}
 #'
-#' Kosmidis I. and Firth D. (2011). Multinomial logit bias reduction via
-#' the Poisson log-linear model. *Biometrika*, **98**, 755-759.
+#' Kosmidis I, Firth D (2011). Multinomial logit bias reduction
+#' via the Poisson log-linear model. *Biometrika*, **98**, 755-759
+#' \url{http://dx.doi.org/10.1093/biomet/asr026}
 #'
-#' Palmgren, J. (1981). The Fisher Information Matrix for Log Linear
+#' Palmgren, J (1981). The Fisher Information Matrix for Log Linear
 #' Models Arguing Conditionally on Observed Explanatory
-#' Variables. *Biometrika*, **68**, 563-566.
+#' Variables. *Biometrika*, **68**, 563-566
+#' \url{https://doi.org/10.1093/biomet/68.2.563}
 #'
 #' @examples
 #'
@@ -210,7 +212,7 @@ brmultinom <- function(formula, data, weights, subset, na.action,
     fit <- brglmFit(x = Xextended, y = Yextended,
                     start = NULL,
                     family = poisson("log"), control = control, intercept = TRUE, fixed_totals = fixed_totals)
-    
+
     ## TODO:
     ## + starting values
     ## + subset
@@ -336,7 +338,7 @@ summary.brmultinom <- function(object, correlation = FALSE, digits = options()$d
     ncat <- object$ncat
     coefficients <- coef.brmultinom(object)
     object$digits <- digits
-    object$AIC <- AIC(object)    
+    object$AIC <- AIC(object)
     object$logLik <- logLik(object)
     if (is.null(coefficients)) {
         object$coefficients <- NULL
@@ -350,7 +352,7 @@ summary.brmultinom <- function(object, correlation = FALSE, digits = options()$d
         vc <- vcov.brglmFit(object)
         vc <- vc[object$ofInterest, object$ofInterest]
         se <- sqrt(diag(vc))
-        ses <- matrix(se, nrow = ncat - 1, byrow = TRUE, dimnames = dimnames(coefficients))        
+        ses <- matrix(se, nrow = ncat - 1, byrow = TRUE, dimnames = dimnames(coefficients))
         object$coefficients <- coefficients
         object$standard.errors <- ses
         ## object$AIC <- AIC(object)

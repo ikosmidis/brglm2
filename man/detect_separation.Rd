@@ -104,7 +104,7 @@ version 0.8. A new version of \code{detect_separation} is now
 maintained in the \pkg{detectseparation} R package at
 \url{https://cran.r-project.org/package=detectseparation}. In order
 to use the version in \code{detect_separation} load first
-\pkg{brglm2} and then \pkg{detectseparation}, i.e. 
+\pkg{brglm2} and then \pkg{detectseparation}, i.e.
 \code{library(brglm2); library(detectseparation)}.
 }
 \examples{
@@ -138,14 +138,18 @@ update(murder_glm, method = "brglm_fit")
 }
 }
 \references{
-Konis K. (2007). *Linear Programming Algorithms for Detecting
+Konis K (2007). *Linear Programming Algorithms for Detecting
 Separated Data in Binary Logistic Regression
 Models*. DPhil. University of Oxford.
 \url{https://ora.ox.ac.uk/objects/uuid:8f9ee0d0-d78e-4101-9ab4-f9cbceed2a2a}
 
-Konis K. (2013). safeBinaryRegression: Safe Binary Regression. R
+Konis K (2013). safeBinaryRegression: Safe Binary Regression. R
 package version 0.1-3.
 \url{https://CRAN.R-project.org/package=safeBinaryRegression}
+
+Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+and shrinkage in binomial-response generalized linear
+models. *Biometrika* \url{https://doi.org/10.1093/biomet/asaa052}
 }
 \seealso{
 \code{\link{brglm_fit}}, \code{\link{glm.fit}} and \code{\link{glm}}

@@ -57,13 +57,13 @@
 #'
 #' @references
 #'
-#' Kosmidis, I. & Firth, D (2020). Jeffreys-prior penalty, finiteness
+#' Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
 #' and shrinkage in binomial-response generalized linear
-#' models. *Biometrika*. \url{https://doi.org/10.1093/biomet/asaa052}
+#' models. *Biometrika* \url{https://doi.org/10.1093/biomet/asaa052}
 #'
-#' Lesaffre, E. & Albert, A. (1989). Partial Separation in Logistic
+#' Lesaffre E, Albert A (1989). Partial Separation in Logistic
 #' Discrimination. *Journal of the Royal Statistical Society. Series B
-#' (Methodological)*, **51**, 109-116. \url{https://www.jstor.org/stable/2345845}
+#' (Methodological)*, **51**, 109-116 \url{https://doi.org/10.1111/j.2517-6161.1989.tb01752.x}
 #'
 #' @examples
 #'
