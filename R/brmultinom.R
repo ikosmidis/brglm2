@@ -492,3 +492,45 @@ predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
     })
     drop(Y)
 }
+
+#' Method for computing confidence intervals for one or more
+#' regression parameters in a \code{\link{brmultinom}} object
+#'
+#' @inheritParams stats::confint
+#'
+#' @export
+confint.brmultinom <- function (object, parm, level = 0.95, ...)  {
+    ## Apart from formatting changes this function is identical to
+    ## nnet:::confint.multinom
+    cf <- coef(object)
+    pnames <- if (is.matrix(cf)) colnames(cf) else names(cf)
+    if (missing(parm)) {
+        parm <- seq_along(pnames)
+    }
+    else {
+        if (is.character(parm))  {
+            parm <- match(parm, pnames, nomatch = 0L)
+        }
+    }
+    a <- (1 - level) / 2
+    a <- c(a, 1 - a)
+    pct <- paste(round(100 * a, 1), "%")
+    fac <- qnorm(a)
+    if (is.matrix(cf)) {
+        ses <- matrix(sqrt(diag(vcov(object))), ncol = ncol(cf),
+            byrow = TRUE)[, parm, drop = FALSE]
+        cf <- cf[, parm, drop = FALSE]
+        ci <- array(NA, dim = c(dim(cf), 2L), dimnames = c(dimnames(cf),
+            list(pct)))
+        ci[, , 1L] <- cf + ses * fac[1L]
+        ci[, , 2L] <- cf + ses * fac[2L]
+        aperm(ci, c(2L, 3L, 1L))
+    }
+    else {
+        ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(pnames[parm],
+            pct))
+        ses <- sqrt(diag(vcov(object)))[parm]
+        ci[] <- cf[parm] + ses %o% fac
+        ci
+    }
+}
