@@ -274,13 +274,12 @@
 #' summary(endometrialBR_median)
 #'
 #' @export
-brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
-                      mustart = NULL, offset = rep(0, nobs), family = gaussian(),
-                      control = list(), intercept = TRUE,
-                      ## Arguments that glm will not use in its call to brglmFit (be wise with defaults!)
-                      fixed_totals = NULL, singular.ok = TRUE)
+brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
+                     mustart = NULL, offset = rep(0, nobs), family = gaussian(),
+                     control = list(), intercept = TRUE,
+                     ## Arguments that glm will not use in its call to brglmFit (be wise with defaults!)
+                     fixed_totals = NULL, singular.ok = TRUE)
 {
-
     trace_iteration <- function() {
         if (iter %% control$trace == 0) {
             st <-  max(abs(step_beta), na.rm = TRUE)
@@ -675,10 +674,13 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## needed
     x <- as.matrix(x)
     betas_names <- dimnames(x)[[2L]]
+    nvars <- ncol(x)
+    if (is.null(betas_names)) {
+        betas_names <- colnames(x) <- paste0("x", seq.int(nvars))
+    }
     ynames <- if (is.matrix(y)) rownames(y) else names(y)
     converged <- FALSE
     nobs <- NROW(y)
-    nvars <- ncol(x)
     EMPTY <- nvars == 0
     if (is.null(weights)) {
         weights <- rep.int(1, nobs)
