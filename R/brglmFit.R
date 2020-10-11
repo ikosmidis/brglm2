@@ -25,7 +25,7 @@
 #' Kosmidis & Firth (2009), the median bias-reduction adjusted scores
 #' approach in Kenne Pagui et al. (2017), the correction of the asymptotic
 #' bias in Cordeiro & McCullagh (1991), the mixed bias-reduction
-#' adjusted scores approach in Kosmidis et al (2019), maximum
+#' adjusted scores approach in Kosmidis et al (2020), maximum
 #' penalized likelihood with powers of the Jeffreys prior as penalty,
 #' and maximum likelihood. Estimation is performed using a quasi
 #' Fisher scoring iteration (see \code{vignette("iteration",
@@ -61,7 +61,7 @@
 #'
 #' A detailed description of the supported adjustments and the quasi
 #' Fisher scoring iteration is given in the iteration vignette (see,
-#' \code{vignette("iteration", "brglm2")} or Kosmidis et al, 2019).  A
+#' \code{vignette("iteration", "brglm2")} or Kosmidis et al, 2020).  A
 #' shorter description of the quasi Fisher scoring iteration is also
 #' given in one of the vignettes of the *enrichwith* R package (see,
 #' \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
@@ -82,11 +82,11 @@
 #' The type of score adjustment to be used is specified through the
 #' \code{type} argument (see \code{\link{brglmControl}} for
 #' details). The available options are
-#' 
+#'
 #' \itemize{
 #'
 #' \item \code{type = "AS_mixed"}: the mixed bias-reducing score adjustments in
-#' Kosmidis et al (2019) that result in mean bias reduction for the
+#' Kosmidis et al (2020) that result in mean bias reduction for the
 #' regression parameters and median bias reduction for the dispersion
 #' parameter, if any; default.
 #'
@@ -106,7 +106,7 @@
 #'
 #' \item \code{type = "correction"}: asymptotic bias correction, as in
 #' Cordeiro & McCullagh (1991).
-#' 
+#'
 #' }
 #'
 #'
@@ -141,9 +141,10 @@
 #'
 #' @references
 #'
-#' Kosmidis I and Firth D (2019). Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models. *arXiv e-prints*,
-#' arXiv:1812.01938 <URL: http://arxiv.org/abs/1812.01938>.
-#' 
+#' Kosmidis, I. & Firth, D (2020). Jeffreys-prior penalty, finiteness
+#' and shrinkage in binomial-response generalized linear
+#' models. *Biometrika*. \url{https://doi.org/10.1093/biomet/asaa052}
+#'
 #' Kosmidis I, Kenne Pagui EC, Sartori N (2020). Mean and median bias
 #' reduction in generalized linear models. *Statistics and Computing*,
 #' **30**, 43-59
@@ -197,7 +198,7 @@
 #' all.equal(coef(lizardsBR_mean), coef(lizards_Jeffreys))
 #'
 #' # Maximum penalized likelihood with powers of the Jeffreys prior as
-#' # penalty. See Kosmidis & Firth (2019) for the finiteness and
+#' # penalty. See Kosmidis & Firth (2020) for the finiteness and
 #' # shrinkage properties of the maximum penalized likelihood
 #' # estimators in binomial response models
 #' \donttest{
@@ -205,14 +206,14 @@
 #' coefs <- sapply(a, function(a) {
 #'       out <- glm(cbind(grahami, opalinus) ~ height + diameter +
 #'              light + time, family = binomial(logit), data = lizards,
-#'              method = "brglmFit", type = "MPL_Jeffreys", a = a) 
+#'              method = "brglmFit", type = "MPL_Jeffreys", a = a)
 #'       coef(out)
 #' })
 #' # Illustration of shrinkage as a grows
 #' matplot(a, t(coefs), type = "l", col = 1, lty = 1)
 #' abline(0, 0, col = "grey")
 #'}
-#' 
+#'
 #' ## Another example from
 #' ## King, Gary, James E. Alt, Nancy Elizabeth Burns and Michael Laver
 #' ## (1990).  "A Unified Model of Cabinet Dissolution in Parliamentary
@@ -494,7 +495,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
         })
     }
-    
+
     ## Implementation by Euloge Clovis Kenne Pagui, 20 April 2017 (kept here for testing)
     ## AS_median_adjustment <- function(pars, level = 0, fit = NULL) {
     ##     if (is.null(fit)) {
@@ -810,7 +811,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
             if (family$family == "binomial") {
                 weights.adj <- weights + (!(is_correction)) * adj
-                y.adj <- (weights * y + (!(is_correction)) * 0.5 * adj)/weights.adj                
+                y.adj <- (weights * y + (!(is_correction)) * 0.5 * adj)/weights.adj
             }
             else {
                 weights.adj <- weights
@@ -1011,7 +1012,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## Convergence analysis
         if ((failed | iter >= control$maxit) & !(is_correction)) {
             warning("brglmFit: algorithm did not converge", call. = FALSE)
-            converged <- FALSE            
+            converged <- FALSE
         }
         else {
             converged <- TRUE

@@ -102,19 +102,19 @@ be used to construct a \code{control} argument.
      \code{poisson}, then the responses are adjusted by and
      \code{response_adjustment}. \code{response_adjustment = NULL}
      (default) is equivalent to setting it to
-     "number of parameters"/"number of observations". 
+     "number of parameters"/"number of observations".
 
 . .  When \code{type = "AS_mixed"} (default), mean bias reduction is
     used for the regression parameters, and median bias reduction
     for the dispersion parameter, if that is not fixed. This
     adjustment has been developed based on equivariance arguments
-    (see, Kosmidis et al, 2019, Section 4) in order to produce
+    (see, Kosmidis et al, 2020, Section 4) in order to produce
     regression parameter estimates that are invariant to arbitrary
     contrasts, and estimates for the dispersion parameter that are
     invariant to arbitrary non-linear transformations. \code{type =
     "AS_mixed"} and \code{type = "AS_mean"} return the same results
     if \code{brglmFit} is called with \code{family} \code{binomial}
-    or \code{poisson} (i.e. families with fixed dispersion). 
+    or \code{poisson} (i.e. families with fixed dispersion).
 
      When \code{type = "MPL_Jeffreys"}, \code{brglmFit} will
      maximize the penalized log-likelihood
@@ -125,7 +125,7 @@ be used to construct a \code{control} argument.
      information. The argument $a$ controls the amount of
      penalization and its default value is \code{a = 1/2},
      corresponding to maximum penalized likelihood using a
-     Jeffreys-prior penalty. See, Kosmidis & Firth (2019) for
+     Jeffreys-prior penalty. See, Kosmidis & Firth (2020) for
      proofs and discussion about the finiteness and shrinkage
      properties of the maximum penalized likelihood estimators for
      binomial-response generalized linear models.
@@ -135,7 +135,7 @@ be used to construct a \code{control} argument.
      for Poisson log-linear models and logistic regression models,
      i.e. for binomial and Poisson regression models with canonical
      links. See, Firth (1993) for details.
-     
+
      \code{brglm_control} is an alias to \code{brglmControl}.
 }
 \examples{
@@ -165,9 +165,9 @@ coef(coalitionBRc, model = "dispersion")
 reduction in generalized linear models. *Statistics and Computing*,
 **30**, 43-59
 
-Kosmidis I and Firth D (2019). Jeffreys-prior penalty, finiteness
+Kosmidis, I. & Firth, D (2020). Jeffreys-prior penalty, finiteness
 and shrinkage in binomial-response generalized linear
-models. *arXiv e-prints*, arXiv:1812.01938
+models. *Biometrika*. \url{https://doi.org/10.1093/biomet/asaa052}
 
 #' Firth D (1993). Bias reduction of maximum likelihood estimates.
 Biometrika, **80**, 27-38

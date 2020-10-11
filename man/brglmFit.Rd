@@ -95,7 +95,7 @@ mean bias-reducing adjusted scores approach in Firth (1993) and
 Kosmidis & Firth (2009), the median bias-reduction adjusted scores
 approach in Kenne Pagui et al. (2017), the correction of the asymptotic
 bias in Cordeiro & McCullagh (1991), the mixed bias-reduction
-adjusted scores approach in Kosmidis et al (2019), maximum
+adjusted scores approach in Kosmidis et al (2020), maximum
 penalized likelihood with powers of the Jeffreys prior as penalty,
 and maximum likelihood. Estimation is performed using a quasi
 Fisher scoring iteration (see \code{vignette("iteration",
@@ -106,7 +106,7 @@ scoring iterates.
 \details{
 A detailed description of the supported adjustments and the quasi
 Fisher scoring iteration is given in the iteration vignette (see,
-\code{vignette("iteration", "brglm2")} or Kosmidis et al, 2019).  A
+\code{vignette("iteration", "brglm2")} or Kosmidis et al, 2020).  A
 shorter description of the quasi Fisher scoring iteration is also
 given in one of the vignettes of the *enrichwith* R package (see,
 \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
@@ -131,7 +131,7 @@ details). The available options are
 \itemize{
 
 \item \code{type = "AS_mixed"}: the mixed bias-reducing score adjustments in
-Kosmidis et al (2019) that result in mean bias reduction for the
+Kosmidis et al (2020) that result in mean bias reduction for the
 regression parameters and median bias reduction for the dispersion
 parameter, if any; default.
 
@@ -207,7 +207,7 @@ lizards_Jeffreys <- glm(cbind(grahami, opalinus) ~ height + diameter +
 all.equal(coef(lizardsBR_mean), coef(lizards_Jeffreys))
 
 # Maximum penalized likelihood with powers of the Jeffreys prior as
-# penalty. See Kosmidis & Firth (2019) for the finiteness and
+# penalty. See Kosmidis & Firth (2020) for the finiteness and
 # shrinkage properties of the maximum penalized likelihood
 # estimators in binomial response models
 \donttest{
@@ -215,7 +215,7 @@ a <- seq(0, 20, 0.5)
 coefs <- sapply(a, function(a) {
       out <- glm(cbind(grahami, opalinus) ~ height + diameter +
              light + time, family = binomial(logit), data = lizards,
-             method = "brglmFit", type = "MPL_Jeffreys", a = a) 
+             method = "brglmFit", type = "MPL_Jeffreys", a = a)
       coef(out)
 })
 # Illustration of shrinkage as a grows
@@ -284,8 +284,9 @@ summary(endometrialBR_median)
 
 }
 \references{
-Kosmidis I and Firth D (2019). Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models. *arXiv e-prints*,
-arXiv:1812.01938 <URL: http://arxiv.org/abs/1812.01938>.
+Kosmidis, I. & Firth, D (2020). Jeffreys-prior penalty, finiteness
+and shrinkage in binomial-response generalized linear
+models. *Biometrika*. \url{https://doi.org/10.1093/biomet/asaa052}
 
 Kosmidis I, Kenne Pagui EC, Sartori N (2020). Mean and median bias
 reduction in generalized linear models. *Statistics and Computing*,

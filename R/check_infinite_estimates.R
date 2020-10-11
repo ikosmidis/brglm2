@@ -44,7 +44,7 @@
 #' infinity.
 #'
 #' @note
-#' 
+#'
 #' \code{check_infinite_estimates} will be removed from \pkg{brglm2}
 #' at version 0.8. An new version of \code{check_infinite_estimates}
 #' is now maintained in the \pkg{detectseparation} R package at
@@ -57,9 +57,13 @@
 #'
 #' @references
 #'
-#' Lesaffre, E., & Albert, A. (1989). Partial Separation in Logistic
+#' Kosmidis, I. & Firth, D (2020). Jeffreys-prior penalty, finiteness
+#' and shrinkage in binomial-response generalized linear
+#' models. *Biometrika*. \url{https://doi.org/10.1093/biomet/asaa052}
+#'
+#' Lesaffre, E. & Albert, A. (1989). Partial Separation in Logistic
 #' Discrimination. *Journal of the Royal Statistical Society. Series B
-#' (Methodological)*, **51**, 109-116
+#' (Methodological)*, **51**, 109-116. \url{https://www.jstor.org/stable/2345845}
 #'
 #' @examples
 #'
@@ -83,7 +87,8 @@
 #' }
 #' @export
 check_infinite_estimates.glm <- function(object, nsteps = 20, ...)
-{   
+{
+    ## Deprecation warning comes from method in `brglm2-package.R`
     is_brmultinom <- inherits(object, "brmultinom")
 
     if ((class(object)[1] != "glm") & (!is_brmultinom)) {

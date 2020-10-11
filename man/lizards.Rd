@@ -4,7 +4,9 @@
 \name{lizards}
 \alias{lizards}
 \title{Habitat preferences of lizards}
-\format{An object of class \code{data.frame} with 23 rows and 6 columns.}
+\format{
+An object of class \code{data.frame} with 23 rows and 6 columns.
+}
 \source{
 McCullagh, P. and Nelder, J. A. (1989) _Generalized Linear
   Models_ (2nd Edition).  London: Chapman and Hall.

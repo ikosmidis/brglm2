@@ -13,7 +13,7 @@ Firth (1993) and Kosmidis & Firth (2009), the median bias-reduction
 adjusted scores approach in Kenne Pagui et al. (2017), the
 correction of the asymptotic bias in Cordeiro & McCullagh (1991),
 the mixed bias-reduction adjusted scores approach in Kosmidis et al
-(2019), maximum penalized likelihood with powers of the Jeffreys
+(2020), maximum penalized likelihood with powers of the Jeffreys
 prior as penalty, and maximum likelihood.
 }
 \details{

@@ -8,7 +8,7 @@
 #' adjusted scores approach in Kenne Pagui et al. (2017), the
 #' correction of the asymptotic bias in Cordeiro & McCullagh (1991),
 #' the mixed bias-reduction adjusted scores approach in Kosmidis et al
-#' (2019), maximum penalized likelihood with powers of the Jeffreys
+#' (2020), maximum penalized likelihood with powers of the Jeffreys
 #' prior as penalty, and maximum likelihood.
 #'
 #'
@@ -31,7 +31,7 @@
 #' \code{\link{brmultinom}} (baseline category logit models for
 #' nominal multinomial responses), and \code{\link{bracl}} (adjacent
 #' category logit models for ordinal multinomial responses).
-#' 
+#'
 #' @details
 #'
 #'
@@ -102,7 +102,7 @@ if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 #'
 #' @note
 #'
-#' 
+#'
 #' \code{check_infinite_estimates} will be removed from \pkg{brglm2}
 #' at version 0.8. An new version of
 #' \code{check_infinite_estimates} is now maintained in the
@@ -110,7 +110,7 @@ if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 #' \url{https://cran.r-project.org/package=detectseparation}.
 #'
 #' @seealso check_infinite_estimates.glm
-#' 
+#'
 #' @export
 check_infinite_estimates <- function(object, ...) {
     function_moves_to_new_package(gsub("\\(|\\)", "", deparse(match.call()[1])),
