@@ -161,7 +161,7 @@ coef(coalitionBRc, model = "dispersion")
 
 }
 \references{
-#' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
+Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 reduction in generalized linear models. *Statistics and Computing*,
 **30**, 43-59 \url{https://doi.org/10.1007/s11222-019-09860-6}
 
