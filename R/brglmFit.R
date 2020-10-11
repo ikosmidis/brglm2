@@ -1177,6 +1177,24 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
          class = "brglmFit")
 }
 
+#' Extract model coefficients from \code{\link{brglmFit}} objects
+#'
+#'
+#'
+#' @inheritParams stats::coef
+#' @param model one of \code{"mean"} (default), \code{"dispersion"}, \code{"full"},
+#'     to return the estimates of the parameters in the linear
+#'     prediction only, the estimate of the dispersion parameter only,
+#'     or both, respectively.
+#'
+#' @details
+#'
+#' See \code{\link{coef}} for more details.
+#'
+#' @seealso
+#'
+#' \code{\link{coef}}
+#'
 #' @export
 coef.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) {
     model <- match.arg(model)
