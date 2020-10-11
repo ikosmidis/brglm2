@@ -118,7 +118,10 @@ Poisson and multinomial responses, the adjusted score equations
 approach returns estimates with improved frequentist properties,
 that are also always finite, even in cases where the maximum
 likelihood estimates are infinite (e.g. complete and quasi-complete
-separation in multinomial regression). See, also,
+separation in multinomial regression). See, Kosmidis and Firth
+(2020) for a proof for binomial-response GLMs with Jeffreys-pior
+penalties to the log-likelihood, which is equivalent to mean bias
+reduction for logistic regression. See, also,
 \code{\link{detect_separation}} and
 \code{\link{check_infinite_estimates}} for pre-fit and post-fit
 methods for the detection of infinite estimates in binomial
