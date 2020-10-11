@@ -26,6 +26,16 @@ Along with methods for improving the estimation of generalized linear models (se
 
 The key methods are `detect_separation` and `check_infinite_estimates` and this vignettes describes their use.
 
+**Note:** 
+
+‘detect_separation’ and `check_infinite_estimates` will be removed
+from ‘brglm2’ at version 0.8.  New versions are now maintained in the
+‘detectseparation’ R package at <URL:
+https://cran.r-project.org/package=detectseparation>. In order to use
+the version in ‘detect_separation’ load first ‘brglm2’ and then
+‘detectseparation’, i.e. ‘library(brglm2); library(detectseparation)’.
+
+
 # Checking for infinite estimates
 
 @heinze:02 used a logistic regression model to analyze data from a
