@@ -172,7 +172,7 @@
 #'
 #' Kosmidis I (2014). Bias in parametric estimation: reduction and
 #' useful side-effects. *WIRE Computational Statistics*, **6**,
-#' 185-196 \url{http://doi.org/10.1002/wics.1296}
+#' 185-196 \url{https://doi.org/10.1002/wics.1296}
 #'
 #' @examples
 #' ## The lizards example from ?brglm::brglm
