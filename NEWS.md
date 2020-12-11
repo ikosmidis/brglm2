@@ -1,3 +1,9 @@
+# brglm2 0.7.1
+
+## Bug fixes
+
+* Fixed bug where `confint` was not returning anything when applied to objects of class `brmultinom`
+
 # brglm2 0.7.0
 
 ## Bug fixes
