@@ -4,7 +4,8 @@
 \name{endometrial}
 \alias{endometrial}
 \title{Histology grade and risk factors for 79 cases of endometrial cancer}
-\format{A data frame with 79 rows and 4 variables:
+\format{
+A data frame with 79 rows and 4 variables:
 \describe{
 
 \item{NV}{neovasculization with coding 0 for absent and 1 for present}
@@ -15,7 +16,8 @@
 
 \item{HG}{histology grade with coding 0 for low grade and 1 for high grade}
 
-}}
+}
+}
 \source{
 The packaged data set was downloaded in \code{.dat} format
     from \url{http://www.stat.ufl.edu/~aa/glm/data}. The latter

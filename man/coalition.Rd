@@ -4,7 +4,9 @@
 \name{coalition}
 \alias{coalition}
 \title{Coalition data}
-\format{An object of class \code{data.frame} with 314 rows and 7 columns.}
+\format{
+An object of class \code{data.frame} with 314 rows and 7 columns.
+}
 \usage{
 coalition
 }

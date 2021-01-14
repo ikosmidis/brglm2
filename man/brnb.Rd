@@ -50,7 +50,7 @@ brnb(
     included in the formula instead or as well, and if more than one is
     specified their sum is used.  See \code{\link[stats]{model.offset}}.}
 
-\item{link}{The link function.  Currently must be one of \code{log}, \code{sqrt} 
+\item{link}{The link function.  Currently must be one of \code{log}, \code{sqrt}
 or \code{identity}.}
 
 \item{start}{starting values for the parameters in the linear predictor.}
@@ -117,7 +117,7 @@ A fitted model object of class \code{brnb} inheriting from \code{negbin} and \co
 four additional components, namely \code{theta} for the ML estimate of
 dispersion parameter as in \code{glm.nb}, \code{vcov.mean} for
 the estimated variance covariance matrix of the regression coefficients while \code{vcov.dispersion}
-for the estimated variance of the dispersion parameter in a chosen parameterization (using the expected information) 
+for the estimated variance of the dispersion parameter in a chosen parameterization (using the expected information)
 and  \code{twologlik} for  twice the log-likelihood function.
 }
 \description{
@@ -129,12 +129,12 @@ reduction methods. Reference needed.
 Thanks to  the orthogonality between coefficients and dispersion parameter,
 the alternate  quasi Fisher scoring iteration is used. A detailed description of the
 procedure is given in the iteration vignette (see,
-\code{vignette("iteration", "brglm2")} or Kosmidis et al, 2020).   
+\code{vignette("iteration", "brglm2")} or Kosmidis et al, 2020).
 (The number of alternations and the number of iterations when estimating
 parameters are controlled by the \code{maxit} argument of  \code{brglmControl}.)
 
-The type of score adjustment to be used is specified through the 
-\code{type} argument (see \code{\link{brglmControl}} for details). 
+The type of score adjustment to be used is specified through the
+\code{type} argument (see \code{\link{brglmControl}} for details).
 The available options are:
 \itemize{
 \item \code{type = "AS_mixed"}: the mixed bias-reducing score adjustments in
@@ -152,8 +152,8 @@ with powers of the Jeffreys prior as penalty.
 Cordeiro & McCullagh (1991).
 }
 
-The choice of the parameterization for the dispersion is controlled by 
-the  \code{transformation} argument (see \code{\link{brglmControl}} for details). 
+The choice of the parameterization for the dispersion is controlled by
+the  \code{transformation} argument (see \code{\link{brglmControl}} for details).
 The default is \code{identity} but using option  \code{inverse} produces
 the results as in \code{glm.nb}.
 }
@@ -162,33 +162,35 @@ the results as in \code{glm.nb}.
 likelihood estimator of the negative binomial dispersion parameter.
 Biometrics, 61, 179--185.
 
-Number of revertant colonies of salmonella
+## Number of revertant colonies of salmonella
+freq <- c(15, 16, 16, 27, 33, 20,
+          21, 18, 26, 41, 38, 27,
+          29, 21, 33, 60, 41, 42)
+dose <- rep(c(0, 10, 33, 100, 333, 1000), 3)
+observation <- rep(1:3, each = 6)
+salmonella <- data.frame(freq, dose, observation)
 
-freq=c(15,16,16,27,33,20,
-21,18,26,41,38,27,
-29,21,33,60,41,42)
-dose=rep(c(0,10,33,100,333,1000),3)
-observation=rep(1:3,each=6)
-salmonella=data.frame(freq,dose,observation)
-# Maximum likelihood fit with glm.nb of MASS
-fitmle.glmnb<-glm.nb(freq~dose+log(dose+10))
-# Maximum likelihood fit with brnb
-fitmle.brnb<- brnb(freq~dose+log(dose+10),link="log",
-transformation ="inverse",type = "ML")
-# Mean bias-reduced fit:
-fitBR_mean<- brnb(freq~dose+log(dose+10),link="log", 
+## Maximum likelihood fit with glm.nb of MASS
+fitmle_glmnb <- MASS::glm.nb(freq~dose+log(dose+10))
+
+## Maximum likelihood fit with brnb
+fitmle.brnb <- brnb(freq ~ dose + log(dose+10), link = "log",
+                    transformation ="inverse", type = "ML")
+
+## Mean bias-reduced fit:
+fitBR_mean<- brnb(freq~dose+log(dose+10),link="log",
 transformation ="inverse",type = "AS_mean")
 # Median bias-reduced fit:
-fitBR_median<- brnb(freq~dose+log(dose+10),link="log",  
+fitBR_median<- brnb(freq~dose+log(dose+10),link="log",
 transformation ="inverse",type = "AS_median")
 # Mixed bias-reduced fit:
-fitBR_mixed<- brnb(freq~dose+log(dose+10),link="log", 
+fitBR_mixed<- brnb(freq~dose+log(dose+10),link="log",
 transformation ="inverse",type = "AS_mixed")
  # Mean bias-corrected fit:
-fitBC_mean<- brnb(freq~dose+log(dose+10),link="log", 
+fitBC_mean<- brnb(freq~dose+log(dose+10),link="log",
 transformation ="inverse",type = "correction")
  Modified penalized likelihood with Jeffreys fit:
-fitmplJ<- brnb(freq~dose+log(dose+10),link="log", 
+fitmplJ<- brnb(freq~dose+log(dose+10),link="log",
 transformation ="inverse",type = "MPL_Jeffreys")
 # summary of methods
 res=round(cbind(coef(fitmle.brnb,"full"),sqrt(diag(vcov(fitmle.brnb,"full"))),
@@ -218,7 +220,7 @@ all.equal(fitmle.brnb2$dispersion,1/fitmle.brnb$dispersion,tolerance = 1e-05)
 all.equal(fitBR_median2$dispersion,1/fitBR_median$dispersion,tolerance = 1e-05)
 
 ## check for prior weights
-duptimes <- c(2,1,3,5,rep(1,14)) 
+duptimes <- c(2,1,3,5,rep(1,14))
 idx <- rep(1:nrow(salmonella), duptimes)
 dupsalmonella <- salmonella[idx,]
 
@@ -262,7 +264,7 @@ all.equal(coef(fitmplJ.ew,"full"), coef(fitmplJ.w,"full"),tolerance = 1e-10)
 Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
 linear models. *Journal of the Royal Statistical Society. Series B(Methodological)*,
  **53**, 629-643.
- 
+
 Firth D (1993). Bias reduction of maximum likelihood estimates,
 Biometrika. **80**, 27-38.
 
