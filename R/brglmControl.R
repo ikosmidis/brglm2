@@ -32,8 +32,9 @@
 #'     \code{AS_median} (median-bias reducing adjusted scores),
 #'     \code{AS_mixed} (bias reduction using mixed score adjustments;
 #'     default), \code{correction} (asymptotic bias correction),
-#'     \code{MPL_Jeffreys} (maximum penalized likelihood with powers of the
-#'     Jeffreys prior as penalty) and\code{ML} (maximum likelihood).
+#'     \code{MPL_Jeffreys} (maximum penalized likelihood with powers
+#'     of the Jeffreys prior as penalty) and\code{ML} (maximum
+#'     likelihood).
 #' @param transformation the transformation of the dispersion to be
 #'     estimated. Default is \code{identity}. See Details.
 #' @param slowit a positive real used as a multiplier for the
@@ -44,6 +45,8 @@
 #' @param response_adjustment a (small) positive constant or a vector
 #'     of such. Default is \code{NULL}. See Details.
 #' @param a power of the Jeffreys prior penalty. See Details.
+#' @param ... further arguments passed to
+#'     \code{\link{brglmControl}}. Currently ignored in the outpup.
 #'
 #' @details \code{\link{brglmControl}} provides default values and
 #'     sanity checking for the various constants that control the
@@ -160,7 +163,7 @@ brglmControl <- function(epsilon = 1e-06, maxit = 100,
                          slowit = 1,
                          response_adjustment = NULL,
                          max_step_factor = 12,
-                         a = 1/2) {
+                         a = 1/2, ...) {
     type <- match.arg(type)
 
     if (is.character(transformation)) {
