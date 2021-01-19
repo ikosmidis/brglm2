@@ -38,8 +38,8 @@ test_that("brglmControl arguments can be passed directly from the brglmFit call"
 
 
 
-test_that("... work as expected", {
-    b_control <- brglmControl(ABCDEFGHIJK = 1)
+b_control <- brglmControl(epsilon = 1e-02, ABCDEFG123 = 1, response_adjustment = c(0.3, 0.2), trace = TRUE, )
+test_that("the object brglmControl returns with defaults is as expected", {
     expect_identical(b_control$epsilon, 1e-02)
     expect_identical(b_control$maxit, 100)
     expect_true(b_control$trace)
