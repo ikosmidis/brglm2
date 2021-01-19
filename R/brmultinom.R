@@ -333,8 +333,7 @@ logLik.brmultinom <- function(object, ...) {
 
 #' @method summary brmultinom
 #' @export
-summary.brmultinom <- function(object, correlation = FALSE, digits = options()$digits,
-                               Wald.ratios = FALSE, ...) {
+summary.brmultinom <- function(object, correlation = FALSE, digits = options()$digits, Wald.ratios = FALSE, ...) {
     ncat <- object$ncat
     coefficients <- coef.brmultinom(object)
     object$digits <- digits
@@ -356,8 +355,10 @@ summary.brmultinom <- function(object, correlation = FALSE, digits = options()$d
         object$coefficients <- coefficients
         object$standard.errors <- ses
         ## object$AIC <- AIC(object)
-        if (Wald.ratios)
+        if (Wald.ratios) {
             object$Wald.ratios <- coef/ses
+            object$Wald.pvalues <-  2 * pnorm(-abs(object$Wald.ratios))
+        }
         if (correlation)
             object$correlation <- vc/outer(se, se)
     }

@@ -123,3 +123,4 @@ check_infinite_estimates <- function(object, ...) {
                                   "detectseparation")
     UseMethod("check_infinite_estimates")
 }
+
