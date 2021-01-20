@@ -8,6 +8,13 @@
   argument was specified using the output from `brglmControl()` or
   `brglm_control()`.
 
+## New functionality
+* added `check_aliasing` option in `brglmControl()` to tell
+  `brglm_fit()` to skip (`check_aliasing = TRUE`) or not
+  (`check_aliasing = FALSE`) rank deficiency checks (through a QR
+  decomposition of the model matrix), saving some computational effort
+  for large model matrices.
+
 # brglm2 0.7.0
 
 ## Bug fixes

@@ -140,7 +140,7 @@
 #'
 #' @author Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}
 #'
-#' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
+#' @seealso \code{\link{brglmControl}}, \code{\link{glm.fit}}, \code{\link{glm}}
 #'
 #' @references
 #'
@@ -778,25 +778,31 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     else {
         boundary <- converged <- FALSE
         ## Detect aliasing
-        qrx <- qr(x)
-        rank <- qrx$rank
-        is_full_rank <- rank == nvars
-
-        if (!singular.ok && !is_full_rank) {
-            stop("singular fit encountered")
-        }
-        if (!isTRUE(is_full_rank)) {
-            aliased <- qrx$pivot[seq.int(qrx$rank + 1, nvars)]
-            X_all <- x
-            x <- x[, -aliased]
-            nvars_all <- nvars
-            nvars <- ncol(x)
+        if (!isTRUE(control$check_aliasing)) {
+            is_full_rank <- TRUE ## Assumption
+            rank <- nvars_all <- nvars
             betas_names_all <- betas_names
-            betas_names <- betas_names[-aliased]
         }
         else {
-            nvars_all <- nvars
-            betas_names_all <- betas_names
+            qrx <- qr(x)
+            rank <- qrx$rank
+            is_full_rank <- rank == nvars
+            if (!isTRUE(singular.ok) && !isTRUE(is_full_rank)) {
+                stop("singular fit encountered")
+            }
+            if (!isTRUE(is_full_rank)) {
+                aliased <- qrx$pivot[seq.int(qrx$rank + 1, nvars)]
+                X_all <- x
+                x <- x[, -aliased]
+                nvars_all <- nvars
+                nvars <- ncol(x)
+                betas_names_all <- betas_names
+                betas_names <- betas_names[-aliased]
+            }
+            else {
+                nvars_all <- nvars
+                betas_names_all <- betas_names
+            }
         }
         betas_all <- structure(rep(NA_real_, nvars_all), .Names = betas_names_all)
         keep <- weights > 0

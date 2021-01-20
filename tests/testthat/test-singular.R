@@ -8,9 +8,9 @@ clotting <- data.frame(
     lot = factor(c(rep(1, 9), rep(2, 9))))
 mod <- glm(conc ~ lot*log(u) + I(2*log(u)), data = clotting, family = Gamma)
 
+X <- model.matrix(mod)
+Y <- mod$y
 test_that("brglmFit returns an error if singular.ok = TRUE", {
-    X <- model.matrix(mod)
-    Y <- mod$y
     expect_error(brglm_fit(X, Y, family = Gamma(), singular.ok = FALSE),
                  regexp = "singular fit encountered")
     expect_true(is.na(coef(brglm_fit(X, Y, family = Gamma(), singular.ok = TRUE))["I(2 * log(u))"]))

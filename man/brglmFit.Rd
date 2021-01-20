@@ -318,7 +318,7 @@ useful side-effects. *WIRE Computational Statistics*, **6**,
 185-196 \url{https://doi.org/10.1002/wics.1296}
 }
 \seealso{
-\code{\link{glm.fit}} and \code{\link{glm}}
+\code{\link{brglmControl}}, \code{\link{glm.fit}}, \code{\link{glm}}
 }
 \author{
 Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}
