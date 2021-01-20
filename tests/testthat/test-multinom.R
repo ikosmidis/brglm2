@@ -26,6 +26,11 @@ expect_warning(
                         data = hepat, weights = counts)
 )
 
+test_that("ML fails when there is separation", {
+    expect_error(brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML"),
+        regex = "NA/NaN/Inf in foreign function")
+})
+
 
 tol <- 1e-05
 test_that("brmultinom returns the same estimates as pmlr", {
@@ -62,10 +67,30 @@ enzymes$Group <- factor(enzymes$Group, levels=c("2","1","3"))
 enzymes$counts <- rep(1, nrow(enzymes))
 ## enzpmlr <- pmlr(Group ~ AST + GLDH, weights = counts, data = enzymes, method = "wald")
 ## enzbrmultinom <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes)
+##
+## this expect_warning here is preventive for the non-integer counts
+## warnings that are generated internally but are not visible to the
+## user
 expect_warning(
     enzbrmultinom_ml <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes, type = "ML")
 )
 enzmultinom <- nnet::multinom(Group ~ AST + GLDH, weights = counts, data = enzymes, trace = FALSE)
+
+
+
+test_that("confint methods works as expected", {
+    cnnet <- confint(enzmultinom, level = 0.9123)
+    ccbrm <- confint(enzbrmultinom_ml, level = 0.9123)
+    expect_equal(cnnet, ccbrm, tolerance = 1e-04)
+
+    c1 <- drop(confint(enzbrmultinom_ml, level = 0.99, parm = 3))
+    c2 <- with(summary(enzbrmultinom_ml), {
+        rbind(coefficients[, "GLDH"] - qnorm(1 - 0.01/2) * standard.errors[, "GLDH"],
+              coefficients[, "GLDH"] + qnorm(1 - 0.01/2) * standard.errors[, "GLDH"])
+    })
+    expect_equal(c1, c2, tolerance = 1e-10, check.attributes = FALSE)
+})
+
 
 aic1 <- AIC(enzbrmultinom_ml)
 aic2 <- AIC(enzmultinom)
@@ -73,12 +98,11 @@ aic3 <- -2 * logLik(enzbrmultinom_ml) + 2 * length(coef(enzbrmultinom_ml))
 aic4 <- summary(enzbrmultinom_ml)$AIC
 
 ###
-test_that("AIC with brmultino", {
+test_that("AIC with brmultinon", {
     expect_equal(aic1, aic2, tolerance = 1e-06)
     expect_equal(aic1, unclass(aic3), tolerance = 1e-06, check.attributes = FALSE)
     expect_equal(aic1, aic4, tolerance = 1e-06)
 })
-
 
 
 ###############
