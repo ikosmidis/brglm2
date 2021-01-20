@@ -15,6 +15,7 @@
   decomposition of the model matrix), saving some computational effort
 
 
+
 # brglm2 0.7.0
 
 ## Bug fixes
