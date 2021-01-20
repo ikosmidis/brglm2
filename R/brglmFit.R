@@ -675,6 +675,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     ## Ensure x is a matrix, extract variable names, observation
     ## names, nobs, nvars, and initialize weights and offsets if
     ## needed
+
     x <- as.matrix(x)
     betas_names <- dimnames(x)[[2L]]
     nvars <- ncol(x)

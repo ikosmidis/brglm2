@@ -31,8 +31,8 @@ bracl(
   }
 
 \item{data}{
-    an optional data frame in which to interpret the variables occurring
-    in \code{formula}.
+    an optional data frame, list or environment in which to interpret
+    the variables occurring in \code{formula}.
   }
 
 \item{weights}{
