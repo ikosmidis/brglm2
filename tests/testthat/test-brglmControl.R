@@ -50,3 +50,23 @@ test_that("the object brglmControl returns with defaults is as expected", {
     expect_equal(b_control$slowit, 1)
     expect_equal(b_control$max_step_factor, 12)
 })
+
+
+
+## A Gamma example, from McCullagh & Nelder (1989, pp. 300-2)
+clotting <- data.frame(
+    u = c(5,10,15,20,30,40,60,80,100, 5,10,15,20,30,40,60,80,100),
+    conc = c(118,58,42,35,27,25,21,19,18,69,35,26,21,18,16,13,12,12),
+    lot = factor(c(rep(1, 9), rep(2, 9))))
+
+clot_formula <- conc ~ lot*log(u) + I(2*log(u))
+
+test_that("check_aliasing option works as expected", {
+    expect_error(glm(clot_formula, data = clotting, family = Gamma(), method = brglm_fit, check_aliasing = FALSE),
+                 regexp = "NA/NaN/Inf in foreign")
+    mod <- glm(clot_formula, data = clotting, family = Gamma(), method = brglm_fit, check_aliasing = TRUE)
+    expect_true(is.na(coef(mod)["I(2 * log(u))"]))
+    ## check defaults
+    mod <- glm(clot_formula, data = clotting, family = Gamma(), method = brglm_fit)
+    expect_true(is.na(coef(mod)["I(2 * log(u))"]))
+})
