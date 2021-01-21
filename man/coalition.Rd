@@ -20,7 +20,7 @@ Data is as provided in the Zeilig R package (\url{https://cran.r-project.org/pac
 King G, Alt J E, Burns N E, Laver M. (1990). A Unified
  Model of Cabinet Dissolution in Parliamentary
  Democracies. *American Journal of Political Science*, **34**,
- 846-870. \url{https://doi.org/10.2307/2111401}
+ 846-870. \doi{10.2307/2111401}
 
  King G, Alt J E, Burns N E, Laver M. ICPSR
  Publication Related Archive, 1115.

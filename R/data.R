@@ -66,11 +66,11 @@
 #'
 #' Heinze G, Schemper M (2002). A Solution to the Problem of
 #' Separation in Logistic Regression. *Statistics in Medicine*,
-#' **21**, 2409–2419 \url{https://doi.org/10.1002/sim.1047}
+#' **21**, 2409–2419 \doi{10.1002/sim.1047}
 #'
 #' Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
 #' and shrinkage in binomial-response generalized linear
-#' models. *Biometrika* \url{https://doi.org/10.1093/biomet/asaa052}
+#' models. *Biometrika* \doi{10.1093/biomet/asaa052}
 #'
 #'
 "endometrial"
@@ -91,7 +91,7 @@
 #'  King G, Alt J E, Burns N E, Laver M. (1990). A Unified
 #'  Model of Cabinet Dissolution in Parliamentary
 #'  Democracies. *American Journal of Political Science*, **34**,
-#'  846-870. \url{https://doi.org/10.2307/2111401}
+#'  846-870. \doi{10.2307/2111401}
 #'
 #'  King G, Alt J E, Burns N E, Laver M. ICPSR
 #'  Publication Related Archive, 1115.

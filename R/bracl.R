@@ -57,23 +57,23 @@
 #'
 #' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 #' reduction in generalized linear models. *Statistics and Computing*,
-#' **30**, 43-59 \url{https://doi.org/10.1007/s11222-019-09860-6}
+#' **30**, 43-59 \doi{10.1007/s11222-019-09860-6}
 #'
 #' Agresti, A (2010). *Analysis of Ordinal Categorical Data* (2nd
 #' edition).  Wiley Series in Probability and Statistics. Wiley.
 #'
 #' Albert A, Anderson J A (1984). On the Existence of Maximum
 #' Likelihood Estimates in Logistic Regression Models. *Biometrika*,
-#' **71**, 1--10 \url{https://doi.org/10.2307/2336390}
+#' **71**, 1--10 \doi{10.2307/2336390}
 #'
 #' Kosmidis I, Firth D (2011). Multinomial logit bias reduction
 #' via the Poisson log-linear model. *Biometrika*, **98**,
-#' 755-759 \url{http://dx.doi.org/10.1093/biomet/asr026}
+#' 755-759 \doi{10.1093/biomet/asr026}
 #'
 #' Palmgren J (1981). The Fisher Information Matrix for Log Linear
 #' Models Arguing Conditionally on Observed Explanatory
 #' Variables. *Biometrika*, **68**,
-#' 563-566 \url{https://doi.org/10.1093/biomet/68.2.563}
+#' 563-566 \doi{10.1093/biomet/68.2.563}
 #'
 #' @examples
 #'

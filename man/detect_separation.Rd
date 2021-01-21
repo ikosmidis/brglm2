@@ -149,7 +149,7 @@ package version 0.1-3.
 
 Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
 and shrinkage in binomial-response generalized linear
-models. *Biometrika* \url{https://doi.org/10.1093/biomet/asaa052}
+models. *Biometrika* \doi{10.1093/biomet/asaa052}
 }
 \seealso{
 \code{\link{brglm_fit}}, \code{\link{glm.fit}} and \code{\link{glm}}

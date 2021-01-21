@@ -27,7 +27,7 @@
 
 ## Other improvements, updates and additions
 * Updated reference to [Kenne Pagui et al (2017)](https://doi.org/10.1093/biomet/asx046).q
-* Updated reference to [Kosmidis and Firth (2020)](http://doi.org/10.1093/biomet/asaa052).
+* Updated reference to [Kosmidis and Firth (2020)](https://doi.org/10.1093/biomet/asaa052).
 * Fixed issues with references.
 * Updated documentation.
 
