@@ -42,7 +42,7 @@ subtraction of an estimate of the bias of the maximum likelihood
 estimator from the maximum likelihood estimates as prescribed in
 [Cordeiro and McCullagh
 (1991)](https://www.jstor.org/stable/2345592). [Kosmidis et al
-(2019)](https://doi.org/10.1007/s11222-019-09860-6) provides a
+(2020)](https://doi.org/10.1007/s11222-019-09860-6) provides a
 unifying framework and algorithms for mean and median bias reduction
 for the estimation of generalized linear models.
 
@@ -59,11 +59,17 @@ likelihood is penalized by a power of the Jeffreys invariant prior).
 
 ## Installation
 
-Install the development version from github:
+Install the current version from CRAN:
 
-``` r
-# install.packages("devtools")
-remotes::install_github("ikosmidis/brglm2")
+```r
+install.packages("brglm2")
+```
+
+or the development version from github:
+
+```r
+# install.packages("remotes")
+remotes::install_github("ikosmidis/brglm2", ref = "develop")
 ```
 
 ## Example
@@ -98,11 +104,11 @@ value `r round(coef(summary(modML))["NV", "z value"], 3)` for the
 $z$-statistic cannot be trusted for inference on the size of the
 effect for `NV`.
 
-Many of the estimation methods implemented in **brglm2** not only
-return estimates with improved frequentist properties
-(e.g. asymptotically smaller mean and median bias than what ML
-typically delivers), but also estimates and estimated standard errors
-that are always finite in binomial (e.g. logistic, probit, and
+As mentioned earlier, many of the estimation methods implemented in
+**brglm2** not only return estimates with improved frequentist
+properties (e.g. asymptotically smaller mean and median bias than what
+ML typically delivers), but also estimates and estimated standard
+errors that are always finite in binomial (e.g. logistic, probit, and
 complementary log-log regression) and multinomial regression models
 (e.g. baseline category logit models for nominal responses, and
 adjacent category logit models for ordinal responses). For example,
@@ -116,32 +122,34 @@ summary(update(modML, method = "brglm_fit"))
 A quick comparison of the output from mean bias reduction to that from
 ML reveals a dramatic change in the $z$-statistic for `NV`, now that
 estimates and estimated standard errors are finite. In particular, the
-evidence against the null of "NV" not contributing to the model in the
+evidence against the null of `NV` not contributing to the model in the
 presence of the other covariates being now stronger.
 
-See `?brglmFit` and `vignettes(package = "brglm2")` for more examples
-and the other estimation methods for generalized linear models,
-including median bias reduction and maximum penalized likelihood with
-Jeffreys' prior penalty.
+See `?brglm_fit` and `?brglm_control` for more examples and the other
+estimation methods for generalized linear models, including median
+bias reduction and maximum penalized likelihood with Jeffreys' prior
+penalty. Also do not forget to take a look at the vignettes
+(`vignette(package = "brglm2")`) for details and more case studies.
 
 ## Solving adjusted score equations using quasi-Fisher scoring
 
 The workhorse function in **brglm2** is
-[`brglmFit`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R),
-which can be passed directly to the `method` argument of the `glm`
-function. `brglmFit` implements a quasi [Fisher
+[`brglm_fit`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R)
+(or equivalently `brglmFit` if you like camel case), which, as we did
+in the example above, can be passed directly to the `method` argument
+of the `glm` function. `brglm_fit` implements a quasi [Fisher
 scoring](https://en.wikipedia.org/wiki/Scoring_algorithm) procedure,
 whose special cases result in a range of explicit and implicit bias
-reduction methods for generalized linear models. Bias reduction for
-multinomial logistic regression (nominal responses) can be performed
-using the function `brmultinom`, and for adjacent category models
-(ordinal responses) using the function `bracl`. Both `brmultinom` and
-`bracl` rely on `brglmFit`.
+reduction methods for generalized linear models for more
+details). Bias reduction for multinomial logistic regression (nominal
+responses) can be performed using the function `brmultinom`, and for
+adjacent category models (ordinal responses) using the function
+`bracl`. Both `brmultinom` and `bracl` rely on `brglm_fit`.
 
 The [iteration
 vignette](https://cran.r-project.org/package=brglm2/vignettes/iteration.html)
 and [Kosmidis et al
-(2019)](https://doi.org/10.1007/s11222-019-09860-6) present the
+(2020)](https://doi.org/10.1007/s11222-019-09860-6) present the
 iteration and give mathematical details for the bias-reducing
 adjustments to the score functions for generalized linear models.
 
