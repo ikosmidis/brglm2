@@ -74,15 +74,15 @@ remotes::install_github("ikosmidis/brglm2")
 ## Example
 
 Below we follow the example of [Heinze and Schemper
-(2002)](https://doi.org/10.1002/sim.1047) and fit a logistic
-regression model using maximum likelihood (ML) to analyze data from a
-study on endometrial cancer (see `?brglm2::endometrial` for details
-and references).
+(2002)](https://doi.org/10.1002/sim.1047) and fit a probit regression
+model using maximum likelihood (ML) to analyze data from a study on
+endometrial cancer (see `?brglm2::endometrial` for details and
+references).
 
 ```{r, echo = TRUE, eval = TRUE}
 library("brglm2")
 data("endometrial", package = "brglm2")
-modML <- glm(HG ~ NV + PI + EH, family = binomial(), data = endometrial)
+modML <- glm(HG ~ NV + PI + EH, family = binomial("probit"), data = endometrial)
 summary(modML)
 ```
 
@@ -107,21 +107,22 @@ Many of the estimation methods implemented in **brglm2** not only
 return estimates with improved frequentist properties
 (e.g. asymptotically smaller mean and median bias than what ML
 typically delivers), but also return finite estimates and estimated
-standard errors in binomial (e.g. logit, probit, and complementary
+standard errors in binomial (e.g. logistic, probit, and complementary
 log-log regression) and multinomial regression models (e.g. baseline
-category logistic regression for nominal responses and adjacent
-category logit models for ordinal responses). For example, the code
-chunk below refits the model on the endometrial cancer study data
-using mean bias reduction.
+category logit models for nominal responses, and adjacent category
+logit models for ordinal responses). For example, the code chunk below
+refits the model on the endometrial cancer study data using mean bias
+reduction.
 
 ```{r, echo = TRUE, eval = TRUE}
 summary(update(modML, method = "brglm_fit"))
 ```
 
 A quick comparison of the output from mean bias reduction to that from
-ML reveals a dramatic change in the $z$-statistic for `NV`.  The
+ML reveals a dramatic change in the $z$-statistic for `NV`, now that
+estimates and estimated standard errors are finite. In particular, the
 evidence against the null of "NV" not contributing to the model in the
-presence of the other covariates is now much stronger.
+presence of the other covariates being now stronger.
 
 See `?brglmFit` and `vignettes(package = "brglm2")` for more examples
 and the other estimation methods for generalized linear models,
