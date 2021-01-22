@@ -14,11 +14,10 @@ coverage](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)]
 
 [**brglm2**](https://github.com/ikosmidis/brglm2) provides tools for the
 estimation and inference from generalized linear models using various
-methods for bias reduction ([Kosmidis,
-2014](https://doi.org/10.1002/wics.1296)). **brglm2** supports all
-generalized linear models supported in R, and provides methods for
-multinomial logistic regression (nominal responses) and adjacent
-category models (ordinal responses).
+methods for bias reduction. **brglm2** supports all generalized linear
+models supported in R, and provides methods for multinomial logistic
+regression (nominal responses) and adjacent category models (ordinal
+responses).
 
 Reduction of estimation bias is achieved by solving either the mean-bias
 reducing adjusted score equations in [Firth
