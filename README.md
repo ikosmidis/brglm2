@@ -44,11 +44,6 @@ for logistic regression (and, for more general binomial-response models
 where the likelihood is penalized by a power of the Jeffreys invariant
 prior).
 
-**brglm2** also provides *pre-fit* and *post-fit* methods for the
-detection of separation and of infinite maximum likelihood estimates in
-binomial response generalized linear models (see `?detect_separation`
-and `?check_infinite_estimates`).
-
 Installation
 ------------
 
@@ -97,7 +92,9 @@ references).
     #> Number of Fisher Scoring iterations: 17
 
 The ML estimate of the parameter for `NV` is actually infinite, as can
-be quickly verified using the **detectseparation** R package
+be quickly verified using the
+[**detectseparation**](https://cran.r-project.org/package=detectseparation)
+R package
 
     # install.packages("detectseparation")
     library("detectseparation")
@@ -119,10 +116,10 @@ of the effect for `NV`.
 Many of the estimation methods implemented in **brglm2** not only return
 estimates with improved frequentist properties (e.g. asymptotically
 smaller mean and median bias than what ML typically delivers), but also
-return finite estimates and estimated standard errors in binomial
-(e.g. logistic, probit, and complementary log-log regression) and
-multinomial regression models (e.g. baseline category logit models for
-nominal responses, and adjacent category logit models for ordinal
+estimates and estimated standard errors that are always finite in
+binomial (e.g. logistic, probit, and complementary log-log regression)
+and multinomial regression models (e.g. baseline category logit models
+for nominal responses, and adjacent category logit models for ordinal
 responses). For example, the code chunk below refits the model on the
 endometrial cancer study data using mean bias reduction.
 
