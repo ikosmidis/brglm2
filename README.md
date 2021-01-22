@@ -1,7 +1,7 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-brglm2
-======
+brglm2 <img src="man/figures/hex_detectseparation.svg" width="320" align="right">
+=================================================================================
 
 <!-- badges: start -->
 
@@ -102,6 +102,16 @@ R package
 
     # install.packages("detectseparation")
     library("detectseparation")
+    #> Registered S3 method overwritten by 'detectseparation':
+    #>   method                  from  
+    #>   print.detect_separation brglm2
+    #> 
+    #> Attaching package: 'detectseparation'
+    #> The following objects are masked from 'package:brglm2':
+    #> 
+    #>     check_infinite_estimates, checkInfiniteEstimates,
+    #>     detect_separation, detect_separation_control, detectSeparation,
+    #>     detectSeparationControl
     update(modML, method = "detect_separation")
     #> Implementation: ROI | Solver: lpsolve 
     #> Separation: TRUE 
