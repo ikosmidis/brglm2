@@ -55,7 +55,7 @@ separation). See, [Kosmidis & Firth
 (2020)](http://doi.org/10.1093/biomet/asaa052) for the proof of the
 latter result in the case of mean bias reduction for logistic
 regression (and, for more general binomial-response models where the
-likelihood is penalized by a power of the Jeffreys invariant prior).
+likelihood is penalized by a power of the Jeffreys' invariant prior).
 
 ## Installation
 
