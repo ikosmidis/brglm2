@@ -156,7 +156,7 @@
 #' coef(coalitionBRc, model = "dispersion")
 #'
 #' @export
-brglmControl <- function(epsilon = 1e-06, epsilonExp = 10^(-15),maxit = 100,
+brglmControl <- function(epsilon = 1e-06,maxit = 100,
                          trace = FALSE,
                          type = c("AS_mixed", "AS_mean", "AS_median", "correction", "MPL_Jeffreys", "ML"),
                          transformation = "identity",
@@ -193,7 +193,7 @@ brglmControl <- function(epsilon = 1e-06, epsilonExp = 10^(-15),maxit = 100,
     }
     if (!is.numeric(epsilon) || epsilon <= 0)
         stop("value of 'epsilon' must be > 0")
-    list(epsilon = epsilon, epsilonExp = epsilonExp, maxit = maxit, trace = trace,
+    list(epsilon = epsilon,  maxit = maxit, trace = trace,
          response_adjustment = response_adjustment,
          type = type,
          Trans = Trans,

@@ -197,7 +197,7 @@
 
 
 brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
-                 link="log", start = NULL, etastart = NULL,
+                 link = "log", start = NULL, etastart = NULL,
                  mustart = NULL,  control = list(...), na.action,
                  model = TRUE, x = FALSE, y = TRUE, contrasts = NULL,
                  intercept = TRUE, singular.ok = TRUE ,...)
@@ -213,7 +213,7 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
     if (control$trace) {
       st <- max(abs(step_beta), na.rm = TRUE)
       gr <- max(abs(adjusted_grad_beta), na.rm = TRUE)
-      cat("Coefficients update:\t",sprintf("%03f", betas), "\n", sep = " ")
+      cat("Coefficients update:\t", sprintf("%03f", betas), "\n", sep = " ")
       cat("Outer/Inner iteration:\t", sprintf("%03d", iter),
           "/", sprintf("%03d", step_factor), "\n", sep = "")
       cat("max |step|:", format(round(st, 6), nsmall = 6,
@@ -264,9 +264,6 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
     stop("negative weights not allowed")
 
   control <- do.call("brglmControl", control)
-  # if (control$type == "MPL_Jeffreys")
-  #   stop("maximum penalized likelihood with power Jeffreys
-  #        not yet available: implementation in progress")
   ok_links <- c("log", "sqrt", "identity")
     if (!isTRUE(link %in% ok_links))
       stop(link, " is not one of the appropriate link function")
@@ -286,7 +283,7 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
   dkappa.dphi <- linkobj_disp$mu.eta
   d2kappa.dphi <- linkobj_disp$d2mu.deta
 
-  fam0 <- do.call("poisson",list(link=link))
+  fam0 <- do.call("poisson", list(link = link))
 
   is_ML <- control$type == "ML"
   is_AS_median <- control$type == "AS_median"
@@ -294,9 +291,9 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
   is_correction <- control$type == "correction"
 
   ## computation of y's functions
-  s1fun <- function(yy,k) {
+  s1fun <- function(yy, k) {
     res <- 0
-    if (yy > 0 ) {
+    if (yy > 0) {
       j <- 0:(yy - 1)
       res <- sum(j / (k * j + 1))
     }
@@ -308,29 +305,56 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
   ##
   ## IK, 29/09/2020: Best to implement this in C or C++ to avoid
   ## overhead from using multiple loops over observations
-  exp_quant <- function(mu, k, eps = control$epsilonExp) {
+  ## EK 03.01.2021 a part written in c 
+  ## epsilonExp is directly fixed inside the function
+  ## there is no control on how large is ymax
+  
+  exp_quant <- function(mu, k) {
+    n <- length(mu)
+    E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- numeric(n)
     if (k < 0) stop("negative value of k")
-    ymax<-max(qnbinom(1 - eps, mu = mu, size = 1 / k))
-    if (ymax > 10000) stop("ymax too much large") ## to control with a flag
-    yval<-0:ymax
-    pmat<-sapply(mu, function(x) dnbinom(yval, mu = x, size = 1 / k))
-    j<-c(0, 0:(ymax - 1))
-    E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- NULL
-    if (is_ML & is_correction) {
-      s2 <- cumsum(j^2 / (k * j + 1)^2)
-      E_s2 <- apply(pmat * s2, 2, sum)
+    ymax<-max(qnbinom(1 - 1e-15, mu = mu, size = 1 / k))
+  
+    #if (ymax > 30000) stop("ymax too much large")  ## need control on largest value?
+    
+    if (ymax > 1) {
+      out <- .C('expectedValues',
+                as.double(mu),
+                as.double(k),
+                as.integer(ymax),
+                as.integer(n),
+                E_s2 = as.double(E_s2),
+                E_s2y = as.double(E_s2y),
+                E_s1s2 = as.double(E_s1s2),
+                E_s3 = as.double(E_s3)
+      )
+      E_s2 <- out$E_s2
+      E_s2y <- out$E_s2y
+      E_s1s2 <- out$E_s1s2
+      E_s3 <- out$E_s3
     }
-    else {
-      s1 <- cumsum(j / (k * j + 1))
-      s2 <- cumsum(j^2 / (k * j + 1)^2)
-      s3 <- cumsum(j^3 / (k * j + 1)^3)
-      E_s2 <- apply(pmat * s2, 2, sum)
-      E_s2y <- apply(pmat * s2 * yval, 2, sum)
-      E_s1s2 <- apply(pmat * s1 * s2, 2, sum)
-      E_s3 <- apply(pmat * s3, 2, sum)
-    }
-    list(E_s2 = E_s2, E_s2y = E_s2y, E_s1s2 = E_s1s2, E_s3 = E_s3)
+    list( E_s2 = E_s2, E_s2y = E_s2y, E_s1s2 = E_s1s2, E_s3 = E_s3) 
   }
+  
+  ## old R version 
+  # exp_quant <- function(mu, k) {
+  #   E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- numeric(length(mu))
+  #   if (k < 0) stop("negative value of k")
+  #   ymax <- max(qnbinom(1 - 1e-15, mu = mu, size = 1 / k)) ## need control on largest value?
+  #   if (ymax > 1) {
+  #     yval <- 0:ymax
+  #     pmat <- sapply(mu, function(x) dnbinom(yval, mu = x, size = 1 / k))
+  #     j <- c(0, 0:(ymax - 1))
+  #     s1 <- cumsum(j / (k * j + 1))
+  #     s2 <- cumsum(j^2 / (k * j + 1)^2)
+  #     s3 <- cumsum(j^3 / (k * j + 1)^3)
+  #     E_s2 <- apply((temp <- pmat * s2), 2, sum)
+  #     E_s2y <- apply(temp * yval, 2, sum)
+  #     E_s1s2 <- apply(temp * s1 , 2, sum)
+  #     E_s3 <- apply(pmat * s3, 2, sum)
+  #   }
+  #   list( E_s2 = E_s2, E_s2y = E_s2y, E_s1s2 = E_s1s2, E_s3 = E_s3) 
+  # }
 
   ## required quantities
 
@@ -350,7 +374,7 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
     wx <- sqrt(working_weights) * x
     qr_decomposition <- qr(wx)
     s1 <- sapply(y, function(t) s1fun(t, k))
-    expectations <- exp_quant(mus, k, control$epsilonExp)
+    expectations <- exp_quant(mus, k)
     out <- c(list(betas = betas,
                   k = k,
                   etas = etas,
@@ -380,7 +404,7 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
   }
 
   # score function
-  score <- function(pars, level=0, fit=NULL) {
+  score <- function(pars, level = 0, fit = NULL) {
     if (is.null(fit)) {
       fit <- key_quantities(pars)
     }
@@ -543,7 +567,7 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
       failed_adjustment <- any(is.na(adjustment))
     }
     if (level == 1) {
-      grad <- score(pars, level = 1, fit=fit)
+      grad <- score(pars, level = 1, fit = fit)
       inverse_info <- try(information(pars, level = 1, inverse = TRUE,fit = fit))
       failed_inversion <- inherits(inverse_info, "try-error")
       adjustment <- adjustment_function(pars, level = 1, fit = fit)
@@ -553,7 +577,7 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
                 inverse_info = inverse_info,
                 adjustment = adjustment,
                 failed_inversion = failed_inversion,
-                failed_adjustment=failed_adjustment)
+                failed_adjustment = failed_adjustment)
     out
   }
 
@@ -639,31 +663,27 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
 
     if (length(start) > nvars_all + 1 | length(start) < nvars_all ) {
       stop(paste(paste(gettextf("length of 'start' should be equal to %d and correspond to initial betas for %s",
-                                nvars_all, paste(deparse(betas_names_all),
-                                                 collapse = ", "), "or", gettextf("to %d and also include a starting value for the transformed dispersion",
+           nvars_all, paste(deparse(betas_names_all),
+           collapse = ", "), "or", gettextf("to %d and also include a starting value for the transformed dispersion",
                                                                                   nvars_all)))), domain = NA_real_)
     }
   }
 
   adjusted_grad_all <- rep(NA_real_, nvars_all + 1)
   names(adjusted_grad_all) <- c(betas_names_all, "dispersion")
-
+  names(dispersion) <- "dispersion"
   par <- c(betas, dispersion)
   quantities <- key_quantities(par)
   ## keeped to test
   # if (control$type == "MPL_Jeffreys"){
-  #   opt <- try(nlminb(par, loglikMPL,fit=NULL,lower =c(rep(-Inf,nvars),10^{-8}),upper = rep(+Inf,nvars+1) ),TRUE)
-  #   #betas <-opt$par[-(nvars+1)]
-  #   #dispersion <- opt$par[nvars+1]
+  #   opt <- try(nlminb(par, loglikMPL,fit = NULL,lower = c(rep(-Inf,nvars),10^{-8}), upper = rep(+Inf, nvars + 1) ),TRUE)
+  #   #betas <-opt$par[-(nvars + 1)]
+  #   #dispersion <- opt$par[nvars + 1]
   #   cat("\n","Estimates par. with Jeff obtained with nlminb as test: ","\n\n")
   #   print(opt)
   # }
   step_components_beta <- compute_step_components(par, level = 0, fit = quantities)
-  #cat("step_comp_beta","\n")
-  #print(step_components_beta)
   step_components_dispersion <- compute_step_components(par, level = 1, fit = quantities)
-  #cat("step_comp_disp","\n")
-  #print(step_components_dispersion)
   if (step_components_beta$failed_inversion) {
     warning("failed to invert the information matrix")
   }
@@ -702,7 +722,7 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
         par <- c(betas, dispersion)
         quantities <- key_quantities(par)
         step_components_beta <- compute_step_components(par, level = 0, fit = quantities)
-        step_components_dispersion<- compute_step_components(par,  level = 1, fit = quantities)
+        step_components_dispersion <- compute_step_components(par,  level = 1, fit = quantities)
         if (failed_inversion_beta <- step_components_beta$failed_inversion) {
           warning("failed to invert the information matrix")
           break
@@ -767,6 +787,7 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
     betas[is.na(betas)] <- 0
     nvars <- nvars_all
   }
+  
   par <- c(betas, dispersion)
   if (is_correction)
   {
@@ -822,8 +843,6 @@ brnb <- function(formula, data ,subset, weights = NULL, offset = NULL,
 
   vcov.dispersion <- step_components_dispersion$inverse_info
   names(vcov.dispersion) <-  paste0(control$transformation, "(dispersion)")
-  #se <- c(sqrt(diag(vcov.mean)),sqrt(vcov.dispersion))
-  #names(se) <-  c(betas_names, paste0(control$transformation, "(dispersion)"))
   out <- list(coefficients = betas,
               vcov.mean = vcov.mean,
               vcov.dispersion =  vcov.dispersion,
@@ -873,28 +892,6 @@ coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...){
   object$transformed_dispersion <- object$dispersion
   brglm2:::coef.brglmFit(object, model, ...)
 }
-# coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
-#   model <- match.arg(model)
-#   switch(model,
-#          "mean" = {
-#            object$coefficients
-#          },
-#          "dispersion" = {
-#            disp <- object$dispersion
-#            names(disp) <- paste0(object$transformation, "(dispersion)")
-#            disp
-#          },
-#          "full" = {
-#            disp <- object$dispersion
-#            ntd <- paste0(object$transformation, "(dispersion)")
-#            names(disp) <- ntd
-#            betas <- object$coefficients
-#            theta <- c(betas, disp)
-#            theta
-#          })
-# }
-
-
 
 #' @method vcov brnb
 #' @export
@@ -903,29 +900,6 @@ vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete 
   object$dispersion <- 1
   brglm2:::vcov.brglmFit(object, model , complete , ...)
 }
-# vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
-#   model <- match.arg(model)
-#   switch(model,
-#          mean = {
-#            object$vcov.mean
-#          },
-#          dispersion = {
-#            vtd <- object$vcov.dispersion
-#            ntd <- paste0(object$transformation, "(dispersion)")
-#            names(vtd) <- ntd
-#            vtd
-#          },
-#          full = {
-#            vbetas <- object$vcov.mean
-#            vtd <- object$vcov.dispersion
-#            nBetasAll <- c(colnames(vbetas), paste0(object$transformation, "(dispersion)"))
-#            vBetasAll <- cbind(rbind(vbetas, 0),
-#                               c(numeric(nrow(vbetas)), vtd))
-#            dimnames(vBetasAll) <- list(nBetasAll, nBetasAll)
-#            vBetasAll
-#          })
-# }
-
 
 #' @method summary brnb
 #' @export
@@ -977,22 +951,24 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
     printCoefmat(x$coefficients, digits = digits, signif.legend = FALSE)
   } else cat("\nNo coefficients (in mean model)\n")
 
-
-
   if(getOption("show.signif.stars") & any( x$coefficients[, 4L] < 0.1))
     cat("---\nSignif. codes: ", "0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1", "\n")
 
   if(NROW(x$coef.dispersion)) {
-      cat(paste("\nDispersion parameter ( with transformation ", x$transformation," function):\n", sep = ""))
-      printCoefmat(x$coef.dispersion, digits = digits, signif.legend = FALSE)
+      cat(paste("\n(Dispersion parameter  with ", x$transformation," transformation function: ", 
+                round(x$coef.dispersion[,1], 7),")\n", sep = ""))
+    #  printCoefmat(x$coef.dispersion, digits = digits, signif.legend = FALSE)
   } else cat("\nNo coefficients (in precision model)\n")
 
   ## IK, 28/09/2020: This needs work
+  ## EK, 02/01/2021: some work to be close to brglmFit output, not sure if it is what you intended
   cat("\n", apply(cbind(paste(format(c("Null",
                                        "Residual"), justify = "right"), "deviance:"),
                         format(unlist(x[c("null.deviance",
-                                          "deviance")]), digits = max(5, digits + 1)), " on",                                                format(unlist(x[c("df.null", "df.residual")])), " degrees of freedom\n"),
+                                          "deviance")]), digits = max(5, digits + 1)), " on", 
+                    format(unlist(x[c("df.null", "df.residual")])), " degrees of freedom\n"),
                   1, paste, collapse = " "), sep = "")
+  cat(paste("AIC:", round(x$aic,digits), "\n"))
 
   cat("\nType of estimator:", x$type, switch(x$type,
                                              "ML" = "(maximum likelihood)",
@@ -1003,9 +979,6 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
   ))
 
   cat(paste("\nNumber of iterations in the quasi-Fisher scoring:", x$iter, "\n"))
-  cat(paste("\nAIC:", round(x$aic,2), "\n"))
-
-
   invisible(x)
 }
 
@@ -1029,40 +1002,31 @@ print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
     }
 
     ## IK, 28/09/2020: Why do we get "[1]" printed with dispersion, with every method except "correction"?
-    if (length(x$dispersion)) {
-        cat(paste("Dispersion parameter (with transformation ", x$transformation, " function):\n", sep = ""))
-        print.default(format(x$dispersion, digits = digits), print.gap = 2, quote = FALSE)
-        cat("\n")
-    }
-    else {
-        cat("No coefficients (in precision model)\n\n")
-    }
+    ## Ek, 02/01/2021 problem solved with similar output as brglmFit
+    cat("\nDegrees of Freedom:", x$df.null, "Total (i.e. Null); ",
+        x$df.residual, "Residual\n")
+    if (nchar(mess <- naprint(x$na.action)))
+      cat("  (", mess, ")\n", sep = "")
+    cat("Null Deviance:\t", format(round(x$null.deviance, digits)),
+        "\n")
+      cat("Residual Deviance:\t", format(round(x$deviance, digits)),
+           "\tAIC:", format(round(x$aic, digits)),
+          "\n")
+    #  if (length(x$dispersion)) {
+    #     cat(paste("Dispersion parameter (with transformation ", x$transformation, " function):\n", sep = ""))
+    #     print.default(format(x$dispersion, digits = digits), print.gap = 2, quote = FALSE)
+    #     cat("\n")
+    # }
+    # else {
+    #     cat("No coefficients (in precision model)\n\n")
+    # }
 
   }
 }
 
 
 
-
-# genData<- function(R,true_coefs,X,link,transformation)
-# {
-#   x <- as.matrix(X)
-#   p <- ncol(x)
-#   n <- nrow(x)
-#   linkobj <- enrichwith::enrich(make.link(link))
-#   linkinv <- linkobj$linkinv
-#   linkobj_disp <- enrichwith::enrich(make.link(transformation))
-#   linkinv_disp <- linkobj_disp$linkinv
-#
-#   betas <- true_coefs[1:p]
-#   phi <- true_coefs[p+1]
-#   k <- linkinv_disp(phi)
-#   etas <- drop(x %*% betas)
-#   mus <- linkinv(etas)
-#   sapply(seq.int(R),function(t)rnbinom(n, mu=mus, size=1/k))
-# }
-
-# brglmControl<-function (epsilon = 1e-07,epsilonExp=10^(-15) ,maxit = 100, trace = FALSE,
+# brglmControl<-function (epsilon = 1e-07, maxit = 100, trace = FALSE,
 #                         type = c("AS_mixed", "AS_mean", "AS_median", "correction", "MPL_Jeffreys", "ML"),
 #           transformation = "identity", slowit = 1, response_adjustment = NULL,
 #           max_step_factor = 12, a = 1/2)
@@ -1090,7 +1054,7 @@ print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
 #   }
 #   if (!is.numeric(epsilon) || epsilon <= 0)
 #     stop("value of 'epsilon' must be > 0")
-#   list(epsilon = epsilon, epsilonExp=epsilonExp, maxit = maxit, trace = trace, response_adjustment = response_adjustment,
+#   list(epsilon = epsilon,  maxit = maxit, trace = trace, response_adjustment = response_adjustment,
 #        type = type, Trans = Trans, inverseTrans = inverseTrans,
 #        transformation = transformation, slowit = slowit, max_step_factor = max_step_factor,
 #        a = a)
