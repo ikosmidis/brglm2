@@ -47,8 +47,9 @@ update(lizardsML_mis, method = "brglmFit", type = "AS_median",
 
 }
 \references{
-Neuhaus J. M. (1999). Bias and efficiency loss due to misclassified
+Neuhaus J M (1999). Bias and efficiency loss due to misclassified
 responses in binary regression. Biometrika, **86**, 843-855
+\url{https://www.jstor.org/stable/2673589}
 }
 \seealso{
 \code{\link[stats]{glm}}, \code{\link{brglm_fit}}

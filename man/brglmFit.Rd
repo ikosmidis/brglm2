@@ -95,7 +95,7 @@ mean bias-reducing adjusted scores approach in Firth (1993) and
 Kosmidis & Firth (2009), the median bias-reduction adjusted scores
 approach in Kenne Pagui et al. (2017), the correction of the asymptotic
 bias in Cordeiro & McCullagh (1991), the mixed bias-reduction
-adjusted scores approach in Kosmidis et al (2019), maximum
+adjusted scores approach in Kosmidis et al (2020), maximum
 penalized likelihood with powers of the Jeffreys prior as penalty,
 and maximum likelihood. Estimation is performed using a quasi
 Fisher scoring iteration (see \code{vignette("iteration",
@@ -106,7 +106,7 @@ scoring iterates.
 \details{
 A detailed description of the supported adjustments and the quasi
 Fisher scoring iteration is given in the iteration vignette (see,
-\code{vignette("iteration", "brglm2")} or Kosmidis et al, 2019).  A
+\code{vignette("iteration", "brglm2")} or Kosmidis et al, 2020).  A
 shorter description of the quasi Fisher scoring iteration is also
 given in one of the vignettes of the *enrichwith* R package (see,
 \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
@@ -118,7 +118,10 @@ Poisson and multinomial responses, the adjusted score equations
 approach returns estimates with improved frequentist properties,
 that are also always finite, even in cases where the maximum
 likelihood estimates are infinite (e.g. complete and quasi-complete
-separation in multinomial regression). See, also,
+separation in multinomial regression). See, Kosmidis and Firth
+(2020) for a proof for binomial-response GLMs with Jeffreys-pior
+penalties to the log-likelihood, which is equivalent to mean bias
+reduction for logistic regression. See, also,
 \code{\link{detect_separation}} and
 \code{\link{check_infinite_estimates}} for pre-fit and post-fit
 methods for the detection of infinite estimates in binomial
@@ -131,7 +134,7 @@ details). The available options are
 \itemize{
 
 \item \code{type = "AS_mixed"}: the mixed bias-reducing score adjustments in
-Kosmidis et al (2019) that result in mean bias reduction for the
+Kosmidis et al (2020) that result in mean bias reduction for the
 regression parameters and median bias reduction for the dispersion
 parameter, if any; default.
 
@@ -207,7 +210,7 @@ lizards_Jeffreys <- glm(cbind(grahami, opalinus) ~ height + diameter +
 all.equal(coef(lizardsBR_mean), coef(lizards_Jeffreys))
 
 # Maximum penalized likelihood with powers of the Jeffreys prior as
-# penalty. See Kosmidis & Firth (2019) for the finiteness and
+# penalty. See Kosmidis & Firth (2020) for the finiteness and
 # shrinkage properties of the maximum penalized likelihood
 # estimators in binomial response models
 \donttest{
@@ -215,7 +218,7 @@ a <- seq(0, 20, 0.5)
 coefs <- sapply(a, function(a) {
       out <- glm(cbind(grahami, opalinus) ~ height + diameter +
              light + time, family = binomial(logit), data = lizards,
-             method = "brglmFit", type = "MPL_Jeffreys", a = a) 
+             method = "brglmFit", type = "MPL_Jeffreys", a = a)
       coef(out)
 })
 # Illustration of shrinkage as a grows
@@ -284,37 +287,38 @@ summary(endometrialBR_median)
 
 }
 \references{
-Kosmidis I and Firth D (2019). Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models. *arXiv e-prints*,
-arXiv:1812.01938 <URL: http://arxiv.org/abs/1812.01938>.
+Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+and shrinkage in binomial-response generalized linear
+models. *Biometrika* \doi{10.1093/biomet/asaa052}
 
-Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
-reduction in generalized linear models. *arXiv e-prints*,
-arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
+Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
+reduction in generalized linear models. *Statistics and Computing*,
+**30**, 43-59 \doi{10.1007/s11222-019-09860-6}
 
-Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
+Cordeiro G M, McCullagh P (1991). Bias correction in generalized
 linear models. *Journal of the Royal Statistical Society. Series B
-(Methodological)*, **53**, 629-643
+(Methodological)*, **53**, 629-643 \doi{10.1111/j.2517-6161.1991.tb01852.x}
 
-Firth D (1993). Bias reduction of maximum likelihood estimates,
-Biometrika. **80**, 27-38
+Firth D (1993). Bias reduction of maximum likelihood estimates.
+*Biometrika*. **80**, 27-38 \doi{10.2307/2336755}
 
-Kenne Pagui EC, Salvan A, and Sartori N (2017). Median bias
+Kenne Pagui E C, Salvan A, Sartori N (2017). Median bias
 reduction of maximum likelihood estimates. *Biometrika*, **104**,
-923–938
+923–938 \doi{10.1093/biomet/asx046}
 
-Kosmidis I and Firth D (2009). Bias reduction in exponential family
-nonlinear models. *Biometrika*, **96**, 793-804
+Kosmidis I, Firth D (2009). Bias reduction in exponential family
+nonlinear models. *Biometrika*, **96**, 793-804 \doi{10.1093/biomet/asp055}
 
-Kosmidis I and Firth D (2010). A generic algorithm for reducing
+Kosmidis I, Firth D (2010). A generic algorithm for reducing
 bias in parametric estimation. *Electronic Journal of Statistics*,
-**4**, 1097-1112
+**4**, 1097-1112 \doi{10.1214/10-EJS579}
 
 Kosmidis I (2014). Bias in parametric estimation: reduction and
 useful side-effects. *WIRE Computational Statistics*, **6**,
-185-196
+185-196 \doi{10.1002/wics.1296}
 }
 \seealso{
-\code{\link{glm.fit}} and \code{\link{glm}}
+\code{\link{brglmControl}}, \code{\link{glm.fit}}, \code{\link{glm}}
 }
 \author{
 Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}

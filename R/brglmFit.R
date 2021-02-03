@@ -25,7 +25,7 @@
 #' Kosmidis & Firth (2009), the median bias-reduction adjusted scores
 #' approach in Kenne Pagui et al. (2017), the correction of the asymptotic
 #' bias in Cordeiro & McCullagh (1991), the mixed bias-reduction
-#' adjusted scores approach in Kosmidis et al (2019), maximum
+#' adjusted scores approach in Kosmidis et al (2020), maximum
 #' penalized likelihood with powers of the Jeffreys prior as penalty,
 #' and maximum likelihood. Estimation is performed using a quasi
 #' Fisher scoring iteration (see \code{vignette("iteration",
@@ -61,7 +61,7 @@
 #'
 #' A detailed description of the supported adjustments and the quasi
 #' Fisher scoring iteration is given in the iteration vignette (see,
-#' \code{vignette("iteration", "brglm2")} or Kosmidis et al, 2019).  A
+#' \code{vignette("iteration", "brglm2")} or Kosmidis et al, 2020).  A
 #' shorter description of the quasi Fisher scoring iteration is also
 #' given in one of the vignettes of the *enrichwith* R package (see,
 #' \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
@@ -73,7 +73,10 @@
 #' approach returns estimates with improved frequentist properties,
 #' that are also always finite, even in cases where the maximum
 #' likelihood estimates are infinite (e.g. complete and quasi-complete
-#' separation in multinomial regression). See, also,
+#' separation in multinomial regression). See, Kosmidis and Firth
+#' (2020) for a proof for binomial-response GLMs with Jeffreys-pior
+#' penalties to the log-likelihood, which is equivalent to mean bias
+#' reduction for logistic regression. See, also,
 #' \code{\link{detect_separation}} and
 #' \code{\link{check_infinite_estimates}} for pre-fit and post-fit
 #' methods for the detection of infinite estimates in binomial
@@ -82,11 +85,11 @@
 #' The type of score adjustment to be used is specified through the
 #' \code{type} argument (see \code{\link{brglmControl}} for
 #' details). The available options are
-#' 
+#'
 #' \itemize{
 #'
 #' \item \code{type = "AS_mixed"}: the mixed bias-reducing score adjustments in
-#' Kosmidis et al (2019) that result in mean bias reduction for the
+#' Kosmidis et al (2020) that result in mean bias reduction for the
 #' regression parameters and median bias reduction for the dispersion
 #' parameter, if any; default.
 #'
@@ -106,7 +109,7 @@
 #'
 #' \item \code{type = "correction"}: asymptotic bias correction, as in
 #' Cordeiro & McCullagh (1991).
-#' 
+#'
 #' }
 #'
 #'
@@ -137,38 +140,39 @@
 #'
 #' @author Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}
 #'
-#' @seealso \code{\link{glm.fit}} and \code{\link{glm}}
+#' @seealso \code{\link{brglmControl}}, \code{\link{glm.fit}}, \code{\link{glm}}
 #'
 #' @references
 #'
-#' Kosmidis I and Firth D (2019). Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models. *arXiv e-prints*,
-#' arXiv:1812.01938 <URL: http://arxiv.org/abs/1812.01938>.
-#' 
-#' Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
-#' reduction in generalized linear models. *arXiv e-prints*,
-#' arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
+#' Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+#' and shrinkage in binomial-response generalized linear
+#' models. *Biometrika* \doi{10.1093/biomet/asaa052}
 #'
-#' Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
+#' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
+#' reduction in generalized linear models. *Statistics and Computing*,
+#' **30**, 43-59 \doi{10.1007/s11222-019-09860-6}
+#'
+#' Cordeiro G M, McCullagh P (1991). Bias correction in generalized
 #' linear models. *Journal of the Royal Statistical Society. Series B
-#' (Methodological)*, **53**, 629-643
+#' (Methodological)*, **53**, 629-643 \doi{10.1111/j.2517-6161.1991.tb01852.x}
 #'
-#' Firth D (1993). Bias reduction of maximum likelihood estimates,
-#' Biometrika. **80**, 27-38
+#' Firth D (1993). Bias reduction of maximum likelihood estimates.
+#' *Biometrika*. **80**, 27-38 \doi{10.2307/2336755}
 #'
-#' Kenne Pagui EC, Salvan A, and Sartori N (2017). Median bias
+#' Kenne Pagui E C, Salvan A, Sartori N (2017). Median bias
 #' reduction of maximum likelihood estimates. *Biometrika*, **104**,
-#' 923–938
+#' 923–938 \doi{10.1093/biomet/asx046}
 #'
-#' Kosmidis I and Firth D (2009). Bias reduction in exponential family
-#' nonlinear models. *Biometrika*, **96**, 793-804
+#' Kosmidis I, Firth D (2009). Bias reduction in exponential family
+#' nonlinear models. *Biometrika*, **96**, 793-804 \doi{10.1093/biomet/asp055}
 #'
-#' Kosmidis I and Firth D (2010). A generic algorithm for reducing
+#' Kosmidis I, Firth D (2010). A generic algorithm for reducing
 #' bias in parametric estimation. *Electronic Journal of Statistics*,
-#' **4**, 1097-1112
+#' **4**, 1097-1112 \doi{10.1214/10-EJS579}
 #'
 #' Kosmidis I (2014). Bias in parametric estimation: reduction and
 #' useful side-effects. *WIRE Computational Statistics*, **6**,
-#' 185-196
+#' 185-196 \doi{10.1002/wics.1296}
 #'
 #' @examples
 #' ## The lizards example from ?brglm::brglm
@@ -197,7 +201,7 @@
 #' all.equal(coef(lizardsBR_mean), coef(lizards_Jeffreys))
 #'
 #' # Maximum penalized likelihood with powers of the Jeffreys prior as
-#' # penalty. See Kosmidis & Firth (2019) for the finiteness and
+#' # penalty. See Kosmidis & Firth (2020) for the finiteness and
 #' # shrinkage properties of the maximum penalized likelihood
 #' # estimators in binomial response models
 #' \donttest{
@@ -205,14 +209,14 @@
 #' coefs <- sapply(a, function(a) {
 #'       out <- glm(cbind(grahami, opalinus) ~ height + diameter +
 #'              light + time, family = binomial(logit), data = lizards,
-#'              method = "brglmFit", type = "MPL_Jeffreys", a = a) 
+#'              method = "brglmFit", type = "MPL_Jeffreys", a = a)
 #'       coef(out)
 #' })
 #' # Illustration of shrinkage as a grows
 #' matplot(a, t(coefs), type = "l", col = 1, lty = 1)
 #' abline(0, 0, col = "grey")
 #'}
-#' 
+#'
 #' ## Another example from
 #' ## King, Gary, James E. Alt, Nancy Elizabeth Burns and Michael Laver
 #' ## (1990).  "A Unified Model of Cabinet Dissolution in Parliamentary
@@ -273,13 +277,12 @@
 #' summary(endometrialBR_median)
 #'
 #' @export
-brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
-                      mustart = NULL, offset = rep(0, nobs), family = gaussian(),
-                      control = list(), intercept = TRUE,
-                      ## Arguments that glm will not use in its call to brglmFit (be wise with defaults!)
-                      fixed_totals = NULL, singular.ok = TRUE)
+brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
+                     mustart = NULL, offset = rep(0, nobs), family = gaussian(),
+                     control = list(), intercept = TRUE,
+                     ## Arguments that glm will not use in its call to brglmFit (be wise with defaults!)
+                     fixed_totals = NULL, singular.ok = TRUE)
 {
-
     trace_iteration <- function() {
         if (iter %% control$trace == 0) {
             st <-  max(abs(step_beta), na.rm = TRUE)
@@ -494,7 +497,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
         })
     }
-    
+
     ## Implementation by Euloge Clovis Kenne Pagui, 20 April 2017 (kept here for testing)
     ## AS_median_adjustment <- function(pars, level = 0, fit = NULL) {
     ##     if (is.null(fit)) {
@@ -672,12 +675,16 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     ## Ensure x is a matrix, extract variable names, observation
     ## names, nobs, nvars, and initialize weights and offsets if
     ## needed
+
     x <- as.matrix(x)
     betas_names <- dimnames(x)[[2L]]
+    nvars <- ncol(x)
+    if (is.null(betas_names)) {
+        betas_names <- colnames(x) <- paste0("x", seq.int(nvars))
+    }
     ynames <- if (is.matrix(y)) rownames(y) else names(y)
     converged <- FALSE
     nobs <- NROW(y)
-    nvars <- ncol(x)
     EMPTY <- nvars == 0
     if (is.null(weights)) {
         weights <- rep.int(1, nobs)
@@ -772,25 +779,31 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
     else {
         boundary <- converged <- FALSE
         ## Detect aliasing
-        qrx <- qr(x)
-        rank <- qrx$rank
-        is_full_rank <- rank == nvars
-
-        if (!singular.ok && !is_full_rank) {
-            stop("singular fit encountered")
-        }
-        if (!isTRUE(is_full_rank)) {
-            aliased <- qrx$pivot[seq.int(qrx$rank + 1, nvars)]
-            X_all <- x
-            x <- x[, -aliased]
-            nvars_all <- nvars
-            nvars <- ncol(x)
+        if (!isTRUE(control$check_aliasing)) {
+            is_full_rank <- TRUE ## Assumption
+            rank <- nvars_all <- nvars
             betas_names_all <- betas_names
-            betas_names <- betas_names[-aliased]
         }
         else {
-            nvars_all <- nvars
-            betas_names_all <- betas_names
+            qrx <- qr(x)
+            rank <- qrx$rank
+            is_full_rank <- rank == nvars
+            if (!isTRUE(singular.ok) && !isTRUE(is_full_rank)) {
+                stop("singular fit encountered")
+            }
+            if (!isTRUE(is_full_rank)) {
+                aliased <- qrx$pivot[seq.int(qrx$rank + 1, nvars)]
+                X_all <- x
+                x <- x[, -aliased]
+                nvars_all <- nvars
+                nvars <- ncol(x)
+                betas_names_all <- betas_names
+                betas_names <- betas_names[-aliased]
+            }
+            else {
+                nvars_all <- nvars
+                betas_names_all <- betas_names
+            }
         }
         betas_all <- structure(rep(NA_real_, nvars_all), .Names = betas_names_all)
         keep <- weights > 0
@@ -810,7 +823,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
             }
             if (family$family == "binomial") {
                 weights.adj <- weights + (!(is_correction)) * adj
-                y.adj <- (weights * y + (!(is_correction)) * 0.5 * adj)/weights.adj                
+                y.adj <- (weights * y + (!(is_correction)) * 0.5 * adj)/weights.adj
             }
             else {
                 weights.adj <- weights
@@ -1011,7 +1024,7 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
         ## Convergence analysis
         if ((failed | iter >= control$maxit) & !(is_correction)) {
             warning("brglmFit: algorithm did not converge", call. = FALSE)
-            converged <- FALSE            
+            converged <- FALSE
         }
         else {
             converged <- TRUE
@@ -1176,6 +1189,24 @@ brglmFit <- function (x, y, weights = rep(1, nobs), start = NULL, etastart = NUL
          class = "brglmFit")
 }
 
+#' Extract model coefficients from \code{\link{brglmFit}} objects
+#'
+#'
+#'
+#' @inheritParams stats::coef
+#' @param model one of \code{"mean"} (default), \code{"dispersion"}, \code{"full"},
+#'     to return the estimates of the parameters in the linear
+#'     prediction only, the estimate of the dispersion parameter only,
+#'     or both, respectively.
+#'
+#' @details
+#'
+#' See \code{\link{coef}} for more details.
+#'
+#' @seealso
+#'
+#' \code{\link{coef}}
+#'
 #' @export
 coef.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) {
     model <- match.arg(model)

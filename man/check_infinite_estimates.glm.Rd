@@ -68,9 +68,13 @@ matplot(check_infinite_estimates(all_ml), type = "l", lty = 1,
 }
 }
 \references{
-Lesaffre, E., & Albert, A. (1989). Partial Separation in Logistic
+Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+and shrinkage in binomial-response generalized linear
+models. *Biometrika* \doi{10.1093/biomet/asaa052}
+
+Lesaffre E, Albert A (1989). Partial Separation in Logistic
 Discrimination. *Journal of the Royal Statistical Society. Series B
-(Methodological)*, **51**, 109-116
+(Methodological)*, **51**, 109-116 \doi{10.1111/j.2517-6161.1989.tb01752.x}
 }
 \seealso{
 \code{\link[nnet]{multinom}}, \code{\link{brmultinom}}

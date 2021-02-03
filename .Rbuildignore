@@ -22,3 +22,5 @@ vignettes/iteration.pdf
 
 anova.R
 ^CRAN-RELEASE$
+^\.github$
+^README\.Rmd$

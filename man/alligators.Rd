@@ -4,7 +4,8 @@
 \name{alligators}
 \alias{alligators}
 \title{Alligator food choice data}
-\format{A data frame with 80 rows and 5 variables:
+\format{
+A data frame with 80 rows and 5 variables:
 
 \describe{
 
@@ -18,7 +19,8 @@
 
 \item{freq}{number of alligators for each foodchoice, lake, gender and size combination}
 
-}}
+}
+}
 \source{
 The alligators data set is analyzed in Agresti (2002, Subsection~7.1.2).
 }
@@ -29,7 +31,7 @@ alligators
 Alligator food choice data
 }
 \references{
-Agresti, A. (2002). *Categorical Data Analysis*.  Wiley Series in
+Agresti A (2002). *Categorical Data Analysis*.  Wiley Series in
 Probability and Statistics. Wiley
 }
 \seealso{

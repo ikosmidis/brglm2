@@ -4,7 +4,8 @@
 \name{stemcell}
 \alias{stemcell}
 \title{Opinion on Stem Cell Research and Religious Fundamentalism}
-\format{A data frame with 24 rows and 4 variables:
+\format{
+A data frame with 24 rows and 4 variables:
 \describe{
 
 \item{research}{opinion about funding stem cell research with levels \code{definitely}, \code{probably}, \code{probably not}, \code{definitely not}}
@@ -17,7 +18,8 @@ beliefs with levels \code{fundamentalist}, \code{moderate},
 
 \item{frequency}{the number of times a respondent fell in each of the combinations of levels for \code{research}, \code{religion} and \code{gender}}
 
-}}
+}
+}
 \source{
 The \code{stemcell} data set is analyzed in Agresti (2010, Subsection~4.1.5).
 }
@@ -31,7 +33,7 @@ stem cell research and the fundamentalism/liberalism of one’s
 religious beliefs, stratified by gender.
 }
 \references{
-Agresti, A. (2010). *Analysis of Ordinal Categorical Data* (2nd edition).  Wiley Series in
+Agresti A (2010). *Analysis of Ordinal Categorical Data* (2nd edition).  Wiley Series in
 Probability and Statistics. Wiley
 }
 \seealso{

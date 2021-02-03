@@ -85,23 +85,25 @@
 #'
 #' @references
 #'
-#' Kosmidis I, Kenne Pagui EC, Sartori N (2019). Mean and median bias
-#' reduction in generalized linear models. *arXiv e-prints*,
-#' arXiv:1804.04085. To appear in Statistics and Computing, <URL: https://arxiv.org/abs/1804.04085>.
+#' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
+#' reduction in generalized linear models. *Statistics and Computing*,
+#' **30**, 43-59 \doi{10.1007/s11222-019-09860-6}
 #'
-#' Agresti A. (2002). *Categorical data analysis* (2nd edition). Wiley
+#' Agresti A (2002). *Categorical data analysis* (2nd edition). Wiley
 #' Series in Probability and Statistics. Wiley.
 #'
-#' Albert A. and Anderson J. A. (1984). On the Existence of Maximum
+#' Albert A, Anderson J A (1984). On the Existence of Maximum
 #' Likelihood Estimates in Logistic Regression Models. *Biometrika*,
-#' **71** 1--10.
+#' **71** 1--10, \doi{10.2307/2336390}
 #'
-#' Kosmidis I. and Firth D. (2011). Multinomial logit bias reduction via
-#' the Poisson log-linear model. *Biometrika*, **98**, 755-759.
+#' Kosmidis I, Firth D (2011). Multinomial logit bias reduction
+#' via the Poisson log-linear model. *Biometrika*, **98**, 755-759
+#' \doi{10.1093/biomet/asr026}
 #'
-#' Palmgren, J. (1981). The Fisher Information Matrix for Log Linear
+#' Palmgren, J (1981). The Fisher Information Matrix for Log Linear
 #' Models Arguing Conditionally on Observed Explanatory
-#' Variables. *Biometrika*, **68**, 563-566.
+#' Variables. *Biometrika*, **68**, 563-566
+#' \doi{10.1093/biomet/68.2.563}
 #'
 #' @examples
 #'
@@ -210,7 +212,7 @@ brmultinom <- function(formula, data, weights, subset, na.action,
     fit <- brglmFit(x = Xextended, y = Yextended,
                     start = NULL,
                     family = poisson("log"), control = control, intercept = TRUE, fixed_totals = fixed_totals)
-    
+
     ## TODO:
     ## + starting values
     ## + subset
@@ -331,12 +333,11 @@ logLik.brmultinom <- function(object, ...) {
 
 #' @method summary brmultinom
 #' @export
-summary.brmultinom <- function(object, correlation = FALSE, digits = options()$digits,
-                               Wald.ratios = FALSE, ...) {
+summary.brmultinom <- function(object, correlation = FALSE, digits = options()$digits, Wald.ratios = FALSE, ...) {
     ncat <- object$ncat
     coefficients <- coef.brmultinom(object)
     object$digits <- digits
-    object$AIC <- AIC(object)    
+    object$AIC <- AIC(object)
     object$logLik <- logLik(object)
     if (is.null(coefficients)) {
         object$coefficients <- NULL
@@ -350,12 +351,14 @@ summary.brmultinom <- function(object, correlation = FALSE, digits = options()$d
         vc <- vcov.brglmFit(object)
         vc <- vc[object$ofInterest, object$ofInterest]
         se <- sqrt(diag(vc))
-        ses <- matrix(se, nrow = ncat - 1, byrow = TRUE, dimnames = dimnames(coefficients))        
+        ses <- matrix(se, nrow = ncat - 1, byrow = TRUE, dimnames = dimnames(coefficients))
         object$coefficients <- coefficients
         object$standard.errors <- ses
         ## object$AIC <- AIC(object)
-        if (Wald.ratios)
+        if (Wald.ratios) {
             object$Wald.ratios <- coef/ses
+            object$Wald.pvalues <-  2 * pnorm(-abs(object$Wald.ratios))
+        }
         if (correlation)
             object$correlation <- vc/outer(se, se)
     }
@@ -489,4 +492,46 @@ predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
     }, probs = {
     })
     drop(Y)
+}
+
+#' Method for computing confidence intervals for one or more
+#' regression parameters in a \code{\link{brmultinom}} object
+#'
+#' @inheritParams stats::confint
+#'
+#' @export
+confint.brmultinom <- function (object, parm, level = 0.95, ...)  {
+    ## Apart from formatting changes this function is identical to
+    ## nnet:::confint.multinom
+    cf <- coef(object)
+    pnames <- if (is.matrix(cf)) colnames(cf) else names(cf)
+    if (missing(parm)) {
+        parm <- seq_along(pnames)
+    }
+    else {
+        if (is.character(parm))  {
+            parm <- match(parm, pnames, nomatch = 0L)
+        }
+    }
+    a <- (1 - level) / 2
+    a <- c(a, 1 - a)
+    pct <- paste(round(100 * a, 1), "%")
+    fac <- qnorm(a)
+    if (is.matrix(cf)) {
+        ses <- matrix(sqrt(diag(vcov(object))), ncol = ncol(cf),
+            byrow = TRUE)[, parm, drop = FALSE]
+        cf <- cf[, parm, drop = FALSE]
+        ci <- array(NA, dim = c(dim(cf), 2L), dimnames = c(dimnames(cf),
+            list(pct)))
+        ci[, , 1L] <- cf + ses * fac[1L]
+        ci[, , 2L] <- cf + ses * fac[2L]
+        aperm(ci, c(2L, 3L, 1L))
+    }
+    else {
+        ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(pnames[parm],
+            pct))
+        ses <- sqrt(diag(vcov(object)))[parm]
+        ci[] <- cf[parm] + ses %o% fac
+        ci
+    }
 }

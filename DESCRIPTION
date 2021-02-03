@@ -1,11 +1,11 @@
 Package: brglm2
 Title: Bias Reduction in Generalized Linear Models
-Version: 0.6.2
+Version: 0.7.1
 Authors@R: c(person(given = "Ioannis", family = "Kosmidis", role = c("aut", "cre"), email = "ioannis.kosmidis@warwick.ac.uk", comment = c(ORCID = "0000-0003-1556-0302")),
 	     person(given = "Kjell", family = "Konis", role = "ctb", email = "kjell.konis@me.com"),
 	     person(given = c("Euloge", "Clovis"), family = c("Kenne Pagui"), role = "ctb", email = "kenne@stat.unipd.it"),
 	     person(given = "Nicola", family = "Sartori", role = "ctb", email = "sartori@stat.unipd.it"))
-Description: Estimation and inference from generalized linear models based on various methods for bias reduction and maximum penalized likelihood with powers of the Jeffreys prior as penalty. The 'brglmFit' fitting method can achieve reduction of estimation bias by solving either the mean bias-reducing adjusted score equations in Firth (1993) <doi:10.1093/biomet/80.1.27> and Kosmidis and Firth (2009) <doi:10.1093/biomet/asp055>, or the median bias-reduction adjusted score equations in Kenne et al. (2016) <arXiv:1604.04768>, or through the direct subtraction of an estimate of the bias of the maximum likelihood estimator from the maximum likelihood estimates as in Cordeiro and McCullagh (1991) <http://www.jstor.org/stable/2345592>. See Kosmidis et al (2019) <doi:10.1007/s11222-019-09860-6> for more details. Estimation in all cases takes place via a quasi Fisher scoring algorithm, and S3 methods for the construction of of confidence intervals for the reduced-bias estimates are provided. In the special case of generalized linear models for binomial and multinomial responses (both ordinal and nominal), the adjusted score approaches return estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite (e.g. complete and quasi-complete separation). 'brglm2' also provides pre-fit and post-fit methods for detecting separation and infinite maximum likelihood estimates in binomial response generalized linear models.
+Description: Estimation and inference from generalized linear models based on various methods for bias reduction and maximum penalized likelihood with powers of the Jeffreys prior as penalty. The 'brglmFit' fitting method can achieve reduction of estimation bias by solving either the mean bias-reducing adjusted score equations in Firth (1993) <doi:10.1093/biomet/80.1.27> and Kosmidis and Firth (2009) <doi:10.1093/biomet/asp055>, or the median bias-reduction adjusted score equations in Kenne et al. (2017) <doi:10.1093/biomet/asx046>, or through the direct subtraction of an estimate of the bias of the maximum likelihood estimator from the maximum likelihood estimates as in Cordeiro and McCullagh (1991) <https://www.jstor.org/stable/2345592>. See Kosmidis et al (2020) <doi:10.1007/s11222-019-09860-6> for more details. Estimation in all cases takes place via a quasi Fisher scoring algorithm, and S3 methods for the construction of of confidence intervals for the reduced-bias estimates are provided. In the special case of generalized linear models for binomial and multinomial responses (both ordinal and nominal), the adjusted score approaches to mean and media bias reduction have been found to return estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite (e.g. complete and quasi-complete separation; see Kosmidis and Firth, 2020 <doi:10.1093/biomet/asaa052>, for a proof for mean bias reduction in logistic regression). 'brglm2' also provides pre-fit and post-fit methods for detecting separation and infinite maximum likelihood estimates in binomial response generalized linear models.
 URL: https://github.com/ikosmidis/brglm2
 BugReports: https://github.com/ikosmidis/brglm2/issues
 Depends: R (>= 3.3.0)
@@ -13,6 +13,6 @@ Imports: MASS, stats, Matrix, graphics, nnet, enrichwith, lpSolveAPI, numDeriv
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 Suggests: testthat, knitr, rmarkdown, covr
 VignetteBuilder: knitr

@@ -4,14 +4,16 @@
 \name{lizards}
 \alias{lizards}
 \title{Habitat preferences of lizards}
-\format{An object of class \code{data.frame} with 23 rows and 6 columns.}
+\format{
+An object of class \code{data.frame} with 23 rows and 6 columns.
+}
 \source{
-McCullagh, P. and Nelder, J. A. (1989) _Generalized Linear
+McCullagh P, Nelder J A (1989) _Generalized Linear
   Models_ (2nd Edition).  London: Chapman and Hall.
 
 Originally from
 
-    Schoener, T. W. (1970) Nonsynchronous spatial overlap of lizards
+    Schoener T W (1970) Nonsynchronous spatial overlap of lizards
     in patchy habitats.  _Ecology_ *51*, 408-418.
 }
 \usage{

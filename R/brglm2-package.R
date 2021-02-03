@@ -8,7 +8,7 @@
 #' adjusted scores approach in Kenne Pagui et al. (2017), the
 #' correction of the asymptotic bias in Cordeiro & McCullagh (1991),
 #' the mixed bias-reduction adjusted scores approach in Kosmidis et al
-#' (2019), maximum penalized likelihood with powers of the Jeffreys
+#' (2020), maximum penalized likelihood with powers of the Jeffreys
 #' prior as penalty, and maximum likelihood.
 #'
 #'
@@ -31,7 +31,7 @@
 #' \code{\link{brmultinom}} (baseline category logit models for
 #' nominal multinomial responses), and \code{\link{bracl}} (adjacent
 #' category logit models for ordinal multinomial responses).
-#' 
+#'
 #' @details
 #'
 #'
@@ -51,27 +51,35 @@
 #'
 #' @references
 #'
-#' Cordeiro G. M. & McCullagh, P. (1991). Bias correction in generalized
+#' Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+#' and shrinkage in binomial-response generalized linear
+#' models. *Biometrika* \doi{10.1093/biomet/asaa052}
+#'
+#' Cordeiro G M, McCullagh P (1991). Bias correction in generalized
 #' linear models. *Journal of the Royal Statistical Society. Series B
-#' (Methodological)*, **53**, 629-643
+#' (Methodological)*, **53**, 629-643 \doi{10.1111/j.2517-6161.1991.tb01852.x}
 #'
-#' Firth D. (1993). Bias reduction of maximum likelihood estimates,
-#' Biometrika, **80**, 27-38
+#' Firth D (1993). Bias reduction of maximum likelihood estimates,
+#' Biometrika, **80**, 27-38 \doi{10.2307/2336755}
 #'
-#' Kenne Pagui E C, Salvan A and Sartori N (2016). Median bias
-#' reduction of maximum likelihood estimates. *arXiv*,
-#' **arXiv:1604.04768**
+#' Kenne Pagui E C, Salvan A, Sartori N (2017). Median bias
+#' reduction of maximum likelihood estimates. *Biometrika*, **104**,
+#' 923–938 \doi{10.1093/biomet/asx046}
 #'
-#' Kosmidis I and Firth D (2009). Bias reduction in exponential family
-#' nonlinear models. *Biometrika*, **96**, 793-804
+#' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
+#' reduction in generalized linear models. *Statistics and Computing*,
+#' **30**, 43-59 \doi{10.1007/s11222-019-09860-6}
 #'
-#' Kosmidis I and Firth D (2010). A generic algorithm for reducing
+#' Kosmidis I, Firth D (2009). Bias reduction in exponential family
+#' nonlinear models. *Biometrika*, **96**, 793-804 \doi{10.1093/biomet/asp055}
+#'
+#' Kosmidis I, Firth D (2010). A generic algorithm for reducing
 #' bias in parametric estimation. *Electronic Journal of Statistics*,
-#' **4**, 1097-1112
+#' **4**, 1097-1112 \doi{10.1214/10-EJS579}
 #'
 #' Kosmidis I (2014). Bias in parametric estimation: reduction and
 #' useful side-effects. *WIRE Computational Statistics*, **6**,
-#' 185-196
+#' 185-196 \doi{10.1002/wics.1296}
 #'
 #' @docType package
 #' @name brglm2
@@ -98,7 +106,7 @@ if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 #'
 #' @note
 #'
-#' 
+#'
 #' \code{check_infinite_estimates} will be removed from \pkg{brglm2}
 #' at version 0.8. An new version of
 #' \code{check_infinite_estimates} is now maintained in the
@@ -106,7 +114,7 @@ if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 #' \url{https://cran.r-project.org/package=detectseparation}.
 #'
 #' @seealso check_infinite_estimates.glm
-#' 
+#'
 #' @export
 check_infinite_estimates <- function(object, ...) {
     function_moves_to_new_package(gsub("\\(|\\)", "", deparse(match.call()[1])),
@@ -115,3 +123,4 @@ check_infinite_estimates <- function(object, ...) {
                                   "detectseparation")
     UseMethod("check_infinite_estimates")
 }
+

@@ -1,6 +1,8 @@
 year <- sub("-.*", "", meta$Date)
 note <- sprintf("R package version %s", meta$Version)
 
+citHeader("To cite package 'brglm2' in publications use the following, as appropriate:")
+
 c(bibentry(bibtype = "Manual",
            title = "{brglm2}: Bias Reduction in Generalized Linear Models",
            author = c(person(given = "Ioannis", family = "Kosmidis")),
@@ -8,12 +10,19 @@ c(bibentry(bibtype = "Manual",
            note = note,
            url = "https://CRAN.R-project.org/package=brglm2"),
   bibentry(bibtype = "article",
+           title = "Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models",
+           author = c(person(given = "Ioannis", family = "Kosmidis"),
+                      person(given = "David", family = "Firth")),
+           year = 2020,
+           journal = "Biometirka",
+           url = "https://doi.org/10.1093/biomet/asaa052"),
+  bibentry(bibtype = "article",
            title = "Mean and median bias reduction in generalized linear models",
            author = c(person(given = "Ioannis", family = "Kosmidis"),
                       person(given = c("Euloge", "Clovis"), family = c("Kenne Pagui")),
                       person(given = "Nicola", family = "Sartori")),
-           year = 2019,
-           journal = "arXiv e-prints",
-           volume = "arXiv:1804.04085",
-           note = "To appear in Statistics and Computing",
-           url = "https://arxiv.org/abs/1804.04085"))
+           year = 2020,
+           journal = "Statistics and Computing",
+           volume = "30",
+           pages = "43-59",
+           url = "https://doi.org/10.1007/s11222-019-09860-6"))

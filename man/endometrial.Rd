@@ -4,7 +4,8 @@
 \name{endometrial}
 \alias{endometrial}
 \title{Histology grade and risk factors for 79 cases of endometrial cancer}
-\format{A data frame with 79 rows and 4 variables:
+\format{
+A data frame with 79 rows and 4 variables:
 \describe{
 
 \item{NV}{neovasculization with coding 0 for absent and 1 for present}
@@ -15,7 +16,8 @@
 
 \item{HG}{histology grade with coding 0 for low grade and 1 for high grade}
 
-}}
+}
+}
 \source{
 The packaged data set was downloaded in \code{.dat} format
     from \url{http://www.stat.ufl.edu/~aa/glm/data}. The latter
@@ -32,11 +34,16 @@ endometrial
 Histology grade and risk factors for 79 cases of endometrial cancer
 }
 \references{
-Agresti, A. (2015). *Foundations of Linear and Generalized Linear
+Agresti A (2015). *Foundations of Linear and Generalized Linear
 Models*.  Wiley Series in Probability and Statistics. Wiley
 
-Heinze, G., & Schemper, M. (2002). A Solution to the Problem of
-Separation in Logistic Regression. *Statistics in Medicine*, **21**, 2409–2419
+Heinze G, Schemper M (2002). A Solution to the Problem of
+Separation in Logistic Regression. *Statistics in Medicine*,
+**21**, 2409–2419 \doi{10.1002/sim.1047}
+
+Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+and shrinkage in binomial-response generalized linear
+models. *Biometrika* \doi{10.1093/biomet/asaa052}
 }
 \seealso{
 \code{\link{brglm_fit}}
