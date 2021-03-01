@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2020 Ioannis Kosmidis
+# Copyright (C) 2016-2021 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -356,7 +356,7 @@ summary.brmultinom <- function(object, correlation = FALSE, digits = options()$d
         object$standard.errors <- ses
         ## object$AIC <- AIC(object)
         if (Wald.ratios) {
-            object$Wald.ratios <- coef/ses
+            object$Wald.ratios <- coefficients/ses
             object$Wald.pvalues <-  2 * pnorm(-abs(object$Wald.ratios))
         }
         if (correlation)
