@@ -1,3 +1,10 @@
+# brglm2 0.7.2
+
+## Bug fixes
+
+* Fixed a bug that would return an error when `Wald.ratios = TRUE` in
+  `summary.brmultinom`.
+
 # brglm2 0.7.1
 
 ## Bug fixes
