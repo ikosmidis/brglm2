@@ -94,6 +94,9 @@
 #'
 NULL
 
+## NAMESPACE should have import(stats), import(Matrix)
+
+
 ## Suggestion by Kurt Hornik to avoid a warning related to the binding
 ## of n which is evaluated by family$initialize
 if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
