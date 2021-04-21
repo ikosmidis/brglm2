@@ -107,10 +107,6 @@ process. See \code{\link{brglmControl}} for details.}
 
     For \code{weights}: further arguments passed to or from other methods.
   }
-
-\item{init_dispersion}{initial value for the dispersion
-parameter. If omitted the maximum likelihood estimate of the
-dispersion parameter is used from an initial Poisson GLM fit.}
 }
 \value{
 A fitted model object of class \code{brnb} inheriting from
