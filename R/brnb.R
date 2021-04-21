@@ -21,9 +21,6 @@
 #' @inheritParams stats::glm
 #' @param link The link function.  Currently must be one of
 #'     \code{log}, \code{sqrt} or \code{identity}.
-#' @param init_dispersion initial value for the dispersion
-#'     parameter. If omitted the maximum likelihood estimate of the
-#'     dispersion parameter is used from an initial Poisson GLM fit.
 #' @param control a list of parameters for controlling the fitting
 #'     process. See \code{\link{brglmControl}} for details.
 #' @return A fitted model object of class \code{brnb} inheriting from
@@ -234,7 +231,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         stop(link, " is not one of the appropriate link function")
     ok_transformations <- c("log", "sqrt", "identity", "inverse")
     if (!isTRUE(control$transformation %in% ok_transformations))
-        stop(transformation, " is not one of the implemented dispersion transformations")
+        stop(control$transformation, " is not one of the implemented dispersion transformations")
 
     linkobj <- enrichwith::enrich(make.link(link),with="d2mu.deta")
     linkfun <- linkobj$linkfun
@@ -849,7 +846,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
 #' @export
 coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
     object$transformed_dispersion <- object$dispersion
-    brglm2:::coef.brglmFit(object, model, ...)
+    coef.brglmFit(object, model, ...)
 }
 
 #' @method vcov brnb
@@ -857,7 +854,7 @@ coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
 vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete = TRUE, ...) {
     object$info_transformed_dispersion <- 1/object$vcov.dispersion
     object$dispersion <- 1
-    brglm2:::vcov.brglmFit(object, model , complete , ...)
+    vcov.brglmFit(object, model , complete , ...)
 }
 
 #' @method summary brnb

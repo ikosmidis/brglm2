@@ -67,3 +67,32 @@ test_that("prior weights work as expected", {
     expect_equal(coef(fitJe, "full"), coef(fitJw, "full"), tolerance = 1e-10)
 })
 
+## Dispersion transformations
+test_that("dispersion transformations work as expected for ML/mixed BR/median BR", {
+    for (f0 in list(fitML, fitBR_median, fitBR_mixed)) {
+        fsqrt <- update(f0, transformation = "sqrt")
+        flog <- update(f0, transformation = "log")
+        expect_equal(coef(fsqrt, model = "dispersion"),
+                     sqrt(coef(f0, model = "dispersion")),
+                     tol = 1e-05, check.attributes = FALSE)
+        expect_equal(coef(flog, model = "dispersion"),
+                     log(coef(f0, model = "dispersion")),
+                     tol = 1e-05, check.attributes = FALSE)
+    }
+})
+
+test_that("dispersion transformations work as expected for mean BR", {
+    f0 <- fitBR_mean
+    fsqrt <- update(f0, transformation = "sqrt")
+    flog <- update(f0, transformation = "log")
+    expect_false(isTRUE(all.equal(coef(fsqrt, model = "dispersion"),
+                                  sqrt(1 / coef(f0, model = "dispersion")),
+                                  tol = 1e-04, check.attributes = FALSE)))
+    expect_false(isTRUE(all.equal(coef(flog, model = "dispersion"),
+                                  -log(coef(f0, model = "dispersion")),
+                                  tol = 1e-04, check.attributes = FALSE)))
+})
+
+test_that("error is produced for not implemented transformations", {
+    expect_error(update(fitBR_mean, transformation = "asd"))
+})
