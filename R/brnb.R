@@ -263,53 +263,53 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     }
 
     ## Computation of needed expectations almost exactly
-    ## exp_quant <- function(mu, k) {
-    ##     n <- length(mu)
-    ##     E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- numeric(n)
-    ##     if (k < 0) stop("negative value of k")
-    ##     ymax <- max(qnbinom(1 - 10 * .Machine$double.eps, mu = mu, size = 1 / k))
-    ##                                     #if (ymax > 30000) stop("ymax too much large")  ## need control on largest value?
-    ##     if (ymax > 1) {
-    ##         out <- .C('expectedValues',
-    ##                   as.double(mu),
-    ##                   as.double(k),
-    ##                   as.integer(ymax),
-    ##                   as.integer(n),
-    ##                   E_s2 = as.double(E_s2),
-    ##                   E_s2y = as.double(E_s2y),
-    ##                   E_s1s2 = as.double(E_s1s2),
-    ##                   E_s3 = as.double(E_s3))
-    ##         E_s2 <- out$E_s2
-    ##         E_s2y <- out$E_s2y
-    ##         E_s1s2 <- out$E_s1s2
-    ##         E_s3 <- out$E_s3
-    ##     }
-    ##     list(E_s2 = E_s2, E_s2y = E_s2y, E_s1s2 = E_s1s2, E_s3 = E_s3)
-    ## }
-
-    ## ## IK, 20 Apr 2021: Optimized R version of exp_quant
     exp_quant <- function(mu, k) {
-        if (k < 0) {
-            stop("encountered negative value of k")
-        }
-        E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- numeric(length(mu))
-        ymax <- max(qnbinom(1 - 10 * .Machine$double.eps, mu = mu, size = 1 / k), na.rm = TRUE)
+        n <- length(mu)
+        E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- numeric(n)
+        if (k < 0) stop("negative value of k")
+        ymax <- max(qnbinom(1 - 10 * .Machine$double.eps, mu = mu, size = 1 / k))
+                                        #if (ymax > 30000) stop("ymax too much large")  ## need control on largest value?
         if (ymax > 1) {
-            yval <- 0:ymax
-            pmat <- sapply(mu, function(x) dnbinom(yval, mu = x, size = 1 / k))
-            j <- c(0, 0:(ymax - 1))
-            fra <- j / (k * j + 1)
-            s1 <- cumsum(fra)
-            s2 <- cumsum(fra^2)
-            s3 <- cumsum(fra^3)
-            temp <- pmat * s2
-            E_s2 <- .colSums(temp, ymax + 1, nobs, TRUE)
-            E_s2y <- .colSums(temp * yval, ymax + 1, nobs, TRUE)
-            E_s1s2 <- .colSums(temp * s1, ymax + 1, nobs, TRUE)
-            E_s3 <- .colSums(pmat * s3, ymax + 1, nobs, TRUE)
+            out <- .C('expectedValues',
+                      as.double(mu),
+                      as.double(k),
+                      as.integer(ymax),
+                      as.integer(n),
+                      E_s2 = as.double(E_s2),
+                      E_s2y = as.double(E_s2y),
+                      E_s1s2 = as.double(E_s1s2),
+                      E_s3 = as.double(E_s3))
+            E_s2 <- out$E_s2
+            E_s2y <- out$E_s2y
+            E_s1s2 <- out$E_s1s2
+            E_s3 <- out$E_s3
         }
         list(E_s2 = E_s2, E_s2y = E_s2y, E_s1s2 = E_s1s2, E_s3 = E_s3)
     }
+
+    ## ## ## IK, 20 Apr 2021: Optimized R version of exp_quant
+    ## exp_quant <- function(mu, k) {
+    ##     if (k < 0) {
+    ##         stop("encountered negative value of k")
+    ##     }
+    ##     E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- numeric(length(mu))
+    ##     ymax <- max(qnbinom(1 - 10 * .Machine$double.eps, mu = mu, size = 1 / k), na.rm = TRUE)
+    ##     if (ymax > 1) {
+    ##         yval <- 0:ymax
+    ##         pmat <- sapply(mu, function(x) dnbinom(yval, mu = x, size = 1 / k))
+    ##         j <- c(0, 0:(ymax - 1))
+    ##         fra <- j / (k * j + 1)
+    ##         s1 <- cumsum(fra)
+    ##         s2 <- cumsum(fra^2)
+    ##         s3 <- cumsum(fra^3)
+    ##         temp <- pmat * s2
+    ##         E_s2 <- .colSums(temp, ymax + 1, nobs, TRUE)
+    ##         E_s2y <- .colSums(temp * yval, ymax + 1, nobs, TRUE)
+    ##         E_s1s2 <- .colSums(temp * s1, ymax + 1, nobs, TRUE)
+    ##         E_s3 <- .colSums(pmat * s3, ymax + 1, nobs, TRUE)
+    ##     }
+    ##     list(E_s2 = E_s2, E_s2y = E_s2y, E_s1s2 = E_s1s2, E_s3 = E_s3)
+    ## }
 
     ## required quantities
 
