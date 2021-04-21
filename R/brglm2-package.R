@@ -90,7 +90,7 @@
 #' @importFrom graphics plot
 #' @importFrom nnet class.ind
 #' @importFrom numDeriv grad
-#'
+#' @useDynLib brglm2
 #'
 NULL
 

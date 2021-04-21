@@ -2,7 +2,7 @@
 % Please edit documentation in R/brnb.R
 \name{brnb}
 \alias{brnb}
-\title{Bias reduction for negative binomial regression model}
+\title{Bias reduction for negative binomial regression model.}
 \usage{
 brnb(
   formula,
@@ -50,8 +50,8 @@ brnb(
     included in the formula instead or as well, and if more than one is
     specified their sum is used.  See \code{\link[stats]{model.offset}}.}
 
-\item{link}{The link function.  Currently must be one of \code{log}, \code{sqrt}
-or \code{identity}.}
+\item{link}{The link function.  Currently must be one of
+\code{log}, \code{sqrt} or \code{identity}.}
 
 \item{start}{starting values for the parameters in the linear predictor.}
 
@@ -108,157 +108,132 @@ process. See \code{\link{brglmControl}} for details.}
     For \code{weights}: further arguments passed to or from other methods.
   }
 
-\item{init_dispersion}{optional initial value for the dispersion parameter.  If omitted a maximum
-likelihood estimator after an initial fit using a Poisson GLM is used.}
+\item{init_dispersion}{initial value for the dispersion
+parameter. If omitted the maximum likelihood estimate of the
+dispersion parameter is used from an initial Poisson GLM fit.}
 }
 \value{
-A fitted model object of class \code{brnb} inheriting from \code{negbin} and \code{brglmFit}.
-  The object is like the output of \code{brglmFit} but contains
-four additional components, namely \code{theta} for the ML estimate of
-dispersion parameter as in \code{glm.nb}, \code{vcov.mean} for
-the estimated variance covariance matrix of the regression coefficients while \code{vcov.dispersion}
-for the estimated variance of the dispersion parameter in a chosen parameterization (using the expected information)
-and  \code{twologlik} for  twice the log-likelihood function.
+A fitted model object of class \code{brnb} inheriting from
+    \code{negbin} and \code{brglmFit}.  The object is like the
+    output of \code{brglmFit} but contains four additional
+    components, namely \code{theta} for the ML estimate of
+    dispersion parameter as in \code{glm.nb}, \code{vcov.mean} for
+    the estimated variance covariance matrix of the regression
+    coefficients while \code{vcov.dispersion} for the estimated
+    variance of the dispersion parameter in a chosen
+    parameterization (using the expected information) and
+    \code{twologlik} for twice the log-likelihood function.
 }
 \description{
-\code{brnb} is a function that fits
-negative regression model using implicit and explicit bias
-reduction methods. Reference needed.
+\code{brnb} is a function that fits negative regression model using
+implicit and explicit bias reduction methods.
 }
 \details{
-Thanks to  the orthogonality between coefficients and dispersion parameter,
-the alternate  quasi Fisher scoring iteration is used. A detailed description of the
-procedure is given in the iteration vignette (see,
-\code{vignette("iteration", "brglm2")} or Kosmidis et al, 2020).
-(The number of alternations and the number of iterations when estimating
-parameters are controlled by the \code{maxit} argument of  \code{brglmControl}.)
+Thanks to the orthogonality between coefficients and dispersion
+parameter, the alternate quasi Fisher scoring iteration is used. A
+detailed description of the procedure is given in the iteration
+vignette (see, \code{vignette("iteration", "brglm2")} or Kosmidis
+et al, 2020). The number of alternations and the number of
+iterations when estimating parameters are controlled by the
+\code{maxit} argument of \code{brglmControl}.
+
+IK, 20 Apr 2021: Fix terminology "alternate quasi Fisher scoring"
 
 The type of score adjustment to be used is specified through the
 \code{type} argument (see \code{\link{brglmControl}} for details).
 The available options are:
+
 \itemize{
-\item \code{type = "AS_mixed"}: the mixed bias-reducing score adjustments in
-Kosmidis et al (2019) that result in mean bias reduction for the
-regression parameters and median bias reduction for the dispersion
-parameter, if any; default.
-\item \code{type = "AS_mean"}: the mean bias-reducing score adjustments
-in Firth, 1993 and Kosmidis & Firth, 2009.
-\item \code{type = "AS_median"}: the median-bias reducing score
+
+\item \code{type = "AS_mixed"}: the mixed bias-reducing score
+adjustments in Kosmidis et al (2020) that result in mean bias
+reduction for the regression parameters and median bias reduction
+for the dispersion parameter, if any; default.
+
+\item \code{type = "AS_mean"}: the mean bias-reducing score
+adjustments in Firth (1993) and Kosmidis & Firth (2009).
+
+\item \code{type = "AS_median"}: the median bias-reducing score
 adjustments in Kenne Pagui et al. (2017)
+
 \item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
 with powers of the Jeffreys prior as penalty.
-\item \code{type = "ML"}: maximum likelihood
+
+\item \code{type = "ML"}: maximum likelihood.
+
 \item \code{type = "correction"}: asymptotic bias correction, as in
 Cordeiro & McCullagh (1991).
+
 }
 
-The choice of the parameterization for the dispersion is controlled by
-the  \code{transformation} argument (see \code{\link{brglmControl}} for details).
-The default is \code{identity} but using option  \code{inverse} produces
-the results as in \code{glm.nb}.
+The choice of the parameterization for the dispersion is controlled
+by the \code{transformation} argument (see
+\code{\link{brglmControl}} for details).  The default is
+\code{identity} but using option \code{inverse} produces the
+results as in \code{glm.nb}.
 }
 \examples{
-## example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
-likelihood estimator of the negative binomial dispersion parameter.
-Biometrics, 61, 179--185.
-
-## Number of revertant colonies of salmonella
+# Rxample in Saha, K., & Paul, S. (2005). Bias-corrected maximum
+# likelihood estimator of the negative binomial dispersion
+# parameter.  Biometrics, 61, 179--185.
+#
+# Number of revertant colonies of salmonella data
 salmonella <- data.frame(freq = c(15, 16, 16, 27, 33, 20,
                                   21, 18, 26, 41, 38, 27,
                                   29, 21, 33, 60, 41, 42),
                          dose = rep(c(0, 10, 33, 100, 333, 1000), 3),
                          observation = rep(1:3, each = 6))
 
-## Maximum likelihood fit with glm.nb of MASS
-salmonella_fm <- freq ~ dose + log(dose+10)
+# Maximum likelihood fit with glm.nb of MASS
+salmonella_fm <- freq ~ dose + log(dose + 10)
 fitML_glmnb <- MASS::glm.nb(salmonella_fm, data = salmonella)
 
-## Maximum likelihood fit with brnb
+# Maximum likelihood fit with brnb
 fitML <- brnb(salmonella_fm, data = salmonella,
               link = "log", transformation = "inverse", type = "ML")
 
-## Mean bias-reduced fit
-fitBR_mean <- brnb(salmonella_fm, data = salmonella,
-                    link = "log", transformation = "inverse", type = "AS_mean")
+# Mean bias-reduced fit
+fitBR_mean <- update(fitML, type = "AS_mean")
 
-## Median bias-reduced fit
-fitBR_median <- brnb(salmonella_fm, data = salmonella,
-                     link = "log", transformation = "inverse", type = "AS_median")
+# Median bias-reduced fit
+fitBR_median <- update(fitML, type = "AS_median")
 
-## Mixed bias-reduced fit
-fitBR_mixed <- brnb(salmonella_fm, data = salmonella,
-                    link = "log", transformation = "inverse", type = "AS_mixed")
+# Mixed bias-reduced fit
+fitBR_mixed <- update(fitML, type = "AS_mixed")
 
-## Mean bias-corrected fit
-fitBC_mean <- brnb(salmonella_fm, data = salmonella,
-                    link = "log", transformation = "inverse", type = "correction")
+# Mean bias-corrected fit
+fitBC_mean <- update(fitML, type = "correction")
 
-## Penalized likelihood with Jeffreys-prior penalty
-fit_Jeffreys <- brnb(salmonella_fm, data = salmonella,
-                     link = "log", transformation = "inverse", type = "MPL_Jeffreys")
+# Penalized likelihood with Jeffreys-prior penalty
+fit_Jeffreys <- update(fitML, type = "MPL_Jeffreys")
 
-## The parameter estimates from glm.nb and
-## brnb with type = "ML" are numerically the same
+# The parameter estimates from glm.nb and brnb with type = "ML" are
+# numerically the same
 all.equal(c(coef(fitML_glmnb), fitML_glmnb$theta),
             coef(fitML, model = "full"), check.attributes = FALSE)
 
-## Because of the invariance properties of the maximum likelihood #
-## and median reduced-bias estimators the estimate of a funciton of #
-## the dispersion should be (numerically) the same as the function of
-## the estimate of the dispersion
-fitML_id <- update(fitML, transformation = "identity")
-fitBR_median_id <- update(fitBR_median, transformation = "identity")
+# Because of the invariance properties of the maximum likelihood,
+# median reduced-bias, and mixed reduced-bias estimators the
+# estimate of a monotone function of the dispersion should be
+# (numerically) the same as the function of the estimate of the
+# dispersion:
 
-## ML
+# ML
 coef(fitML, model = "dispersion")
-1/coef(fitML_id, model = "dispersion")
+1 / coef(update(fitML, transformation = "identity"), model = "dispersion")
 
-## median BR
+# Median BR
 coef(fitBR_median, model = "dispersion")
-1/coef(fitBR_median_id, model = "dispersion")
+1 / coef(update(fitBR_median, transformation = "identity"), model = "dispersion")
 
-## IK, 28/09/2002: stopped
+# Mixed BR
+coef(fitBR_mixed, model = "dispersion")
+1 / coef(update(fitBR_mixed, transformation = "identity"), model = "dispersion")
 
-## check for prior weights
-duptimes <- c(2,1,3,5,rep(1,14))
-idx <- rep(1:nrow(salmonella), duptimes)
-dupsalmonella <- salmonella[idx,]
+## The same is not true for mean BR
+coef(fitBR_mean, model = "dispersion")
+1 / coef(update(fitBR_mean, transformation = "identity"), model = "dispersion")
 
-## fit with equal weights
-fitML.ew <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "ML",data=dupsalmonella)
-fitBR_mean.ew <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "AS_mean",data=dupsalmonella)
-fitBR_median.ew <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "AS_median",data=dupsalmonella)
-fitBR_mixed.ew <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "AS_mixed",data=dupsalmonella)
-fitBC_mean.ew<- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "correction",data=dupsalmonella)
- fitmplJ.ew<- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "MPL_Jeffreys",data=dupsalmonella)
-
-## fit using weights
-fitML.w <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "ML",data=salmonella,weights = duptimes)
-fitBR_mean.w <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "AS_mean",data=salmonella,weights = duptimes)
-fitBR_median.w <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "AS_median",data=salmonella,weights = duptimes)
-fitBR_mixed.w <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "AS_mixed",data=salmonella,weights = duptimes)
-fitBC_mean.w<- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "correction",data=salmonella,weights = duptimes)
-fitmplJ.w <- brnb(freq~dose+log(dose+10),link="log",transformation ="identity",
-type = "MPL_Jeffreys",data=salmonella,weights = duptimes)
-
-## all numerical results are the same
-all.equal(coef(fitML.ew,"full"), coef(fitML.w,"full"),tolerance = 1e-10)
-all.equal(coef(fitBR_mean.ew,"full"), coef(fitBR_mean.w,"full"),tolerance = 1e-10)
-all.equal(coef(fitBR_median.ew,"full"), coef(fitBR_median.w,"full"),tolerance = 1e-10)
-all.equal(coef(fitBR_mixed.ew,"full"), coef(fitBR_mixed.w,"full"),tolerance = 1e-10)
-all.equal(coef(fitBC_mean.ew,"full"), coef(fitBC_mean.w,"full"),tolerance = 1e-10)
-all.equal(coef(fitmplJ.ew,"full"), coef(fitmplJ.w,"full"),tolerance = 1e-10)
 }
 \references{
 Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
