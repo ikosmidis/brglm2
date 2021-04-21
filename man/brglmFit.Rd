@@ -144,13 +144,13 @@ and \code{type = "AS_mean"} will return the same results when
 \code{family} is \code{binomial} or \code{poisson}, i.e. when the
 dispersion is fixed)
 
-\item \code{type = "AS_median"}: the median-bias reducing score
+\item \code{type = "AS_median"}: the median bias-reducing score
 adjustments in Kenne Pagui et al. (2017)
 
 \item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
 with powers of the Jeffreys prior as penalty.
 
-\item \code{type = "ML"}: maximum likelihood
+\item \code{type = "ML"}: maximum likelihood.
 
 \item \code{type = "correction"}: asymptotic bias correction, as in
 Cordeiro & McCullagh (1991).

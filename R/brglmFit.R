@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2020 Ioannis Kosmidis
+# Copyright (C) 2016-2021 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -99,13 +99,13 @@
 #' \code{family} is \code{binomial} or \code{poisson}, i.e. when the
 #' dispersion is fixed)
 #'
-#' \item \code{type = "AS_median"}: the median-bias reducing score
+#' \item \code{type = "AS_median"}: the median bias-reducing score
 #' adjustments in Kenne Pagui et al. (2017)
 #'
 #' \item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
 #' with powers of the Jeffreys prior as penalty.
 #'
-#' \item \code{type = "ML"}: maximum likelihood
+#' \item \code{type = "ML"}: maximum likelihood.
 #'
 #' \item \code{type = "correction"}: asymptotic bias correction, as in
 #' Cordeiro & McCullagh (1991).
