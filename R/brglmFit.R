@@ -1318,7 +1318,7 @@ vcov.brglmFit <- function(object, model = c("mean", "full", "dispersion"), compl
                                   c(numeric(nrow(vbetas)), vtd))
                dimnames(vBetasAll) <- list(nBetasAll, nBetasAll)
                vBetasAll
-           })
+    })
 }
 
 

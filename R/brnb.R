@@ -168,10 +168,8 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                  link = "log", start = NULL, etastart = NULL,
                  mustart = NULL,  control = list(...), na.action,
                  model = TRUE, x = FALSE, y = TRUE, contrasts = NULL,
-                 intercept = TRUE, singular.ok = TRUE ,...)
-{
+                 intercept = TRUE, singular.ok = TRUE ,...) {
 
-    ## log lik
     loglik <- function(n, th, mu, y, w) {
         sum(w * (lgamma(th + y) - lgamma(th) - lgamma(y + 1) +
                  th * log(th) + y * log(mu + (y == 0)) - (th + y) * log(th + mu)))
@@ -188,13 +186,11 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                                       scientific = FALSE), "\t", "max |gradient|:",
                 format(round(gr, 6), nsmall = 6, scientific = FALSE),
                 "\n")
-
             st <- abs(step_dispersion)
             gr <- abs(adjusted_grad_dispersion)
             cat("Dispersion update:\t",sprintf("%03f", dispersion), "\n", sep = "")
             cat("Outer iteration:\t", sprintf("%03d", iter),
                 "\n")
-
             cat("max |step|:", format(round(st, 6), nsmall = 6,
                                       scientific = FALSE), "\t", "max |gradient|:",
                 format(round(gr, 6), nsmall = 6, scientific = FALSE),
@@ -227,7 +223,8 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     if (missing_offset <- is.null(offset)) {
         offset <- rep.int(0, nobs)
     }
-  if (is.null(weights)) weights <- rep(1,nobs)
+
+    if (is.null(weights)) weights <- rep(1,nobs)
     if (any(weights < 0))
         stop("negative weights not allowed")
 
@@ -873,24 +870,19 @@ summary.brnb <- function(object, ...) {
     se.dispersion <- sqrt(object$vcov.dispersion)
     cf <- cbind(cf, se.mean, cf/se.mean, 2 * pnorm(-abs(cf/se.mean)))
     colnames(cf) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
-
     rownames(cf) <- names(object$coefficients)
     object$coefficients <- cf
     object$se.betas <- se.mean
     object$se.dispersion <- se.dispersion
-
     coef.dispersion <- cbind(cf.dispersion, se.dispersion)
     colnames(coef.dispersion) <- c("Estimate", "Std. Error")
     rownames(coef.dispersion) <- c("dispersion")
     object$coef.dispersion <- coef.dispersion
     ## number of iterations
-
     object$iterations <- object$iter
-
     ## delete some slots
     object$terms <- object$model <- object$y <-NULL
     object$x <- object$levels <- object$contrasts <-  NULL
-
     ## return
     class(object) <- "summary.brnb"
     object
@@ -898,10 +890,8 @@ summary.brnb <- function(object, ...) {
 
 #' @method print summary.brnb
 #' @export
-print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
-{
+print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
     cat("\nCall:", deparse(x$call, width.cutoff = floor(getOption("width") * 0.85)), "", sep = "\n")
-
     if (!x$converged) {
         cat("model did not converge\n")
     }
@@ -943,8 +933,7 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
 
 #' @method print brnb
 #' @export
-print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
-{
+print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
     cat("\nCall:", deparse(x$call, width.cutoff = floor(getOption("width") * 0.85)), "", sep = "\n")
     if (!x$converged) {
       cat("model did not converge\n")
