@@ -41,9 +41,9 @@ Heinze G, Schemper M (2002). A Solution to the Problem of
 Separation in Logistic Regression. *Statistics in Medicine*,
 **21**, 2409–2419 \doi{10.1002/sim.1047}
 
-Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 and shrinkage in binomial-response generalized linear
-models. *Biometrika* \doi{10.1093/biomet/asaa052}
+models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
 }
 \seealso{
 \code{\link{brglm_fit}}
