@@ -101,7 +101,7 @@
 #' nonlinear models. *Biometrika*, **96**, 793-804.
 #'
 #' @examples
-#' # Rxample in Saha, K., & Paul, S. (2005). Bias-corrected maximum
+#' # Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
 #' # likelihood estimator of the negative binomial dispersion
 #' # parameter.  Biometrics, 61, 179--185.
 #' #
@@ -162,6 +162,16 @@
 #' coef(fitBR_mean, model = "dispersion")
 #' 1 / coef(update(fitBR_mean, transformation = "identity"), model = "dispersion")
 #'
+#' \donttest{
+#' ## An example  from Venables & Ripley (2002, p.169).
+#' data("quine", package = "MASS")
+#' quineML <- brnb(Days ~ Sex/(Age + Eth*Lrn), link = "sqrt", transformation="inverse", data = quine, type="ML")
+#' quineBR_mean <- update(quineML, type = "AS_mean")
+#' quineBR_median <- update(quineML, type = "AS_median")
+#' quineBR_mixed <- update(quineML, type = "AS_mixed")
+#' quine_Jeffreys <- update(quineML, type = "MPL_Jeffreys")
+#' }
+#' 
 #' @export
 brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                  link = "log", start = NULL, etastart = NULL,
@@ -840,10 +850,25 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     out$xlevels <- .getXlevels(Terms,mf)
     out$control <- control
     out$offset <- offset
-    class(out)<-c("brnb","negbin")
+    class(out)<-c("brnb","negbin","glm")
     out
 }
 
+
+#' Extract model coefficients from \code{\link{brnb}} objects
+#'
+#'
+#'
+#' @inheritParams stats::coef
+#' @param model one of \code{"mean"} (default), \code{"full"}, \code{"dispersion"}, 
+#'     to return the estimates of the parameters in the linear
+#'     prediction only, or both, the estimate of the dispersion parameter only,
+#'      respectively.
+#'
+#' @details
+#'
+#' See \code{\link{coef}} for more details.
+#'
 #' @method coef brnb
 #' @export
 coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
@@ -851,6 +876,25 @@ coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
     coef.brglmFit(object, model, ...)
 }
 
+#' Extract model variance-covariance matrix from \code{\link{brnb}} objects
+#'
+#'
+#' @inheritParams stats::vcov.glm
+#' @param object an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.  
+#' @param model character specifying for which component of the model variance-covariance matrix should be extracted.
+#'
+#' @details
+#'
+#' The options for \code{model} are \code{"mean"} for mean regression
+#'  only (default), \code{"dispersion"} for the dispersion
+#' parameter (in a chosen transformation; see
+#' \code{\link{brglmControl}}), and \code{"full"} for both the mean
+#' regression and the (transformed) dispersion parameters.
+#' See \code{\link{vcov}} for more details.
+#'
+#' @seealso
+#'
+#' \code{\link{vcov}}
 #' @method vcov brnb
 #' @export
 vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete = TRUE, ...) {
@@ -859,6 +903,22 @@ vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete 
     vcov.brglmFit(object, model , complete , ...)
 }
 
+#' \code{summary} method for \code{\link{brnb}} objects
+#'
+#' @inheritParams stats::summary.glm
+#' @param object an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.  
+#' @details The interface of the summary method for
+#'     \code{\link{brnb}} objects is similar to that of
+#'     \code{\link{brglmFit}} objects with minor additional informations. The summary method for
+#'     \code{\link{brnb}} objects computes the p-values of the
+#'     individual Wald statistics based on the standard normal
+#'     distribution.
+#'
+#' @seealso \code{\link{summary.brglmFit}} and \code{\link{glm}}
+#'
+#' @examples
+#' ## For examples see examples(brnb)
+#' 
 #' @method summary brnb
 #' @export
 summary.brnb <- function(object, ...) {
@@ -887,6 +947,19 @@ summary.brnb <- function(object, ...) {
     object
 }
 
+#' Summarizing Linear Model Fits
+#' 
+#' print summary output for class "brnb". 
+#' 
+#' @param x an object of class "summary.brnb", usually, a result of a call to summary.brnb.
+#' @param digits the number of significant digits to use when printing.
+#' @details \code{print.summary.brnb} tries to be smart about formatting the coefficients,
+#' standard errors, and additionally gives "significant stars". The \code{coefficients}
+#' components of the result gives the estimated coefficients and their estimated
+#' standard errors, together with their ratio. The latter column is labelled \code{z} ratio.
+#' A fourth column gives the two-tailed p-value corresponding to the \code{z} ratio
+#' based on Normal reference distribution.
+#' 
 #' @method print summary.brnb
 #' @export
 print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
@@ -955,4 +1028,68 @@ print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
             "\tAIC:", format(round(x$aic, digits)), "\n")
   }
 }
+
+#' Method for computing Wald confidence intervals for one or more
+#' regression parameters in a \code{\link{brnb}} object
+#'
+#' @inheritParams stats::confint
+#'
+#' @method confint brnb
+#' @export
+confint.brnb <- function(object, parm, level = 0.95, ...) {
+  confint.default(object, parm, level, ...)
+}
+
+#' Simulate Responses
+#' 
+#' Simulate one or more responses from the distribution 
+#' corresponding to a fitted model \code{brnb} object.
+#' @param object an object representing a fitted model. 
+#' @param nsim number of response vectors to simulate. Defaults to 1.
+#' @param seed an object specifying if and how the random 
+#' number generator should be initialized (``seeded'').
+
+#' @examples
+#' # Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
+#' # likelihood estimator of the negative binomial dispersion
+#' # parameter.  Biometrics, 61, 179--185.
+#' #
+#' Frequency distribution of red mites on apple leaves.
+#' nomites=0:8
+#' noleaves=c(70, 38, 17, 10, 9, 3, 2, 1, 0)
+#' fit_glmnb = MASS::glm.nb(nomites~1,link="identity",weights = noleaves) 
+#' fit_brnb <- brnb(nomites~1,link="identity",transformation="inverse"
+#'              ,type = "ML",weights = noleaves)
+#' ## Let us simulate 10 response vectors 
+#' sim_glmnb <- simulate(fit_glmnb, nsim = 10, seed = 123)  
+#' sim_brnb <-  simulate(fit_brnb, nsim = 10, seed = 123) 
+#' # The results  from glm.nb and brnb with type = "ML" are
+#' # exactly the same
+#' all.equal(sim_glmnb, sim_brnb, check.attributes = FALSE)             
+
+
+#' @method simulate brnb
+#' @export
+simulate.brnb <- function(object, nsim = 1, seed = NULL) {
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
+    runif(1)
+  if (is.null(seed)) 
+    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+  else {
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+    set.seed(seed)
+    RNGstate <- structure(seed, kind = as.list(RNGkind()))
+    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+  }
+  theta <- object$theta
+  mus <- fitted(object)
+  n <- length(mus)
+  val <- rnegbin(n*nsim, mu = mus, theta = theta)
+  dim(val) <- c(n, nsim)
+  val <- as.data.frame(val)
+  names(val) <- paste0("sim_", seq_len(nsim))
+  attr(val, "seed") <- RNGstate
+  val
+}
+
 

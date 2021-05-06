@@ -169,7 +169,7 @@ by the \code{transformation} argument (see
 results as in \code{glm.nb}.
 }
 \examples{
-# Rxample in Saha, K., & Paul, S. (2005). Bias-corrected maximum
+# Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
 # likelihood estimator of the negative binomial dispersion
 # parameter.  Biometrics, 61, 179--185.
 #
@@ -229,6 +229,16 @@ coef(fitBR_mixed, model = "dispersion")
 ## The same is not true for mean BR
 coef(fitBR_mean, model = "dispersion")
 1 / coef(update(fitBR_mean, transformation = "identity"), model = "dispersion")
+
+\donttest{
+## An example  from Venables & Ripley (2002, p.169).
+data("quine", package = "MASS")
+quineML <- brnb(Days ~ Sex/(Age + Eth*Lrn), link = "sqrt", transformation="inverse", data = quine, type="ML")
+quineBR_mean <- update(quineML, type = "AS_mean")
+quineBR_median <- update(quineML, type = "AS_median")
+quineBR_mixed <- update(quineML, type = "AS_mixed")
+quine_Jeffreys <- update(quineML, type = "MPL_Jeffreys")
+}
 
 }
 \references{
