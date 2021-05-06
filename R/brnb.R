@@ -79,6 +79,8 @@
 #' \code{identity} but using option \code{inverse} produces the
 #' results as in \code{glm.nb}.
 #'
+#' @author Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}, Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}
+#'
 #' @references
 #'
 #' Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
