@@ -122,3 +122,40 @@ test_that("prediction with NAs works", {
 })
 
 
+
+test_that("simulate from bracl objects returns a data frame with expected characteristics", {
+    simu_df <- simulate(fit_bracl_p)
+    nam_mf <- names(model.frame(fit_bracl_p))
+    nam_simu <- names(simu_df)
+    expect_identical(nrow(simu_df),
+                     nrow(stemcell) * nlevels(stemcell$research))
+    expect_identical(levels(simu_df$research),
+                     levels(stemcell$research))
+    expect_identical(is.ordered(simu_df$research),
+                     is.ordered(stemcell$research))
+    expect_identical(nam_mf[!(nam_mf %in% nam_simu)],
+                     "(weights)")
+    expect_identical(nam_simu[!(nam_simu %in% nam_mf)],
+                     as.character(fit_bracl_p$call$weights))
+    expect_identical(nam_simu[(nam_simu %in% nam_mf)],
+                     nam_mf[(nam_mf %in% nam_simu)])
+})
+
+
+test_that("simulate from bracl objects returns a data frame with expected characteristics", {
+    simu_df <- simulate(fit_bracl)
+    nam_mf <- names(model.frame(fit_bracl))
+    nam_simu <- names(simu_df)
+    expect_identical(nrow(simu_df),
+                     nrow(stemcell) * nlevels(stemcell$research))
+    expect_identical(levels(simu_df$research),
+                     levels(stemcell$research))
+    expect_identical(is.ordered(simu_df$research),
+                     is.ordered(stemcell$research))
+    expect_identical(nam_mf[!(nam_mf %in% nam_simu)],
+                     "(weights)")
+    expect_identical(nam_simu[!(nam_simu %in% nam_mf)],
+                     as.character(fit_bracl$call$weights))
+    expect_identical(nam_simu[(nam_simu %in% nam_mf)],
+                     nam_mf[(nam_mf %in% nam_simu)])
+})
