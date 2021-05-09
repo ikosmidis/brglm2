@@ -145,8 +145,8 @@ bracl <- function(formula, data, weights, subset, na.action,
     keep <- w > 0
     nkeep <- sum(keep)
 
-    cats0 <- apply(Y, 1, function(x) which(x == 1))
-    cats <- rep(seq.int(ncat), each = nrow(X))
+    ## cats0 <- apply(Y, 1, function(x) which(x == 1))
+    cats <- rep(seq.int(ncat), each = nrow(X))[keep]
 
     fixed_totals <- rep(seq.int(nkeep), ncat)
 
@@ -172,15 +172,13 @@ bracl <- function(formula, data, weights, subset, na.action,
     ## Set up the extended response
     Yextended <- c(Y[keep] * w[keep])
 
-
-
     fit <- brglmFit(x = Xextended, y = Yextended,
                     start = NULL,
                     family = poisson("log"), control = control, intercept = TRUE, fixed_totals = fixed_totals)
 
     ## Fitted values
     fitted <- do.call("rbind", tapply(fit$fitted, fixed_totals, function(x) x/sum(x)))
-    rownames(fitted) <- rownames(X)
+    rownames(fitted) <- rownames(X)[keep]
     colnames(fitted) <- lev
     fit$fitted.values <- fitted
     fit$parallel  <- parallel
