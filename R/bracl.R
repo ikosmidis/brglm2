@@ -381,41 +381,40 @@ predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
     if (!inherits(object, "bracl"))
         stop("not a \"bracl\" fit")
     type <- match.arg(type)
-    if (missing(newdata))
-        Y <- fitted(object)
+    if (missing(newdata)) {
+        newdata <- model.frame(object)
+    }
     else {
         newdata <- as.data.frame(newdata)
-        rn <- row.names(newdata)
-        Terms <- delete.response(object$terms)
-        m <- model.frame(Terms, newdata, na.action = na.omit,
-                         xlev = object$xlevels)
-        if (!is.null(cl <- attr(Terms, "dataClasses")))
-            .checkMFClasses(cl, m)
-        keep <- match(row.names(m), rn)
-        X <- model.matrix(Terms, m, contrasts = object$contrasts)
-        cc <- coef(object)
-        nams <- names(cc)
-        if (object$parallel) {
-            int <- (object$ncat - 1):1
-            sl <- nams[-int]
-            coefs <- cbind(rev(cumsum(cc[int])),
-                           int * matrix(cc[sl], nrow = object$ncat - 1, ncol = length(sl), byrow = TRUE))
-            rownames(coefs) <- object$lev[-object$ref]
-        }
-        else {
-            coefs <- matrix(cc, nrow = object$ncat - 1)
-            rownames(coefs) <- object$lev[-object$ref]
-            coefs <- apply(coefs, 2, function(x) cumsum(rev(x)))
-        }
-        fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn[keep], object$lev))
-        fits1 <- apply(coefs, 1, function(b) X %*% b)
-
-        fits[, rownames(coefs)] <- fits1
-        Y1 <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
-        Y <- matrix(NA, nrow(newdata), ncol(Y1), dimnames = list(rn, colnames(Y1)))
-        Y[keep, ] <- Y1
-
     }
+    rn <- row.names(newdata)
+    Terms <- delete.response(object$terms)
+    m <- model.frame(Terms, newdata, na.action = na.omit,
+                     xlev = object$xlevels)
+    if (!is.null(cl <- attr(Terms, "dataClasses")))
+        .checkMFClasses(cl, m)
+    keep <- match(row.names(m), rn)
+    X <- model.matrix(Terms, m, contrasts = object$contrasts)
+    cc <- coef(object)
+    nams <- names(cc)
+    if (object$parallel) {
+        int <- (object$ncat - 1):1
+        sl <- nams[-int]
+        coefs <- cbind(rev(cumsum(cc[int])),
+                       int * matrix(cc[sl], nrow = object$ncat - 1, ncol = length(sl), byrow = TRUE))
+        rownames(coefs) <- object$lev[-object$ref]
+    }
+    else {
+        coefs <- matrix(cc, nrow = object$ncat - 1)
+        rownames(coefs) <- object$lev[-object$ref]
+        coefs <- apply(coefs, 2, function(x) cumsum(rev(x)))
+    }
+    fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn[keep], object$lev))
+    fits1 <- apply(coefs, 1, function(b) X %*% b)
+    fits[, rownames(coefs)] <- fits1
+    Y1 <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
+    Y <- matrix(NA, nrow(newdata), ncol(Y1), dimnames = list(rn, colnames(Y1)))
+    Y[keep, ] <- Y1
     switch(type, class = {
         if (length(object$lev) > 2L) Y <- factor(max.col(Y),
             levels = seq_along(object$lev), labels = object$lev)
