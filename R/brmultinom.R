@@ -535,3 +535,35 @@ confint.brmultinom <- function (object, parm, level = 0.95, ...)  {
         ci
     }
 }
+
+
+#' Method for simulating data sets from \code{\link{brmultinom}} and
+#' \code{\link{bracl}} objects
+#'
+#'
+#' @export
+simulate.brmultinom <- function(object, ...) {
+    mf <- model.frame(object)
+    if (is.null(mf)) {
+        mf <- model.frame(update(object, model = TRUE))
+    }
+    probs <- predict(object, type = "probs")
+    categories <- colnames(probs)
+    ncat <- object$ncat
+    weights <- model.weights(mf)
+    samples <- sapply(1:nrow(probs), function(j) rmultinom(1, weights[j], probs[j, ]))
+    mf <- mf[rep(1:nrow(mf), each = ncat), ]
+    mf[, 1] <- factor(colnames(probs),
+                      levels = levels(mf[, 1]),
+                      ordered = is_ordered(mf[, 1]))
+    weights_ind <- grep("(weights)", names(mf))
+    if (length(weights_ind)) {
+        weights_nam <- as.character(object$call$weights)
+        names(mf)[weights_ind] <- weights_nam
+    }
+    else {
+        weights_nam <- ".weights"
+    }
+    mf[[weights_nam]] <- c(samples)
+    mf
+}

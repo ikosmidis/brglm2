@@ -1,3 +1,14 @@
+# brglm2 0.7.3
+
+## Bug fixes
+
+* Fixed a bug in `bracl()` related to the handling or zero weights
+  that could result in hard-to-traceback errors
+  
+## New functionality
+
+* `simulate()` method for objects of class `brmultinom` and `bracl`
+
 # brglm2 0.7.2
 
 ## Bug fixes
