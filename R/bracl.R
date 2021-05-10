@@ -398,6 +398,7 @@ predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
         rownames(coefs) <- object$lev[-object$ref]
         coefs <- apply(coefs, 2, function(x) cumsum(rev(x)))
     }
+
     fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn[keep], object$lev))
     fits1 <- apply(coefs, 1, function(b) X %*% b)
     fits[, rownames(coefs)] <- fits1

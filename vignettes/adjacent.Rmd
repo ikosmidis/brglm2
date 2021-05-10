@@ -35,11 +35,13 @@ The `stemcell` data set ships with **brglm2**. @agresti:15[, Section 4.1] provid
 ```{r, echo = TRUE}
 library("brglm2")
 data("stemcell", package = "brglm2")
+stem <- within(stemcell, religion <- as.numeric(religion))
 ```
 ## Maximum likelihood estimation
 The following chunk of code fits an adjacent category logit model with proportional odds and reproduces @agresti:10[, Table 4.2]. Note that the intercept parameters are different because @agresti:10[, Table 4.2] uses different contrasts for the intercept parameters.
 ```{r, echo = TRUE}
-stemcells_ml <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell,
+stem_formula <- research ~ religion + gender
+stemcells_ml <- bracl(stem_formula, weights = frequency, data = stem,
                       parallel = TRUE, type = "ML")
 summary(stemcells_ml)
 ```
@@ -52,7 +54,7 @@ class(stemcells_ml)
 
 We can check if a model with non-proportional odds fits the data equally well by fitting it and carrying out a likelihood ration test.
 ```{r, echo = TRUE}
-stemcells_ml_full <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell,
+stemcells_ml_full <- bracl(stem_formula, weights = frequency, data = stemcell,
                            parallel = FALSE, type = "ML")
 summary(stemcells_ml_full)
 ```
