@@ -381,20 +381,9 @@ predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
     if (!inherits(object, "bracl"))
         stop("not a \"bracl\" fit")
     type <- match.arg(type)
-    if (missing(newdata)) {
-        newdata <- model.frame(object)
-    }
-    else {
-        newdata <- as.data.frame(newdata)
-    }
-    rn <- row.names(newdata)
-    Terms <- delete.response(object$terms)
-    m <- model.frame(Terms, newdata, na.action = na.omit,
-                     xlev = object$xlevels)
-    if (!is.null(cl <- attr(Terms, "dataClasses")))
-        .checkMFClasses(cl, m)
-    keep <- match(row.names(m), rn)
-    X <- model.matrix(Terms, m, contrasts = object$contrasts)
+    X <- if (missing(newdata)) model.matrix(object) else model.matrix(object, data = newdata)
+    rn <- attr(X, "rn_data")
+    keep <- attr(X, "rn_kept")
     cc <- coef(object)
     nams <- names(cc)
     if (object$parallel) {
@@ -413,7 +402,7 @@ predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
     fits1 <- apply(coefs, 1, function(b) X %*% b)
     fits[, rownames(coefs)] <- fits1
     Y1 <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
-    Y <- matrix(NA, nrow(newdata), ncol(Y1), dimnames = list(rn, colnames(Y1)))
+    Y <- matrix(NA, length(rn), ncol(Y1), dimnames = list(rn, colnames(Y1)))
     Y[keep, ] <- Y1
     switch(type, class = {
         if (length(object$lev) > 2L) Y <- factor(max.col(Y),

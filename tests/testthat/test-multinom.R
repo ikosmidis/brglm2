@@ -115,7 +115,7 @@ test_that("brmultinom returns the same fitted values as nnet::multinom if type =
 })
 
 test_that("brmultinom returns the same model matrix as nnet::multinom", {
-    expect_equal(model.matrix(enzbrmultinom_ml) ,model.matrix(enzmultinom))
+    expect_equal(model.matrix(enzbrmultinom_ml), model.matrix(enzmultinom), check.attributes = FALSE)
 })
 
 test_that("brmultinom returns the same maximized loglikelihood as nnet::multinom if type = 'ML'", {

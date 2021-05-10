@@ -461,26 +461,15 @@ predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
     if (!inherits(object, "brmultinom"))
         stop("not a \"brmultinom\" fit")
     type <- match.arg(type)
-    if (missing(newdata)) {
-        newdata <- model.frame(object)
-    }
-    else {
-        newdata <- as.data.frame(newdata)
-    }
-    rn <- row.names(newdata)
-    Terms <- delete.response(object$terms)
-    m <- model.frame(Terms, newdata, na.action = na.omit,
-                     xlev = object$xlevels)
-    if (!is.null(cl <- attr(Terms, "dataClasses")))
-        .checkMFClasses(cl, m)
-    keep <- match(row.names(m), rn)
-    X <- model.matrix(Terms, m, contrasts = object$contrasts)
+    X <- if (missing(newdata)) model.matrix(object) else model.matrix(object, data = newdata)
+    rn <- attr(X, "rn_data")
+    keep <- attr(X, "rn_kept")
     coefs <- coef(object)
     fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn[keep], object$lev))
     fits1 <- apply(coefs, 1, function(b) X %*% b)
     fits[, rownames(coefs)] <- fits1
     Y1 <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
-    Y <- matrix(NA, nrow(newdata), ncol(Y1), dimnames = list(rn, colnames(Y1)))
+    Y <- matrix(NA, length(rn), ncol(Y1), dimnames = list(rn, colnames(Y1)))
     Y[keep, ] <- Y1
     switch(type, class = {
         if (length(object$lev) > 2L) Y <- factor(max.col(Y),
@@ -493,6 +482,30 @@ predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
     })
     drop(Y)
 }
+
+#' @method model.matrix brmultinom
+#' @export
+model.matrix.brmultinom <- function(object, data, ...) {
+    if (!inherits(object, "brmultinom"))
+        stop("not a \"brmultinom\" fit")
+    if (missing(data)) {
+        data <- model.frame(object)
+    }
+    else {
+        data <- as.data.frame(data)
+    }
+    Terms <- delete.response(object$terms)
+    m <- model.frame(Terms, data, na.action = na.omit,
+                     xlev = object$xlevels)
+    if (!is.null(cl <- attr(Terms, "dataClasses")))
+        .checkMFClasses(cl, m)
+    X <- model.matrix(Terms, m, contrasts = object$contrasts)
+    rn <- row.names(data)
+    attr(X, "rn_data") <- rn
+    attr(X, "rn_kept") <-  match(row.names(m), rn)
+    X
+}
+
 
 #' Method for computing confidence intervals for one or more
 #' regression parameters in a \code{\link{brmultinom}} object
@@ -544,9 +557,6 @@ confint.brmultinom <- function (object, parm, level = 0.95, ...)  {
 #' @export
 simulate.brmultinom <- function(object, ...) {
     mf <- model.frame(object)
-    if (is.null(mf)) {
-        mf <- model.frame(update(object, model = TRUE))
-    }
     probs <- predict(object, type = "probs")
     categories <- colnames(probs)
     ncat <- object$ncat
