@@ -561,6 +561,9 @@ simulate.brmultinom <- function(object, ...) {
     categories <- colnames(probs)
     ncat <- object$ncat
     weights <- model.weights(mf)
+    if (is.null(weights)) {
+        weights <- rep.int(1L, nrow(mf))
+    }
     samples <- sapply(1:nrow(probs), function(j) rmultinom(1, weights[j], probs[j, ]))
     mf <- mf[rep(1:nrow(mf), each = ncat), ]
     mf[, 1] <- factor(colnames(probs),
