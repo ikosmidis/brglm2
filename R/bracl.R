@@ -157,12 +157,12 @@ bracl <- function(formula, data, weights, subset, na.action,
     if (parallel) {
         Xextended <- cbind(Matrix::kronecker(rep(1, ncat), Xnuisance),
                            Matrix::kronecker(Matrix::Diagonal(ncat)[, -ncat, drop = FALSE], X[keep, xint]),
-        (ncat - cats) * Matrix::kronecker(c(rep(1, ncat - 1), 0), X[keep, -xint]))
+        (ncat - cats) * Matrix::kronecker(c(rep(1, ncat - 1), 0), X[keep, -xint, drop = FALSE]))
         ofInterest <- c(paste(lev[-ncat], rep("(Intercept)", ncat - 1), sep = ":"), colnames(X)[-xint])
     }
     else {
         Xextended <- cbind(Matrix::kronecker(rep(1, ncat), Xnuisance),
-                           Matrix::kronecker(Matrix::Diagonal(ncat)[, -ncat, drop = FALSE], X[keep, ]))
+                           Matrix::kronecker(Matrix::Diagonal(ncat)[, -ncat, drop = FALSE], X[keep, , drop = FALSE]))
         ofInterest <- paste(rep(lev[-ncat], each = nvar),
                             rep(colnames(X), ncat - 1), sep = ":")
     }
