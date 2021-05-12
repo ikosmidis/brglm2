@@ -4,6 +4,8 @@
 
 * Fixed a bug in `bracl()` related to the handling or zero weights
   that could result in hard-to-traceback errors
+* Fixed a bug in `bracl()` that could cause errors in fits with one
+  covariate.
   
 ## New functionality
 
