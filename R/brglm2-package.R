@@ -124,3 +124,60 @@ check_infinite_estimates <- function(object, ...) {
     UseMethod("check_infinite_estimates")
 }
 
+
+#' Ordinal superiority scores of Agresti and Kateri (2017)
+#'
+#' \code{\link{ordinal_superiority}} is a method for the estimation
+#' and inference about model-based ordinal superiority scores
+#' introduced in Agresti and Kateri (2017, Section 5) from fitted
+#' objects. The mean bias of the estimates of the ordinal superiority
+#' scores can be corrected.
+#'
+#' @inheritParams stats::glm.fit
+#' @param object a fitted object from an ordinal regression
+#'     model. Currently only models from class \code{"bracl"} are
+#'     supported.
+#' @param formula a RHS formula indicating the group variable to use.
+#' @param measure either \code{"gamma"} (default) or \code{"Delta"},
+#'     specificying the ordinal superiority measure to be returned.
+#' @param level the confidence level required when computing
+#'     confidence intervals for the ordinal superiority measures.
+#' @param bc logical. If \code{FALSE} (default) then the ordinal
+#'     superiority measures are computed using the estimates in
+#'     \code{object}. If \code{TRUE} then the ordinal superiority
+#'     measure estimates are corrected for mean bias.
+#'
+#' @examples
+#' data("stemcell", package = "brglm2")
+#'
+#' # Adjacent category logit (proportional odds)
+#' stem <- within(stemcell, {nreligion = as.numeric(religion)})
+#' fit_bracl_p <- bracl(research ~ nreligion + gender, weights = frequency,
+#'                      data = stem, type = "ML", parallel = TRUE)
+#'
+#' # Estimates and 95% confidence intervals for the probabilities that the response
+#' # category for gender "female" is higher than the response category for gender "male",
+#' # while adjusting for religion.
+#' ordinal_superiority(fit_bracl_p, ~ gender)
+#'
+#' \dontrun{
+#' # And their bias corrected versions with 99% CIs
+#' ordinal_superiority(fit_bracl_p, ~ gender, bc = TRUE, level = 0.99)
+#' # Note that the object is refitted with type = "AS_mean"
+#'
+#' }
+#'
+#'
+#' @references
+#'
+#' Agresti, A., Kateri, M. (2017). Ordinal probability effect measures
+#' for group comparisons in multinomial cumulative link models:
+#' Ordinal robability effect measures. *Biometrics*, **73** 214-219
+#' \doi{10.1111/biom.12565}
+#'
+ordinal_superiority <- function(object, formula, data,
+                                measure = c("gamma", "Delta"),
+                                level = 0.95,
+                                bc = FALSE) {
+    UseMethod("ordinal_superiority")
+}
