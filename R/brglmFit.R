@@ -945,6 +945,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                 testhalf <- TRUE
                 ## Inner iteration
                 while (testhalf & step_factor < control$max_step_factor) {
+                    ## store previous values
+                    betas0 <- betas; dispersion0 <- dispersion
                     step_beta_previous <- step_beta
                     step_zeta_previous <- step_zeta
                     ## Update betas
@@ -960,7 +962,13 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                     transformed_dispersion <- eval(control$Trans)
                     ## Mean quantities
 
-                    quantities <- key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE)
+                    quantities <- try(key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE), silent = TRUE)
+                    ## This is to capture qr failing and revering to previous estimates
+                    if (failed_adjustment_beta <- is(quantities, "try-error")) {
+                        betas <- betas0; dispersion <- dispersion0
+                        warning("failed to calculate score adjustment")
+                        break
+                    }
                     step_components_beta <- compute_step_components(theta, level = 0, fit = quantities)
                     step_components_zeta <- compute_step_components(theta, level = 1, fit = quantities)
                     if (failed_inversion_beta <- step_components_beta$failed_inversion) {
