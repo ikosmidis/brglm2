@@ -2,6 +2,7 @@
 
 ## Bug fixes
 
+
 * Fixed a bug that would return an error when `Wald.ratios = TRUE` in
   `summary.brmultinom`.
 * Fixed bug in `vcov.bracl` that would return an error if the
@@ -11,6 +12,8 @@
   that could result in hard-to-traceback errors.
 * Fixed a bug in `bracl()` that could cause errors in fits with one
   covariate.
+* `brglmFit()` iteration returns last estimates that worked if
+  iteration fails.
   
 ## New functionality
 
