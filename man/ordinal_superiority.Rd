@@ -30,11 +30,10 @@ supported.}
 
 \item{formula}{a RHS formula indicating the group variable to use.}
 
-\item{data}{an optional data frame, list or environment (or object
-    coercible by \code{\link{as.data.frame}} to a data frame) containing
-    the variables in the model.  If not found in \code{data}, the
-    variables are taken from \code{environment(formula)},
-    typically the environment from which \code{glm} is called.}
+\item{data}{an optional data frame in which to look for variables
+with which to compute ordinal superiority measures.  If
+omitted, an attempt is made to use the data that produced
+\code{object}.}
 
 \item{measure}{either \code{"gamma"} (default) or \code{"Delta"},
 specificying the ordinal superiority measure to be returned.}
@@ -78,7 +77,6 @@ ordinal_superiority(fit_bracl_p, ~ gender, bc = TRUE, level = 0.99)
 }
 \references{
 Agresti, A., Kateri, M. (2017). Ordinal probability effect measures
-for group comparisons in multinomial cumulative link models:
-Ordinal robability effect measures. *Biometrics*, **73** 214-219
-\doi{10.1111/biom.12565}
+for group comparisons in multinomial cumulative link models.
+*Biometrics*, **73** 214-219 #' \doi{10.1111/biom.12565}
 }

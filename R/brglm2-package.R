@@ -133,11 +133,14 @@ check_infinite_estimates <- function(object, ...) {
 #' objects. The mean bias of the estimates of the ordinal superiority
 #' scores can be corrected.
 #'
-#' @inheritParams stats::glm.fit
 #' @param object a fitted object from an ordinal regression
 #'     model. Currently only models from class \code{"bracl"} are
 #'     supported.
 #' @param formula a RHS formula indicating the group variable to use.
+#' @param data an optional data frame in which to look for variables
+#'     with which to compute ordinal superiority measures.  If
+#'     omitted, an attempt is made to use the data that produced
+#'     \code{object}.
 #' @param measure either \code{"gamma"} (default) or \code{"Delta"},
 #'     specificying the ordinal superiority measure to be returned.
 #' @param level the confidence level required when computing
@@ -171,9 +174,8 @@ check_infinite_estimates <- function(object, ...) {
 #' @references
 #'
 #' Agresti, A., Kateri, M. (2017). Ordinal probability effect measures
-#' for group comparisons in multinomial cumulative link models:
-#' Ordinal robability effect measures. *Biometrics*, **73** 214-219
-#' \doi{10.1111/biom.12565}
+#' for group comparisons in multinomial cumulative link models.
+#' *Biometrics*, **73** 214-219 #' \doi{10.1111/biom.12565}
 #'
 ordinal_superiority <- function(object, formula, data,
                                 measure = c("gamma", "Delta"),

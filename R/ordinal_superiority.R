@@ -48,34 +48,35 @@ ordinal_superiority.bracl <- function(object, formula, data,
         }
     }
     gammas <- gammas - bias_gammas
-    mean_gammas <- mean(gammas)
+    ## mean_gammas <- mean(gammas)
     ## compute standard error for gamma
     grads <- numDeriv::jacobian(.ordsup, x = coef(object),
                                 X = X, group_id = z_ind, ncat = object$ncat,
                                 ref = object$ref, lev = object$lev, measure = "gamma")
-    grad_mean <- apply(grads, 2, mean)
+    ## grad_mean <- apply(grads, 2, mean)
     se <- apply(grads, 1, function(x) sqrt(crossprod(x, (coef_vcov %*% x))))
-    se_mean <- sqrt(crossprod(grad_mean, (coef_vcov %*% grad_mean)))
+    ## se_mean <- sqrt(crossprod(grad_mean, (coef_vcov %*% grad_mean)))
     ## Confidence intervals as in Agresti and Kateri
     a <- 1/2 + level/2
     pct <- stats:::format.perc(c(1 - a, a), 3)
     lsd <- drop(qnorm(a) * se / (gammas * (1 - gammas)))
     ci <- qlogis(gammas) + cbind(rep(-1, nx),  1) * lsd
-    lsd_mean <- drop(qnorm(a) * se_mean / (mean_gammas * (1 - mean_gammas)))
-    ci_mean <- qlogis(mean_gammas) + c(-1, 1) * lsd_mean
+    ## lsd_mean <- drop(qnorm(a) * se_mean / (mean_gammas * (1 - mean_gammas)))
+    ## ci_mean <- qlogis(mean_gammas) + c(-1, 1) * lsd_mean
     if (isTRUE(measure == "Delta")) {
         out <- cbind(Xnoz, 2 * gammas - 1, 2 * se, 2 * plogis(ci) - 1)
-        out_mean <- c(2 * mean_gammas - 1, 2 * se_mean, 2 * plogis(ci_mean) - 1)
+        ## out_mean <- c(2 * mean_gammas - 1, 2 * se_mean, 2 * plogis(ci_mean) - 1)
         colnames(out)[ncol(Xnoz) + 1:4] <- c("Delta", "se", pct)
-        names(out_mean) <- c("Delta*", "se", pct)
+        ## names(out_mean) <- c("Delta*", "se", pct)
     }
     else {
         out <- cbind(Xnoz, gammas, se, plogis(ci))
-        out_mean <- c(mean_gammas, se_mean, plogis(ci_mean))
+        ## out_mean <- c(mean_gammas, se_mean, plogis(ci_mean))
         colnames(out)[ncol(Xnoz) + 1:4] <- c("gamma", "se", pct)
-        names(out_mean) <- c("gamma*", "se", pct)
+        ## names(out_mean) <- c("gamma*", "se", pct)
     }
-    list(individual = out, mean = out_mean)
+    ## list(individual = out, mean = out_mean)
+    out
 }
 
 ## X should be the covariate values where the ordsup is computed and a column for z. X is duplicated internally with z == 1 and z == 0
