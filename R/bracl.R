@@ -255,6 +255,9 @@ vcov.bracl <- function(object, ...) {
         vbeta <- vc[beta_names, beta_names]
         vint <- ddiff(vc[intercept_names, intercept_names])
         vintslo <- -diff(rbind(vc[intercept_names, beta_names], 0))
+        if (nrow(vintslo) == 1) {
+            vintslo <- drop(vintslo)
+        }
         par_names <- c(intercept_names, beta_names)
         vc[par_names, par_names] <- rbind(cbind(vint, vintslo),
                                           cbind(t(vintslo), vbeta))
