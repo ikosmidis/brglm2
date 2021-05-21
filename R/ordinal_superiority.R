@@ -58,7 +58,7 @@ ordinal_superiority.bracl <- function(object, formula, data,
     ## se_mean <- sqrt(crossprod(grad_mean, (coef_vcov %*% grad_mean)))
     ## Confidence intervals as in Agresti and Kateri
     a <- 1/2 + level/2
-    pct <- format.perc(c(1 - a, a), 3)
+    pct <- paste(format(100 * c(1 - a, a), trim = TRUE, scientific = FALSE, digits = 3), "%")
     lsd <- drop(qnorm(a) * se / (gammas * (1 - gammas)))
     ci <- qlogis(gammas) + cbind(rep(-1, nx),  1) * lsd
     ## lsd_mean <- drop(qnorm(a) * se_mean / (mean_gammas * (1 - mean_gammas)))
