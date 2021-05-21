@@ -550,9 +550,37 @@ confint.brmultinom <- function (object, parm, level = 0.95, ...)  {
 }
 
 
-#' Method for simulating data sets from \code{\link{brmultinom}} and
+#' Method for simulating a data set from \code{\link{brmultinom}} and
 #' \code{\link{bracl}} objects
 #'
+#' @param object an object of class \code{\link{brmultinom}} or
+#'     \code{\link{bracl}}.
+#' @param ... currently not used.
+#'
+#' @return
+#'
+#' A \code{\link{data.frame}} with \code{object$ncat} times the rows
+#' that \code{model.frame(object)} have and the same variables. If
+#' \code{weights} has been specified in the call that generated
+#' \code{object}, then the simulate frequencies will populate the
+#' weights variable. Otherwise, the resulting \code{data.frame} will
+#' have a \code{".weights"} variable with the simulated multinomial
+#' counts.
+#'
+#' @examples
+#'
+#' ## Multinomial logistic regression
+#' data("housing", package = "MASS")
+#' houseML1 <- brmultinom(Sat ~ Infl + Type + Cont, weights = Freq,
+#'                        data = housing, type = "ML", ref = 1)
+#' simulate(houseML1)
+#'
+#' ## Adjacent-category logits
+#' data("stemcell", package = "brglm2")
+#' stemML1 <- bracl(research ~ religion + gender, weights = frequency,
+#'                 data = stemcell, type = "ML")
+#'
+#' simulate(stemML1)
 #'
 #' @export
 simulate.brmultinom <- function(object, ...) {
