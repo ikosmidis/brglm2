@@ -82,9 +82,9 @@
 #' package version 0.1-3.
 #' \url{https://CRAN.R-project.org/package=safeBinaryRegression}
 #'
-#' Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+#' Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 #' and shrinkage in binomial-response generalized linear
-#' models. *Biometrika* \doi{10.1093/biomet/asaa052}
+#' models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
 #'
 #' @examples
 #'

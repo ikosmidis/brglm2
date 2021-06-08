@@ -67,9 +67,9 @@
 #'
 #' @references
 #'
-#' Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+#' Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 #' and shrinkage in binomial-response generalized linear
-#' models. *Biometrika* \doi{10.1093/biomet/asaa052}
+#' models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
 #'
 #' Cordeiro G M, McCullagh P (1991). Bias correction in generalized
 #' linear models. *Journal of the Royal Statistical Society. Series B
@@ -106,9 +106,12 @@
 #' @importFrom graphics plot
 #' @importFrom nnet class.ind
 #' @importFrom numDeriv grad
-#'
+#' @useDynLib brglm2
 #'
 NULL
+
+## NAMESPACE should have import(stats), import(Matrix)
+
 
 ## Suggestion by Kurt Hornik to avoid a warning related to the binding
 ## of n which is evaluated by family$initialize

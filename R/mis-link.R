@@ -13,7 +13,6 @@
 #  A copy of the GNU General Public License is available at
 #  http://www.r-project.org/Licenses/
 
-
 #' A \code{link-glm} object for misclassified responses in binomial regression models
 #'
 #' \code{\link{mis}} is a \code{link-glm} object that specifies the link function in Neuhaus (1999, expression~(8)) for handling misclassified responses in binomial regression models using maximum likelihood. A prior specification of the sensitivity and specificity is required.
