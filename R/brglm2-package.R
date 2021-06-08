@@ -117,33 +117,6 @@ NULL
 ## of n which is evaluated by family$initialize
 if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 
-#' Generic method for checking for infinite estimates
-#' @param object a fitted model object (e.g. the result of a
-#'     \code{\link{glm}} call).
-#' @param ... other options to be passed to the method.
-#'
-#'
-#' @note
-#'
-#'
-#' \code{check_infinite_estimates} will be removed from \pkg{brglm2}
-#' at version 0.8. An new version of
-#' \code{check_infinite_estimates} is now maintained in the
-#' \pkg{detectseparation} R package at
-#' \url{https://cran.r-project.org/package=detectseparation}.
-#'
-#' @seealso check_infinite_estimates.glm
-#'
-#' @export
-check_infinite_estimates <- function(object, ...) {
-    function_moves_to_new_package(gsub("\\(|\\)", "", deparse(match.call()[1])),
-                                  "0.8",
-                                  "brglm2",
-                                  "detectseparation")
-    UseMethod("check_infinite_estimates")
-}
-
-
 #' Ordinal superiority scores of Agresti and Kateri (2017)
 #'
 #' \code{\link{ordinal_superiority}} is a method for the estimation
@@ -196,7 +169,7 @@ check_infinite_estimates <- function(object, ...) {
 #' Agresti, A., Kateri, M. (2017). Ordinal probability effect measures
 #' for group comparisons in multinomial cumulative link models.
 #' *Biometrics*, **73** 214-219 #' \doi{10.1111/biom.12565}
-#'
+#' @export
 ordinal_superiority <- function(object, formula, data,
                                 measure = c("gamma", "Delta"),
                                 level = 0.95,
