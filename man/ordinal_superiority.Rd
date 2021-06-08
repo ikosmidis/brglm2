@@ -67,7 +67,8 @@ fit_bracl_p <- bracl(research ~ nreligion + gender, weights = frequency,
 ordinal_superiority(fit_bracl_p, ~ gender)
 
 \dontrun{
-# And their bias corrected versions with 99\% CIs
+# And their (very-similar in value here) bias corrected versions
+# with 99\% CIs
 ordinal_superiority(fit_bracl_p, ~ gender, bc = TRUE, level = 0.99)
 # Note that the object is refitted with type = "AS_mean"
 
