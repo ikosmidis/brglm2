@@ -233,11 +233,19 @@ coef(fitBR_mean, model = "dispersion")
 \donttest{
 ## An example  from Venables & Ripley (2002, p.169).
 data("quine", package = "MASS")
-quineML <- brnb(Days ~ Sex/(Age + Eth*Lrn), link = "sqrt", transformation="inverse", data = quine, type="ML")
+quineML <- brnb(Days ~ Sex/(Age + Eth*Lrn), link = "sqrt", transformation="inverse",
+                data = quine, type="ML")
 quineBR_mean <- update(quineML, type = "AS_mean")
 quineBR_median <- update(quineML, type = "AS_median")
 quineBR_mixed <- update(quineML, type = "AS_mixed")
 quine_Jeffreys <- update(quineML, type = "MPL_Jeffreys")
+
+fits <- list(ML = quineML,
+             AS_mean = quineBR_mean,
+             AS_median = quineBR_median,
+             AS_mixed = quineBR_mixed,
+             MPL_Jeffreys = quine_Jeffreys)
+sapply(fits, coef, model = "full")
 }
 
 }
@@ -258,4 +266,7 @@ reduction in generalized linear models. *Statistics and Computing*, **30** 43--5
 
 Kosmidis I and Firth D (2009). Bias reduction in exponential family
 nonlinear models. *Biometrika*, **96**, 793-804.
+}
+\author{
+Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}, Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}
 }

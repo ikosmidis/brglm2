@@ -10,7 +10,7 @@
 \item{object}{an object for which the extraction of model coefficients is
     meaningful.}
 
-\item{model}{one of \code{"mean"} (default), \code{"full"}, \code{"dispersion"}, 
+\item{model}{one of \code{"mean"} (default), \code{"full"}, \code{"dispersion"},
 to return the estimates of the parameters in the linear
 prediction only, or both, the estimate of the dispersion parameter only,
  respectively.}

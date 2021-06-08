@@ -165,13 +165,21 @@
 #' \donttest{
 #' ## An example  from Venables & Ripley (2002, p.169).
 #' data("quine", package = "MASS")
-#' quineML <- brnb(Days ~ Sex/(Age + Eth*Lrn), link = "sqrt", transformation="inverse", data = quine, type="ML")
+#' quineML <- brnb(Days ~ Sex/(Age + Eth*Lrn), link = "sqrt", transformation="inverse",
+#'                 data = quine, type="ML")
 #' quineBR_mean <- update(quineML, type = "AS_mean")
 #' quineBR_median <- update(quineML, type = "AS_median")
 #' quineBR_mixed <- update(quineML, type = "AS_mixed")
 #' quine_Jeffreys <- update(quineML, type = "MPL_Jeffreys")
+#'
+#' fits <- list(ML = quineML,
+#'              AS_mean = quineBR_mean,
+#'              AS_median = quineBR_median,
+#'              AS_mixed = quineBR_mixed,
+#'              MPL_Jeffreys = quine_Jeffreys)
+#' sapply(fits, coef, model = "full")
 #' }
-#' 
+#'
 #' @export
 brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                  link = "log", start = NULL, etastart = NULL,
@@ -860,7 +868,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
 #'
 #'
 #' @inheritParams stats::coef
-#' @param model one of \code{"mean"} (default), \code{"full"}, \code{"dispersion"}, 
+#' @param model one of \code{"mean"} (default), \code{"full"}, \code{"dispersion"},
 #'     to return the estimates of the parameters in the linear
 #'     prediction only, or both, the estimate of the dispersion parameter only,
 #'      respectively.
@@ -880,7 +888,7 @@ coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
 #'
 #'
 #' @inheritParams stats::vcov.glm
-#' @param object an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.  
+#' @param object an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.
 #' @param model character specifying for which component of the model variance-covariance matrix should be extracted.
 #'
 #' @details
@@ -906,7 +914,7 @@ vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete 
 #' \code{summary} method for \code{\link{brnb}} objects
 #'
 #' @inheritParams stats::summary.glm
-#' @param object an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.  
+#' @param object an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.
 #' @details The interface of the summary method for
 #'     \code{\link{brnb}} objects is similar to that of
 #'     \code{\link{brglmFit}} objects with minor additional informations. The summary method for
@@ -918,7 +926,7 @@ vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete 
 #'
 #' @examples
 #' ## For examples see examples(brnb)
-#' 
+#'
 #' @method summary brnb
 #' @export
 summary.brnb <- function(object, ...) {
@@ -948,9 +956,9 @@ summary.brnb <- function(object, ...) {
 }
 
 #' Summarizing Linear Model Fits
-#' 
-#' print summary output for class "brnb". 
-#' 
+#'
+#' print summary output for class "brnb".
+#'
 #' @param x an object of class "summary.brnb", usually, a result of a call to summary.brnb.
 #' @param digits the number of significant digits to use when printing.
 #' @details \code{print.summary.brnb} tries to be smart about formatting the coefficients,
@@ -959,7 +967,7 @@ summary.brnb <- function(object, ...) {
 #' standard errors, together with their ratio. The latter column is labelled \code{z} ratio.
 #' A fourth column gives the two-tailed p-value corresponding to the \code{z} ratio
 #' based on Normal reference distribution.
-#' 
+#'
 #' @method print summary.brnb
 #' @export
 print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
@@ -1041,12 +1049,12 @@ confint.brnb <- function(object, parm, level = 0.95, ...) {
 }
 
 #' Simulate Responses
-#' 
-#' Simulate one or more responses from the distribution 
+#'
+#' Simulate one or more responses from the distribution
 #' corresponding to a fitted model \code{brnb} object.
-#' @param object an object representing a fitted model. 
+#' @param object an object representing a fitted model.
 #' @param nsim number of response vectors to simulate. Defaults to 1.
-#' @param seed an object specifying if and how the random 
+#' @param seed an object specifying if and how the random
 #' number generator should be initialized (``seeded'').
 
 #' @examples
@@ -1057,23 +1065,23 @@ confint.brnb <- function(object, parm, level = 0.95, ...) {
 #' Frequency distribution of red mites on apple leaves.
 #' nomites=0:8
 #' noleaves=c(70, 38, 17, 10, 9, 3, 2, 1, 0)
-#' fit_glmnb = MASS::glm.nb(nomites~1,link="identity",weights = noleaves) 
+#' fit_glmnb = MASS::glm.nb(nomites~1,link="identity",weights = noleaves)
 #' fit_brnb <- brnb(nomites~1,link="identity",transformation="inverse"
 #'              ,type = "ML",weights = noleaves)
-#' ## Let us simulate 10 response vectors 
-#' sim_glmnb <- simulate(fit_glmnb, nsim = 10, seed = 123)  
-#' sim_brnb <-  simulate(fit_brnb, nsim = 10, seed = 123) 
+#' ## Let us simulate 10 response vectors
+#' sim_glmnb <- simulate(fit_glmnb, nsim = 10, seed = 123)
+#' sim_brnb <-  simulate(fit_brnb, nsim = 10, seed = 123)
 #' # The results  from glm.nb and brnb with type = "ML" are
 #' # exactly the same
-#' all.equal(sim_glmnb, sim_brnb, check.attributes = FALSE)             
+#' all.equal(sim_glmnb, sim_brnb, check.attributes = FALSE)
 
 
 #' @method simulate brnb
 #' @export
 simulate.brnb <- function(object, nsim = 1, seed = NULL) {
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
+  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
     runif(1)
-  if (is.null(seed)) 
+  if (is.null(seed))
     RNGstate <- get(".Random.seed", envir = .GlobalEnv)
   else {
     R.seed <- get(".Random.seed", envir = .GlobalEnv)
