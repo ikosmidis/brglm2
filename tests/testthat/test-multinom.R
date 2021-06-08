@@ -27,8 +27,8 @@ expect_warning(
 )
 
 test_that("ML fails when there is separation", {
-    expect_error(brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML"),
-        regex = "NA/NaN/Inf in foreign function")
+    expect_warning(brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML"),
+        regex = "algorithm did not converge|failed to calculate score adjustment")
 })
 
 
