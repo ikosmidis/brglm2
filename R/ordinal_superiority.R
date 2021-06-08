@@ -24,7 +24,7 @@ ordinal_superiority.bracl <- function(object, formula, data,
     measure <- match.arg(measure)
     ## If bc is TRUE and object is not a reduced mean-bias fit then
     ## compute reduced mean-bias estimators.
-    if (!is(object, "bracl")) {
+    if (!inherits(object, "bracl")) {
         stop("ordinal superiority measures are not available for objects of class ", class(object)[1])
     }
     if (!isTRUE(object$parallel)) {

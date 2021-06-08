@@ -964,7 +964,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 
                     quantities <- try(key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE), silent = TRUE)
                     ## This is to capture qr failing and revering to previous estimates
-                    if (failed_adjustment_beta <- is(quantities, "try-error")) {
+                    if (failed_adjustment_beta <- inherits(quantities, "try-error")) {
                         betas <- betas0; dispersion <- dispersion0
                         warning("failed to calculate score adjustment")
                         break
