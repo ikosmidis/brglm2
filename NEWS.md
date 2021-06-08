@@ -1,7 +1,6 @@
-# brglm2 0.7.2
+# brglm2 0.8.0
 
 ## Bug fixes
-
 
 * Fixed a bug that would return an error when `Wald.ratios = TRUE` in
   `summary.brmultinom`.
@@ -17,11 +16,16 @@
   
 ## New functionality
 
+* `brnb()` allows fitting negative binomial regression models using
+  implicit and explicit bias reduction methods.
 * `simulate()` method for objects of class `brmultinom` and `bracl`
 * `ordinal_superiority()` method to estimate Agresti and Kateri
   (2017)'s ordinal superiority measures, and compute bias corrections
   for those.
 
+## Other improvements, updates and additions
+
+* Documentation and example updates.
 
 # brglm2 0.7.1
 
