@@ -6,27 +6,13 @@
 \alias{detect_separation}
 \title{Defunct Functions in package \pkg{brglm2}}
 \usage{
-check_infinite_estimates(object, ...)
+check_infinite_estimates(...)
 
-detect_separation(
-  x,
-  y,
-  weights = rep(1, nobs),
-  start = NULL,
-  etastart = NULL,
-  mustart = NULL,
-  offset = rep(0, nobs),
-  family = gaussian(),
-  control = list(),
-  intercept = TRUE,
-  singular.ok = TRUE
-)
+detect_separation(...)
 }
-\description{
-The functions or variables listed here are no longer part of
- \pkg{brglm2}.
-}
-\details{
+\arguments{
+\item{...}{arguments to be passed to functions and methods.
+
 \itemize{
 
 \item \code{\link{detect_separation}}: This function is defunct
@@ -41,5 +27,9 @@ from \pkg{brglm2} since version 0.8.0. A new version of
 \pkg{detectseparation} R package at
 \url{https://cran.r-project.org/package=detectseparation}.
 
+}}
 }
+\description{
+The functions or variables listed here are no longer part of
+ \pkg{brglm2}.
 }

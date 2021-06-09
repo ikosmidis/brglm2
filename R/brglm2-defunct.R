@@ -3,6 +3,9 @@
 #'  The functions or variables listed here are no longer part of
 #'  \pkg{brglm2}.
 #'
+#'
+#' @param ... arguments to be passed to functions and methods.
+#'
 #' \itemize{
 #'
 #' \item \code{\link{detect_separation}}: This function is defunct
@@ -23,7 +26,7 @@ NULL
 
 #' @rdname brglm2-defunct
 #' @export
-check_infinite_estimates <- function(object, ...) {
+check_infinite_estimates <- function(...) {
     function_moved_to_new_package(gsub("\\(|\\)", "", deparse(match.call()[1])),
                                   "0.8.0",
                                   "brglm2",
@@ -32,10 +35,7 @@ check_infinite_estimates <- function(object, ...) {
 
 #' @rdname brglm2-defunct
 #' @export
-detect_separation <- function(x, y, weights = rep(1, nobs),
-                             start = NULL, etastart = NULL,  mustart = NULL,
-                             offset = rep(0, nobs), family = gaussian(),
-                             control = list(), intercept = TRUE, singular.ok = TRUE) {
+detect_separation <- function(...) {
     function_moved_to_new_package(gsub("\\(|\\)", "", deparse(match.call()[1])),
                                   "0.8.0",
                                   "brglm2",
