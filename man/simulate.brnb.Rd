@@ -4,7 +4,7 @@
 \alias{simulate.brnb}
 \title{Simulate Responses}
 \usage{
-\method{simulate}{brnb}(object, nsim = 1, seed = NULL)
+\method{simulate}{brnb}(object, nsim = 1, seed = NULL, ...)
 }
 \arguments{
 \item{object}{an object representing a fitted model.}

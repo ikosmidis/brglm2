@@ -10,6 +10,8 @@
 \item{x}{an object of class "summary.brnb", usually, a result of a call to summary.brnb.}
 
 \item{digits}{the number of significant digits to use when printing.}
+
+\item{...}{extra arguments to passed to methods. Not used currently.}
 }
 \description{
 print summary output for class "brnb".

@@ -961,6 +961,7 @@ summary.brnb <- function(object, ...) {
 #'
 #' @param x an object of class "summary.brnb", usually, a result of a call to summary.brnb.
 #' @param digits the number of significant digits to use when printing.
+#' @param ... extra arguments to passed to methods. Not used currently.
 #' @details \code{print.summary.brnb} tries to be smart about formatting the coefficients,
 #' standard errors, and additionally gives "significant stars". The \code{coefficients}
 #' components of the result gives the estimated coefficients and their estimated
@@ -1078,7 +1079,7 @@ confint.brnb <- function(object, parm, level = 0.95, ...) {
 
 #' @method simulate brnb
 #' @export
-simulate.brnb <- function(object, nsim = 1, seed = NULL) {
+simulate.brnb <- function(object, nsim = 1, seed = NULL, ...) {
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
     runif(1)
   if (is.null(seed))
