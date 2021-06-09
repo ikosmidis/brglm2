@@ -13,6 +13,8 @@
 
 \item{seed}{an object specifying if and how the random
 number generator should be initialized (``seeded'').}
+
+\item{...}{extra arguments to be passed to methods. Not currently used.}
 }
 \description{
 Simulate one or more responses from the distribution

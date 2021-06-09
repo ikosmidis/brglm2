@@ -1057,6 +1057,7 @@ confint.brnb <- function(object, parm, level = 0.95, ...) {
 #' @param nsim number of response vectors to simulate. Defaults to 1.
 #' @param seed an object specifying if and how the random
 #' number generator should be initialized (``seeded'').
+#' @param ... extra arguments to be passed to methods. Not currently used.
 
 #' @examples
 #' # Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
