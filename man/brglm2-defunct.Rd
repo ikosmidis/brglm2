@@ -11,8 +11,13 @@ check_infinite_estimates(...)
 detect_separation(...)
 }
 \arguments{
-\item{...}{arguments to be passed to functions and methods.
-
+\item{...}{arguments to be passed to functions and methods.}
+}
+\description{
+The functions or variables listed here are no longer part of
+ \pkg{brglm2}.
+}
+\details{
 \itemize{
 
 \item \code{\link{detect_separation}}: This function is defunct
@@ -27,9 +32,5 @@ from \pkg{brglm2} since version 0.8.0. A new version of
 \pkg{detectseparation} R package at
 \url{https://cran.r-project.org/package=detectseparation}.
 
-}}
 }
-\description{
-The functions or variables listed here are no longer part of
- \pkg{brglm2}.
 }

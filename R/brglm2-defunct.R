@@ -6,6 +6,9 @@
 #'
 #' @param ... arguments to be passed to functions and methods.
 #'
+#'
+#' @details
+#'
 #' \itemize{
 #'
 #' \item \code{\link{detect_separation}}: This function is defunct
