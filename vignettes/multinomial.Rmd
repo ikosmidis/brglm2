@@ -78,10 +78,11 @@ summary(all_ml_sparse)
 ```
 Specifically, judging from the estimated standard errors, the estimates for `(Intercept)`, `lakeHancock`, `lakeOklawaha` and `lakeTrafford` for `Reptile` and `lakeHancock` for `Bird` seem to be infinite.
 
-To quickly check if that's indeed the case we can use the `check_infinite_estimates` method (see, also the [`separation`](https://cran.r-project.org/package=brglm2/vignettes/separation.html) vignette).
+To quickly check if that's indeed the case we can use the `check_infinite_estimates` method of the [**detectseparation**][https://cran.r-project.org/package=detectseparation] R package.
 ```{r, echo = TRUE}
+library("detectseparation")
 se_ratios <- check_infinite_estimates(all_ml_sparse)
-matplot(se_ratios, type = "l", lty = 1, ylim = c(0.5, 1.5), xlab = "Iteration")
+plot(se_ratios)
 ```
 
 Some of the estimated standard errors diverge as the number of Fisher scoring iterations increases, which is evidence of complete or quasi-complete separation [@lesaffre:89].
