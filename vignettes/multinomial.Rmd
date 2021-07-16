@@ -21,9 +21,9 @@ knitr::opts_chunk$set(
 
 
 # **brmultinom**
-The [**brglm2**](https://github.com/ikosmidis/brglm2) R package provides `brmultinom` which is a wrapper of `brglmFit` for fitting multinomial logistic regression models (a.k.a. baseline category logit models) using either maximum likelihood or maximum penalized likelihood or any of the various bias reduction methods described in `brglmFit`. `brmultinom` uses the equivalent Poisson log-linear model, by appropriately re-scaling the Poisson means to match the multinomial totals (a.k.a. the "Poisson trick"). The mathematical details and algorithm on using the Poisson trick for mean-bias reduction are given in @kosmidis:11.
+The [**brglm2**](https://github.com/ikosmidis/brglm2) R package provides `brmultinom()` which is a wrapper of `brglmFit` for fitting multinomial logistic regression models (a.k.a. baseline category logit models) using either maximum likelihood or maximum penalized likelihood or any of the various bias reduction methods described in `brglmFit()`. `brmultinom()` uses the equivalent Poisson log-linear model, by appropriately re-scaling the Poisson means to match the multinomial totals (a.k.a. the "Poisson trick"). The mathematical details and algorithm on using the Poisson trick for mean-bias reduction are given in @kosmidis:11.
 
-This vignettes illustrates the use of `brmultinom` and of the associated methods, using the alligator food choice example in @agresti:02[, Section 7.1]
+This vignettes illustrates the use of `brmultinom()` and of the associated methods, using the alligator food choice example in @agresti:02[, Section 7.1]
 
 # Alligator data
 
@@ -78,7 +78,7 @@ summary(all_ml_sparse)
 ```
 Specifically, judging from the estimated standard errors, the estimates for `(Intercept)`, `lakeHancock`, `lakeOklawaha` and `lakeTrafford` for `Reptile` and `lakeHancock` for `Bird` seem to be infinite.
 
-To quickly check if that's indeed the case we can use the `check_infinite_estimates` method of the [**detectseparation**][https://cran.r-project.org/package=detectseparation] R package.
+To quickly check if that's indeed the case we can use the `check_infinite_estimates()` method of the [**detectseparation**][https://cran.r-project.org/package=detectseparation] R package.
 ```{r, echo = TRUE}
 library("detectseparation")
 se_ratios <- check_infinite_estimates(all_ml_sparse)
