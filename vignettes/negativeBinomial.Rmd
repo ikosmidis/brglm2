@@ -51,6 +51,7 @@ using the various estimation methods that `brnb()` supports.
 
 
 ```{r, echo = TRUE}
+library("brglm2")
 ames_ML <- brnb(ames_f, link = "log", data = salmonella,
                 transformation = "identity",  type = "ML")
 ## Estimated regression and dispersion parameters
