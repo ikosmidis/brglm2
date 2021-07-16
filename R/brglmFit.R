@@ -74,13 +74,13 @@
 #' that are also always finite, even in cases where the maximum
 #' likelihood estimates are infinite (e.g. complete and quasi-complete
 #' separation in multinomial regression). See, Kosmidis and Firth
-#' (2021) for a proof for binomial-response GLMs with Jeffreys-pior
+#' (2021) for a proof for binomial-response GLMs with Jeffreys-prior
 #' penalties to the log-likelihood, which is equivalent to mean bias
 #' reduction for logistic regression. See, also,
 #' \code{\link[detectseparation]{detect_separation}} and
-#' \code{\link[detectseparation]{check_infinite_estimates}} for pre-fit and post-fit
-#' methods for the detection of infinite estimates in binomial
-#' response generalized linear models.
+#' \code{\link[detectseparation]{check_infinite_estimates}} for
+#' pre-fit and post-fit methods for the detection of infinite
+#' estimates in binomial response generalized linear models.
 #'
 #' The type of score adjustment to be used is specified through the
 #' \code{type} argument (see \code{\link{brglmControl}} for

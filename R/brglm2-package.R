@@ -134,7 +134,7 @@ if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 #'     omitted, an attempt is made to use the data that produced
 #'     \code{object}.
 #' @param measure either \code{"gamma"} (default) or \code{"Delta"},
-#'     specificying the ordinal superiority measure to be returned.
+#'     specifying the ordinal superiority measure to be returned.
 #' @param level the confidence level required when computing
 #'     confidence intervals for the ordinal superiority measures.
 #' @param bc logical. If \code{FALSE} (default) then the ordinal

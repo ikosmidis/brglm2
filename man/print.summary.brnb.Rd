@@ -7,20 +7,25 @@
 \method{print}{summary.brnb}(x, digits = max(3, getOption("digits") - 3), ...)
 }
 \arguments{
-\item{x}{an object of class "summary.brnb", usually, a result of a call to summary.brnb.}
+\item{x}{an object of class "summary.brnb", usually, a result of a
+call to summary.brnb.}
 
-\item{digits}{the number of significant digits to use when printing.}
+\item{digits}{the number of significant digits to use when
+printing.}
 
-\item{...}{extra arguments to passed to methods. Not used currently.}
+\item{...}{extra arguments to passed to methods. Not used
+currently.}
 }
 \description{
 print summary output for class "brnb".
 }
 \details{
-\code{print.summary.brnb} tries to be smart about formatting the coefficients,
-standard errors, and additionally gives "significant stars". The \code{coefficients}
-components of the result gives the estimated coefficients and their estimated
-standard errors, together with their ratio. The latter column is labelled \code{z} ratio.
-A fourth column gives the two-tailed p-value corresponding to the \code{z} ratio
-based on Normal reference distribution.
+\code{print.summary.brnb} tries to be smart about
+    formatting the coefficients, standard errors, and additionally
+    gives "significant stars". The \code{coefficients} components
+    of the result gives the estimated coefficients and their
+    estimated standard errors, together with their ratio
+    (\code{z}). A fourth column gives the two-tailed p-value
+    corresponding to the \code{z} statistica based on Normal
+    reference distribution.
 }

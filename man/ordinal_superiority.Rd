@@ -36,7 +36,7 @@ omitted, an attempt is made to use the data that produced
 \code{object}.}
 
 \item{measure}{either \code{"gamma"} (default) or \code{"Delta"},
-specificying the ordinal superiority measure to be returned.}
+specifying the ordinal superiority measure to be returned.}
 
 \item{level}{the confidence level required when computing
 confidence intervals for the ordinal superiority measures.}
