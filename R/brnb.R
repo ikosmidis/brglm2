@@ -19,35 +19,32 @@
 #' implicit and explicit bias reduction methods.
 #'
 #' @inheritParams stats::glm
-#' @param link The link function.  Currently must be one of
-#'     \code{log}, \code{sqrt} or \code{identity}.
+#' @param link The link function. Currently must be one of \code{log},
+#'     \code{sqrt} or \code{identity}.
 #' @param control a list of parameters for controlling the fitting
 #'     process. See \code{\link{brglmControl}} for details.
 #' @return A fitted model object of class \code{brnb} inheriting from
-#'     \code{negbin} and \code{brglmFit}.  The object is like the
-#'     output of \code{brglmFit} but contains four additional
-#'     components, namely \code{theta} for the ML estimate of
-#'     dispersion parameter as in \code{glm.nb}, \code{vcov.mean} for
-#'     the estimated variance covariance matrix of the regression
-#'     coefficients while \code{vcov.dispersion} for the estimated
-#'     variance of the dispersion parameter in a chosen
-#'     parameterization (using the expected information) and
-#'     \code{twologlik} for twice the log-likelihood function.
+#'     \code{negbin} and \code{brglmFit}. The object is similar to the
+#'     output of \code{\link{brglmFit}} but contains four additional
+#'     components: \code{theta} for the maximum likelihood estimate of
+#'     the dispersion parameter as in \code{\link[MASS]{glm.nb}}, \code{vcov.mean}
+#'     for the estimated variance-covariance matrix of the regression
+#'     coefficients, \code{vcov.dispersion} for the estimated variance
+#'     of the dispersion parameter in the chosen parameterization
+#'     (using the expected information), and \code{twologlik} for
+#'     twice the log-likelihood function.
 #'
 #' @details
 #'
-#' Thanks to the orthogonality between coefficients and dispersion
-#' parameter, the alternate quasi Fisher scoring iteration is used. A
-#' detailed description of the procedure is given in the iteration
-#' vignette (see, \code{vignette("iteration", "brglm2")} or Kosmidis
-#' et al, 2020). The number of alternations and the number of
-#' iterations when estimating parameters are controlled by the
-#' \code{maxit} argument of \code{brglmControl}.
-#'
-#' IK, 20 Apr 2021: Fix terminology "alternate quasi Fisher scoring"
+#' A detailed description of the fitting procedure is given in the
+#' iteration vignette (see, \code{vignette("iteration", "brglm2")} and
+#' Kosmidis et al, 2020). The number of iterations when estimating
+#' parameters are controlled by the \code{maxit} argument of
+#' \code{\link{brglmControl}}.
 #'
 #' The type of score adjustment to be used is specified through the
 #' \code{type} argument (see \code{\link{brglmControl}} for details).
+#'
 #' The available options are:
 #'
 #' \itemize{
@@ -76,8 +73,8 @@
 #' The choice of the parameterization for the dispersion is controlled
 #' by the \code{transformation} argument (see
 #' \code{\link{brglmControl}} for details).  The default is
-#' \code{identity} but using option \code{inverse} produces the
-#' results as in \code{glm.nb}.
+#' \code{"identity"}. Using \code{transformation = "inverse"} uses the
+#' dispersion parameterization that \code{\link[MASS]{glm.nb}} uses.
 #'
 #' @author Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}, Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}
 #'
