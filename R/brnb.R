@@ -13,10 +13,10 @@
 #  A copy of the GNU General Public License is available at
 #  http://www.r-project.org/Licenses/
 
-#' Bias reduction for negative binomial regression model.
+#' Bias reduction for negative binomial regression models
 #'
-#' \code{brnb} is a function that fits negative regression model using
-#' implicit and explicit bias reduction methods.
+#' \code{brnb} is a function that fits negative binomial regression
+#' models using implicit and explicit bias reduction methods.
 #'
 #' @inheritParams stats::glm
 #' @param link The link function. Currently must be one of \code{log},

@@ -2,7 +2,7 @@
 % Please edit documentation in R/brnb.R
 \name{brnb}
 \alias{brnb}
-\title{Bias reduction for negative binomial regression model.}
+\title{Bias reduction for negative binomial regression models}
 \usage{
 brnb(
   formula,
@@ -121,8 +121,8 @@ A fitted model object of class \code{brnb} inheriting from
     twice the log-likelihood function.
 }
 \description{
-\code{brnb} is a function that fits negative regression model using
-implicit and explicit bias reduction methods.
+\code{brnb} is a function that fits negative binomial regression
+models using implicit and explicit bias reduction methods.
 }
 \details{
 A detailed description of the fitting procedure is given in the
