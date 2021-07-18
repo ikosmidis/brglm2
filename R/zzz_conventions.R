@@ -1,3 +1,18 @@
+# Copyright (C) 2017-2021 Ioannis Kosmidis
+
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 or 3 of the License
+#  (at your option).
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  A copy of the GNU General Public License is available at
+#  http://www.r-project.org/Licenses/
+
 ## Some convenience names
 
 #' @rdname brglmControl
@@ -7,17 +22,6 @@ brglm_control <- brglmControl
 #' @rdname brglmFit
 #' @export
 brglm_fit <- brglmFit
-
-#' @rdname detect_separation
-#' @export
-detectSeparation <- detect_separation
-
-#' @rdname detect_separation_control
-#' @export
-detectSeparationControl <- detect_separation_control
-
-#' @export
-checkInfiniteEstimates <- check_infinite_estimates
 
 #### Method conventions
 

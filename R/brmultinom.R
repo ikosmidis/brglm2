@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2020 Ioannis Kosmidis
+# Copyright (C) 2016-2021 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -356,7 +356,7 @@ summary.brmultinom <- function(object, correlation = FALSE, digits = options()$d
         object$standard.errors <- ses
         ## object$AIC <- AIC(object)
         if (Wald.ratios) {
-            object$Wald.ratios <- coef/ses
+            object$Wald.ratios <- coefficients/ses
             object$Wald.pvalues <-  2 * pnorm(-abs(object$Wald.ratios))
         }
         if (correlation)
@@ -461,27 +461,16 @@ predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
     if (!inherits(object, "brmultinom"))
         stop("not a \"brmultinom\" fit")
     type <- match.arg(type)
-    if (missing(newdata))
-        Y <- fitted(object)
-    else {
-        newdata <- as.data.frame(newdata)
-        rn <- row.names(newdata)
-        Terms <- delete.response(object$terms)
-        m <- model.frame(Terms, newdata, na.action = na.omit,
-            xlev = object$xlevels)
-        if (!is.null(cl <- attr(Terms, "dataClasses")))
-            .checkMFClasses(cl, m)
-        keep <- match(row.names(m), rn)
-        X <- model.matrix(Terms, m, contrasts = object$contrasts)
-
-        coefs <- coef(object)
-        fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn[keep], object$lev))
-        fits1 <- apply(coefs, 1, function(b) X %*% b)
-        fits[, rownames(coefs)] <- fits1
-        Y1 <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
-        Y <- matrix(NA, nrow(newdata), ncol(Y1), dimnames = list(rn, colnames(Y1)))
-        Y[keep, ] <- Y1
-    }
+    X <- if (missing(newdata)) model.matrix(object) else model.matrix(object, data = newdata)
+    rn <- attr(X, "rn_data")
+    keep <- attr(X, "rn_kept")
+    coefs <- coef(object)
+    fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn[keep], object$lev))
+    fits1 <- apply(coefs, 1, function(b) X %*% b)
+    fits[, rownames(coefs)] <- fits1
+    Y1 <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
+    Y <- matrix(NA, length(rn), ncol(Y1), dimnames = list(rn, colnames(Y1)))
+    Y[keep, ] <- Y1
     switch(type, class = {
         if (length(object$lev) > 2L) Y <- factor(max.col(Y),
             levels = seq_along(object$lev), labels = object$lev)
@@ -493,6 +482,30 @@ predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
     })
     drop(Y)
 }
+
+#' @method model.matrix brmultinom
+#' @export
+model.matrix.brmultinom <- function(object, data, ...) {
+    if (!inherits(object, "brmultinom"))
+        stop("not a \"brmultinom\" fit")
+    if (missing(data)) {
+        data <- model.frame(object)
+    }
+    else {
+        data <- as.data.frame(data)
+    }
+    Terms <- delete.response(object$terms)
+    m <- model.frame(Terms, data, na.action = na.omit,
+                     xlev = object$xlevels)
+    if (!is.null(cl <- attr(Terms, "dataClasses")))
+        .checkMFClasses(cl, m)
+    X <- model.matrix(Terms, m, contrasts = object$contrasts)
+    rn <- row.names(data)
+    attr(X, "rn_data") <- rn
+    attr(X, "rn_kept") <-  match(row.names(m), rn)
+    X
+}
+
 
 #' Method for computing confidence intervals for one or more
 #' regression parameters in a \code{\link{brmultinom}} object
@@ -534,4 +547,64 @@ confint.brmultinom <- function (object, parm, level = 0.95, ...)  {
         ci[] <- cf[parm] + ses %o% fac
         ci
     }
+}
+
+
+#' Method for simulating a data set from \code{\link{brmultinom}} and
+#' \code{\link{bracl}} objects
+#'
+#' @param object an object of class \code{\link{brmultinom}} or
+#'     \code{\link{bracl}}.
+#' @param ... currently not used.
+#'
+#' @return
+#'
+#' A \code{\link{data.frame}} with \code{object$ncat} times the rows
+#' that \code{model.frame(object)} have and the same variables. If
+#' \code{weights} has been specified in the call that generated
+#' \code{object}, then the simulate frequencies will populate the
+#' weights variable. Otherwise, the resulting \code{data.frame} will
+#' have a \code{".weights"} variable with the simulated multinomial
+#' counts.
+#'
+#' @examples
+#'
+#' ## Multinomial logistic regression
+#' data("housing", package = "MASS")
+#' houseML1 <- brmultinom(Sat ~ Infl + Type + Cont, weights = Freq,
+#'                        data = housing, type = "ML", ref = 1)
+#' simulate(houseML1)
+#'
+#' ## Adjacent-category logits
+#' data("stemcell", package = "brglm2")
+#' stemML1 <- bracl(research ~ religion + gender, weights = frequency,
+#'                 data = stemcell, type = "ML")
+#'
+#' simulate(stemML1)
+#'
+#' @export
+simulate.brmultinom <- function(object, ...) {
+    mf <- model.frame(object)
+    probs <- predict(object, type = "probs")
+    categories <- colnames(probs)
+    ncat <- object$ncat
+    weights <- model.weights(mf)
+    if (is.null(weights)) {
+        weights <- rep.int(1L, nrow(mf))
+    }
+    samples <- sapply(1:nrow(probs), function(j) rmultinom(1, weights[j], probs[j, ]))
+    mf <- mf[rep(1:nrow(mf), each = ncat), ]
+    mf[, 1] <- factor(colnames(probs),
+                      levels = levels(mf[, 1]),
+                      ordered = is.ordered(mf[, 1]))
+    weights_ind <- grep("(weights)", names(mf))
+    if (length(weights_ind)) {
+        weights_nam <- as.character(object$call$weights)
+        names(mf)[weights_ind] <- weights_nam
+    }
+    else {
+        weights_nam <- ".weights"
+    }
+    mf[[weights_nam]] <- c(samples)
+    mf
 }

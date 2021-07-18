@@ -1,3 +1,19 @@
+# Copyright (C) 2020-2021 Ioannis Kosmidis
+
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 or 3 of the License
+#  (at your option).
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  A copy of the GNU General Public License is available at
+#  http://www.r-project.org/Licenses/
+
+#'
 #' brglm2: Bias Reduction in Generalized Linear Models
 #'
 #' Estimation and inference from generalized linear models using
@@ -51,9 +67,9 @@
 #'
 #' @references
 #'
-#' Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+#' Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 #' and shrinkage in binomial-response generalized linear
-#' models. *Biometrika* \doi{10.1093/biomet/asaa052}
+#' models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
 #'
 #' Cordeiro G M, McCullagh P (1991). Bias correction in generalized
 #' linear models. *Journal of the Royal Statistical Society. Series B
@@ -90,37 +106,73 @@
 #' @importFrom graphics plot
 #' @importFrom nnet class.ind
 #' @importFrom numDeriv grad
-#'
+#' @useDynLib brglm2
 #'
 NULL
+
+## NAMESPACE should have import(stats), import(Matrix)
+
 
 ## Suggestion by Kurt Hornik to avoid a warning related to the binding
 ## of n which is evaluated by family$initialize
 if (getRversion() >= "2.15.1") globalVariables(c("n", "lambda"))
 
-#' Generic method for checking for infinite estimates
-#' @param object a fitted model object (e.g. the result of a
-#'     \code{\link{glm}} call).
-#' @param ... other options to be passed to the method.
+#' Ordinal superiority scores of Agresti and Kateri (2017)
+#'
+#' \code{\link{ordinal_superiority}} is a method for the estimation
+#' and inference about model-based ordinal superiority scores
+#' introduced in Agresti and Kateri (2017, Section 5) from fitted
+#' objects. The mean bias of the estimates of the ordinal superiority
+#' scores can be corrected.
+#'
+#' @param object a fitted object from an ordinal regression
+#'     model. Currently only models from class \code{"bracl"} are
+#'     supported.
+#' @param formula a RHS formula indicating the group variable to use.
+#' @param data an optional data frame in which to look for variables
+#'     with which to compute ordinal superiority measures.  If
+#'     omitted, an attempt is made to use the data that produced
+#'     \code{object}.
+#' @param measure either \code{"gamma"} (default) or \code{"Delta"},
+#'     specifying the ordinal superiority measure to be returned.
+#' @param level the confidence level required when computing
+#'     confidence intervals for the ordinal superiority measures.
+#' @param bc logical. If \code{FALSE} (default) then the ordinal
+#'     superiority measures are computed using the estimates in
+#'     \code{object}. If \code{TRUE} then the ordinal superiority
+#'     measure estimates are corrected for mean bias.
+#'
+#' @examples
+#' data("stemcell", package = "brglm2")
+#'
+#' # Adjacent category logit (proportional odds)
+#' stem <- within(stemcell, {nreligion = as.numeric(religion)})
+#' fit_bracl_p <- bracl(research ~ nreligion + gender, weights = frequency,
+#'                      data = stem, type = "ML", parallel = TRUE)
+#'
+#' # Estimates and 95% confidence intervals for the probabilities that the response
+#' # category for gender "female" is higher than the response category for gender "male",
+#' # while adjusting for religion.
+#' ordinal_superiority(fit_bracl_p, ~ gender)
+#'
+#' \dontrun{
+#' # And their (very-similar in value here) bias corrected versions
+#' # with 99% CIs
+#' ordinal_superiority(fit_bracl_p, ~ gender, bc = TRUE, level = 0.99)
+#' # Note that the object is refitted with type = "AS_mean"
+#'
+#' }
 #'
 #'
-#' @note
+#' @references
 #'
-#'
-#' \code{check_infinite_estimates} will be removed from \pkg{brglm2}
-#' at version 0.8. An new version of
-#' \code{check_infinite_estimates} is now maintained in the
-#' \pkg{detectseparation} R package at
-#' \url{https://cran.r-project.org/package=detectseparation}.
-#'
-#' @seealso check_infinite_estimates.glm
-#'
+#' Agresti, A., Kateri, M. (2017). Ordinal probability effect measures
+#' for group comparisons in multinomial cumulative link models.
+#' *Biometrics*, **73** 214-219 #' \doi{10.1111/biom.12565}
 #' @export
-check_infinite_estimates <- function(object, ...) {
-    function_moves_to_new_package(gsub("\\(|\\)", "", deparse(match.call()[1])),
-                                  "0.8",
-                                  "brglm2",
-                                  "detectseparation")
-    UseMethod("check_infinite_estimates")
+ordinal_superiority <- function(object, formula, data,
+                                measure = c("gamma", "Delta"),
+                                level = 0.95,
+                                bc = FALSE) {
+    UseMethod("ordinal_superiority")
 }
-

@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 ```
 
 # **bracl**
-The [**brglm2**](https://github.com/ikosmidis/brglm2) R package provides `bracl` which is a wrapper of `brglmFit` for fitting adjacent category models for ordinal responses using either maximum likelihood or maximum penalized likelihood or any of the various bias reduction methods described in `brglmFit`. There is a formal equivalence between adjacent category logit models for ordinal responses and multinomial logistic regression models (see, e.g. the [Multinomial logistic regression using brglm2](https://cran.r-project.org/package=brglm2/vignettes/multinomial.html) vignette and the `brmultinom` function). `bracl` utilized that equivalence and fits the corresponding Poisson log-linear model, by appropriately re-scaling the Poisson means to match the multinomial totals (a.k.a. the "Poisson trick"). The mathematical details and algorithm on using the Poisson trick for mean-bias reduction are given in @kosmidis:11.
+The [**brglm2**](https://github.com/ikosmidis/brglm2) R package provides `bracl()` which is a wrapper of `brglmFit()` for fitting adjacent category models for ordinal responses using either maximum likelihood or maximum penalized likelihood or any of the various bias reduction methods described in `brglmFit()`. There is a formal equivalence between adjacent category logit models for ordinal responses and multinomial logistic regression models (see, e.g. the [Multinomial logistic regression using brglm2](https://cran.r-project.org/package=brglm2/vignettes/multinomial.html) vignette and the `brmultinom()` function). `bracl()` utilizes that equivalence and fits the corresponding Poisson log-linear model, by appropriately re-scaling the Poisson means to match the multinomial totals (a.k.a. the "Poisson trick"). The mathematical details and algorithm on using the Poisson trick for mean-bias reduction are given in @kosmidis:11.
 
 
 
@@ -35,11 +35,13 @@ The `stemcell` data set ships with **brglm2**. @agresti:15[, Section 4.1] provid
 ```{r, echo = TRUE}
 library("brglm2")
 data("stemcell", package = "brglm2")
+stem <- within(stemcell, religion <- as.numeric(religion))
 ```
 ## Maximum likelihood estimation
 The following chunk of code fits an adjacent category logit model with proportional odds and reproduces @agresti:10[, Table 4.2]. Note that the intercept parameters are different because @agresti:10[, Table 4.2] uses different contrasts for the intercept parameters.
 ```{r, echo = TRUE}
-stemcells_ml <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell,
+stem_formula <- research ~ religion + gender
+stemcells_ml <- bracl(stem_formula, weights = frequency, data = stem,
                       parallel = TRUE, type = "ML")
 summary(stemcells_ml)
 ```
@@ -52,7 +54,7 @@ class(stemcells_ml)
 
 We can check if a model with non-proportional odds fits the data equally well by fitting it and carrying out a likelihood ration test.
 ```{r, echo = TRUE}
-stemcells_ml_full <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell,
+stemcells_ml_full <- bracl(stem_formula, weights = frequency, data = stemcell,
                            parallel = FALSE, type = "ML")
 summary(stemcells_ml_full)
 ```
@@ -71,7 +73,7 @@ pchisq(lrt, df1, lower.tail = FALSE)
 hence, the simpler model is found to be as adequate as the full model is.
 
 # Mean and median bias reduction
-We can use `bracl` to fit the adjacent category model using estimators with smaller mean or median bias. For mean bias reduction we do
+We can use `bracl()` to fit the adjacent category model using estimators with smaller mean or median bias. For mean bias reduction we do
 ```{r, echo = TRUE}
 summary(update(stemcells_ml, type = "AS_mean"))
 ```
@@ -82,13 +84,13 @@ summary(update(stemcells_ml, type = "AS_median"))
 The estimates from mean and median bias reduction are similar to the maximum likelihood ones, indicating that estimation bias is not a major issue here.
 
 # Prediction
-We can predict the category probabilities using the `predict` method
+We can predict the category probabilities using the `predict()` method
 ```{r, echo = TRUE}
 predict(stemcells_ml, type = "probs")
 ```
 
 # Relevant resources
-`?brglmFit` and `?brglm_control` contain quick descriptions of the various bias reduction methods supported in **brglm2**. The [`iteration`](https://cran.r-project.org/package=brglm2/brglm2.pdf) vignette describes the iteration and gives the mathematical details for the bias-reducing adjustments to the score functions for generalized linear models.
+`?brglmFit` and `?brglm_control` provide descriptions of the various bias reduction methods supported in **brglm2**. The [`iteration`](https://cran.r-project.org/package=brglm2/brglm2.pdf) vignette describes the iteration and gives the mathematical details for the bias-reducing adjustments to the score functions for generalized linear models.
 
 
 # Citation

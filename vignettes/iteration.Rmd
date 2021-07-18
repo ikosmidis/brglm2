@@ -1,6 +1,6 @@
 ---
 title: "Bias reduction in generalized linear models"
-author: "[Ioannis Kosmidis](http://www.ikosmidis.com), [Euloge Clovis Kenne Pagui](http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home) and [Nicola Sartori](https://homes.stat.unipd.it/nicolasartori/)"
+author: "[Ioannis Kosmidis](http://www.ikosmidis.com), [Euloge Clovis Kenne Pagui](http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home)"
 date: "29 April 2017"
 output: rmarkdown::html_vignette
 bibliography: brglm2.bib
@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 
 In the special case of generalized linear models for binomial, Poisson and multinomial responses (both nominal and ordinal), mean and median bias reduction and maximum penalized likelihood return estimates with improved frequentist properties, that are also always finite, even in cases where the maximum likelihood estimates are infinite, like in complete and quasi-complete separation as defined in @albert:84.
 
-The workhorse function is [`brglmFit`](https://cran.r-project.org/package=brglm2/brglm2.pdf), which can be passed directly to the `method` argument of the `glm` function. `brglmFit` implements a quasi-[Fisher scoring](https://en.wikipedia.org/wiki/Scoring_algorithm) procedure, whose special cases result in various explicit and implicit bias reduction methods for generalized linear models [the classification of bias reduction methods into explicit and implicit is given in @kosmidis:14].
+The workhorse function is [`brglmFit()`](https://cran.r-project.org/package=brglm2/brglm2.pdf), which can be passed directly to the `method` argument of the `glm` function. `brglmFit` implements a quasi-[Fisher scoring](https://en.wikipedia.org/wiki/Scoring_algorithm) procedure, whose special cases result in various explicit and implicit bias reduction methods for generalized linear models [the classification of bias reduction methods into explicit and implicit is given in @kosmidis:14].
 
 # This vignette
 
@@ -178,7 +178,7 @@ where $\rho = (\rho_1, \ldots, \rho_n)^T$ with $\rho_i = h_i \{2 d_i'/(d_i w_i) 
 
 # Fitting algorithm in `brglmFit`
 
-`brglmFit` implements a quasi Fisher scoring procedure for solving the adjusted score equations $s_\beta + A_\beta = 0_p$ and $s_\phi + A_\phi = 0$. The iteration consists of an outer loop and an inner loop that implements step-halving. The algorithm is as follows:
+`brglmFit()` implements a quasi Fisher scoring procedure for solving the adjusted score equations $s_\beta + A_\beta = 0_p$ and $s_\phi + A_\phi = 0$. The iteration consists of an outer loop and an inner loop that implements step-halving. The algorithm is as follows:
 
 ### Input
 
@@ -264,9 +264,9 @@ where $\rho = (\rho_1, \ldots, \rho_n)^T$ with $\rho_i = h_i \{2 d_i'/(d_i w_i) 
 
 # Notes
 
-+ For $K = M = 1$, $\beta^{(0)} = \hat\beta$ and $\phi^{(0)} = \hat\phi$, the above iteration computes the bias-corrected estimates proposed in @cordeiro:91. This is achieved with the `brglmFit` method is called with `type = "correction"` (see `?brglmFit`).
++ For $K = M = 1$, $\beta^{(0)} = \hat\beta$ and $\phi^{(0)} = \hat\phi$, the above iteration computes the bias-corrected estimates proposed in @cordeiro:91. This is achieved when the `brglmFit()` function is called with `type = "correction"` (see `?brglmFit`).
 
-+ The mean-bias reducing adjusted score functions are solved when the `brglmFit` method is used with `type = "AS_mean"`, and the median-bias reducing adjusted score functions with `type = "AS_median"` (see `?brglmFit`). Estimation using mixed adjustments is through `type = "AS_mixed"`. `type = "MPL_Jeffreys"` does maximum penalized likelihood with a power of the Jeffreys prior as penalty.
++ The mean-bias reducing adjusted score functions are solved when the `brglmFit()` function is called with `type = "AS_mean"`, and the median-bias reducing adjusted score functions with `type = "AS_median"` (see `?brglmFit`). Estimation using mixed adjustments is through `type = "AS_mixed"`. `type = "MPL_Jeffreys"` does maximum penalized likelihood with a power of the Jeffreys prior as penalty.
 
 + The steps where $\phi$ and the $\phi$ direction are updated are ignored for generalized linear models with known dispersion parameter, like in models with binomial and Poisson responses. Also, in that case, $v_\phi^{(.)}$ and $\upsilon_\phi^{(.)}$ in steps 9, 14 and 16 are set to zero.
 
@@ -276,7 +276,7 @@ where $\rho = (\rho_1, \ldots, \rho_n)^T$ with $\rho_i = h_i \{2 d_i'/(d_i w_i) 
 
 # Contributions to this vignette
 
-The first version of the vignette has been written by Ioannis Kosmidis. Eugene Clovis Kenne Pagui and Nicola Sartori contributed the first version of the section "Median bias-reducing adjusted score functions", and Ioannis Kosmidis brought the expressions for the median bias-reducing adjustments in the reduced form that is shown above and is implemented in `brglmFit`.
+The first version of the vignette has been written by Ioannis Kosmidis. Eugene Clovis Kenne Pagui and Nicola Sartori contributed the first version of the section "Median bias-reducing adjusted score functions", and Ioannis Kosmidis brought the expressions for the median bias-reducing adjustments in the reduced form that is shown above and is implemented in `brglmFit()`.
 
 @kosmidis:2019 provides more details about mean and median bias reduction in generalized linear models.
 

@@ -1,0 +1,196 @@
+---
+title: "Negative binomial regression using **brglm2**"
+author: "[Euloge Clovis Kenne Pagui](http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home), [Ioannis Kosmidis](http://www.ikosmidis.com)"
+date: "12 June 2021"
+output: rmarkdown::html_vignette
+bibliography: brglm2.bib
+vignette: >
+  %\VignetteIndexEntry{Negative Binomial regression using **brglm2**}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 6
+)
+```
+
+
+# **brnb**
+
+The [**brglm2**](https://github.com/ikosmidis/brglm2) R package provides the `brnb()` function for fitting negative binomial regression models (see @agresti:15, Section 7.3, for a recent account on negative binomial regression models) using either maximum likelihood or any of the various bias reduction and adjusted estimating functions methods provided by `brglmFit()` (see `?brglmFit` for resources).
+
+This vignette demonstrates the use of `brnb()` and of the associated methods, using the case studies in @kenne:20.
+
+# Ames salmonella data
+
+@magolin:89 provide data from an Ames salmonella reverse mutagenicity assay. The response variable corresponds to the number of revertant colonies observed (`freq`) on each of three replicate plates (`plate`), and the covariate (`dose`) is the dose level of quinoline on the plate in micro-grams. The code chunk below sets up a data frame with the data from replicate 1 in @magolin:89[, Table 1].
+
+```{r, echo = TRUE}
+freq <- c(15, 16, 16, 27, 33, 20,
+          21, 18, 26, 41, 38, 27,
+          29, 21, 33, 60, 41, 42)
+dose <- rep(c(0, 10, 33, 100, 333, 1000), 3)
+plate <- rep(1:3, each = 6)
+(salmonella <- data.frame(freq, dose, plate))
+```
+
+The following code chunks reproduces @kenne:20[, Table 2] by estimating the negative binomial regression model with log link and model formula
+
+```{r, echo = TRUE}
+ames_f <- freq ~ dose + log(dose + 10)
+```
+
+using the various estimation methods that `brnb()` supports.
+
+## Maximum likelihood estimation
+
+
+```{r, echo = TRUE}
+library("brglm2")
+ames_ML <- brnb(ames_f, link = "log", data = salmonella,
+                transformation = "identity",  type = "ML")
+## Estimated regression and dispersion parameters
+est <- coef(ames_ML, model = "full")
+## Estimated standard errors for the regression parameters
+sds <- sqrt(c(diag(ames_ML$vcov.mean), ames_ML$vcov.dispersion))
+round(cbind(est, sds), 4)
+```
+
+## Bias reduction 
+
+### Asymptotic mean-bias correction
+
+The following code chunks updates the model fit using asymptotic mean-bias correction for estimating the model parameters
+
+```{r, echo = TRUE}
+ames_BC <- update(ames_ML, type = "correction")
+## Estimated regression and dispersion parameters
+est <- coef(ames_BC, model = "full")
+## Estimated standard errors for the regression parameters
+sds <- sqrt(c(diag(ames_BC$vcov.mean), ames_BC$vcov.dispersion))
+round(cbind(est, sds), 4)
+```
+
+### Mean-bias reducing adjusted score equations
+
+The corresponding fit using mean-bias reducing adjusted score equations is
+
+```{r, echo = TRUE}
+ames_BRmean <- update(ames_ML, type = "AS_mean")
+## Estimated regression and dispersion parameters
+est <- coef(ames_BRmean, model = "full")
+## Estimated standard errors for the regression parameters
+sds <- sqrt(c(diag(ames_BRmean$vcov.mean), ames_BRmean$vcov.dispersion))
+round(cbind(est, sds), 4)
+```
+
+## Median-bias reducing adjusted score equations
+
+The corresponding fit using median-bias reducing adjusted score equations is
+
+```{r, echo = TRUE}
+ames_BRmedian <- update(ames_ML, type = "AS_median")
+## Estimated regression and dispersion parameters
+est <- coef(ames_BRmedian, model = "full")
+## Estimated standard errors for the regression parameters
+sds <- sqrt(c(diag(ames_BRmedian$vcov.mean), ames_BRmedian$vcov.dispersion))
+round(cbind(est, sds), 4)
+```
+
+## Mixed bias reducing adjusted score equations
+
+As is done in @kosmidis:2019[, Section 4] for generalized linear models,
+we can exploit the Fisher orthogonality of the regression parameters
+and the dispersion parameter and use a composite bias reduction
+adjustment to the score functions. Such an adjustment delivers
+mean-bias reduced estimates for the regression parameters and a
+median-bias reduced estimate for the dispersion parameter. The
+resulting estimates of the regression parameters are invariant in terms
+of their mean bias properties under arbitrary contrasts, and that of
+the dispersion parameter is invariant in terms of its median bias
+properties under monotone transformations.
+
+Fitting the model using mixed-bias reducing adjusted score equations gives
+
+```{r, echo = TRUE}
+ames_BRmixed <- update(ames_ML, type = "AS_mixed")
+## Estimated regression and dispersion parameters
+est <- coef(ames_BRmixed, model = "full")
+## Estimated standard errors for the regression parameters
+sds <- sqrt(c(diag(ames_BRmixed$vcov.mean), ames_BRmixed$vcov.dispersion))
+round(cbind(est, sds), 4)
+```
+
+
+<!-- # Epileptic seizures data -->
+
+<!--  @kenne:20[, Section 5.2] provides a detailed description of the variables recorded in the data set. -->
+<!-- ```{r, echo = TRUE} -->
+<!-- library(MASS) -->
+<!-- epil2 <- epil[epil$period == 1, ] -->
+<!-- epil2["period"] <- rep(0, 59); epil2["y"] <- epil2["base"]; epil["time"] <- 1;  -->
+<!-- epil2["time"] <- 4 -->
+<!-- epil2 <- rbind(epil, epil2) -->
+<!-- epil2$pred <- unclass(epil2$trt) * (epil2$period > 0); epil2$subject <- factor(epil2$subject) -->
+<!-- epil3 <- aggregate(epil2, list(epil2$subject, epil2$period > 0), -->
+<!--                    function(x) if(is.numeric(x)) sum(x) else x[1])  -->
+<!-- epil3$pred <- factor(epil3$pred, -->
+<!--                      labels = c("base", "placebo", "drug")) -->
+<!-- contrasts(epil3$pred) <- structure(contr.sdif(3), -->
+<!--                                    dimnames = list(NULL, c("placebo-base", "drug-placebo"))) -->
+<!-- ``` -->
+
+<!-- ## Maximum likelihood estimation -->
+
+<!-- The following chunk of code reproduces @kenne:20[, Figure 4]. The model uses the log link on the mean and identity transformation for dispersion parameter. -->
+<!-- ```{r, echo = TRUE} -->
+<!-- epil3_ML <- brnb(y ~ -1+ factor(subject) + factor(pred),  data = epil3, type = "ML") -->
+<!-- ## Estimated of interest regression coefficients and dispersion parameters -->
+<!-- round(c(epil3_ML$coefficients[-c(1:59)], epil3_ML$dispersion), 2) -->
+<!-- ## Estimated standard errors -->
+<!-- round(c(summary(epil3_ML)$coefficients[-c(1:59), 2], sqrt(epil3_ML$vcov.dispersion)), 2) -->
+<!-- ``` -->
+
+<!-- ## Mean and median bias reduction -->
+
+<!-- Fitting the model using mean-bias reducing adjusted score equations gives -->
+<!-- ```{r, echo = TRUE} -->
+<!-- epil3_BRmean <- brnb(y ~ -1+ factor(subject) + factor(pred),  data = epil3, type = "AS_mean") -->
+<!-- ## Estimated  of interest regression coefficients and dispersion parameters -->
+<!-- round(c(epil3_BRmean$coefficients[-c(1:59)], epil3_BRmean$dispersion), 2) -->
+<!-- ## Estimated standard errors -->
+<!-- round(c(summary(epil3_BRmean)$coefficients[-c(1:59), 2], sqrt(epil3_BRmean$vcov.dispersion)), 2) -->
+<!-- ``` -->
+
+<!-- The corresponding fit using median-bias reducing adjusted score equations is -->
+<!-- ```{r, echo = TRUE} -->
+<!-- epil3_BRmedian <- brnb(y ~ -1+ factor(subject) + factor(pred),  data = epil3, type = "AS_median") -->
+<!-- ## Estimated  of interest regression coefficients and dispersion parameters -->
+<!-- round(c(epil3_BRmedian$coefficients[-c(1:59)], epil3_BRmedian$dispersion), 2) -->
+<!-- ## Estimated standard errors -->
+<!-- round(c(summary(epil3_BRmedian)$coefficients[-c(1:59), 2], sqrt(epil3_BRmedian$vcov.dispersion)), 2) -->
+<!-- ``` -->
+
+<!-- ## Mean bias correction -->
+<!-- ```{r, echo = TRUE} -->
+<!-- epil3_BCmean <- brnb(y ~ -1+ factor(subject) + factor(pred),  data = epil3, type = "correction") -->
+<!-- ## Estimated  of interest regression coefficients and dispersion parameters -->
+<!-- round(c(epil3_BCmean$coefficients[-c(1:59)], epil3_BCmean$dispersion), 2) -->
+<!-- ## Estimated standard errors -->
+<!-- round(c(summary(epil3_BCmean)$coefficients[-c(1:59), 2], sqrt(epil3_BCmean$vcov.dispersion)), 2) -->
+<!-- ``` -->
+
+The differences between reduced-bias estimation and maximum likelihood are particularly pronounced for the dispersion parameter. Improved estimation of the dispersion parameter results to larger estimated standard errors than maximum likelihood. Hence, the estimated standard errors based on the maximum likelihood estimates appear to be smaller than they should be, which is also supported by the simulation results in @kenne:20[, Section 5].
+
+# Relevant resources
+`?brglmFit` and `?brglm_control` contain quick descriptions of the various bias reduction methods supported in **brglm2**. The [`iteration`](https://cran.r-project.org/package=brglm2/brglm2.pdf) vignette describes the iteration and gives the mathematical details for the bias-reducing adjustments to the score functions for generalized linear models.
+
+# Citation
+If you found this vignette or **brglm2**, in general, useful, please consider citing **brglm2** and the associated paper. You can find information on how to do this by typing `citation("brglm2")`.
+
+# References

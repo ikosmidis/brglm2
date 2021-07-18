@@ -27,8 +27,8 @@ expect_warning(
 )
 
 test_that("ML fails when there is separation", {
-    expect_error(brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML"),
-        regex = "NA/NaN/Inf in foreign function")
+    expect_warning(brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML"),
+        regex = "algorithm did not converge|failed to calculate score adjustment")
 })
 
 
@@ -115,7 +115,7 @@ test_that("brmultinom returns the same fitted values as nnet::multinom if type =
 })
 
 test_that("brmultinom returns the same model matrix as nnet::multinom", {
-    expect_equal(model.matrix(enzbrmultinom_ml) ,model.matrix(enzmultinom))
+    expect_equal(model.matrix(enzbrmultinom_ml), model.matrix(enzmultinom), check.attributes = FALSE)
 })
 
 test_that("brmultinom returns the same maximized loglikelihood as nnet::multinom if type = 'ML'", {
@@ -165,11 +165,31 @@ test_that("predict.brmultinom returns the right result", {
     expect_equal(predict(hepml1, newdata = newdata), predict(hepml3, newdata = newdata), tolerance = 1e-04)
 })
 
+test_that("simulate method returns a data frame with expected characteristics", {
+    simu_df <- simulate(hepbr1)
+    nam_mf <- names(model.frame(hepbr1))
+    nam_simu <- names(simu_df)
+    expect_identical(nrow(simu_df),
+                     nrow(hepat) * nlevels(hepat$type))
+    expect_identical(levels(simu_df$type),
+                     levels(hepat$type))
+    expect_identical(is.ordered(simu_df$type),
+                     is.ordered(hepat$type))
+    expect_identical(nam_mf[!(nam_mf %in% nam_simu)],
+                     "(weights)")
+    expect_identical(nam_simu[!(nam_simu %in% nam_mf)],
+                     as.character(hepbr1$call$weights))
+    expect_identical(nam_simu[(nam_simu %in% nam_mf)],
+                     nam_mf[(nam_mf %in% nam_simu)])
+})
+
+
+
 ## Aligator data
 ## data("alligators", package = "brglm2")
-## k <- 3
-## all_ml <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
+## all_ml <- brmultinom(foodchoice ~ size + lake , weights = freq,
 ##                      data = alligators, type = "ML", ref = 1)
+## out <- sapply(1:1000, function(j) coef(update(all_ml, data = simulate(all_ml))))
 
 ## all_mean <- brmultinom(foodchoice ~ size + lake , weights = round(freq/k),
 ##                        data = alligators, type = "AS_mean", ref = 1)

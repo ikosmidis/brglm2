@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2020 Ioannis Kosmidis
+# Copyright (C) 2016-2021 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -145,8 +145,8 @@ bracl <- function(formula, data, weights, subset, na.action,
     keep <- w > 0
     nkeep <- sum(keep)
 
-    cats0 <- apply(Y, 1, function(x) which(x == 1))
-    cats <- rep(seq.int(ncat), each = nrow(X))
+    ## cats0 <- apply(Y, 1, function(x) which(x == 1))
+    cats <- rep(seq.int(ncat), each = nrow(X))[keep]
 
     fixed_totals <- rep(seq.int(nkeep), ncat)
 
@@ -157,12 +157,12 @@ bracl <- function(formula, data, weights, subset, na.action,
     if (parallel) {
         Xextended <- cbind(Matrix::kronecker(rep(1, ncat), Xnuisance),
                            Matrix::kronecker(Matrix::Diagonal(ncat)[, -ncat, drop = FALSE], X[keep, xint]),
-        (ncat - cats) * Matrix::kronecker(c(rep(1, ncat - 1), 0), X[keep, -xint]))
+        (ncat - cats) * Matrix::kronecker(c(rep(1, ncat - 1), 0), X[keep, -xint, drop = FALSE]))
         ofInterest <- c(paste(lev[-ncat], rep("(Intercept)", ncat - 1), sep = ":"), colnames(X)[-xint])
     }
     else {
         Xextended <- cbind(Matrix::kronecker(rep(1, ncat), Xnuisance),
-                           Matrix::kronecker(Matrix::Diagonal(ncat)[, -ncat, drop = FALSE], X[keep, ]))
+                           Matrix::kronecker(Matrix::Diagonal(ncat)[, -ncat, drop = FALSE], X[keep, , drop = FALSE]))
         ofInterest <- paste(rep(lev[-ncat], each = nvar),
                             rep(colnames(X), ncat - 1), sep = ":")
     }
@@ -172,15 +172,13 @@ bracl <- function(formula, data, weights, subset, na.action,
     ## Set up the extended response
     Yextended <- c(Y[keep] * w[keep])
 
-
-
     fit <- brglmFit(x = Xextended, y = Yextended,
                     start = NULL,
                     family = poisson("log"), control = control, intercept = TRUE, fixed_totals = fixed_totals)
 
     ## Fitted values
     fitted <- do.call("rbind", tapply(fit$fitted, fixed_totals, function(x) x/sum(x)))
-    rownames(fitted) <- rownames(X)
+    rownames(fitted) <- rownames(X)[keep]
     colnames(fitted) <- lev
     fit$fitted.values <- fitted
     fit$parallel  <- parallel
@@ -257,6 +255,9 @@ vcov.bracl <- function(object, ...) {
         vbeta <- vc[beta_names, beta_names]
         vint <- ddiff(vc[intercept_names, intercept_names])
         vintslo <- -diff(rbind(vc[intercept_names, beta_names], 0))
+        if (nrow(vintslo) == 1) {
+            vintslo <- drop(vintslo)
+        }
         par_names <- c(intercept_names, beta_names)
         vc[par_names, par_names] <- rbind(cbind(vint, vintslo),
                                           cbind(t(vintslo), vbeta))
@@ -383,41 +384,30 @@ predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
     if (!inherits(object, "bracl"))
         stop("not a \"bracl\" fit")
     type <- match.arg(type)
-    if (missing(newdata))
-        Y <- fitted(object)
-    else {
-        newdata <- as.data.frame(newdata)
-        rn <- row.names(newdata)
-        Terms <- delete.response(object$terms)
-        m <- model.frame(Terms, newdata, na.action = na.omit,
-                         xlev = object$xlevels)
-        if (!is.null(cl <- attr(Terms, "dataClasses")))
-            .checkMFClasses(cl, m)
-        keep <- match(row.names(m), rn)
-        X <- model.matrix(Terms, m, contrasts = object$contrasts)
-        cc <- coef(object)
-        nams <- names(cc)
-        if (object$parallel) {
-            int <- (object$ncat - 1):1
-            sl <- nams[-int]
-            coefs <- cbind(rev(cumsum(cc[int])),
-                           int * matrix(cc[sl], nrow = object$ncat - 1, ncol = length(sl), byrow = TRUE))
-            rownames(coefs) <- object$lev[-object$ref]
-        }
-        else {
-            coefs <- matrix(cc, nrow = object$ncat - 1)
-            rownames(coefs) <- object$lev[-object$ref]
-            coefs <- apply(coefs, 2, function(x) cumsum(rev(x)))
-        }
-        fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn[keep], object$lev))
-        fits1 <- apply(coefs, 1, function(b) X %*% b)
-
-        fits[, rownames(coefs)] <- fits1
-        Y1 <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
-        Y <- matrix(NA, nrow(newdata), ncol(Y1), dimnames = list(rn, colnames(Y1)))
-        Y[keep, ] <- Y1
-
+    X <- if (missing(newdata)) model.matrix(object) else model.matrix(object, data = newdata)
+    rn <- attr(X, "rn_data")
+    keep <- attr(X, "rn_kept")
+    cc <- coef(object)
+    nams <- names(cc)
+    if (object$parallel) {
+        int <- (object$ncat - 1):1
+        sl <- nams[-int]
+        coefs <- cbind(rev(cumsum(cc[int])),
+                       int * matrix(cc[sl], nrow = object$ncat - 1, ncol = length(sl), byrow = TRUE))
+        rownames(coefs) <- object$lev[-object$ref]
     }
+    else {
+        coefs <- matrix(cc, nrow = object$ncat - 1)
+        rownames(coefs) <- object$lev[-object$ref]
+        coefs <- apply(coefs, 2, function(x) cumsum(rev(x)))
+    }
+
+    fits <- matrix(0, nrow = nrow(X), ncol = object$ncat, dimnames = list(rn[keep], object$lev))
+    fits1 <- apply(coefs, 1, function(b) X %*% b)
+    fits[, rownames(coefs)] <- fits1
+    Y1 <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
+    Y <- matrix(NA, length(rn), ncol(Y1), dimnames = list(rn, colnames(Y1)))
+    Y[keep, ] <- Y1
     switch(type, class = {
         if (length(object$lev) > 2L) Y <- factor(max.col(Y),
             levels = seq_along(object$lev), labels = object$lev)

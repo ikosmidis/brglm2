@@ -119,13 +119,13 @@ approach returns estimates with improved frequentist properties,
 that are also always finite, even in cases where the maximum
 likelihood estimates are infinite (e.g. complete and quasi-complete
 separation in multinomial regression). See, Kosmidis and Firth
-(2020) for a proof for binomial-response GLMs with Jeffreys-pior
+(2021) for a proof for binomial-response GLMs with Jeffreys-prior
 penalties to the log-likelihood, which is equivalent to mean bias
 reduction for logistic regression. See, also,
-\code{\link{detect_separation}} and
-\code{\link{check_infinite_estimates}} for pre-fit and post-fit
-methods for the detection of infinite estimates in binomial
-response generalized linear models.
+\code{\link[detectseparation]{detect_separation}} and
+\code{\link[detectseparation]{check_infinite_estimates}} for
+pre-fit and post-fit methods for the detection of infinite
+estimates in binomial response generalized linear models.
 
 The type of score adjustment to be used is specified through the
 \code{type} argument (see \code{\link{brglmControl}} for
@@ -144,13 +144,13 @@ and \code{type = "AS_mean"} will return the same results when
 \code{family} is \code{binomial} or \code{poisson}, i.e. when the
 dispersion is fixed)
 
-\item \code{type = "AS_median"}: the median-bias reducing score
+\item \code{type = "AS_median"}: the median bias-reducing score
 adjustments in Kenne Pagui et al. (2017)
 
 \item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
 with powers of the Jeffreys prior as penalty.
 
-\item \code{type = "ML"}: maximum likelihood
+\item \code{type = "ML"}: maximum likelihood.
 
 \item \code{type = "correction"}: asymptotic bias correction, as in
 Cordeiro & McCullagh (1991).
@@ -210,7 +210,7 @@ lizards_Jeffreys <- glm(cbind(grahami, opalinus) ~ height + diameter +
 all.equal(coef(lizardsBR_mean), coef(lizards_Jeffreys))
 
 # Maximum penalized likelihood with powers of the Jeffreys prior as
-# penalty. See Kosmidis & Firth (2020) for the finiteness and
+# penalty. See Kosmidis & Firth (2021) for the finiteness and
 # shrinkage properties of the maximum penalized likelihood
 # estimators in binomial response models
 \donttest{
@@ -287,9 +287,9 @@ summary(endometrialBR_median)
 
 }
 \references{
-Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 and shrinkage in binomial-response generalized linear
-models. *Biometrika* \doi{10.1093/biomet/asaa052}
+models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
 
 Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 reduction in generalized linear models. *Statistics and Computing*,

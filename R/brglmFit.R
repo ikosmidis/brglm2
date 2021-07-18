@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2020 Ioannis Kosmidis
+# Copyright (C) 2016-2021 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -74,13 +74,13 @@
 #' that are also always finite, even in cases where the maximum
 #' likelihood estimates are infinite (e.g. complete and quasi-complete
 #' separation in multinomial regression). See, Kosmidis and Firth
-#' (2020) for a proof for binomial-response GLMs with Jeffreys-pior
+#' (2021) for a proof for binomial-response GLMs with Jeffreys-prior
 #' penalties to the log-likelihood, which is equivalent to mean bias
 #' reduction for logistic regression. See, also,
-#' \code{\link{detect_separation}} and
-#' \code{\link{check_infinite_estimates}} for pre-fit and post-fit
-#' methods for the detection of infinite estimates in binomial
-#' response generalized linear models.
+#' \code{\link[detectseparation]{detect_separation}} and
+#' \code{\link[detectseparation]{check_infinite_estimates}} for
+#' pre-fit and post-fit methods for the detection of infinite
+#' estimates in binomial response generalized linear models.
 #'
 #' The type of score adjustment to be used is specified through the
 #' \code{type} argument (see \code{\link{brglmControl}} for
@@ -99,13 +99,13 @@
 #' \code{family} is \code{binomial} or \code{poisson}, i.e. when the
 #' dispersion is fixed)
 #'
-#' \item \code{type = "AS_median"}: the median-bias reducing score
+#' \item \code{type = "AS_median"}: the median bias-reducing score
 #' adjustments in Kenne Pagui et al. (2017)
 #'
 #' \item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
 #' with powers of the Jeffreys prior as penalty.
 #'
-#' \item \code{type = "ML"}: maximum likelihood
+#' \item \code{type = "ML"}: maximum likelihood.
 #'
 #' \item \code{type = "correction"}: asymptotic bias correction, as in
 #' Cordeiro & McCullagh (1991).
@@ -144,9 +144,9 @@
 #'
 #' @references
 #'
-#' Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
+#' Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 #' and shrinkage in binomial-response generalized linear
-#' models. *Biometrika* \doi{10.1093/biomet/asaa052}
+#' models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
 #'
 #' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 #' reduction in generalized linear models. *Statistics and Computing*,
@@ -201,7 +201,7 @@
 #' all.equal(coef(lizardsBR_mean), coef(lizards_Jeffreys))
 #'
 #' # Maximum penalized likelihood with powers of the Jeffreys prior as
-#' # penalty. See Kosmidis & Firth (2020) for the finiteness and
+#' # penalty. See Kosmidis & Firth (2021) for the finiteness and
 #' # shrinkage properties of the maximum penalized likelihood
 #' # estimators in binomial response models
 #' \donttest{
@@ -945,6 +945,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                 testhalf <- TRUE
                 ## Inner iteration
                 while (testhalf & step_factor < control$max_step_factor) {
+                    ## store previous values
+                    betas0 <- betas; dispersion0 <- dispersion
                     step_beta_previous <- step_beta
                     step_zeta_previous <- step_zeta
                     ## Update betas
@@ -960,7 +962,13 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                     transformed_dispersion <- eval(control$Trans)
                     ## Mean quantities
 
-                    quantities <- key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE)
+                    quantities <- try(key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE), silent = TRUE)
+                    ## This is to capture qr failing and revering to previous estimates
+                    if (failed_adjustment_beta <- inherits(quantities, "try-error")) {
+                        betas <- betas0; dispersion <- dispersion0
+                        warning("failed to calculate score adjustment")
+                        break
+                    }
                     step_components_beta <- compute_step_components(theta, level = 0, fit = quantities)
                     step_components_zeta <- compute_step_components(theta, level = 1, fit = quantities)
                     if (failed_inversion_beta <- step_components_beta$failed_inversion) {
@@ -1318,7 +1326,7 @@ vcov.brglmFit <- function(object, model = c("mean", "full", "dispersion"), compl
                                   c(numeric(nrow(vbetas)), vtd))
                dimnames(vBetasAll) <- list(nBetasAll, nBetasAll)
                vBetasAll
-           })
+    })
 }
 
 

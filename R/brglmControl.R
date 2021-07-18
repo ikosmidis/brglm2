@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2020 Ioannis Kosmidis
+# Copyright (C) 2016-2021 Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@
 #' "brglm2")} for more information. The argument $a$ controls the
 #' amount of penalization and its default value is \code{a = 1/2},
 #' corresponding to maximum penalized likelihood using a
-#' Jeffreys-prior penalty. See, Kosmidis & Firth (2020) for proofs and
+#' Jeffreys-prior penalty. See, Kosmidis & Firth (2021) for proofs and
 #' discussion about the finiteness and shrinkage properties of the
 #' maximum penalized likelihood estimators for binomial-response
 #' generalized linear models.
@@ -136,13 +136,13 @@
 #'
 #' @references
 #'
+#' Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
+#' and shrinkage in binomial-response generalized linear
+#' models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
+#'
 #' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 #' reduction in generalized linear models. *Statistics and Computing*,
 #' **30**, 43-59 \doi{10.1007/s11222-019-09860-6}
-#'
-#' Kosmidis I, Firth D (2020). Jeffreys-prior penalty, finiteness
-#' and shrinkage in binomial-response generalized linear
-#' models. *Biometrika* \doi{10.1093/biomet/asaa052}
 #'
 #' Firth D (1993). Bias reduction of maximum likelihood estimates.
 #' Biometrika, **80**, 27-38 \doi{10.2307/2336755}

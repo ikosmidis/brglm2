@@ -5,7 +5,7 @@ date: "01 July 2017"
 output: rmarkdown::html_vignette
 bibliography: brglm2.bib
 vignette: >
-  %\VignetteIndexEntry{Multinomial logistic regression using brglm2}
+  %\VignetteIndexEntry{Multinomial logistic regression using **brglm2**}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,9 +21,9 @@ knitr::opts_chunk$set(
 
 
 # **brmultinom**
-The [**brglm2**](https://github.com/ikosmidis/brglm2) R package provides `brmultinom` which is a wrapper of `brglmFit` for fitting multinomial logistic regression models (a.k.a. baseline category logit models) using either maximum likelihood or maximum penalized likelihood or any of the various bias reduction methods described in `brglmFit`. `brmultinom` uses the equivalent Poisson log-linear model, by appropriately re-scaling the Poisson means to match the multinomial totals (a.k.a. the "Poisson trick"). The mathematical details and algorithm on using the Poisson trick for mean-bias reduction are given in @kosmidis:11.
+The [**brglm2**](https://github.com/ikosmidis/brglm2) R package provides `brmultinom()` which is a wrapper of `brglmFit` for fitting multinomial logistic regression models (a.k.a. baseline category logit models) using either maximum likelihood or maximum penalized likelihood or any of the various bias reduction methods described in `brglmFit()`. `brmultinom()` uses the equivalent Poisson log-linear model, by appropriately re-scaling the Poisson means to match the multinomial totals (a.k.a. the "Poisson trick"). The mathematical details and algorithm on using the Poisson trick for mean-bias reduction are given in @kosmidis:11.
 
-This vignettes illustrates the use of `brmultinom` and of the associated methods, using the alligator food choice example in @agresti:02[, Section 7.1]
+This vignettes illustrates the use of `brmultinom()` and of the associated methods, using the alligator food choice example in @agresti:02[, Section 7.1]
 
 # Alligator data
 
@@ -78,10 +78,11 @@ summary(all_ml_sparse)
 ```
 Specifically, judging from the estimated standard errors, the estimates for `(Intercept)`, `lakeHancock`, `lakeOklawaha` and `lakeTrafford` for `Reptile` and `lakeHancock` for `Bird` seem to be infinite.
 
-To quickly check if that's indeed the case we can use the `check_infinite_estimates` method (see, also the [`separation`](https://cran.r-project.org/package=brglm2/vignettes/separation.html) vignette).
+To quickly check if that's indeed the case we can use the `check_infinite_estimates()` method of the [**detectseparation**][https://cran.r-project.org/package=detectseparation] R package.
 ```{r, echo = TRUE}
+library("detectseparation")
 se_ratios <- check_infinite_estimates(all_ml_sparse)
-matplot(se_ratios, type = "l", lty = 1, ylim = c(0.5, 1.5), xlab = "Iteration")
+plot(se_ratios)
 ```
 
 Some of the estimated standard errors diverge as the number of Fisher scoring iterations increases, which is evidence of complete or quasi-complete separation [@lesaffre:89].
