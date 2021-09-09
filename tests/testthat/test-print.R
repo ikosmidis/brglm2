@@ -1,4 +1,4 @@
-context("test print methods")
+context("test print methods and associated classes")
 
 ## source(system.file("inst", "brglm0/brglm0.R", package = "brglm2"))
 data("lizards", package = "brglm2")
@@ -16,6 +16,47 @@ for (type in names(types)) {
     liz <- glm(cbind(grahami, opalinus) ~ height + diameter + light + time, family = binomial(),
                data = lizards,
                method = "brglmFit", type = type)
-
-
+    expect_output(print(liz), "Coefficients")
+    expect_output(print(liz), "Degrees of Freedom")
+    expect_output(print(liz), "Null Deviance")
+    expect_equal(liz$type, type)
+    summ <- summary(liz)
+    expect_true(all(class(summ) %in% c("summary.brglmFit", "summary.glm")))
+    expect_output(print(summ), "Type of estimator:")
+    expect_output(print(summ), type)
+    expect_output(print(summ), types[[type]])
 }
+
+
+## brnb
+salmonella <- data.frame(freq = c(15, 16, 16, 27, 33, 20,
+                                   21, 18, 26, 41, 38, 27,
+                                   29, 21, 33, 60, 41, 42),
+                         dose = rep(c(0, 10, 33, 100, 333, 1000), 3),
+                         observation = rep(1:3, each = 6))
+salmonella_fm <- freq ~ dose + log(dose + 10)
+fit_brnb <- brnb(salmonella_fm, data = salmonella,
+                 link = "log", transformation = "inverse", type = "ML")
+summ <- summary(fit_brnb)
+expect_output(print(summ), "Type of estimator:")
+expect_output(print(summ), "ML")
+expect_output(print(summ), "(maximum likelihood)")
+
+## brmultinom
+
+fit_brmultinom <- brmultinom(Sat ~ Infl + Type + Cont, weights = Freq,
+                             data = housing, type = "ML", ref = 1)
+summ <- summary(fit_brmultinom)
+expect_output(print(summ), "Type of estimator:")
+expect_output(print(summ), "ML")
+expect_output(print(summ), "(maximum likelihood)")
+
+
+## bracl
+data("stemcell", package = "brglm2")
+fit_bracl <- bracl(research ~ as.numeric(religion) + gender, weights = frequency,
+                    data = stemcell, type = "ML")
+summ <- summary(fit_bracl)
+expect_output(print(summ), "Type of estimator:")
+expect_output(print(summ), "ML")
+expect_output(print(summ), "(maximum likelihood)")

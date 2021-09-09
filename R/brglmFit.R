@@ -1387,17 +1387,8 @@ print.summary.brglmFit <- function (x, digits = max(3L, getOption("digits") - 3L
     if (nzchar(mess <- naprint(x$na.action)))
         cat("  (", mess, ")\n", sep = "")
     cat("AIC: ", format(x$aic, digits = max(4L, digits + 1L)))
-    cat("\n\nType of estimator:", x$type,
-        switch(x$type,
-               "ML" = "(maximum likelihood)",
-               "correction" = "(bias correction)",
-               "AS_mean" = "(mean bias-reducing adjusted score equations)",
-               "AS_median" = "(median bias-reducing adjusted score equations)",
-               "AS_mixed" = "(mixed bias-reducing adjusted score equations)",
-               "MPL_Jeffreys" = "(maximum penalized likelihood with Jeffreys'-prior penalty)"
-               ))
-    cat("\n", "Number of Fisher Scoring iterations: ", x$iter,
-        "\n", sep = "")
+    cat("\n\nType of estimator:", x$type, get_type_description(x$type))
+    cat("\n", "Number of Fisher Scoring iterations: ", x$iter, "\n", sep = "")
     correl <- x$correlation
     if (!is.null(correl)) {
         p <- NCOL(correl)
@@ -1414,6 +1405,5 @@ print.summary.brglmFit <- function (x, digits = max(3L, getOption("digits") - 3L
             }
         }
     }
-    cat("\n")
     invisible(x)
 }

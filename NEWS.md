@@ -1,5 +1,13 @@
-# brglm2 0.8.0
+# brglm2 0.8.1
 
+## Other improvements, updates and additions
+
+* Work on output consistenty from `print()` methods for `summary.XYZ`
+  objects; estimator type is now printed and other fixes.
+  
+* Documentation fixes and updates
+
+# brglm2 0.8.0
  
 ## New functionality
 
@@ -46,7 +54,7 @@
   decomposition of the model matrix), saving some computational effort.
 
 ## Other improvements, updates and additions
-* Updated DOI links in documentation and some http -> https fixes.
+* updated DOI links in documentation and some http -> https fixes.
 
 # brglm2 0.7.0
 
