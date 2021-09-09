@@ -1342,7 +1342,9 @@ DD <- function(expr,name, order = 1) {
 
 
 ## Almost all code is from stats:::print.summary.glm apart from minor modifications
-#' @rdname stats::summary.glm
+#' @rdname summary.brglmFit
+#' @method print summary.brglmFit
+#' @export
 print.summary.brglmFit <- function (x, digits = max(3L, getOption("digits") - 3L),
                                     symbolic.cor = x$symbolic.cor,
                                     signif.stars = getOption("show.signif.stars"), ...) {

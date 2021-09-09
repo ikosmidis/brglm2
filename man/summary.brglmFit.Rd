@@ -2,6 +2,7 @@
 % Please edit documentation in R/brglmFit.R
 \name{summary.brglmFit}
 \alias{summary.brglmFit}
+\alias{print.summary.brglmFit}
 \title{\code{summary} method for \code{\link{brglmFit}} objects}
 \usage{
 \method{summary}{brglmFit}(
@@ -9,6 +10,14 @@
   dispersion = NULL,
   correlation = FALSE,
   symbolic.cor = FALSE,
+  ...
+)
+
+\method{print}{summary.brglmFit}(
+  x,
+  digits = max(3L, getOption("digits") - 3L),
+  symbolic.cor = x$symbolic.cor,
+  signif.stars = getOption("show.signif.stars"),
   ...
 )
 }
@@ -27,6 +36,14 @@
     a symbolic form (see \code{\link[stats]{symnum}}) rather than as numbers.}
 
 \item{...}{further arguments passed to or from other methods.}
+
+\item{x}{an object of class \code{"summary.glm"}, usually, a result of a
+    call to \code{summary.glm}.}
+
+\item{digits}{the number of significant digits to use when printing.}
+
+\item{signif.stars}{logical. If \code{TRUE}, \sQuote{significance stars}
+    are printed for each coefficient.}
 }
 \description{
 \code{summary} method for \code{\link{brglmFit}} objects
