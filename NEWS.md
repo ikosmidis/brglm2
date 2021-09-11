@@ -2,8 +2,10 @@
 
 ## Other improvements, updates and additions
 
-* Work on output consistenty from `print()` methods for `summary.XYZ`
+* Work on output consistently from `print()` methods for `summary.XYZ`
   objects; estimator type is now printed and other fixes.
+  
+* Improved warning when algorithm does not converge.  
   
 * Documentation fixes and updates
 
