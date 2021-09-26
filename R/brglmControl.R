@@ -49,7 +49,7 @@
 #'     of such. Default is \code{NULL}. See Details.
 #' @param a power of the Jeffreys prior penalty. See Details.
 #' @param ... further arguments passed to
-#'     \code{\link{brglmControl}}. Currently ignored in the outpup.
+#'     \code{\link{brglmControl}}. Currently ignored in the output.
 #'
 #' @details
 #'

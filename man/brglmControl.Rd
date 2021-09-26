@@ -73,7 +73,7 @@ consider. Default is \code{12}.}
 \item{a}{power of the Jeffreys prior penalty. See Details.}
 
 \item{...}{further arguments passed to
-\code{\link{brglmControl}}. Currently ignored in the outpup.}
+\code{\link{brglmControl}}. Currently ignored in the output.}
 }
 \value{
 a list with components named as the arguments, including
