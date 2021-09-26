@@ -43,7 +43,7 @@ expect_output(print(summ), "ML")
 expect_output(print(summ), "(maximum likelihood)")
 
 ## brmultinom
-
+data("housing", package = "MASS")
 fit_brmultinom <- brmultinom(Sat ~ Infl + Type + Cont, weights = Freq,
                              data = housing, type = "ML", ref = 1)
 summ <- summary(fit_brmultinom)
