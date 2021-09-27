@@ -1,11 +1,15 @@
 # brglm2 0.8.1
 
+## Bug fixes
+
+* Fixed a bug when predicting from `bracl` objects with non-identifiable parameters.
+
 ## Other improvements, updates and additions
 
 * Work on output consistently from `print()` methods for `summary.XYZ`
   objects; estimator type is now printed and other fixes.
   
-* Improved warning when algorithm does not converge.  
+* Enriched warning when algorithm does not converge with more informative text.
   
 * Documentation fixes and updates
 

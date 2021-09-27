@@ -390,6 +390,8 @@ predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
     rn <- attr(X, "rn_data")
     keep <- attr(X, "rn_kept")
     cc <- coef(object)
+    ## Ignore unidentifiable parameters
+    cc[is.na(cc)] <- 0
     nams <- names(cc)
     if (object$parallel) {
         int <- (object$ncat - 1):1
