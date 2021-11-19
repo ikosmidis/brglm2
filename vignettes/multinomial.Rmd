@@ -1,6 +1,6 @@
 ---
 title: "Multinomial logistic regression using **brglm2**"
-author: "[Ioannis Kosmidis](http://www.ikosmidis.com)"
+author: "[Ioannis Kosmidis](https://www.ikosmidis.com)"
 date: "01 July 2017"
 output: rmarkdown::html_vignette
 bibliography: brglm2.bib

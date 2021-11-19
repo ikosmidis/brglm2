@@ -1,11 +1,11 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-brglm2 <img src="man/figures/hex_brglm2.svg" width="320" align="right">
-=======================================================================
+# brglm2 <img src="man/figures/hex_brglm2.svg" width="320" align="right">
 
 <!-- badges: start -->
 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/brglm2)](https://cran.r-project.org/package=brglm2)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/brglm2)](https://cran.r-project.org/package=brglm2)
 [![R-CMD-check](https://github.com/ikosmidis/brglm2/workflows/R-CMD-check/badge.svg)](https://github.com/ikosmidis/brglm2/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)](https://codecov.io/gh/ikosmidis/brglm2?branch=master)
@@ -43,20 +43,22 @@ for logistic regression (and, for more general binomial-response models
 where the likelihood is penalized by a power of the Jeffreys’ invariant
 prior).
 
-Installation
-------------
+## Installation
 
 Install the current version from CRAN:
 
-    install.packages("brglm2")
+``` r
+install.packages("brglm2")
+```
 
 or the development version from github:
 
-    # install.packages("remotes")
-    remotes::install_github("ikosmidis/brglm2", ref = "develop")
+``` r
+# install.packages("remotes")
+remotes::install_github("ikosmidis/brglm2", ref = "develop")
+```
 
-Example
--------
+## Example
 
 Below we follow the example of [Heinze and Schemper
 (2002)](https://doi.org/10.1002/sim.1047) and fit a probit regression
@@ -64,50 +66,59 @@ model using maximum likelihood (ML) to analyze data from a study on
 endometrial cancer (see `?brglm2::endometrial` for details and
 references).
 
-    library("brglm2")
-    data("endometrial", package = "brglm2")
-    modML <- glm(HG ~ NV + PI + EH, family = binomial("probit"), data = endometrial)
-    summary(modML)
-    #> 
-    #> Call:
-    #> glm(formula = HG ~ NV + PI + EH, family = binomial("probit"), 
-    #>     data = endometrial)
-    #> 
-    #> Deviance Residuals: 
-    #>      Min        1Q    Median        3Q       Max  
-    #> -1.47007  -0.67917  -0.32978   0.00008   2.74898  
-    #> 
-    #> Coefficients:
-    #>              Estimate Std. Error z value Pr(>|z|)    
-    #> (Intercept)   2.18093    0.85732   2.544 0.010963 *  
-    #> NV            5.80468  402.23641   0.014 0.988486    
-    #> PI           -0.01886    0.02360  -0.799 0.424066    
-    #> EH           -1.52576    0.43308  -3.523 0.000427 ***
-    #> ---
-    #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    #> 
-    #> (Dispersion parameter for binomial family taken to be 1)
-    #> 
-    #>     Null deviance: 104.90  on 78  degrees of freedom
-    #> Residual deviance:  56.47  on 75  degrees of freedom
-    #> AIC: 64.47
-    #> 
-    #> Number of Fisher Scoring iterations: 17
+``` r
+library("brglm2")
+data("endometrial", package = "brglm2")
+modML <- glm(HG ~ NV + PI + EH, family = binomial("probit"), data = endometrial)
+summary(modML)
+#> 
+#> Call:
+#> glm(formula = HG ~ NV + PI + EH, family = binomial("probit"), 
+#>     data = endometrial)
+#> 
+#> Deviance Residuals: 
+#>      Min        1Q    Median        3Q       Max  
+#> -1.47007  -0.67917  -0.32978   0.00008   2.74898  
+#> 
+#> Coefficients:
+#>              Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)   2.18093    0.85732   2.544 0.010963 *  
+#> NV            5.80468  402.23641   0.014 0.988486    
+#> PI           -0.01886    0.02360  -0.799 0.424066    
+#> EH           -1.52576    0.43308  -3.523 0.000427 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 104.90  on 78  degrees of freedom
+#> Residual deviance:  56.47  on 75  degrees of freedom
+#> AIC: 64.47
+#> 
+#> Number of Fisher Scoring iterations: 17
+```
 
 The ML estimate of the parameter for `NV` is actually infinite, as can
 be quickly verified using the
 [**detectseparation**](https://cran.r-project.org/package=detectseparation)
 R package
 
-    # install.packages("detectseparation")
-    library("detectseparation")
-    update(modML, method = "detect_separation")
-    #> Implementation: ROI | Solver: lpsolve 
-    #> Separation: TRUE 
-    #> Existence of maximum likelihood estimates
-    #> (Intercept)          NV          PI          EH 
-    #>           0         Inf           0           0 
-    #> 0: finite value, Inf: infinity, -Inf: -infinity
+``` r
+# install.packages("detectseparation")
+library("detectseparation")
+#> 
+#> Attaching package: 'detectseparation'
+#> The following objects are masked from 'package:brglm2':
+#> 
+#>     check_infinite_estimates, detect_separation
+update(modML, method = "detect_separation")
+#> Implementation: ROI | Solver: lpsolve 
+#> Separation: TRUE 
+#> Existence of maximum likelihood estimates
+#> (Intercept)          NV          PI          EH 
+#>           0         Inf           0           0 
+#> 0: finite value, Inf: infinity, -Inf: -infinity
+```
 
 The reported, apparently finite estimate
 `r round(coef(summary(modML))["NV", "Estimate"], 3)` for `NV` is merely
@@ -127,32 +138,35 @@ category logit models for ordinal responses). For example, the code
 chunk below refits the model on the endometrial cancer study data using
 mean bias reduction.
 
-    summary(update(modML, method = "brglm_fit"))
-    #> 
-    #> Call:
-    #> glm(formula = HG ~ NV + PI + EH, family = binomial("probit"), 
-    #>     data = endometrial, method = "brglm_fit")
-    #> 
-    #> Deviance Residuals: 
-    #>     Min       1Q   Median       3Q      Max  
-    #> -1.4436  -0.7016  -0.3783   0.3146   2.6218  
-    #> 
-    #> Coefficients:
-    #>             Estimate Std. Error z value Pr(>|z|)    
-    #> (Intercept)  1.91460    0.78877   2.427 0.015210 *  
-    #> NV           1.65892    0.74730   2.220 0.026427 *  
-    #> PI          -0.01520    0.02089  -0.728 0.466793    
-    #> EH          -1.37988    0.40329  -3.422 0.000623 ***
-    #> ---
-    #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    #> 
-    #> (Dispersion parameter for binomial family taken to be 1)
-    #> 
-    #>     Null deviance: 104.903  on 78  degrees of freedom
-    #> Residual deviance:  57.587  on 75  degrees of freedom
-    #> AIC: 65.587
-    #> 
-    #> Number of Fisher Scoring iterations: 4
+``` r
+summary(update(modML, method = "brglm_fit"))
+#> 
+#> Call:
+#> glm(formula = HG ~ NV + PI + EH, family = binomial("probit"), 
+#>     data = endometrial, method = "brglm_fit")
+#> 
+#> Deviance Residuals: 
+#>     Min       1Q   Median       3Q      Max  
+#> -1.4436  -0.7016  -0.3783   0.3146   2.6218  
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)  1.91460    0.78877   2.427 0.015210 *  
+#> NV           1.65892    0.74730   2.220 0.026427 *  
+#> PI          -0.01520    0.02089  -0.728 0.466793    
+#> EH          -1.37988    0.40329  -3.422 0.000623 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 104.903  on 78  degrees of freedom
+#> Residual deviance:  57.587  on 75  degrees of freedom
+#> AIC:  65.587
+#> 
+#> Type of estimator: AS_mixed (mixed bias-reducing adjusted score equations)
+#> Number of Fisher Scoring iterations: 4
+```
 
 A quick comparison of the output from mean bias reduction to that from
 ML reveals a dramatic change in the *z*-statistic for `NV`, now that
@@ -166,8 +180,7 @@ reduction and maximum penalized likelihood with Jeffreys’ prior penalty.
 Also do not forget to take a look at the vignettes
 (`vignette(package = "brglm2")`) for details and more case studies.
 
-Solving adjusted score equations using quasi-Fisher scoring
------------------------------------------------------------
+## Solving adjusted score equations using quasi-Fisher scoring
 
 The workhorse function in **brglm2** is
 [`brglm_fit`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R)
@@ -192,13 +205,13 @@ models.
 The classification of bias reduction methods into explicit and implicit
 is as given in [Kosmidis (2014)](https://doi.org/10.1002/wics.1296).
 
-References and resources
-------------------------
+## References and resources
 
-**brglm2** was presented by [Ioannis Kosmidis](http://www.ikosmidis.com)
-at the useR! 2016 international conference at University of Stanford on
-16 June 2016. The presentation was titled “Reduced-bias inference in
-generalized linear models” and can be watched online at this
+**brglm2** was presented by [Ioannis
+Kosmidis](https://www.ikosmidis.com) at the useR! 2016 international
+conference at University of Stanford on 16 June 2016. The presentation
+was titled “Reduced-bias inference in generalized linear models” and can
+be watched online at this
 [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
 
 Motivation, details and discussion on the methods that **brglm2**

@@ -2,8 +2,8 @@
 
 ## Other improvements, updates and additions
 
-* Housekeeping
-* Removed lpSolveAPI from imports
+* Housekeeping.
+* Removed lpSolveAPI from imports.
 
 # brglm2 0.8.1
 

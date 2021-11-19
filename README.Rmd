@@ -159,7 +159,7 @@ implicit is as given in [Kosmidis
 ## References and resources
 
 **brglm2** was presented by [Ioannis
-Kosmidis](http://www.ikosmidis.com) at the useR! 2016 international
+Kosmidis](https://www.ikosmidis.com) at the useR! 2016 international
 conference at University of Stanford on 16 June 2016. The presentation
 was titled "Reduced-bias inference in generalized linear models" and
 can be watched online at this

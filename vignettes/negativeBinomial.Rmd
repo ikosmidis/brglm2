@@ -1,6 +1,6 @@
 ---
 title: "Negative binomial regression using **brglm2**"
-author: "[Euloge Clovis Kenne Pagui](http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home), [Ioannis Kosmidis](http://www.ikosmidis.com)"
+author: "[Euloge Clovis Kenne Pagui](http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home), [Ioannis Kosmidis](https://www.ikosmidis.com)"
 date: "12 June 2021"
 output: rmarkdown::html_vignette
 bibliography: brglm2.bib
