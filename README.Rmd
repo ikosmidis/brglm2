@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/brglm2)](https://cran.r-project.org/package=brglm2)
 [![R-CMD-check](https://github.com/ikosmidis/brglm2/workflows/R-CMD-check/badge.svg)](https://github.com/ikosmidis/brglm2/actions)
-[![Codecov test coverage](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)](https://codecov.io/gh/ikosmidis/brglm2?branch=master)
+[![Codecov test coverage](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ikosmidis/brglm2?branch=master)
 [![Licence](https://img.shields.io/badge/licence-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 <!-- badges: end -->
 
@@ -158,8 +158,7 @@ implicit is as given in [Kosmidis
 
 ## References and resources
 
-**brglm2** was presented by [Ioannis
-Kosmidis](http://www.ikosmidis.com) at the useR! 2016 international
+**brglm2** was presented by [Ioannis Kosmidis](https://www.ikosmidis.com) at the useR! 2016 international
 conference at University of Stanford on 16 June 2016. The presentation
 was titled "Reduced-bias inference in generalized linear models" and
 can be watched online at this

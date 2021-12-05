@@ -315,6 +315,8 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
     cat("\nResidual Deviance:", format(x$deviance), "\n")
     cat("Log-likelihood:", format(x$logLik), "\n")
     cat("AIC:", format(x$AIC), "\n")
+    cat("\n\nType of estimator:", x$type, get_type_description(x$type))
+    cat("\n", "Number of Fisher Scoring iterations: ", x$iter, "\n", sep = "")
     if (!is.null(correl <- x$correlation)) {
         p <- dim(correl)[2L]
         if (p > 1) {
@@ -388,6 +390,8 @@ predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
     rn <- attr(X, "rn_data")
     keep <- attr(X, "rn_kept")
     cc <- coef(object)
+    ## Ignore unidentifiable parameters
+    cc[is.na(cc)] <- 0
     nams <- names(cc)
     if (object$parallel) {
         int <- (object$ncat - 1):1

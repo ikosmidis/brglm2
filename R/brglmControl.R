@@ -49,7 +49,7 @@
 #'     of such. Default is \code{NULL}. See Details.
 #' @param a power of the Jeffreys prior penalty. See Details.
 #' @param ... further arguments passed to
-#'     \code{\link{brglmControl}}. Currently ignored in the outpup.
+#'     \code{\link{brglmControl}}. Currently ignored in the output.
 #'
 #' @details
 #'
@@ -85,9 +85,9 @@
 #' values for the iteration in \code{brglmFit}. The value of
 #' \code{response_adjustment} governs how the data is
 #' adjusted. Specifically, if \code{family} is \code{binomial}, then
-#' the responses and totals are adjusted by and \code{2 *
-#' response_adjustment}, respectively; if \code{family} is
-#' \code{poisson}, then the responses are adjusted by and
+#' the responses and totals are adjusted by \code{response_adjustment}
+#' and \code{2 * response_adjustment}, respectively; if \code{family}
+#' is \code{poisson}, then the responses are adjusted by and
 #' \code{response_adjustment}. \code{response_adjustment = NULL}
 #' (default) is equivalent to setting it to
 #' "number of parameters"/"number of observations".

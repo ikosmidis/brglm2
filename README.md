@@ -1,14 +1,13 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-brglm2 <img src="man/figures/hex_brglm2.svg" width="320" align="right">
-=======================================================================
+# brglm2 <img src="man/figures/hex_brglm2.svg" width="320" align="right">
 
 <!-- badges: start -->
 
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/brglm2)](https://cran.r-project.org/package=brglm2)
 [![R-CMD-check](https://github.com/ikosmidis/brglm2/workflows/R-CMD-check/badge.svg)](https://github.com/ikosmidis/brglm2/actions)
 [![Codecov test
-coverage](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)](https://codecov.io/gh/ikosmidis/brglm2?branch=master)
+coverage](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ikosmidis/brglm2?branch=master)
 [![Licence](https://img.shields.io/badge/licence-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 <!-- badges: end -->
 
@@ -43,8 +42,7 @@ for logistic regression (and, for more general binomial-response models
 where the likelihood is penalized by a power of the Jeffreys’ invariant
 prior).
 
-Installation
-------------
+## Installation
 
 Install the current version from CRAN:
 
@@ -55,8 +53,7 @@ or the development version from github:
     # install.packages("remotes")
     remotes::install_github("ikosmidis/brglm2", ref = "develop")
 
-Example
--------
+## Example
 
 Below we follow the example of [Heinze and Schemper
 (2002)](https://doi.org/10.1002/sim.1047) and fit a probit regression
@@ -166,8 +163,7 @@ reduction and maximum penalized likelihood with Jeffreys’ prior penalty.
 Also do not forget to take a look at the vignettes
 (`vignette(package = "brglm2")`) for details and more case studies.
 
-Solving adjusted score equations using quasi-Fisher scoring
------------------------------------------------------------
+## Solving adjusted score equations using quasi-Fisher scoring
 
 The workhorse function in **brglm2** is
 [`brglm_fit`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R)
@@ -192,13 +188,13 @@ models.
 The classification of bias reduction methods into explicit and implicit
 is as given in [Kosmidis (2014)](https://doi.org/10.1002/wics.1296).
 
-References and resources
-------------------------
+## References and resources
 
-**brglm2** was presented by [Ioannis Kosmidis](http://www.ikosmidis.com)
-at the useR! 2016 international conference at University of Stanford on
-16 June 2016. The presentation was titled “Reduced-bias inference in
-generalized linear models” and can be watched online at this
+**brglm2** was presented by [Ioannis
+Kosmidis](https://www.ikosmidis.com) at the useR! 2016 international
+conference at University of Stanford on 16 June 2016. The presentation
+was titled “Reduced-bias inference in generalized linear models” and can
+be watched online at this
 [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
 
 Motivation, details and discussion on the methods that **brglm2**

@@ -22,3 +22,18 @@ unless_null <- function(x, if_null) {
     }
 }
 
+
+
+get_type_description <- function(type, parenthesized = TRUE) {
+    pp <- function(txt) {
+        ifelse(parenthesized, paste0("(", txt, ")"), txt)
+    }
+    switch(type,
+           "ML" = pp("maximum likelihood"),
+           "correction" = pp("bias correction"),
+           "AS_mean" = pp("mean bias-reducing adjusted score equations"),
+           "AS_median" = pp("median bias-reducing adjusted score equations"),
+           "AS_mixed" = pp("mixed bias-reducing adjusted score equations"),
+           "MPL_Jeffreys" = pp("maximum penalized likelihood with Jeffreys'-prior penalty")
+           )
+}

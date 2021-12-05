@@ -1,5 +1,26 @@
-# brglm2 0.8.0
+# brglm2 0.8.2
 
+## Other improvements, updates and additions
+
+* Housekeeping.
+* Removed lpSolveAPI from imports.
+
+# brglm2 0.8.1
+
+## Bug fixes
+
+* Fixed a bug when predicting from `bracl` objects with non-identifiable parameters.
+
+## Other improvements, updates and additions
+
+* Work on output consistently from `print()` methods for `summary.XYZ`
+  objects; estimator type is now printed and other fixes.
+  
+* Enriched warning when algorithm does not converge with more informative text.
+  
+* Documentation fixes and updates
+
+# brglm2 0.8.0
  
 ## New functionality
 
@@ -46,7 +67,7 @@
   decomposition of the model matrix), saving some computational effort.
 
 ## Other improvements, updates and additions
-* Updated DOI links in documentation and some http -> https fixes.
+* updated DOI links in documentation and some http -> https fixes.
 
 # brglm2 0.7.0
 

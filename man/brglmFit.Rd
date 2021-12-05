@@ -114,14 +114,16 @@ Kosmidis and Firth (2010) describe a parallel quasi Newton-Raphson
 iteration with the same stationary point.
 
 In the special case of generalized linear models for binomial,
-Poisson and multinomial responses, the adjusted score equations
-approach returns estimates with improved frequentist properties,
-that are also always finite, even in cases where the maximum
-likelihood estimates are infinite (e.g. complete and quasi-complete
-separation in multinomial regression). See, Kosmidis and Firth
-(2021) for a proof for binomial-response GLMs with Jeffreys-prior
-penalties to the log-likelihood, which is equivalent to mean bias
-reduction for logistic regression. See, also,
+Poisson and multinomial responses, the adjusted score equation
+approaches for \code{type = "AS_mixed"}, \code{type = "AS_mean"},
+and \code{type = "AS_median"} (see below for what methods each
+\code{type} corresponds) return estimates with improved frequentist
+properties, that are also always finite, even in cases where the
+maximum likelihood estimates are infinite (e.g. complete and
+quasi-complete separation in multinomial regression). See, Kosmidis
+and Firth (2021) for a proof for binomial-response GLMs with
+Jeffreys-prior penalties to the log-likelihood, which is equivalent
+to mean bias reduction for logistic regression. See, also,
 \code{\link[detectseparation]{detect_separation}} and
 \code{\link[detectseparation]{check_infinite_estimates}} for
 pre-fit and post-fit methods for the detection of infinite

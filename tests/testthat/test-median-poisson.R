@@ -1,4 +1,4 @@
-context("comparison comparison of brglmFit with method = 'AS_median' for Poisson with mbrpr")
+context("comparison of brglmFit with method = 'AS_median' with mbrpr (Poisson)")
 
 ## mbrpr is supplied under the permission of M. Zambelli, and is part
 ## of his unpublished undergraduate thesis submitted in 2016 at the

@@ -1001,16 +1001,9 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
                                             "deviance")]), digits = max(5, digits + 1)), " on",
                           format(unlist(x[c("df.null", "df.residual")])), " degrees of freedom\n"),
                     1, paste, collapse = " "), sep = "")
-    cat(paste("AIC:", round(x$aic,digits), "\n"))
-    cat("\nType of estimator:", x$type,
-        switch(x$type,
-               "ML" = "(maximum likelihood)",
-               "correction" = "(bias-corrected)",
-               "AS_mean" = "(mean bias-reduced)",
-               "AS_median" = "(median bias-reduced)",
-               "AS_mixed" = "(mixed bias-reduced)"
-               ))
-    cat(paste("\nNumber of quasi-Fisher scoring iterations:", x$iter, "\n"))
+    cat(paste("AIC:", round(x$aic,digits)))
+    cat("\n\nType of estimator:", x$type, get_type_description(x$type))
+    cat("\n", "Number of quasi-Fisher scoring iterations:", x$iter, "\n", sep = "")
     invisible(x)
 }
 

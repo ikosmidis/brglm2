@@ -1,6 +1,6 @@
 ---
 title: "Bias reduction in generalized linear models"
-author: "[Ioannis Kosmidis](http://www.ikosmidis.com), [Euloge Clovis Kenne Pagui](http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home)"
+author: "[Ioannis Kosmidis](https://www.ikosmidis.com), [Euloge Clovis Kenne Pagui](http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home)"
 date: "29 April 2017"
 output: rmarkdown::html_vignette
 bibliography: brglm2.bib
@@ -38,7 +38,7 @@ This vignette
 
 The bias-reducing quasi Fisher scoring iteration is also described in detail in the [bias vignette](https://cran.r-project.org/package=enrichwith/vignettes/bias.html) of the [**enrichwith**](https://cran.r-project.org/package=enrichwith) R package. @kosmidis:10 describe a parallel quasi [Newton-Raphson](https://en.wikipedia.org/wiki/Newton%27s_method) procedure.
 
-Most of the material in this vignette comes from a presentation by [Ioannis Kosmidis](http://www.ikosmidis.com) at the useR! 2016 international conference at University of Stanford on 16 June 2016. The presentation was titled "Reduced-bias inference in generalized linear models" and can be watched online at this [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
+Most of the material in this vignette comes from a presentation by [Ioannis Kosmidis](https://www.ikosmidis.com) at the useR! 2016 international conference at University of Stanford on 16 June 2016. The presentation was titled "Reduced-bias inference in generalized linear models" and can be watched online at this [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
 
 # Generalized linear models
 

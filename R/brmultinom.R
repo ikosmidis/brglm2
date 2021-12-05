@@ -52,11 +52,12 @@
 #' overlap, and showed that infinite maximum likelihood estimates
 #' result when complete or quasi-complete separation occurs.
 #'
-#' The adjusted score approach to bias reduction that
-#' \code{\link{brmultinom}} implements (\code{type = "AS_mean"}) is an
-#' alternative to maximum likelihood that results in estimates with
-#' smaller asymptotic bias that are also *always* finite, even in
-#' cases of complete or quasi-complete separation.
+#' The adjusted score approaches to bias reduction that
+#' \code{\link{brmultinom}} implements for \code{type = "AS_mean"} and
+#' \code{type = "AS_median"} are alternatives to maximum likelihood
+#' that result in estimates with smaller asymptotic mean and median
+#' bias, respectively, that are also *always* finite, even in cases of
+#' complete or quasi-complete separation.
 #'
 #' \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
 #' multinomial logit regression models through the 'Poisson trick' (see, for
@@ -393,7 +394,9 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
     }
     cat("\nResidual Deviance:", format(x$deviance), "\n")
     cat("Log-likelihood:", format(x$logLik), "\n")
-    cat("AIC:", format(x$AIC), "\n")
+    cat("AIC:", format(x$AIC))
+    cat("\n\nType of estimator:", x$type, get_type_description(x$type))
+    cat("\n", "Number of Fisher Scoring iterations: ", x$iter, "\n", sep = "")
     if (!is.null(correl <- x$correlation)) {
         p <- dim(correl)[2L]
         if (p > 1) {
