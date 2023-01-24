@@ -159,8 +159,7 @@ bracl <- function(formula, data, weights, subset, na.action,
                            Matrix::kronecker(Matrix::Diagonal(ncat)[, -ncat, drop = FALSE], X[keep, xint]),
         (ncat - cats) * Matrix::kronecker(c(rep(1, ncat - 1), 0), X[keep, -xint, drop = FALSE]))
         ofInterest <- c(paste(lev[-ncat], rep("(Intercept)", ncat - 1), sep = ":"), colnames(X)[-xint])
-    }
-    else {
+    } else {
         Xextended <- cbind(Matrix::kronecker(rep(1, ncat), Xnuisance),
                            Matrix::kronecker(Matrix::Diagonal(ncat)[, -ncat, drop = FALSE], X[keep, , drop = FALSE]))
         ofInterest <- paste(rep(lev[-ncat], each = nvar),
@@ -220,8 +219,7 @@ coef.bracl <- function(object, ...) {
                 names(coefs[intercept_names]) <- intercept_names
                 coefs
             })
-        }
-        else {
+        } else {
             with(object, {
                 coefs <- matrix(coefficients[ofInterest], ncol = ncat - 1)
                 coefs <- -apply(cbind(coefs, 0), 1, diff)
@@ -230,8 +228,7 @@ coef.bracl <- function(object, ...) {
                 coefs
             })
         }
-    }
-    else {
+    } else {
         NULL
     }
 }
@@ -261,8 +258,7 @@ vcov.bracl <- function(object, ...) {
         par_names <- c(intercept_names, beta_names)
         vc[par_names, par_names] <- rbind(cbind(vint, vintslo),
                                           cbind(t(vintslo), vbeta))
-    }
-    else {
+    } else {
         betas <- object$coefNames
         npar <- length(betas)
         for (j in 1:npar) {
@@ -399,8 +395,7 @@ predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
         coefs <- cbind(rev(cumsum(cc[int])),
                        int * matrix(cc[sl], nrow = object$ncat - 1, ncol = length(sl), byrow = TRUE))
         rownames(coefs) <- object$lev[-object$ref]
-    }
-    else {
+    } else {
         coefs <- matrix(cc, nrow = object$ncat - 1)
         rownames(coefs) <- object$lev[-object$ref]
         coefs <- apply(coefs, 2, function(x) cumsum(rev(x)))
