@@ -278,14 +278,13 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         }
         res
     }
-
     ## Computation of needed expectations almost exactly
     exp_quant <- function(mu, k) {
         n <- length(mu)
         E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- numeric(n)
         if (k < 0) stop("negative value of k")
         ymax <- max(qnbinom(1 - 10 * .Machine$double.eps, mu = mu, size = 1 / k))
-                                        #if (ymax > 30000) stop("ymax too much large")  ## need control on largest value?
+        ## if (ymax > 30000) stop("ymax too much large")  ## need control on largest value?
         if (ymax > 1) {
             out <- .C('expectedValues',
                       as.double(mu),
@@ -329,7 +328,6 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     ## }
 
     ## required quantities
-
     key_quantities <- function(pars) {
         betas <- pars[1:nvars]
         phi <- pars[nvars + 1]
@@ -375,7 +373,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         })
     }
 
-                                        # score function
+    ## score function
     score <- function(pars, level = 0, fit = NULL) {
         if (is.null(fit)) {
             fit <- key_quantities(pars)
@@ -400,9 +398,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                 R_matrix <- qr.R(qr_decomposition)
                 if (inverse) {
                     return(chol2inv(R_matrix))
-                }
-                else
-                {
+                } else {
                     return(crossprod(R_matrix))
                 }
             }
@@ -410,9 +406,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                 iphiphi <- sum( weights * (E_s2 + ((2 * k * mus + 2) * log((k * mus + 1)) - k^2 * mus^2 - 2 * k * mus) / (k^4 * mus + k^3)) * d1phi^2, na.rm = TRUE )
                 if (inverse) {
                     return(1/iphiphi)
-                }
-                else
-                {
+                } else {
                     return(iphiphi)
                 }
             }
@@ -526,7 +520,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                                   correction = function(pars, ...) 0,
                                   ML = function(pars, ...) 0)
 
-  ## required components for computing the adjusted scores
+    ## required components for computing the adjusted scores
 
     compute_step_components <- function(pars, level = 0, fit = NULL) {
         if (is.null(fit)) {
@@ -582,8 +576,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         nvars <- ncol(x)
         betas_names_all <- betas_names
         betas_names <- betas_names[-aliased]
-    }
-    else {
+    } else {
         nvars_all <- nvars
         betas_names_all <- betas_names
     }
@@ -604,16 +597,14 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         options(warn = warn)
         betas <- coef(fit)
         names(betas) <- betas_names
-    }
-    else {
+    } else {
         if ((length(start) == nvars_all) & is.numeric(start) ) {
             betas_all <- start
             names(betas_all) <- betas_names_all
             if (!isTRUE(is_full_rank)) {
                 betas_all[aliased] <- NA_real_
                 betas <- betas_all[-aliased]
-            }
-            else {
+            } else {
                 betas <- betas_all
             }
             etas <- drop(x %*% betas + offset)
@@ -627,8 +618,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
             if (!isTRUE(is_full_rank)) {
                 betas_all[aliased] <- NA_real_
                 betas <- betas_all[-aliased]
-            }
-            else {
+            } else {
                 betas <- betas_all
             }
             dispersion <- start[nvars_all + 1]
@@ -681,9 +671,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     if (control$maxit == 0) {
         iter <- 0
         failed <- FALSE
-    }
-    else
-    {
+    } else {
         for (iter in seq.int(control$maxit)) {
             step_factor <- 0
             testhalf <- TRUE
@@ -724,8 +712,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
 
                 if (step_factor == 0 & iter == 1) {
                     testhalf <- TRUE
-                }
-                else {
+                } else {
                     s2 <- c(abs(step_beta), abs(step_dispersion))
                     s1 <- c(abs(step_beta_previous), abs(step_dispersion_previous))
                     testhalf <- sum(s2, na.rm = TRUE) > sum(s1,  na.rm = TRUE)
@@ -749,8 +736,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     if(iter >= control$maxit) {
         convergence <- FALSE
         warning("optimization failed to converge")
-    }
-    else
+    } else
     {
         convergence <- TRUE
     }
@@ -981,8 +967,7 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
     if (NROW(x$coefficients)) {
         cat(paste("\nCoefficients (mean model with ", x$link, " link):\n", sep = ""))
         printCoefmat(x$coefficients, digits = digits, signif.legend = FALSE)
-    }
-    else {
+    } else {
         cat("\nNo coefficients (in mean model)\n")
     }
     if (getOption("show.signif.stars") & any( x$coefficients[, 4L] < 0.1)) {
@@ -991,8 +976,7 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
     if (NROW(x$coef.dispersion)) {
         cat(paste("\n(Dispersion parameter  with ", x$transformation," transformation function: ",
                   round(x$coef.dispersion[,1], 7),")\n", sep = ""))
-    }
-    else {
+    } else {
         cat("\nNo coefficients (in precision model)\n")
     }
     cat("\n", apply(cbind(paste(format(c("Null",
@@ -1012,16 +996,14 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
 print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
     cat("\nCall:", deparse(x$call, width.cutoff = floor(getOption("width") * 0.85)), "", sep = "\n")
     if (!x$converged) {
-      cat("model did not converge\n")
-    }
-    else {
+        cat("model did not converge\n")
+    } else {
         if (length(x$coefficients)) {
             cat(paste("Coefficients (mean model with ", x$link, " link):\n", sep = ""))
             print.default(format(x$coefficients, digits = digits), print.gap = 2, quote = FALSE)
             cat("\n")
-        }
-        else {
-        cat("No coefficients (in mean model)\n\n")
+        } else {
+            cat("No coefficients (in mean model)\n\n")
         }
         cat("\nDegrees of Freedom:", x$df.null, "Total (i.e. Null); ",
             x$df.residual, "Residual\n")
@@ -1030,7 +1012,7 @@ print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
         cat("Null Deviance:\t", format(round(x$null.deviance, digits)), "\n")
         cat("Residual Deviance:\t", format(round(x$deviance, digits)),
             "\tAIC:", format(round(x$aic, digits)), "\n")
-  }
+    }
 }
 
 #' Method for computing Wald confidence intervals for one or more
@@ -1041,7 +1023,7 @@ print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
 #' @method confint brnb
 #' @export
 confint.brnb <- function(object, parm, level = 0.95, ...) {
-  confint.default(object, parm, level, ...)
+    confint.default(object, parm, level, ...)
 }
 
 #' Simulate Responses
@@ -1076,25 +1058,25 @@ confint.brnb <- function(object, parm, level = 0.95, ...) {
 #' @method simulate brnb
 #' @export
 simulate.brnb <- function(object, nsim = 1, seed = NULL, ...) {
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
-    runif(1)
-  if (is.null(seed))
-    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-  else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
-    set.seed(seed)
-    RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-  }
-  theta <- object$theta
-  mus <- fitted(object)
-  n <- length(mus)
-  val <- rnegbin(n*nsim, mu = mus, theta = theta)
-  dim(val) <- c(n, nsim)
-  val <- as.data.frame(val)
-  names(val) <- paste0("sim_", seq_len(nsim))
-  attr(val, "seed") <- RNGstate
-  val
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
+        runif(1)
+    if (is.null(seed))
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
+    theta <- object$theta
+    mus <- fitted(object)
+    n <- length(mus)
+    val <- rnegbin(n*nsim, mu = mus, theta = theta)
+    dim(val) <- c(n, nsim)
+    val <- as.data.frame(val)
+    names(val) <- paste0("sim_", seq_len(nsim))
+    attr(val, "seed") <- RNGstate
+    val
 }
 
 

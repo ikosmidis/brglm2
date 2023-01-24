@@ -194,14 +194,12 @@ brglmControl <- function(epsilon = 1e-06, maxit = 100,
                                inverse = expression(1/transformed_dispersion),
                                log = expression(exp(transformed_dispersion)),
                                inverseSqrt = expression(1/transformed_dispersion^2))
-    }
-    else {
+    } else {
         if (is.list(transformation) && (length(transformation) == 2)) {
             Trans <- transformation[[1]]
             inverseTrans <- transformation[[2]]
             transformation <- "custom_transformation"
-        }
-        else {
+        } else {
             stop("transformation can be either one of 'identity', 'sqrt', 'inverse', 'log' and 'inverseSqrt', or a list of two expressions")
         }
     }

@@ -156,8 +156,7 @@ brmultinom <- function(formula, data, weights, subset, na.action,
     if (!is.matrix(Y)) {
         Y <- as.factor(Y)
         lev <- levels(Y)
-    }
-    else {
+    } else {
         lev <- colnames(Y)
     }
     w <- model.weights(mf)
@@ -300,8 +299,7 @@ coef.brmultinom <- function(object, ...) {
             dimnames(coefs) <- list(lev[-object$ref], coefNames)
             coefs
         })
-    }
-    else {
+    } else {
         NULL
     }
 }
@@ -316,8 +314,7 @@ print.brmultinom <- function(x, digits = max(5L, getOption("digits") - 3L), ...)
      cat("\nCoefficients:\n")
      if (is.null(coef(x))) {
          print("No coefficients")
-     }
-     else {
+     } else {
          print(format(coef(x), digits = digits), print.gap = 2, quote = FALSE)
      }
      cat("\nResidual Deviance:", format(x$deviance), "\n")
@@ -347,8 +344,7 @@ summary.brmultinom <- function(object, correlation = FALSE, digits = options()$d
             object$Wald.ratios <- NULL
         if (correlation)
             object$correlation <- NULL
-    }
-    else {
+    } else {
         vc <- vcov.brglmFit(object)
         vc <- vc[object$ofInterest, object$ofInterest]
         se <- sqrt(diag(vc))
@@ -493,8 +489,7 @@ model.matrix.brmultinom <- function(object, data, ...) {
         stop("not a \"brmultinom\" fit")
     if (missing(data)) {
         data <- model.frame(object)
-    }
-    else {
+    } else {
         data <- as.data.frame(data)
     }
     Terms <- delete.response(object$terms)
@@ -523,8 +518,7 @@ confint.brmultinom <- function (object, parm, level = 0.95, ...)  {
     pnames <- if (is.matrix(cf)) colnames(cf) else names(cf)
     if (missing(parm)) {
         parm <- seq_along(pnames)
-    }
-    else {
+    } else {
         if (is.character(parm))  {
             parm <- match(parm, pnames, nomatch = 0L)
         }
@@ -542,8 +536,7 @@ confint.brmultinom <- function (object, parm, level = 0.95, ...)  {
         ci[, , 1L] <- cf + ses * fac[1L]
         ci[, , 2L] <- cf + ses * fac[2L]
         aperm(ci, c(2L, 3L, 1L))
-    }
-    else {
+    } else {
         ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(pnames[parm],
             pct))
         ses <- sqrt(diag(vcov(object)))[parm]
@@ -604,8 +597,7 @@ simulate.brmultinom <- function(object, ...) {
     if (length(weights_ind)) {
         weights_nam <- as.character(object$call$weights)
         names(mf)[weights_ind] <- weights_nam
-    }
-    else {
+    } else {
         weights_nam <- ".weights"
     }
     mf[[weights_nam]] <- c(samples)
