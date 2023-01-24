@@ -85,8 +85,7 @@ ordinal_superiority.bracl <- function(object, formula, data,
         ## out_mean <- c(2 * mean_gammas - 1, 2 * se_mean, 2 * plogis(ci_mean) - 1)
         colnames(out)[ncol(Xnoz) + 1:4] <- c("Delta", "se", pct)
         ## names(out_mean) <- c("Delta*", "se", pct)
-    }
-    else {
+    } else {
         out <- cbind(Xnoz, gammas, se, plogis(ci))
         ## out_mean <- c(mean_gammas, se_mean, plogis(ci_mean))
         colnames(out)[ncol(Xnoz) + 1:4] <- c("gamma", "se", pct)
