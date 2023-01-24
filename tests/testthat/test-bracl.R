@@ -23,9 +23,7 @@ ge <- c(1, 1, 1, 0, 0, 0)
 library("VGAM")
 
 ## With proportional odds
-expect_warning(
     fit_vgam_p <- vglm(cbind(ff[1, ], ff[2, ], ff[3, ], ff[4, ]) ~ re + ge, family = acat(reverse = TRUE, parallel = TRUE))
-)
 expect_warning(
     fit_bracl_p <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell, type = "ML", parallel = TRUE)
 )
