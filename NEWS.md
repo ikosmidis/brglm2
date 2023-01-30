@@ -1,5 +1,13 @@
 # brglm2 0.8.2-999
 
+## Bug fixes
+
+* Fixed a bug where the dispersion in the resulting object would not be transformed even if `transformation != "identity"` when `type` is `ML` or `AS_median` or `AS_mixed`.
+
+## Other improvements, updates and additions
+
+* Added `expo` methods for `brglmFit` objects, which computes estimates, standard errors and confidence intervals for various corrective methods (currently `"ML"`, `"correction+"`, `"correction*"`, `"Lylesetal2012"`, `"AS_median"`).
+
 # brglm2 0.8.2
 
 ## Other improvements, updates and additions

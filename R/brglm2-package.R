@@ -176,3 +176,8 @@ ordinal_superiority <- function(object, formula, data,
                                 bc = FALSE) {
     UseMethod("ordinal_superiority")
 }
+
+#' @export
+expo <- function(object, type = c("ML", "correction", "AS_median", "Lylesetal2012")) {
+    UseMethod("expo")
+}
