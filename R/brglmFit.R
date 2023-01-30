@@ -604,6 +604,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         transformation1 <- control$transformation
         Trans1 <- control$Trans
         inverseTrans1 <- control$inverseTrans
+        ## Set the transformation to identity
         control$transformation <- "identity"
         control$Trans <- expression(dispersion)
         control$inverseTrans <- expression(transformed_dispersion)
@@ -1002,19 +1003,13 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         residuals <- with(quantities, (y - mus)/d1mus)
         working_weights <- quantities$working_weights
 
-        ## Fisher information for the transformed dispersion
-        ## d1zeta <- eval(d1_transformed_dispersion)
-
-        if (!no_dispersion) {
-            info_transformed_dispersion <- 1/step_components_zeta$inverse_info
-            if (is_ML | is_AS_median | is_AS_mixed) {
-                transformed_dispersion <- eval(Trans1)
-                d1zeta <- eval(DD(Trans1, "dispersion", order = 1))
-                adjusted_grad_all["Transformed dispersion"] <- adjusted_grad_all["Transformed dispersion"] / d1zeta
-                info_transformed_dispersion <- info_transformed_dispersion / d1zeta^2
-            }
-        }
-        if (is_ML | is_AS_median  | is_AS_mixed) {
+        ## info_transformed_dispersion will be NA if is_ML | is_AS_median | is_AS_mixed
+        info_transformed_dispersion <- 1/step_components_zeta$inverse_info
+        if (is_ML | is_AS_median | is_AS_mixed) {
+            transformed_dispersion <- eval(Trans1)
+            d1zeta <- eval(DD(Trans1, "dispersion", order = 1))
+            adjusted_grad_all["Transformed dispersion"] <- adjusted_grad_all["Transformed dispersion"] / d1zeta
+            info_transformed_dispersion <- info_transformed_dispersion / d1zeta^2
             control$transformation <- transformation1
             control$trans <- Trans1
             control$inverseTrans <- inverseTrans1
