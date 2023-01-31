@@ -5,12 +5,12 @@ expo.brglmFit <- function(object, type = c("correction*", "correction+", "Lylese
     to_correct <- type %in% c("correction*", "correction+", "Lylesetal2012")
     if (to_correct) {
         if (object_type != "AS_mixed") {
-            object <- update(object, type = "AS_mixed")
+            object <- update(object, type = "AS_mixed", data = object$data)
         }
     } else {
         ## AS_mean and ML are invariant to transformation
         if (object_type != type) {
-            object <- update(object, type = type)
+            object <- update(object, type = type, data = object$data)
         }
     }
     info_fun <- get_information_function(object)
@@ -49,5 +49,8 @@ print.brglmFit_expo <- function(x, digits = max(3L, getOption("digits") - 3L), .
     cat("\n\nType of estimator:", x$type, get_type_description(x$type), "\n")
 }
 
-
-
+#' @method coef brglmFit_expo
+#' @export
+coef.brglmFit_expo <- function(object, ...) {
+    object$coef
+}
