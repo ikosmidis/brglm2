@@ -1131,8 +1131,6 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 
 #' Extract model coefficients from \code{\link{brglmFit}} objects
 #'
-#'
-#'
 #' @inheritParams stats::coef
 #' @param model one of \code{"mean"} (default), \code{"dispersion"}, \code{"full"},
 #'     to return the estimates of the parameters in the linear

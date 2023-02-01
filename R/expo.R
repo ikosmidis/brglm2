@@ -1,3 +1,77 @@
+# Copyright (C) 2022- Ioannis Kosmidis
+
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 or 3 of the License
+#  (at your option).
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  A copy of the GNU General Public License is available at
+#  http://www.r-project.org/Licenses/
+
+#' Estimate exponentiated parameters of generalized linear models
+#' using various methods
+#'
+#' \code{\link{expo}} updates the supplied \code{\link{brglmFit}}
+#' object to estimate exponentiated parameters of generalized linear
+#' models with maximum likelihood or various mean and median bias
+#' reduction methods.
+#'
+#' @param object an object of class \code{\link{brglmFit}},
+#' @param type the type of correction to be used. The options are
+#'     \code{correction*} (explicit mean bias correction with a
+#'     multiplicative adjustment), \code{correction*} (explicit mean
+#'     bias correction with an additive adjustment),
+#'     \code{Lylesetal2012} (explicit median bias correction using the
+#'     multiplicative adjustment in Lyles et al., 2012),
+#'     \code{AS_median} (median bias reduction), and \code{ML}
+#'     (maximum likelihood). See Details.
+#' @param level the confidence level required. Default is \code{0.95}.
+#'
+#' @details
+#'
+#' The supported methods are:
+#'
+#' COMPLETE ME
+#'
+#' @return an object of class \code{brglmFit_expo}, which is a list
+#'     with components \code{coef} (the estimates of the exponentiated
+#'     regression parameters), \code{se} (the corresponding estimated
+#'     stadnard errors for the exponentiated parameters), \code{ci}
+#'     (confidence intervals of level \code{level} for the
+#'     exponentiated parameters), \code{type} the \code{type} of
+#'     correction that has been requested.
+#'
+#' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+#'
+#' @seealso \code{\link{brglm_fit}} and and \code{\link{brglm_control}}
+#'
+#' @references
+#'
+#'
+#' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
+#' reduction in generalized linear models. *Statistics and Computing*,
+#' **30**, 43-59 \doi{10.1007/s11222-019-09860-6}
+#'
+#' Cordeiro G M, McCullagh P (1991). Bias correction in generalized
+#' linear models. *Journal of the Royal Statistical Society. Series B
+#' (Methodological)*, **53**, 629-643 \doi{10.1111/j.2517-6161.1991.tb01852.x}
+#'
+#' Lyles R H, Guo Y, Greenland S (2012). Reducing bias and mean
+#' squared error associated with regression-based odds ratio
+#' estimators’. *Journal of Statistical Planning and Inference*,
+#' **142** 3235–3241. \doi{10.1016/j.jspi.2012.05.005}.
+#'
+#' @examples
+#'
+#' COMPLETE ME
+#'
+#'
+#'
 #' @export
 expo.brglmFit <- function(object, type = c("correction*", "correction+", "Lylesetal2012", "AS_median", "ML"), level = 0.95) {
     type <- match.arg(type)
@@ -49,6 +123,10 @@ print.brglmFit_expo <- function(x, digits = max(3L, getOption("digits") - 3L), .
     cat("\n\nType of estimator:", x$type, get_type_description(x$type), "\n")
 }
 
+#' Extract estimates from \code{\link{expo_brglmFit}} objects
+#'
+#' @inheritParams stats::coef
+#'
 #' @method coef brglmFit_expo
 #' @export
 coef.brglmFit_expo <- function(object, ...) {
