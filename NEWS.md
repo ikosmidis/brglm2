@@ -1,5 +1,9 @@
 # brglm2 0.8.2-999
 
+## New functionality
+
+* The `expo()` method for `brglmFit` objects estimates exponentiated parameters of generalized linear models with maximum likelihood or various mean and median bias reduction methods (see `?expo` for details). Particularly useful for regression-based odds ratio estimators. 
+
 ## Bug fixes
 
 * Fixed a bug where the dispersion in the resulting object would not be transformed even if `transformation != "identity"` when `type` is `ML` or `AS_median` or `AS_mixed`.
@@ -7,6 +11,10 @@
 ## Other improvements, updates and additions
 
 * Added `expo` methods for `brglmFit` objects, which computes estimates, standard errors and confidence intervals for various corrective methods (currently `"ML"`, `"correction+"`, `"correction*"`, `"Lylesetal2012"`, `"AS_median"`).
+
+* Moved documentation to markdown markup through [**roxygen2**](http://cran.r-project.org/package=roxygen2).
+
+* Various documentation fixes.
 
 # brglm2 0.8.2
 
