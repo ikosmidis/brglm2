@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2021 Ioannis Kosmidis
+# Copyright (C) 2016- Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,30 +17,30 @@
 #' Bias reduction for multinomial response models using the
 #' Poisson trick.
 #'
-#' \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
-#' multinomial regression models using implicit and explicit bias
-#' reduction methods. See Kosmidis & Firth (2011) for details.
+#' [brmultinom()] is a wrapper of [brglmFit()] that fits multinomial
+#' regression models using implicit and explicit bias reduction
+#' methods. See Kosmidis & Firth (2011) for details.
 #'
 #' @inheritParams nnet::multinom
 #' @param control a list of parameters for controlling the fitting
-#'     process. See \code{\link{brglmControl}} for details.
+#'     process. See [brglmControl()] for details.
 #' @param ref the reference category to use for multinomial
 #'     regression. Either an integer, in which case
-#'     levels(response)[ref] is used as a baseline, or a character
+#'     `levels(response)[ref]` is used as a baseline, or a character
 #'     string. Default is 1.
 #' @param x should the model matrix be included with in the result
-#'     (default is \code{TRUE}).
-#' @param ... arguments to be used to form the default 'control'
+#'     (default is `TRUE`).
+#' @param ... arguments to be used to form the default `control`
 #'     argument if it is not supplied directly.
 #'
 #' @details
 #'
-#' The models \code{\link{brmultinom}} handles are also known as
+#' The models [brmultinom()] handles are also known as
 #' baseline-category logit models (see, Agresti, 2002, Section 7.1),
 #' because they model the log-odds of every category against a
 #' baseline category. The user can control which baseline (or
-#' reference) category is used via the \code{ref}. By default
-#' \code{\link{brmultinom}} uses the first category as reference.
+#' reference) category is used via the `ref`. By default
+#' [brmultinom()] uses the first category as reference.
 #'
 #' The maximum likelihood estimates for the parameters of
 #' baseline-category logit models have infinite components with
@@ -52,37 +52,37 @@
 #' overlap, and showed that infinite maximum likelihood estimates
 #' result when complete or quasi-complete separation occurs.
 #'
-#' The adjusted score approaches to bias reduction that
-#' \code{\link{brmultinom}} implements for \code{type = "AS_mean"} and
-#' \code{type = "AS_median"} are alternatives to maximum likelihood
-#' that result in estimates with smaller asymptotic mean and median
-#' bias, respectively, that are also *always* finite, even in cases of
-#' complete or quasi-complete separation.
+#' The adjusted score approaches to bias reduction that [brmultinom()]
+#' implements for `type = "AS_mean"` and `type = "AS_median"` are
+#' alternatives to maximum likelihood that result in estimates with
+#' smaller asymptotic mean and median bias, respectively, that are
+#' also *always* finite, even in cases of complete or quasi-complete
+#' separation.
 #'
-#' \code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
-#' multinomial logit regression models through the 'Poisson trick' (see, for
+#' [brmultinom()] is a wrapper of [brglmFit()] that fits multinomial
+#' logit regression models through the 'Poisson trick' (see, for
 #' example, Palmgren, 1981; Kosmidis & Firth, 2011).
 #'
-#' The implementation relies on the construction of an 'extended'
-#' model matrix for the log-linear model and constraints on the sums
-#' of the Poisson means. Specifically, a log-linear model is fitted on
-#' a Kronecker product
-#' (\url{https://en.wikipedia.org/wiki/Kronecker_product}) of the
-#' original model matrix \code{X} implied by the formula, augmented by
-#' \code{nrow(X)} dummy variables.
+#' The implementation relies on the construction of an extended model
+#' matrix for the log-linear model and constraints on the sums of the
+#' Poisson means. Specifically, a log-linear model is fitted on a
+#' [Kronecker
+#' product](https://en.wikipedia.org/wiki/Kronecker_product) of the
+#' original model matrix `X` implied by the formula, augmented by
+#' `nrow(X)` dummy variables.
 #'
-#' The extended model matrix is sparse, and the \pkg{Matrix} package
-#' is used for its effective storage.
+#' The extended model matrix is sparse, and the
+#' [\pkg{Matrix}](https://cran.r-project.org/package=Matrix) package is
+#' used for its effective storage.
 #'
-#' While \code{\link{brmultinom}} can be used for analyses using
-#' multinomial regression models, the current implementation is more
-#' of a 'proof of concept' and is not expected to scale well with
-#' either of \code{nrow(X)}, \code{ncol(X)} or the number of levels in
-#' the categorical response.
+#' While [brmultinom()] can be used for analyses using multinomial
+#' regression models, the current implementation is more of a proof of
+#' concept and is not expected to scale well with either of `nrow(X)`,
+#' `ncol(X)` or the number of levels in the categorical response.
 #'
 #' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'
-#' @seealso \code{\link[nnet]{multinom}}, \code{\link{bracl}} for adjacent category logit models for ordinal responses
+#' @seealso [nnet::multinom()], [bracl()] for adjacent category logit models for ordinal responses
 #'
 #' @references
 #'
@@ -256,19 +256,19 @@ fitted.brmultinom <- function(object, ...) {
 
 #' Residuals for multinomial logistic regression and adjacent category logit models
 #'
-#' @param object the object coming out of \code{\link{bracl}} and
-#'     \code{\link{brmultinom}}.
+#' @param object the object coming out of [bracl()] and
+#'     [brmultinom()].
 #' @param type the type of residuals which should be returned.  The
-#'     options are: \code{"pearson"} (default), \code{"response"},
-#'     \code{"deviance"}, \code{"working"}. See Details.
+#'     options are: `"pearson"` (default), `"response"`, `"deviance"`,
+#'     `"working"`. See Details.
 #' @param ... Currently not used.
 #'
 #' @details
 #'
 #' The residuals computed are the residuals from the equivalent
 #' Poisson log-linear model fit, organized in a form that matches the
-#' output of \code{fitted(object, type = "probs")}. As a result, the
-#' output is residuals defined in terms of the object and expected
+#' output of `fitted(object, type = "probs")`. As a result, the output
+#' is residuals defined in terms of the object and expected
 #' multinomial counts.
 #'
 #' @seealso brmultinom bracl
@@ -406,35 +406,35 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
     invisible(x)
 }
 
-#' Predict method for \code{brmultinom} fits
+#' Predict method for [brmultinom] fits
 #'
 #' Obtain class and probability predictions from a fitted baseline
 #' category logits model.
 #'
 #' @param object a fitted object of class inheriting from
-#'     \code{"brmultinom"}.
+#'     [brmultinom].
 #' @param newdata optionally, a data frame in which to look for
 #'     variables with which to predict.  If omitted, the fitted linear
 #'     predictors are used.
 #' @param type the type of prediction required. The default is
-#'     \code{"class"}, which produces predictions of the response
-#'     category at the covariate values supplied in \code{"newdata"},
-#'     selecting the category with the largest probability; the
-#'     alternative \code{"probs"} returns all category probabilities
-#'     at the covariate values supplied in \code{"newdata"}.
+#'     `"class"`, which produces predictions of the response category
+#'     at the covariate values supplied in `"newdata"`, selecting the
+#'     category with the largest probability; the alternative
+#'     `"probs"` returns all category probabilities at the covariate
+#'     values supplied in `newdata`.
 #' @param ... further arguments passed to or from other methods.
 #'
 #'
 #' @details
 #'
-#' If \code{newdata} is omitted the predictions are based on the data
-#' used for the fit.
+#' If `newdata` is omitted the predictions are based on the data used
+#' for the fit.
 #'
 #' @return
 #'
-#' If \code{type = "class"} a vector with the predicted response
-#' categories; if \code{type = "probs"} a matrix of probabilities for
-#' all response categories at \code{newdata}.
+#' If `type = "class"` a vector with the predicted response
+#' categories; if `type = "probs"` a matrix of probabilities for all
+#' response categories at `newdata`.
 #'
 #' @examples
 #'
@@ -506,7 +506,7 @@ model.matrix.brmultinom <- function(object, data, ...) {
 
 
 #' Method for computing confidence intervals for one or more
-#' regression parameters in a \code{\link{brmultinom}} object
+#' regression parameters in a [brmultinom()] object
 #'
 #' @inheritParams stats::confint
 #'
@@ -546,22 +546,20 @@ confint.brmultinom <- function (object, parm, level = 0.95, ...)  {
 }
 
 
-#' Method for simulating a data set from \code{\link{brmultinom}} and
-#' \code{\link{bracl}} objects
+#' Method for simulating a data set from [brmultinom()] and [bracl()]
+#' objects
 #'
-#' @param object an object of class \code{\link{brmultinom}} or
-#'     \code{\link{bracl}}.
+#' @param object an object of class [brmultinom()] or [bracl()].
 #' @param ... currently not used.
 #'
 #' @return
 #'
-#' A \code{\link{data.frame}} with \code{object$ncat} times the rows
-#' that \code{model.frame(object)} have and the same variables. If
-#' \code{weights} has been specified in the call that generated
-#' \code{object}, then the simulate frequencies will populate the
-#' weights variable. Otherwise, the resulting \code{data.frame} will
-#' have a \code{".weights"} variable with the simulated multinomial
-#' counts.
+#' A [data.frame] with `object$ncat` times the rows that
+#' `model.frame(object)` have and the same variables. If `weights` has
+#' been specified in the call that generated `object`, then the
+#' simulate frequencies will populate the weights variable. Otherwise,
+#' the resulting [data.frame] will have a `".weights"` variable with
+#' the simulated multinomial counts.
 #'
 #' @examples
 #'

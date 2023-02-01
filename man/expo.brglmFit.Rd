@@ -2,6 +2,7 @@
 % Please edit documentation in R/expo.R
 \name{expo.brglmFit}
 \alias{expo.brglmFit}
+\alias{brglmFit_expo}
 \title{Estimate exponentiated parameters of generalized linear models
 using various methods}
 \usage{
@@ -12,30 +13,29 @@ using various methods}
 )
 }
 \arguments{
-\item{object}{an object of class \code{\link{brglmFit}},}
+\item{object}{an object of class \code{\link[=brglmFit]{brglmFit()}},}
 
-\item{type}{the type of correction to be used. The options are
-\code{correction*} (explicit mean bias correction with a
-multiplicative adjustment), \code{correction*} (explicit mean
-bias correction with an additive adjustment),
-\code{Lylesetal2012} (explicit median bias correction using the
-multiplicative adjustment in Lyles et al., 2012),
-\code{AS_median} (median bias reduction), and \code{ML}
-(maximum likelihood). See Details.}
+\item{type}{the type of correction to be used. The available
+options are \code{"correction*"} (explicit mean bias correction with
+a multiplicative adjustment), \code{"correction*"} (explicit mean
+bias correction with an additive adjustment), \code{"Lylesetal2012"}
+(explicit median bias correction using the multiplicative
+adjustment in Lyles et al., 2012), \code{"AS_median"} (median bias
+reduction), and \code{"ML"} (maximum likelihood). See Details.}
 
 \item{level}{the confidence level required. Default is \code{0.95}.}
 }
 \value{
-an object of class \code{brglmFit_expo}, which is a list
-    with components \code{coef} (the estimates of the exponentiated
-    regression parameters), \code{se} (the corresponding estimated
-    stadnard errors for the exponentiated parameters), \code{ci}
-    (confidence intervals of level \code{level} for the
-    exponentiated parameters), \code{type} the \code{type} of
-    correction that has been requested.
+a list inheriting from class \link{brglmFit_expo} with
+components \code{coef} (the estimates of the exponentiated
+regression parameters), \code{se} (the corresponding estimated
+stadnard errors for the exponentiated parameters), \code{ci}
+(confidence intervals of level \code{level} for the exponentiated
+parameters), and \code{type} for the \code{type} of correction that has
+been requested.
 }
 \description{
-\code{\link{expo}} updates the supplied \code{\link{brglmFit}}
+\code{\link[=expo]{expo()}} updates the supplied \code{\link[=brglmFit]{brglmFit()}}
 object to estimate exponentiated parameters of generalized linear
 models with maximum likelihood or various mean and median bias
 reduction methods.
@@ -54,20 +54,20 @@ COMPLETE ME
 }
 \references{
 Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
-reduction in generalized linear models. *Statistics and Computing*,
-**30**, 43-59 \doi{10.1007/s11222-019-09860-6}
+reduction in generalized linear models. \emph{Statistics and Computing},
+\strong{30}, 43-59 \doi{10.1007/s11222-019-09860-6}
 
 Cordeiro G M, McCullagh P (1991). Bias correction in generalized
-linear models. *Journal of the Royal Statistical Society. Series B
-(Methodological)*, **53**, 629-643 \doi{10.1111/j.2517-6161.1991.tb01852.x}
+linear models. \emph{Journal of the Royal Statistical Society. Series B
+(Methodological)}, \strong{53}, 629-643 \doi{10.1111/j.2517-6161.1991.tb01852.x}
 
 Lyles R H, Guo Y, Greenland S (2012). Reducing bias and mean
 squared error associated with regression-based odds ratio
-estimators’. *Journal of Statistical Planning and Inference*,
-**142** 3235–3241. \doi{10.1016/j.jspi.2012.05.005}.
+estimators’. \emph{Journal of Statistical Planning and Inference},
+\strong{142} 3235–3241. \doi{10.1016/j.jspi.2012.05.005}.
 }
 \seealso{
-\code{\link{brglm_fit}} and and \code{\link{brglm_control}}
+\code{\link[=brglm_fit]{brglm_fit()}} and and \code{\link[=brglm_control]{brglm_control()}}
 }
 \author{
 Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}

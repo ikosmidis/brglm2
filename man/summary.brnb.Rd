@@ -2,30 +2,30 @@
 % Please edit documentation in R/brnb.R
 \name{summary.brnb}
 \alias{summary.brnb}
-\title{\code{summary} method for \code{\link{brnb}} objects}
+\title{\code{\link[=summary]{summary()}} method for \link{brnb} objects}
 \usage{
 \method{summary}{brnb}(object, ...)
 }
 \arguments{
-\item{object}{an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.}
+\item{object}{an object of class \link{brnb}, typically, a result of a
+call to \code{\link[=brnb]{brnb()}}.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \description{
-\code{summary} method for \code{\link{brnb}} objects
+\code{\link[=summary]{summary()}} method for \link{brnb} objects
 }
 \details{
-The interface of the summary method for
-    \code{\link{brnb}} objects is similar to that of
-    \code{\link{brglmFit}} objects with minor additional informations. The summary method for
-    \code{\link{brnb}} objects computes the p-values of the
-    individual Wald statistics based on the standard normal
-    distribution.
+The interface of the summary method for \link{brnb} objects is
+similar to that of \code{\link[=brglmFit]{brglmFit()}} objects with additional
+information. The summary method for \code{\link[=brnb]{brnb()}} objects computes
+the p-values of the individual Wald statistics based on the
+standard normal distribution.
 }
 \examples{
-## For examples see examples(brnb)
+# For examples see examples(brnb)
 
 }
 \seealso{
-\code{\link{summary.brglmFit}} and \code{\link{glm}}
+\code{\link[=summary.brglmFit]{summary.brglmFit()}} and \code{\link[=glm]{glm()}}
 }

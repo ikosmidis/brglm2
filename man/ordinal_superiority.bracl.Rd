@@ -15,8 +15,7 @@
 }
 \arguments{
 \item{object}{a fitted object from an ordinal regression
-model. Currently only models from class \code{"bracl"} are
-supported.}
+model. Currently only models from class \link{bracl} are supported.}
 
 \item{formula}{a RHS formula indicating the group variable to use.}
 
@@ -25,23 +24,23 @@ with which to compute ordinal superiority measures.  If
 omitted, an attempt is made to use the data that produced
 \code{object}.}
 
-\item{measure}{either \code{"gamma"} (default) or \code{"Delta"},
-specifying the ordinal superiority measure to be returned.}
+\item{measure}{either \code{"gamma"} (default) or \code{"Delta"}, specifying
+the ordinal superiority measure to be returned.}
 
 \item{level}{the confidence level required when computing
 confidence intervals for the ordinal superiority measures.}
 
 \item{bc}{logical. If \code{FALSE} (default) then the ordinal
 superiority measures are computed using the estimates in
-\code{object}. If \code{TRUE} then the ordinal superiority
-measure estimates are corrected for mean bias.}
+\code{object}. If \code{TRUE} then the ordinal superiority measure
+estimates are corrected for mean bias.}
 }
 \description{
-\code{\link{ordinal_superiority}} is a method for the estimation
-and inference about model-based ordinal superiority scores
-introduced in Agresti and Kateri (2017, Section 5) from fitted
-objects. The mean bias of the estimates of the ordinal superiority
-scores can be corrected.
+\code{\link[=ordinal_superiority]{ordinal_superiority()}} is a method for the estimation and
+inference about model-based ordinal superiority scores introduced
+in Agresti and Kateri (2017, Section 5) from fitted objects. The
+mean bias of the estimates of the ordinal superiority scores can be
+corrected.
 }
 \examples{
 data("stemcell", package = "brglm2")
@@ -68,5 +67,5 @@ ordinal_superiority(fit_bracl_p, ~ gender, bc = TRUE, level = 0.99)
 \references{
 Agresti, A., Kateri, M. (2017). Ordinal probability effect measures
 for group comparisons in multinomial cumulative link models.
-*Biometrics*, **73** 214-219 #' \doi{10.1111/biom.12565}
+\emph{Biometrics}, \strong{73} 214-219 #' \doi{10.1111/biom.12565}
 }

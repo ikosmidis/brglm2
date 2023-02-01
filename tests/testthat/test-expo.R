@@ -29,7 +29,7 @@ lfit_mix <- update(lfit, type = "AS_mixed")
 or_est_bc1 <- exp(coef(lfit_mix)) * exp(-diag(vcov(lfit_mix))/2)
 or_ses_bc1 <- sqrt(diag(diag(or_est_bc1) %*% solve(info(log(or_est_bc1))) %*% diag(or_est_bc1)))
 for (met in start_methods) {
-    bc1 <- expo(update(lfit, type = met), type = "Lylesetal2012")
+    bc1 <- expo(update(lfit_mix, type = met), type = "Lylesetal2012")
     expect_equal(coef(bc1), or_est_bc1)
     expect_equal(bc1$se, or_ses_bc1, check.attributes = FALSE)
 }
@@ -38,7 +38,7 @@ for (met in start_methods) {
 or_est_bc2 <- exp(coef(lfit_mix)) / (1 + diag(vcov(lfit_mix))/2)
 or_ses_bc2 <- sqrt(diag(diag(or_est_bc2) %*% solve(info(log(or_est_bc2))) %*% diag(or_est_bc2)))
 for (met in start_methods) {
-    bc2 <- expo(update(lfit, type = met), type = "correction*")
+    bc2 <- expo(update(lfit_mix, type = met), type = "correction*")
     expect_equal(coef(bc2), or_est_bc2)
     expect_equal(bc2$se, or_ses_bc2, check.attributes = FALSE)
 }
@@ -57,7 +57,7 @@ lfit_med <- update(lfit, type = "AS_median")
 or_est_med <- exp(coef(lfit_med))
 or_ses_med <- sqrt(diag(diag(or_est_med) %*% solve(info(log(or_est_med))) %*% diag(or_est_med)))
 for (met in start_methods) {
-    med <- expo(update(lfit, type = met), type = "AS_median")
+    med <- expo(update(lfit_med, type = met), type = "AS_median")
     expect_equal(coef(med), or_est_med)
     expect_equal(med$se, or_ses_med, check.attributes = FALSE)
 }

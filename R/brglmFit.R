@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2021 Ioannis Kosmidis
+# Copyright (C) 2016- Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,54 +14,53 @@
 #  http://www.r-project.org/Licenses/
 
 
-#' Fitting function for \code{\link{glm}} for reduced-bias
-#' estimation and inference
+#' Fitting function for [glm()] for reduced-bias estimation and
+#' inference
 #'
-#' \code{\link{brglmFit}} is a fitting method for \code{\link{glm}}
-#' that fits generalized linear models using implicit and explicit
-#' bias reduction methods (Kosmidis, 2014), and other penalized
-#' maximum likelihood methods. Currently supported methods include the
-#' mean bias-reducing adjusted scores approach in Firth (1993) and
-#' Kosmidis & Firth (2009), the median bias-reduction adjusted scores
-#' approach in Kenne Pagui et al. (2017), the correction of the asymptotic
-#' bias in Cordeiro & McCullagh (1991), the mixed bias-reduction
-#' adjusted scores approach in Kosmidis et al (2020), maximum
-#' penalized likelihood with powers of the Jeffreys prior as penalty,
-#' and maximum likelihood. Estimation is performed using a quasi
-#' Fisher scoring iteration (see \code{vignette("iteration",
-#' "brglm2")}), which, in the case of mean-bias reduction, resembles
-#' an iterative correction of the asymptotic bias of the Fisher
-#' scoring iterates.
+#' [brglmFit()] is a fitting method for [glm()] that fits generalized
+#' linear models using implicit and explicit bias reduction methods
+#' (Kosmidis, 2014), and other penalized maximum likelihood
+#' methods. Currently supported methods include the mean bias-reducing
+#' adjusted scores approach in Firth (1993) and Kosmidis & Firth
+#' (2009), the median bias-reduction adjusted scores approach in Kenne
+#' Pagui et al. (2017), the correction of the asymptotic bias in
+#' Cordeiro & McCullagh (1991), the mixed bias-reduction adjusted
+#' scores approach in Kosmidis et al (2020), maximum penalized
+#' likelihood with powers of the Jeffreys prior as penalty, and
+#' maximum likelihood. Estimation is performed using a quasi Fisher
+#' scoring iteration (see `vignette("iteration", "brglm2")`, which, in
+#' the case of mean-bias reduction, resembles an iterative correction
+#' of the asymptotic bias of the Fisher scoring iterates.
 #'
 #' @inheritParams stats::glm.fit
 #' @aliases brglm_fit
-#' @param x \code{x} is a design matrix of dimension \code{n * p}.
-#' @param y \code{y} is a vector of observations of length \code{n}.
+#' @param x a design matrix of dimension `n * p`.
+#' @param y a vector of observations of length `n`.
 #' @param control a list of parameters controlling the fitting
-#'     process. See \code{\link{brglmControl}} for details.
+#'     process. See [brglmControl()] for details.
 #' @param start starting values for the parameters in the linear
-#'     predictor. If \code{NULL} (default) then the maximum likelihood
+#'     predictor. If `NULL` (default) then the maximum likelihood
 #'     estimates are calculated and used as starting values.
-#' @param mustart applied only when start is not \code{NULL}. Starting
+#' @param mustart applied only when start is not `NULL`. Starting
 #'     values for the vector of means to be passed to
-#'     \code{\link{glm.fit}} when computing starting values using
-#'     maximum likelihood.
-#' @param etastart applied only when start is not
-#'     \code{NULL}. Starting values for the linear predictor to be
-#'     passed to \code{\link{glm.fit}} when computing starting values
-#'     using maximum likelihood.
-#' @param fixed_totals effective only when \code{family} is
-#'     \code{poisson}. Either \code{NULL} (no effect) or a vector that
+#'     [glm.fit()] when computing starting values using maximum
+#'     likelihood.
+#' @param etastart applied only when start is not `NULL`. Starting
+#'     values for the linear predictor to be passed to
+#'     [glm.fit()] when computing starting values using maximum
+#'     likelihood.
+#' @param fixed_totals effective only when `family` is
+#'     [poisson()]. Either `NULL` (no effect) or a vector that
 #'     indicates which counts must be treated as a group. See Details
-#'     for more information and \code{\link{brmultinom}}.
-#' @param singular.ok logical. If \code{FALSE}, a singular model is an
+#'     for more information and [brmultinom()].
+#' @param singular.ok logical. If `FALSE`, a singular model is an
 #'     error.
 #'
 #' @details
 #'
 #' A detailed description of the supported adjustments and the quasi
 #' Fisher scoring iteration is given in the iteration vignette (see,
-#' \code{vignette("iteration", "brglm2")} or Kosmidis et al, 2020).  A
+#' `vignette("iteration", "brglm2")` or Kosmidis et al, 2020).  A
 #' shorter description of the quasi Fisher scoring iteration is also
 #' given in one of the vignettes of the *enrichwith* R package (see,
 #' \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
@@ -70,79 +69,69 @@
 #'
 #' In the special case of generalized linear models for binomial,
 #' Poisson and multinomial responses, the adjusted score equation
-#' approaches for \code{type = "AS_mixed"}, \code{type = "AS_mean"},
-#' and \code{type = "AS_median"} (see below for what methods each
-#' \code{type} corresponds) return estimates with improved frequentist
-#' properties, that are also always finite, even in cases where the
-#' maximum likelihood estimates are infinite (e.g. complete and
-#' quasi-complete separation in multinomial regression). See, Kosmidis
-#' and Firth (2021) for a proof for binomial-response GLMs with
-#' Jeffreys-prior penalties to the log-likelihood, which is equivalent
-#' to mean bias reduction for logistic regression. See, also,
-#' \code{\link[detectseparation]{detect_separation}} and
-#' \code{\link[detectseparation]{check_infinite_estimates}} for
-#' pre-fit and post-fit methods for the detection of infinite
-#' estimates in binomial response generalized linear models.
+#' approaches for `type = "AS_mixed"`, `type = "AS_mean"`, and `type =
+#' "AS_median"` (see below for what methods each `type` corresponds)
+#' return estimates with improved frequentist properties, that are
+#' also always finite, even in cases where the maximum likelihood
+#' estimates are infinite (e.g. complete and quasi-complete separation
+#' in multinomial regression). See, Kosmidis and Firth (2021) for a
+#' proof for binomial-response GLMs with Jeffreys-prior penalties to
+#' the log-likelihood, which is equivalent to mean bias reduction for
+#' logistic regression. See, also,
+#' [detectseparation::detect_separation()] and
+#' [detectseparation::check_infinite_estimates()] for pre-fit and
+#' post-fit methods for the detection of infinite estimates in
+#' binomial response generalized linear models.
 #'
 #' The type of score adjustment to be used is specified through the
-#' \code{type} argument (see \code{\link{brglmControl}} for
-#' details). The available options are
+#' `type` argument (see [brglmControl()] for details). The available
+#' options are
 #'
-#' \itemize{
-#'
-#' \item \code{type = "AS_mixed"}: the mixed bias-reducing score adjustments in
+#' * `type = "AS_mixed"`: the mixed bias-reducing score adjustments in
 #' Kosmidis et al (2020) that result in mean bias reduction for the
 #' regression parameters and median bias reduction for the dispersion
 #' parameter, if any; default.
 #'
-#' \item \code{type = "AS_mean"}: the mean bias-reducing score adjustments
-#' in Firth, 1993 and Kosmidis & Firth, 2009. \code{type = "AS_mixed"}
-#' and \code{type = "AS_mean"} will return the same results when
-#' \code{family} is \code{binomial} or \code{poisson}, i.e. when the
-#' dispersion is fixed)
+#' * `type = "AS_mean"`: the mean bias-reducing score adjustments in
+#' Firth, 1993 and Kosmidis & Firth, 2009. `type = "AS_mixed"` and
+#' `type = "AS_mean"` will return the same results when `family` is
+#' [binomial()] or [poisson()], i.e. when the dispersion is fixed
 #'
-#' \item \code{type = "AS_median"}: the median bias-reducing score
+#' * `type = "AS_median"`: the median bias-reducing score
 #' adjustments in Kenne Pagui et al. (2017)
 #'
-#' \item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
+#' * `type = "MPL_Jeffreys"`: maximum penalized likelihood
 #' with powers of the Jeffreys prior as penalty.
 #'
-#' \item \code{type = "ML"}: maximum likelihood.
+#' * `type = "ML"`: maximum likelihood.
 #'
-#' \item \code{type = "correction"}: asymptotic bias correction, as in
+#' * `type = "correction"`: asymptotic bias correction, as in
 #' Cordeiro & McCullagh (1991).
 #'
-#' }
-#'
-#'
 #' The null deviance is evaluated based on the fitted values using the
-#'     method specified by the \code{type} argument (see
-#'     \code{\link{brglmControl}}).
+#' method specified by the `type` argument (see [brglmControl()]).
 #'
-#' The \code{family} argument of the current version of
-#' \code{brglmFit} can accept any combination of \code{\link{family}}
-#' objects and link functions, including families with user-specified
-#' link functions, \code{\link{mis}} links, and \code{\link{power}}
-#' links, but excluding \code{\link{quasi}},
-#' \code{\link{quasipoisson}} and \code{\link{quasibinomial}}
-#' families.
+#' The `family` argument of the current version of [brglmFit()] can
+#' accept any combination of [family] objects and link functions,
+#' including families with user-specified link functions, [mis()]
+#' links, and [power()] links, but excluding [quasi()],
+#' [quasipoisson()] and [quasibinomial()] families.
 #'
-#' The description of \code{method} argument and the \code{Fitting
-#' functions} section in \code{\link{glm}} gives information on
-#' supplying fitting methods to \code{\link{glm}}.
+#' The description of `method` argument and the `Fitting functions`
+#' section in [glm()] gives information on supplying fitting
+#' methods to [glm()].
 #'
-#' \code{fixed_totals} to specify groups of observations for which the
-#' sum of the means of a Poisson model will be held fixed to the
-#' observed count for each group. This argument is used internally in
-#' \code{\link{brmultinom}} and \code{\link{bracl}} for
-#' baseline-category logit models and adjacent category logit models,
-#' respectively.
+#' `fixed_totals` specifies groups of observations for which the sum
+#' of the means of a Poisson model will be held fixed to the observed
+#' count for each group. This argument is used internally in
+#' [brmultinom()] and [bracl()] for baseline-category logit models and
+#' adjacent category logit models, respectively.
 #'
-#' \code{brglm_fit} is an alias to \code{brglmFit}.
+#' [brglm_fit()] is an alias to [brglmFit()].
 #'
 #' @author Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}
 #'
-#' @seealso \code{\link{brglmControl}}, \code{\link{glm.fit}}, \code{\link{glm}}
+#' @seealso [brglmControl()], [glm.fit()], [glm()]
 #'
 #' @references
 #'
@@ -1129,21 +1118,21 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
          class = "brglmFit")
 }
 
-#' Extract model coefficients from \code{\link{brglmFit}} objects
+#' Extract model coefficients from [brglmFit] objects
 #'
 #' @inheritParams stats::coef
-#' @param model one of \code{"mean"} (default), \code{"dispersion"}, \code{"full"},
+#' @param model one of `"mean"` (default), `"dispersion"`, `"full",
 #'     to return the estimates of the parameters in the linear
 #'     prediction only, the estimate of the dispersion parameter only,
 #'     or both, respectively.
 #'
 #' @details
 #'
-#' See \code{\link{coef}} for more details.
+#' See [coef()] for more details.
 #'
 #' @seealso
 #'
-#' \code{\link{coef}}
+#' [coef()]
 #'
 #' @export
 coef.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) {
@@ -1174,22 +1163,21 @@ coef.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) 
     })
 }
 
-#' \code{summary} method for \code{\link{brglmFit}} objects
+#' [summary()] method for [brglmFit] objects
 #'
 #' @inheritParams stats::summary.glm
 #'
-#' @details The interface of the summary method for
-#'     \code{\link{brglmFit}} objects is identical to that of
-#'     \code{\link{glm}} objects. The summary method for
-#'     \code{\link{brglmFit}} objects computes the p-values of the
+#' @details The interface of the summary method for [brglmFit()]
+#'     objects is identical to that of [glm()] objects. The summary
+#'     method for [brglmFit()] objects computes the p-values of the
 #'     individual Wald statistics based on the standard normal
 #'     distribution, unless the family is Gaussian, in which case a t
 #'     distribution with appropriate degrees of freedom is used.
 #'
-#' @seealso \code{\link{summary.glm}} and \code{\link{glm}}
+#' @seealso [summary.glm()] and [glm()]
 #'
 #' @examples
-#' ## For examples see examples(brglmFit)
+#' ## For examples see `examples(brglmFit)`
 #'
 #' @method summary brglmFit
 #' @export
@@ -1212,7 +1200,7 @@ summary.brglmFit <- function(object, dispersion = NULL,
 }
 
 #' Method for computing confidence intervals for one or more
-#' regression parameters in a \code{\link{brglmFit}} object
+#' regression parameters in a [brglmFit()] object
 #'
 #' @inheritParams stats::confint
 #'
@@ -1223,18 +1211,18 @@ confint.brglmFit <- function(object, parm, level = 0.95, ...) {
 }
 
 #' Return the variance-covariance matrix for the regression parameters
-#' in a \code{\link{brglmFit}} object
+#' in a [brglmFit()] object
 #'
 #' @inheritParams stats::vcov.glm
 #' @param model character specifying for which component of the model coefficients should be extracted.
 #'
 #' @details
 #'
-#' The options for \code{model} are \code{"mean"} for mean regression
-#' parameters only (default), \code{"dispersion"} for the dispersion
-#' parameter (or the transformed dispersion; see
-#' \code{\link{brglm_control}}), and \code{"mean"} for both the mean
-#' regression and the (transformed) dispersion parameters.
+#' The options for `model` are `"mean"` for mean regression parameters
+#' only (default), `"dispersion"` for the dispersion parameter (or the
+#' transformed dispersion; see [brglm_control()]), and `"full"` for
+#' both the mean regression and the (transformed) dispersion
+#' parameters.
 #'
 #' @method vcov brglmFit
 #' @export
@@ -1270,7 +1258,8 @@ DD <- function(expr,name, order = 1) {
 
 
 
-## Almost all code is from stats:::print.summary.glm apart from minor modifications
+## Almost all code in print.summary.brglmFit is from
+## stats:::print.summary.glm apart from minor modifications
 #' @rdname summary.brglmFit
 #' @method print summary.brglmFit
 #' @export

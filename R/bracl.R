@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2021 Ioannis Kosmidis
+# Copyright (C) 2016- Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,28 +17,28 @@
 #' Bias reduction for adjacent category logit models for ordinal
 #' responses using the Poisson trick.
 #'
-#' \code{bracl} is a wrapper of \code{\link{brglmFit}} that fits
-#' adjacent category logit models with or without proportional odds
-#' using implicit and explicit bias reduction methods. See Kosmidis &
-#' Firth (2011) for details.
+#' [bracl()] is a wrapper of [brglmFit()] that fits adjacent category
+#' logit models with or without proportional odds using implicit and
+#' explicit bias reduction methods. See Kosmidis & Firth (2011) for
+#' details.
 #'
 #' @inheritParams MASS::polr
 #' @param control a list of parameters for controlling the fitting
-#'     process. See \code{\link{brglmControl}} for details.
-#' @param parallel if \code{FALSE} (default), then a non-proportional
-#'     odds adjacent category model is fit, assuming different
-#'     effects per category; if \code{TRUE} then a proportional odds
-#'     adjacent category model is fit. See Details.
+#'     process. See [brglmControl()] for details.
+#' @param parallel if `FALSE` (default), then a non-proportional odds
+#'     adjacent category model is fit, assuming different effects per
+#'     category; if `TRUE` then a proportional odds adjacent category
+#'     model is fit. See Details.
 #' @param x should the model matrix be included with in the result
-#'     (default is \code{TRUE}).
-#' @param ... arguments to be used to form the default 'control'
+#'     (default is `TRUE`).
+#' @param ... arguments to be used to form the default `control`
 #'     argument if it is not supplied directly.
 #'
 #' @details
 #'
-#' The \code{bracl} function fits adjacent category models, which
-#' assume multinomial observations with probabilities with
-#' proportional odds of the form
+#' The [bracl()] function fits adjacent category models, which assume
+#' multinomial observations with probabilities with proportional odds
+#' of the form
 #'
 #' \deqn{\log\frac{\pi_{ij}}{\pi_{ij + 1}} = \alpha_j + \beta^T x_i}{log(pi[i, j]/pi[i, j+1]) = alpha[j] + sum(beta * x[i, ])}
 #'
@@ -51,7 +51,7 @@
 #'
 #' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'
-#' @seealso \code{\link[nnet]{multinom}}, \code{\link{brmultinom}}
+#' @seealso [nnet::multinom()], [brmultinom()]
 #'
 #' @references
 #'
@@ -326,35 +326,34 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
     invisible(x)
 }
 
-#' Predict method for \code{bracl} fits
+#' Predict method for [bracl] fits
 #'
 #' Obtain class and probability predictions from a fitted adjacent
 #' category logits model.
 #'
-#' @param object a fitted object of class inheriting from
-#'     \code{"bracl"}.
+#' @param object a fitted object of class inheriting from [bracl].
 #' @param newdata optionally, a data frame in which to look for
 #'     variables with which to predict.  If omitted, the fitted linear
 #'     predictors are used.
 #' @param type the type of prediction required. The default is
-#'     \code{"class"}, which produces predictions of the response
-#'     category at the covariate values supplied in \code{"newdata"},
-#'     selecting the category with the largest probability; the
-#'     alternative \code{"probs"} returns all category probabilities
-#'     at the covariate values supplied in \code{"newdata"}.
+#'     `"class"`, which produces predictions of the response category
+#'     at the covariate values supplied in `"newdata"`, selecting the
+#'     category with the largest probability; the alternative
+#'     `"probs"` returns all category probabilities at the covariate
+#'     values supplied in `newdata`.
 #' @param ... further arguments passed to or from other methods.
 #'
 #'
 #' @details
 #'
-#' If \code{newdata} is omitted the predictions are based on the data
+#' If `newdata` is omitted the predictions are based on the data
 #' used for the fit.
 #'
 #' @return
 #'
-#' If \code{type = "class"} a vector with the predicted response
-#' categories; if \code{type = "probs"} a matrix of probabilities for
-#' all response categories at \code{newdata}.
+#' If `type = "class"` a vector with the predicted response
+#' categories; if `type = "probs"` a matrix of probabilities for all
+#' response categories at `newdata`.
 #'
 #' @examples
 #'

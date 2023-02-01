@@ -2,13 +2,13 @@
 % Please edit documentation in R/brnb.R
 \name{print.summary.brnb}
 \alias{print.summary.brnb}
-\title{Summarizing Linear Model Fits}
+\title{Summarizing \link{brnb} fits}
 \usage{
 \method{print}{summary.brnb}(x, digits = max(3, getOption("digits") - 3), ...)
 }
 \arguments{
-\item{x}{an object of class "summary.brnb", usually, a result of a
-call to summary.brnb.}
+\item{x}{an object of class \link{summary.brnb}, usually, a result of a
+call to \code{\link[=summary.brnb]{summary.brnb()}}.}
 
 \item{digits}{the number of significant digits to use when
 printing.}
@@ -17,15 +17,14 @@ printing.}
 currently.}
 }
 \description{
-print summary output for class "brnb".
+print summary output for class \link{brnb}
 }
 \details{
-\code{print.summary.brnb} tries to be smart about
-    formatting the coefficients, standard errors, and additionally
-    gives "significant stars". The \code{coefficients} components
-    of the result gives the estimated coefficients and their
-    estimated standard errors, together with their ratio
-    (\code{z}). A fourth column gives the two-tailed p-value
-    corresponding to the \code{z} statistica based on Normal
-    reference distribution.
+\link{print.summary.brnb} tries to be smart about formatting
+the coefficients, standard errors, and additionally gives
+"significant stars". The \code{coefficients} components of the
+result gives the estimated coefficients and their estimated
+standard errors, together with their ratio (\code{z}). A fourth
+column gives the two-tailed p-value corresponding to the \code{z}
+statistics based on Normal reference distribution.
 }

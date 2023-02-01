@@ -15,22 +15,19 @@ detect_separation(...)
 }
 \description{
 The functions or variables listed here are no longer part of
- \pkg{brglm2}.
+\pkg{brglm2}.
 }
 \details{
 \itemize{
-
-\item \code{\link{detect_separation}}: This function is defunct
-from \pkg{brglm2} since version 0.8.0. A new version of
-\code{detect_separation} is now maintained in the
-\pkg{detectseparation} R package at
-\url{https://cran.r-project.org/package=detectseparation}.
-
-\item \code{check_infinite_estimates} is defunct from
-\pkg{brglm2} since version 0.8.0. An new version of
-\code{check_infinite_estimates} is now maintained in the
-\pkg{detectseparation} R package at
-\url{https://cran.r-project.org/package=detectseparation}.
-
+\item \code{\link[=detect_separation]{detect_separation()}}: This function is defunct from \pkg{brglm2}
+since version 0.8.0. A new version of \code{\link[=detect_separation]{detect_separation()}} is now
+maintained in the
+\href{https://cran.r-project.org/package=detectseparation}{\pkg{detectseparation}}
+R package.
+\item \code{\link[=check_infinite_estimates]{check_infinite_estimates()}} is defunct from \pkg{brglm2} since
+version 0.8.0. An new version of \code{\link[=check_infinite_estimates]{check_infinite_estimates()}} is
+now maintained in the
+\href{https://cran.r-project.org/package=detectseparation}{\pkg{detectseparation}}
+R package.
 }
 }

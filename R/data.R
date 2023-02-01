@@ -1,22 +1,21 @@
 #' Habitat preferences of lizards
 #'
-#' The lizards data frame has 23 rows and 6 columns. Variables
-#' \code{grahami} and \code{opalinus} are counts of two lizard species
-#' at two different perch heights, two different perch diameters, in
-#' sun and in shade, at three times of day.
+#' @format A data frame with 23 rows and 6 columns:
 #'
-#' \itemize{
-#'   \item grahami. count of grahami lizards
-#'   \item opalinus. count of opalinus lizards
-#'   \item height. a factor with levels \code{<5ft}, \code{>=5ft}
-#'   \item diameter. a factor with levels \code{<=2in}, \code{>2in}
-#'   \item light. a factor with levels \code{sunny}, \code{shady}
-#'   \item time. a factor with levels \code{early}, \code{midday}, \code{late}
-#' }
+#' * `grahami`. count of grahami lizards
+#' * `opalinus`. count of opalinus lizards
+#' * `height`. a factor with levels `<5ft`, `>=5ft`
+#' * `diameter`. a factor with levels `<=2in`, `>2in`
+#' * `light`. a factor with levels `sunny`, `shady`
+#' * `time`. a factor with levels `early`, `midday`, `late`
+#'
+#' The variables `grahami` and `opalinus` are counts of two lizard
+#' species at two different perch heights, two different perch
+#' diameters, in sun and in shade, at three times of day.
 #'
 #' @seealso
 #'
-#' \code{\link{brglm_fit}}
+#' [brglm_fit()]
 
 #'
 #' @source
@@ -34,21 +33,15 @@
 #' Histology grade and risk factors for 79 cases of endometrial cancer
 #'
 #' @format A data frame with 79 rows and 4 variables:
-#' \describe{
 #'
-#' \item{NV}{neovasculization with coding 0 for absent and 1 for present}
+#' * `NV`: neovasculization with coding 0 for absent and 1 for present
+#' * `PI`: pulsality index of arteria uterina
+#' * `EH`: endometrium height
+#' * `HG` histology grade with coding 0 for low grade and 1 for high grade
 #'
-#' \item{PI}{pulsality index of arteria uterina}
-#'
-#' \item{EH}{endometrium height}
-#'
-#' \item{HG}{histology grade with coding 0 for low grade and 1 for high grade}
-#'
-#' }
-#'
-#' @source The packaged data set was downloaded in \code{.dat} format
-#'     from \url{http://www.stat.ufl.edu/~aa/glm/data}. The latter
-#'     link provides the data sets used in Agresti (2015).
+#' @source The packaged data set was downloaded in `.dat` format from
+#'     \url{http://www.stat.ufl.edu/~aa/glm/data}. The latter link
+#'     provides the data sets used in Agresti (2015).
 #'
 #'     The endometrial data set was first analyzed in Heinze and
 #'     Schemper (2002), and was originally provided by Dr
@@ -56,7 +49,7 @@
 #'
 #' @seealso
 #'
-#' \code{\link{brglm_fit}}
+#' [brglm_fit()]
 #'
 #'
 #' @references
@@ -84,7 +77,7 @@
 #'
 #' @seealso
 #'
-#' \code{\link{brglm_fit}}
+#' [brglm_fit()]
 #'
 #' @references
 #'
@@ -103,27 +96,20 @@
 #'
 #' @format A data frame with 80 rows and 5 variables:
 #'
-#' \describe{
+#' * `foodchoice`: primary food type, in volume, found in an alligator’s stomach, with levels `fish`, `invertebrate`,`reptile`, `bird`, `other`
+#' * `lake`: lake of capture with levels `Hancock`, `Oklawaha`, `Trafford`, `George`.
+#' * `gender`: gender of the alligator with levels `Male` and `Female`
+#' * `size`: size of the alligator with levels `<=2.3` meters long and `>2.3` meters long
+#' * `freq`: number of alligators for each foodchoice, lake, gender and size combination
 #'
-#' \item{foodchoice}{primary food type, in volume, found in an alligator’s stomach, with levels \code{fish}, \code{invertebrate}, \code{reptile}, \code{bird}, \code{other}}
-#'
-#' \item{lake}{lake of capture with levels \code{Hancock}, \code{Oklawaha}, \code{Trafford}, \code{George}}
-#'
-#' \item{gender}{gender of the alligator with levels \code{Male} and \code{Female}}
-#'
-#' \item{size}{size of the alligator with levels \code{<=2.3} meters long and \code{>2.3} meters long}
-#'
-#' \item{freq}{number of alligators for each foodchoice, lake, gender and size combination}
-#'
-#' }
 #'
 #' @source
 #'
-#' The alligators data set is analyzed in Agresti (2002, Subsection~7.1.2).
+#' The alligators data set is analyzed in Agresti (2002, Subsection 7.1.2).
 #'
 #' @seealso
 #'
-#' \code{\link{brmultinom}}
+#' [brmultinom()]
 #'
 #' @references
 #'
@@ -142,27 +128,21 @@
 #' religious beliefs, stratified by gender.
 #'
 #' @format A data frame with 24 rows and 4 variables:
-#' \describe{
 #'
-#' \item{research}{opinion about funding stem cell research with levels \code{definitely}, \code{probably}, \code{probably not}, \code{definitely not}}
+#' * `research`: opinion about funding stem cell research with levels `definitely`, `probably`, `probably not`, `definitely not`
+#' * `gender`: the gender of the respondent with levels `female` and `male`
+#' * `religion`: the fundamentalism/liberalism of one’s religious beliefs with levels `fundamentalist`, `moderate`,
+#' `liberal`
+#' `frequency`: the number of times a respondent fell in each of the combinations of levels for `research`, `religion` and `gender`
 #'
-#' \item{gender}{the gender of the respondent with levels \code{female} and \code{male}}
-#'
-#' \item{religion}{the fundamentalism/liberalism of one’s religious
-#' beliefs with levels \code{fundamentalist}, \code{moderate},
-#' \code{liberal}}
-#'
-#' \item{frequency}{the number of times a respondent fell in each of the combinations of levels for \code{research}, \code{religion} and \code{gender}}
-#'
-#' }
 #'
 #' @seealso
 #'
-#' \code{\link{bracl}}
+#' [bracl()]
 #'
 #' @source
 #'
-#' The \code{stemcell} data set is analyzed in Agresti (2010, Subsection~4.1.5).
+#' The `stemcell` data set is analyzed in Agresti (2010, Subsection 4.1.5).
 #'
 #' @references
 #'

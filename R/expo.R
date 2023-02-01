@@ -16,21 +16,21 @@
 #' Estimate exponentiated parameters of generalized linear models
 #' using various methods
 #'
-#' \code{\link{expo}} updates the supplied \code{\link{brglmFit}}
+#' [expo()] updates the supplied [brglmFit()]
 #' object to estimate exponentiated parameters of generalized linear
 #' models with maximum likelihood or various mean and median bias
 #' reduction methods.
 #'
-#' @param object an object of class \code{\link{brglmFit}},
-#' @param type the type of correction to be used. The options are
-#'     \code{correction*} (explicit mean bias correction with a
-#'     multiplicative adjustment), \code{correction*} (explicit mean
-#'     bias correction with an additive adjustment),
-#'     \code{Lylesetal2012} (explicit median bias correction using the
-#'     multiplicative adjustment in Lyles et al., 2012),
-#'     \code{AS_median} (median bias reduction), and \code{ML}
-#'     (maximum likelihood). See Details.
-#' @param level the confidence level required. Default is \code{0.95}.
+#' @aliases brglmFit_expo
+#' @param object an object of class [brglmFit()],
+#' @param type the type of correction to be used. The available
+#'     options are `"correction*"` (explicit mean bias correction with
+#'     a multiplicative adjustment), `"correction*"` (explicit mean
+#'     bias correction with an additive adjustment), `"Lylesetal2012"`
+#'     (explicit median bias correction using the multiplicative
+#'     adjustment in Lyles et al., 2012), `"AS_median"` (median bias
+#'     reduction), and `"ML"` (maximum likelihood). See Details.
+#' @param level the confidence level required. Default is `0.95`.
 #'
 #' @details
 #'
@@ -38,17 +38,17 @@
 #'
 #' COMPLETE ME
 #'
-#' @return an object of class \code{brglmFit_expo}, which is a list
-#'     with components \code{coef} (the estimates of the exponentiated
-#'     regression parameters), \code{se} (the corresponding estimated
-#'     stadnard errors for the exponentiated parameters), \code{ci}
-#'     (confidence intervals of level \code{level} for the
-#'     exponentiated parameters), \code{type} the \code{type} of
-#'     correction that has been requested.
+#' @return a list inheriting from class [brglmFit_expo] with
+#'     components `coef` (the estimates of the exponentiated
+#'     regression parameters), `se` (the corresponding estimated
+#'     stadnard errors for the exponentiated parameters), `ci`
+#'     (confidence intervals of level `level` for the exponentiated
+#'     parameters), and `type` for the `type` of correction that has
+#'     been requested.
 #'
 #' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'
-#' @seealso \code{\link{brglm_fit}} and and \code{\link{brglm_control}}
+#' @seealso [brglm_fit()] and and [brglm_control()]
 #'
 #' @references
 #'
@@ -123,7 +123,7 @@ print.brglmFit_expo <- function(x, digits = max(3L, getOption("digits") - 3L), .
     cat("\n\nType of estimator:", x$type, get_type_description(x$type), "\n")
 }
 
-#' Extract estimates from \code{\link{expo_brglmFit}} objects
+#' Extract estimates from [brglmFit_expo] objects
 #'
 #' @inheritParams stats::coef
 #'

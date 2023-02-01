@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2021 Ioannis Kosmidis
+# Copyright (C) 2020- Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -34,19 +34,16 @@
 #' estimates with improved frequentist properties, that are also
 #' always finite, even in cases where the maximum likelihood estimates
 #' are infinite (e.g. complete and quasi-complete separation in
-#' multinomial regression; see also \code{\link{detect_separation}}
-#' and \code{\link{check_infinite_estimates}} for pre-fit and post-fit
-#' methods for the detection of infinite estimates in binomial
-#' response generalized linear models). Estimation in all cases takes
-#' place via a modified Fisher scoring algorithm, and S3 methods for
-#' the construction of confidence intervals for the reduced-bias
-#' estimates are provided.
+#' multinomial regression). Estimation in all cases takes place via a
+#' modified Fisher scoring algorithm, and S3 methods for the
+#' construction of confidence intervals for the reduced-bias estimates
+#' are provided.
 #'
 #' The core model fitters are implemented by the functions
-#' \code{\link{brglm_fit}} (univariate generalized linear models),
-#' \code{\link{brmultinom}} (baseline category logit models for
-#' nominal multinomial responses), and \code{\link{bracl}} (adjacent
-#' category logit models for ordinal multinomial responses).
+#' [brglm_fit()] (univariate generalized linear models),
+#' [brmultinom()] (baseline category logit models for nominal
+#' multinomial responses), and [bracl()] (adjacent category logit
+#' models for ordinal multinomial responses).
 #'
 #' @details
 #'
@@ -56,14 +53,14 @@
 #' when developing **brglm2** in order not to have conflicts when the
 #' user loads **brglm2** and **brglm** simultaneously. The development
 #' and maintenance of the two packages will continue in parallel,
-#' until **brglm2** incorporates all **brglm** functionality and gets
-#' an appropriate wrapper to the \code{brglm::brglm} function.
+#' until **brglm2** incorporates all **brglm** functionality and
+#' provides an appropriate wrapper to the [brglm::brglm()] function.
 #'
 #' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
 #'
 #' @seealso
 #'
-#' \code{\link{brglm_fit}}, \code{\link{brmultinom}}, \code{\link{bracl}}
+#' [brglm_fit()], [brmultinom()], [bracl()]
 #'
 #' @references
 #'

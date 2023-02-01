@@ -50,8 +50,8 @@ brnb(
     included in the formula instead or as well, and if more than one is
     specified their sum is used.  See \code{\link[stats]{model.offset}}.}
 
-\item{link}{The link function. Currently must be one of \code{log},
-\code{sqrt} or \code{identity}.}
+\item{link}{The link function. Currently must be one of \code{"log"},
+\code{"sqrt"} or \code{"identity"}.}
 
 \item{start}{starting values for the parameters in the linear predictor.}
 
@@ -60,7 +60,7 @@ brnb(
 \item{mustart}{starting values for the vector of means.}
 
 \item{control}{a list of parameters for controlling the fitting
-process. See \code{\link{brglmControl}} for details.}
+process. See \code{\link[=brglmControl]{brglmControl()}} for details.}
 
 \item{na.action}{a function which indicates what should happen
     when the data contain \code{NA}s.  The default is set by
@@ -99,19 +99,19 @@ process. See \code{\link{brglmControl}} for details.}
   }
 }
 \value{
-A fitted model object of class \code{brnb} inheriting from
-    \code{negbin} and \code{brglmFit}. The object is similar to the
-    output of \code{\link{brglmFit}} but contains four additional
-    components: \code{theta} for the maximum likelihood estimate of
-    the dispersion parameter as in \code{\link[MASS]{glm.nb}}, \code{vcov.mean}
-    for the estimated variance-covariance matrix of the regression
-    coefficients, \code{vcov.dispersion} for the estimated variance
-    of the dispersion parameter in the chosen parameterization
-    (using the expected information), and \code{twologlik} for
-    twice the log-likelihood function.
+A fitted model object of class \link{brnb} inheriting from
+\link{negbin} and \link{brglmFit}. The object is similar to the output of
+\code{\link[=brglmFit]{brglmFit()}} but contains four additional components: \code{theta}
+for the maximum likelihood estimate of the dispersion parameter
+as in \code{\link[MASS:glm.nb]{MASS::glm.nb()}}, \code{vcov.mean} for the estimated
+variance-covariance matrix of the regression coefficients,
+\code{vcov.dispersion} for the estimated variance of the dispersion
+parameter in the chosen parameterization (using the expected
+information), and \code{twologlik} for twice the log-likelihood
+function.
 }
 \description{
-\code{brnb} is a function that fits negative binomial regression
+\code{\link[=brnb]{brnb()}} is a function that fits negative binomial regression
 models using implicit and explicit bias reduction methods.
 }
 \details{
@@ -119,41 +119,32 @@ A detailed description of the fitting procedure is given in the
 iteration vignette (see, \code{vignette("iteration", "brglm2")} and
 Kosmidis et al, 2020). The number of iterations when estimating
 parameters are controlled by the \code{maxit} argument of
-\code{\link{brglmControl}}.
+\code{\link[=brglmControl]{brglmControl()}}.
 
 The type of score adjustment to be used is specified through the
-\code{type} argument (see \code{\link{brglmControl}} for details).
+\code{type} argument (see \code{\link[=brglmControl]{brglmControl()}} for details).
 
 The available options are:
-
 \itemize{
-
 \item \code{type = "AS_mixed"}: the mixed bias-reducing score
 adjustments in Kosmidis et al (2020) that result in mean bias
 reduction for the regression parameters and median bias reduction
 for the dispersion parameter, if any; default.
-
 \item \code{type = "AS_mean"}: the mean bias-reducing score
 adjustments in Firth (1993) and Kosmidis & Firth (2009).
-
 \item \code{type = "AS_median"}: the median bias-reducing score
 adjustments in Kenne Pagui et al. (2017)
-
 \item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
 with powers of the Jeffreys prior as penalty.
-
 \item \code{type = "ML"}: maximum likelihood.
-
 \item \code{type = "correction"}: asymptotic bias correction, as in
 Cordeiro & McCullagh (1991).
-
 }
 
 The choice of the parameterization for the dispersion is controlled
-by the \code{transformation} argument (see
-\code{\link{brglmControl}} for details).  The default is
-\code{"identity"}. Using \code{transformation = "inverse"} uses the
-dispersion parameterization that \code{\link[MASS]{glm.nb}} uses.
+by the \code{transformation} argument (see \code{\link[=brglmControl]{brglmControl()}} for
+details).  The default is \code{"identity"}. Using \code{transformation = "inverse"} uses the dispersion parameterization that
+\code{\link[MASS:glm.nb]{MASS::glm.nb()}} uses.
 }
 \examples{
 # Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
@@ -238,22 +229,22 @@ sapply(fits, coef, model = "full")
 }
 \references{
 Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
-linear models. *Journal of the Royal Statistical Society. Series B(Methodological)*,
- **53**, 629-643.
+linear models. \emph{Journal of the Royal Statistical Society. Series B(Methodological)},
+\strong{53}, 629-643.
 
 Firth D (1993). Bias reduction of maximum likelihood estimates,
-Biometrika. **80**, 27-38.
+Biometrika. \strong{80}, 27-38.
 
 Kenne Pagui EC, Salvan A, and Sartori N (2017). Median bias
-reduction of maximum likelihood estimates. *Biometrika*, **104**,
+reduction of maximum likelihood estimates. \emph{Biometrika}, \strong{104},
 923--938
 
 Kosmidis I, Kenne Pagui EC, Sartori N (2020). Mean and median bias
-reduction in generalized linear models. *Statistics and Computing*, **30** 43--59.
+reduction in generalized linear models. \emph{Statistics and Computing}, \strong{30} 43--59.
 
 Kosmidis I and Firth D (2009). Bias reduction in exponential family
-nonlinear models. *Biometrika*, **96**, 793-804.
+nonlinear models. \emph{Biometrika}, \strong{96}, 793-804.
 }
 \author{
-Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}, Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}
+Euloge Clovis Kenne Pagui \link{ctb} \email{kenne@stat.unipd.it}, Ioannis Kosmidis \link{aut, cre} \email{ioannis.kosmidis@warwick.ac.uk}
 }

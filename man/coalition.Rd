@@ -18,14 +18,14 @@ Data is as provided in the Zeilig R package (\url{https://cran.r-project.org/pac
 }
 \references{
 King G, Alt J E, Burns N E, Laver M. (1990). A Unified
- Model of Cabinet Dissolution in Parliamentary
- Democracies. *American Journal of Political Science*, **34**,
- 846-870. \doi{10.2307/2111401}
+Model of Cabinet Dissolution in Parliamentary
+Democracies. \emph{American Journal of Political Science}, \strong{34},
+846-870. \doi{10.2307/2111401}
 
- King G, Alt J E, Burns N E, Laver M. ICPSR
- Publication Related Archive, 1115.
+King G, Alt J E, Burns N E, Laver M. ICPSR
+Publication Related Archive, 1115.
 }
 \seealso{
-\code{\link{brglm_fit}}
+\code{\link[=brglm_fit]{brglm_fit()}}
 }
 \keyword{datasets}

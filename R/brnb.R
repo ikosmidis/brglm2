@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2021 Euloge Clovis Kenne Pagui, Ioannis Kosmidis
+# Copyright (C) 2020- Euloge Clovis Kenne Pagui, Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -15,66 +15,62 @@
 
 #' Bias reduction for negative binomial regression models
 #'
-#' \code{brnb} is a function that fits negative binomial regression
+#' [brnb()] is a function that fits negative binomial regression
 #' models using implicit and explicit bias reduction methods.
 #'
 #' @inheritParams stats::glm
-#' @param link The link function. Currently must be one of \code{log},
-#'     \code{sqrt} or \code{identity}.
+#' @param link The link function. Currently must be one of `"log"`,
+#'     `"sqrt"` or `"identity"`.
 #' @param control a list of parameters for controlling the fitting
-#'     process. See \code{\link{brglmControl}} for details.
-#' @return A fitted model object of class \code{brnb} inheriting from
-#'     \code{negbin} and \code{brglmFit}. The object is similar to the
-#'     output of \code{\link{brglmFit}} but contains four additional
-#'     components: \code{theta} for the maximum likelihood estimate of
-#'     the dispersion parameter as in \code{\link[MASS]{glm.nb}}, \code{vcov.mean}
-#'     for the estimated variance-covariance matrix of the regression
-#'     coefficients, \code{vcov.dispersion} for the estimated variance
-#'     of the dispersion parameter in the chosen parameterization
-#'     (using the expected information), and \code{twologlik} for
-#'     twice the log-likelihood function.
+#'     process. See [brglmControl()] for details.
+#' @return A fitted model object of class [brnb] inheriting from
+#'     [negbin] and [brglmFit]. The object is similar to the output of
+#'     [brglmFit()] but contains four additional components: `theta`
+#'     for the maximum likelihood estimate of the dispersion parameter
+#'     as in [MASS::glm.nb()], `vcov.mean` for the estimated
+#'     variance-covariance matrix of the regression coefficients,
+#'     `vcov.dispersion` for the estimated variance of the dispersion
+#'     parameter in the chosen parameterization (using the expected
+#'     information), and `twologlik` for twice the log-likelihood
+#'     function.
 #'
 #' @details
 #'
 #' A detailed description of the fitting procedure is given in the
-#' iteration vignette (see, \code{vignette("iteration", "brglm2")} and
+#' iteration vignette (see, `vignette("iteration", "brglm2")` and
 #' Kosmidis et al, 2020). The number of iterations when estimating
-#' parameters are controlled by the \code{maxit} argument of
-#' \code{\link{brglmControl}}.
+#' parameters are controlled by the `maxit` argument of
+#' [brglmControl()].
 #'
 #' The type of score adjustment to be used is specified through the
-#' \code{type} argument (see \code{\link{brglmControl}} for details).
+#' `type` argument (see [brglmControl()] for details).
 #'
 #' The available options are:
 #'
-#' \itemize{
-#'
-#' \item \code{type = "AS_mixed"}: the mixed bias-reducing score
+#' * `type = "AS_mixed"`: the mixed bias-reducing score
 #' adjustments in Kosmidis et al (2020) that result in mean bias
 #' reduction for the regression parameters and median bias reduction
 #' for the dispersion parameter, if any; default.
 #'
-#' \item \code{type = "AS_mean"}: the mean bias-reducing score
+#' * `type = "AS_mean"`: the mean bias-reducing score
 #' adjustments in Firth (1993) and Kosmidis & Firth (2009).
 #'
-#' \item \code{type = "AS_median"}: the median bias-reducing score
+#' * `type = "AS_median"`: the median bias-reducing score
 #' adjustments in Kenne Pagui et al. (2017)
 #'
-#' \item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
+#' * `type = "MPL_Jeffreys"`: maximum penalized likelihood
 #' with powers of the Jeffreys prior as penalty.
 #'
-#' \item \code{type = "ML"}: maximum likelihood.
+#' * `type = "ML"`: maximum likelihood.
 #'
-#' \item \code{type = "correction"}: asymptotic bias correction, as in
+#' * `type = "correction"`: asymptotic bias correction, as in
 #' Cordeiro & McCullagh (1991).
 #'
-#' }
-#'
 #' The choice of the parameterization for the dispersion is controlled
-#' by the \code{transformation} argument (see
-#' \code{\link{brglmControl}} for details).  The default is
-#' \code{"identity"}. Using \code{transformation = "inverse"} uses the
-#' dispersion parameterization that \code{\link[MASS]{glm.nb}} uses.
+#' by the `transformation` argument (see [brglmControl()] for
+#' details).  The default is `"identity"`. Using `transformation =
+#' "inverse"` uses the dispersion parameterization that
+#' [MASS::glm.nb()] uses.
 #'
 #' @author Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}, Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}
 #'
@@ -846,19 +842,17 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
 }
 
 
-#' Extract model coefficients from \code{\link{brnb}} objects
-#'
-#'
+#' Extract model coefficients from [brnb] objects
 #'
 #' @inheritParams stats::coef
-#' @param model one of \code{"mean"} (default), \code{"full"}, \code{"dispersion"},
+#' @param model one of `"mean"` (default), `"full"`, `"dispersion"`,
 #'     to return the estimates of the parameters in the linear
-#'     prediction only, or both, the estimate of the dispersion parameter only,
-#'      respectively.
+#'     prediction only, or both, the estimate of the dispersion
+#'     parameter only, respectively.
 #'
 #' @details
 #'
-#' See \code{\link{coef}} for more details.
+#' See [coef()] for more details.
 #'
 #' @method coef brnb
 #' @export
@@ -867,25 +861,23 @@ coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
     coef.brglmFit(object, model, ...)
 }
 
-#' Extract model variance-covariance matrix from \code{\link{brnb}} objects
+#' Extract model variance-covariance matrix from [brnb] objects
 #'
 #'
 #' @inheritParams stats::vcov.glm
-#' @param object an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.
+#' @param object an object of class [brnb], typically, a result of a call to [brnb()].
 #' @param model character specifying for which component of the model variance-covariance matrix should be extracted.
 #'
 #' @details
 #'
-#' The options for \code{model} are \code{"mean"} for mean regression
-#'  only (default), \code{"dispersion"} for the dispersion
-#' parameter (in a chosen transformation; see
-#' \code{\link{brglmControl}}), and \code{"full"} for both the mean
-#' regression and the (transformed) dispersion parameters.
-#' See \code{\link{vcov}} for more details.
+#' The options for `model` are `"mean"` for mean regression only
+#'  (default), `"dispersion"` for the dispersion parameter (in a
+#'  chosen transformation; see [brglmControl()], and `"full"` for both
+#'  the mean regression and the (transformed) dispersion parameters.
+#'  See [vcov()] for more details.
 #'
-#' @seealso
+#' @seealso [vcov()]
 #'
-#' \code{\link{vcov}}
 #' @method vcov brnb
 #' @export
 vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete = TRUE, ...) {
@@ -894,21 +886,21 @@ vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete 
     vcov.brglmFit(object, model , complete , ...)
 }
 
-#' \code{summary} method for \code{\link{brnb}} objects
+#' [summary()] method for [brnb] objects
 #'
 #' @inheritParams stats::summary.glm
-#' @param object an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.
-#' @details The interface of the summary method for
-#'     \code{\link{brnb}} objects is similar to that of
-#'     \code{\link{brglmFit}} objects with minor additional informations. The summary method for
-#'     \code{\link{brnb}} objects computes the p-values of the
-#'     individual Wald statistics based on the standard normal
-#'     distribution.
+#' @param object an object of class [brnb], typically, a result of a
+#'     call to [brnb()].
+#' @details The interface of the summary method for [brnb] objects is
+#'     similar to that of [brglmFit()] objects with additional
+#'     information. The summary method for [brnb()] objects computes
+#'     the p-values of the individual Wald statistics based on the
+#'     standard normal distribution.
 #'
-#' @seealso \code{\link{summary.brglmFit}} and \code{\link{glm}}
+#' @seealso [summary.brglmFit()] and [glm()]
 #'
 #' @examples
-#' ## For examples see examples(brnb)
+#' # For examples see examples(brnb)
 #'
 #' @method summary brnb
 #' @export
@@ -938,24 +930,23 @@ summary.brnb <- function(object, ...) {
     object
 }
 
-#' Summarizing Linear Model Fits
+#' Summarizing [brnb] fits
 #'
-#' print summary output for class "brnb".
+#' print summary output for class [brnb]
 #'
-#' @param x an object of class "summary.brnb", usually, a result of a
-#'     call to summary.brnb.
+#' @param x an object of class [summary.brnb], usually, a result of a
+#'     call to [summary.brnb()].
 #' @param digits the number of significant digits to use when
 #'     printing.
 #' @param ... extra arguments to passed to methods. Not used
 #'     currently.
-#' @details \code{print.summary.brnb} tries to be smart about
-#'     formatting the coefficients, standard errors, and additionally
-#'     gives "significant stars". The \code{coefficients} components
-#'     of the result gives the estimated coefficients and their
-#'     estimated standard errors, together with their ratio
-#'     (\code{z}). A fourth column gives the two-tailed p-value
-#'     corresponding to the \code{z} statistica based on Normal
-#'     reference distribution.
+#' @details [print.summary.brnb] tries to be smart about formatting
+#'     the coefficients, standard errors, and additionally gives
+#'     "significant stars". The `coefficients` components of the
+#'     result gives the estimated coefficients and their estimated
+#'     standard errors, together with their ratio (`z`). A fourth
+#'     column gives the two-tailed p-value corresponding to the `z`
+#'     statistics based on Normal reference distribution.
 #'
 #' @method print summary.brnb
 #' @export
@@ -1016,7 +1007,7 @@ print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
 }
 
 #' Method for computing Wald confidence intervals for one or more
-#' regression parameters in a \code{\link{brnb}} object
+#' regression parameters in a [brnb] object
 #'
 #' @inheritParams stats::confint
 #'
@@ -1028,13 +1019,14 @@ confint.brnb <- function(object, parm, level = 0.95, ...) {
 
 #' Simulate Responses
 #'
-#' Simulate one or more responses from the distribution
-#' corresponding to a fitted model \code{brnb} object.
+#' Simulate one or more responses from the distribution corresponding
+#' to a fitted model [brnb] object.
 #' @param object an object representing a fitted model.
 #' @param nsim number of response vectors to simulate. Defaults to 1.
-#' @param seed an object specifying if and how the random
-#' number generator should be initialized (``seeded'').
-#' @param ... extra arguments to be passed to methods. Not currently used.
+#' @param seed an object specifying if and how the random number
+#'     generator should be initialized; see [set.seed()] for details.
+#' @param ... extra arguments to be passed to methods. Not currently
+#'     used.
 
 #' @examples
 #' # Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
