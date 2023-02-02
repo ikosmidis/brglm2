@@ -16,12 +16,23 @@
 #' Estimate exponentiated parameters of generalized linear models
 #' using various methods
 #'
-#' [expo()] uses the supplied [`"brglmFit"`][brglmFit] or
+#' The [expo()] method uses the supplied [`"brglmFit"`][brglmFit] or
 #' [`"glm"`][glm] object to estimate exponentiated parameters of
 #' generalized linear models with maximum likelihood or various mean
-#' and median bias reduction methods.
+#' and median bias reduction methods. [expo()] is useful for computing
+#' (corrected) estimates of the multiplicative impact of a unit
+#' increase on a covariate on the mean of a Poisson log-linear model
+#' (`family = poisson("log")` in [glm()]) while adjusting for other
+#' covariates, the odds ratio associated with a unit increase on a
+#' covariate in a logistic regression model (`family =
+#' binomial("logit")` in [glm()]) while adjusting for other
+#' covariates, the relative risk associated with a unit increase on a
+#' covariate in a relative risk regression model (`family =
+#' binomial("log")` in [glm()]) while adjusting for other covariates,
+#' among others.
 #'
 #' @aliases brglmFit_expo
+#' @aliases expo
 #' @param object an object of class [`"brglmFit"`][brglmFit] or
 #'     [`"glm"`][glm].
 #' @param type the type of correction to be used. The available
@@ -96,7 +107,7 @@
 #'     parameters), and `type` for the `type` of correction that has
 #'     been requested.
 #'
-#' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
 #'
 #' @seealso [brglm_fit()] and and [brglm_control()]
 #'

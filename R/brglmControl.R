@@ -126,7 +126,7 @@
 #'     symbolic expressions for the dispersion transformation
 #'     (`Trans`) and its inverse (`inverseTrans`)
 #'
-#' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
 #'
 #' @seealso [brglm_fit()] and [glm.fit()]
 #'

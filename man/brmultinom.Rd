@@ -175,5 +175,5 @@ Variables. \emph{Biometrika}, \strong{68}, 563-566.
 \code{\link[nnet:multinom]{nnet::multinom()}}, \code{\link[=bracl]{bracl()}} for adjacent category logit models for ordinal responses
 }
 \author{
-Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
 }

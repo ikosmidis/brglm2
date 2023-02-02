@@ -190,5 +190,5 @@ Biometrika, \strong{80}, 27-38. \doi{10.2307/2336755}.
 \code{\link[=brglm_fit]{brglm_fit()}} and \code{\link[=glm.fit]{glm.fit()}}
 }
 \author{
-Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
 }

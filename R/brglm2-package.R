@@ -56,7 +56,7 @@
 #' until **brglm2** incorporates all **brglm** functionality and
 #' provides an appropriate wrapper to the [brglm::brglm()] function.
 #'
-#' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
 #'
 #' @seealso
 #'

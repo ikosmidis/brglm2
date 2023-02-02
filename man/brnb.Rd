@@ -247,5 +247,5 @@ Kosmidis I, Firth D (2009). Bias reduction in exponential family
 nonlinear models. \emph{Biometrika}, \strong{96}, 793-804. \doi{10.1093/biomet/asp055}.
 }
 \author{
-Euloge Clovis Kenne Pagui \link{ctb} \email{kenne@stat.unipd.it}, Ioannis Kosmidis \link{aut, cre} \email{ioannis.kosmidis@warwick.ac.uk}
+Euloge Clovis Kenne Pagui \verb{[aut]} \email{kenne@stat.unipd.it}, Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
 }

@@ -307,5 +307,5 @@ useful side-effects. \emph{WIRE Computational Statistics}, \strong{6},
 \code{\link[=brglmControl]{brglmControl()}}, \code{\link[=glm.fit]{glm.fit()}}, \code{\link[=glm]{glm()}}
 }
 \author{
-Ioannis Kosmidis \link{aut, cre} \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui \link{ctb} \email{kenne@stat.unipd.it}
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui \verb{[ctb]} \email{kenne@stat.unipd.it}
 }

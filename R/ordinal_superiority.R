@@ -21,6 +21,8 @@
 #' mean bias of the estimates of the ordinal superiority scores can be
 #' corrected.
 #'
+#' @aliases ordinal_superiority
+#'
 #' @param object a fitted object from an ordinal regression
 #'     model. Currently only models from class [`"bracl"`][bracl] are supported.
 #' @param formula a RHS formula indicating the group variable to use.

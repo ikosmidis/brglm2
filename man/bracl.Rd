@@ -129,5 +129,5 @@ Variables. \emph{Biometrika}, \strong{68},
 \code{\link[nnet:multinom]{nnet::multinom()}}, \code{\link[=brmultinom]{brmultinom()}}
 }
 \author{
-Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
 }

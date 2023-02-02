@@ -72,7 +72,7 @@
 #' "inverse"` uses the dispersion parameterization that
 #' [MASS::glm.nb()] uses.
 #'
-#' @author Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}, Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}
+#' @author Euloge Clovis Kenne Pagui `[aut]` \email{kenne@stat.unipd.it}, Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
 #'
 #' @references
 #'

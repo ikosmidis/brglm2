@@ -80,7 +80,7 @@
 #' concept and is not expected to scale well with either of `nrow(X)`,
 #' `ncol(X)` or the number of levels in the categorical response.
 #'
-#' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
 #'
 #' @seealso [nnet::multinom()], [bracl()] for adjacent category logit models for ordinal responses
 #'

@@ -2,6 +2,7 @@
 % Please edit documentation in R/ordinal_superiority.R
 \name{ordinal_superiority.bracl}
 \alias{ordinal_superiority.bracl}
+\alias{ordinal_superiority}
 \title{Ordinal superiority scores of Agresti and Kateri (2017)}
 \usage{
 \method{ordinal_superiority}{bracl}(

@@ -3,6 +3,7 @@
 \name{expo.brglmFit}
 \alias{expo.brglmFit}
 \alias{brglmFit_expo}
+\alias{expo}
 \alias{expo.glm}
 \title{Estimate exponentiated parameters of generalized linear models
 using various methods}
@@ -43,10 +44,18 @@ parameters), and \code{type} for the \code{type} of correction that has
 been requested.
 }
 \description{
-\code{\link[=expo]{expo()}} uses the supplied \code{\link[=brglmFit]{"brglmFit"}} or
+The \code{\link[=expo]{expo()}} method uses the supplied \code{\link[=brglmFit]{"brglmFit"}} or
 \code{\link[=glm]{"glm"}} object to estimate exponentiated parameters of
 generalized linear models with maximum likelihood or various mean
-and median bias reduction methods.
+and median bias reduction methods. \code{\link[=expo]{expo()}} is useful for computing
+(corrected) estimates of the multiplicative impact of a unit
+increase on a covariate on the mean of a Poisson log-linear model
+(\code{family = poisson("log")} in \code{\link[=glm]{glm()}}) while adjusting for other
+covariates, the odds ratio associated with a unit increase on a
+covariate in a logistic regression model (\code{family = binomial("logit")} in \code{\link[=glm]{glm()}}) while adjusting for other
+covariates, the relative risk associated with a unit increase on a
+covariate in a relative risk regression model (\code{family = binomial("log")} in \code{\link[=glm]{glm()}}) while adjusting for other covariates,
+among others.
 }
 \details{
 The supported methods throgh the \code{type} argument are:
@@ -126,5 +135,5 @@ estimators’. \emph{Journal of Statistical Planning and Inference},
 \code{\link[=brglm_fit]{brglm_fit()}} and and \code{\link[=brglm_control]{brglm_control()}}
 }
 \author{
-Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
 }

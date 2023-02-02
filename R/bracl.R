@@ -49,7 +49,7 @@
 #' where \eqn{x_i}{x[i, ]} is a vector of covariates and \eqn{\pi_{ij}}{pi[i, j]} is the
 #' probability that category \eqn{j} is observed at the covariate setting \eqn{i}.
 #'
-#' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
 #'
 #' @seealso [nnet::multinom()], [brmultinom()]
 #'

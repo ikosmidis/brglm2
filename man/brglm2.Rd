@@ -77,5 +77,5 @@ useful side-effects. \emph{WIRE Computational Statistics}, \strong{6},
 \code{\link[=brglm_fit]{brglm_fit()}}, \code{\link[=brmultinom]{brmultinom()}}, \code{\link[=bracl]{bracl()}}
 }
 \author{
-Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
 }
