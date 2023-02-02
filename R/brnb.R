@@ -892,7 +892,7 @@ vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete 
 #' @inheritParams stats::summary.glm
 #' @param object an object of class [`"brnb"`][brnb], typically, a
 #'     result of a call to [brnb()].
-#' @param x an object of class [‘"summary.brnb"’][summary.brnb],
+#' @param x an object of class [`"summary.brnb"`][summary.brnb],
 #'     usually, a result of a call to [summary.brnb].
 #' @details The interface of the summary method for [`"brnb"`][brnb]
 #'     objects is similar to that of [`"brglmFit"`][brglmFit] objects

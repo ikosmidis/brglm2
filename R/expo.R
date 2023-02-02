@@ -94,15 +94,15 @@
 #' where both the Jacobin and the information matrix are evaluated at
 #' the logarithm of the estimates of the exponentiated parameters.
 #'
-#' Confidence intervals results from exponentiating the limits of
-#' standard Wald-type intervals computed at the logarithm of the
-#' estimates of the exponentiated parameters.
+#' Confidence intervals results by taking the exponential of the
+#' limits of standard Wald-type intervals computed at the logarithm of
+#' the estimates of the exponentiated parameters.
 #'
 #'
 #' @return a list inheriting from class [`"brglmFit_expo"`][brglmFit_expo] with
 #'     components `coef` (the estimates of the exponentiated
 #'     regression parameters), `se` (the corresponding estimated
-#'     stadnard errors for the exponentiated parameters), `ci`
+#'     standard errors for the exponentiated parameters), `ci`
 #'     (confidence intervals of level `level` for the exponentiated
 #'     parameters), and `type` for the `type` of correction that has
 #'     been requested.
@@ -127,7 +127,7 @@
 #'
 #' Lyles R H, Guo Y, Greenland S (2012). Reducing bias and mean
 #' squared error associated with regression-based odds ratio
-#' estimators’. *Journal of Statistical Planning and Inference*,
+#' estimators. *Journal of Statistical Planning and Inference*,
 #' **142** 3235–3241. \doi{10.1016/j.jspi.2012.05.005}.
 #'
 #' @examples

@@ -15,7 +15,7 @@ result of a call to \code{\link[=brnb]{brnb()}}.}
 
 \item{...}{further arguments passed to or from other methods.}
 
-\item{x}{an object of class \link[=summary.brnb]{‘"summary.brnb"’},
+\item{x}{an object of class \code{\link[=summary.brnb]{"summary.brnb"}},
 usually, a result of a call to \link{summary.brnb}.}
 
 \item{digits}{the number of significant digits to use when printing.}
