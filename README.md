@@ -9,6 +9,8 @@
 [![Codecov test
 coverage](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ikosmidis/brglm2?branch=master)
 [![Licence](https://img.shields.io/badge/licence-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![Contributor
+Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
 <!-- badges: end -->
 
 [**brglm2**](https://github.com/ikosmidis/brglm2) provides tools for the
@@ -98,6 +100,11 @@ R package
 
     # install.packages("detectseparation")
     library("detectseparation")
+    #> 
+    #> Attaching package: 'detectseparation'
+    #> The following objects are masked from 'package:brglm2':
+    #> 
+    #>     check_infinite_estimates, detect_separation
     update(modML, method = "detect_separation")
     #> Implementation: ROI | Solver: lpsolve 
     #> Separation: TRUE 
@@ -147,8 +154,9 @@ mean bias reduction.
     #> 
     #>     Null deviance: 104.903  on 78  degrees of freedom
     #> Residual deviance:  57.587  on 75  degrees of freedom
-    #> AIC: 65.587
+    #> AIC:  65.587
     #> 
+    #> Type of estimator: AS_mixed (mixed bias-reducing adjusted score equations)
     #> Number of Fisher Scoring iterations: 4
 
 A quick comparison of the output from mean bias reduction to that from
@@ -203,3 +211,10 @@ implements are provided in
 Kosmidis, I, Kenne Pagui, E C, Sartori N. (2020). Mean and median bias
 reduction in generalized linear models. [*Statistics and
 Computing*](https://doi.org/10.1007/s11222-019-09860-6) *30*, 43–59.
+
+## Code of Conduct
+
+Please note that the **brglm2** project is released with a [Contributor
+Code of
+Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms.
