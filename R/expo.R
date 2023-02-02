@@ -132,9 +132,25 @@
 #'
 #' @examples
 #'
-#' 1 + 1
+#' ## The lizards example from ?brglm::brglm
+#' lizardsML <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                  light + time, family = binomial(logit), data = lizards,
+#'                  method = "glm.fit")
+#' # Get estimates, standard errors, and confidence intervals of odds
+#' # ratios with various methods
+#' expo(lizardsML, type = "ML")
+#' expo(lizardsML, type = "correction*")
+#' expo(lizardsML, type = "Lylesetal2012")
+#' expo(lizardsML, type = "correction+")
+#' expo(lizardsML, type = "AS_median")
 #'
-#'
+#' ## Example from ?glm
+#' ## Dobson (1990) Page 93: Randomized Controlled Trial :
+#' counts <- c(18,17,15,20,10,20,25,13,12)
+#' outcome <- gl(3,1,9)
+#' treatment <- gl(3,3)
+#' glm.D93 <- glm(counts ~ outcome + treatment, family = poisson())
+#' expo(glm.D93, type = "correction*")
 #'
 #' @export
 expo.brglmFit <- function(object, type = c("correction*", "correction+", "Lylesetal2012", "AS_median", "ML"), level = 0.95) {
@@ -178,7 +194,7 @@ expo.brglmFit <- function(object, type = c("correction*", "correction+", "Lylese
 #' @rdname expo.brglmFit
 #' @export
 expo.glm <- function(object, type = c("correction*", "correction+", "Lylesetal2012", "AS_median", "ML"), level = 0.95) {
-    object <- update(object, method = brglmFit, type = "ML", start = coef(object))
+    object <- update(object, method = brglmFit, type = "AS_mixed")
     out <- expo(object, type, level)
     out$call <- match.call()
     out

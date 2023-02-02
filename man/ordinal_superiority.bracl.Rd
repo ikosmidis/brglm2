@@ -44,6 +44,7 @@ mean bias of the estimates of the ordinal superiority scores can be
 corrected.
 }
 \examples{
+
 data("stemcell", package = "brglm2")
 
 # Adjacent category logit (proportional odds)

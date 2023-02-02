@@ -107,6 +107,7 @@
 #' \doi{10.1093/biomet/68.2.563}.
 #'
 #' @examples
+#' ## The housing data analysis from ?MASS::housing
 #'
 #' data("housing", package = "MASS")
 #'

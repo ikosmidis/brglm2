@@ -147,9 +147,9 @@ details).  The default is \code{"identity"}. Using \code{transformation = "inver
 \code{\link[MASS:glm.nb]{MASS::glm.nb()}} uses.
 }
 \examples{
-# Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
-# likelihood estimator of the negative binomial dispersion
-# parameter.  Biometrics, 61, 179--185.
+## Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
+## likelihood estimator of the negative binomial dispersion
+## parameter.  Biometrics, 61, 179--185.
 #
 # Number of revertant colonies of salmonella data
 salmonella <- data.frame(freq = c(15, 16, 16, 27, 33, 20,

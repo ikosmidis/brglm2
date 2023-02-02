@@ -95,9 +95,9 @@
 #' nonlinear models. *Biometrika*, **96**, 793-804. \doi{10.1093/biomet/asp055}.
 #'
 #' @examples
-#' # Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
-#' # likelihood estimator of the negative binomial dispersion
-#' # parameter.  Biometrics, 61, 179--185.
+#' ## Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
+#' ## likelihood estimator of the negative binomial dispersion
+#' ## parameter.  Biometrics, 61, 179--185.
 #' #
 #' # Number of revertant colonies of salmonella data
 #' salmonella <- data.frame(freq = c(15, 16, 16, 27, 33, 20,

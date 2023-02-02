@@ -125,6 +125,7 @@ concept and is not expected to scale well with either of \code{nrow(X)},
 \code{ncol(X)} or the number of levels in the categorical response.
 }
 \examples{
+## The housing data analysis from ?MASS::housing
 
 data("housing", package = "MASS")
 

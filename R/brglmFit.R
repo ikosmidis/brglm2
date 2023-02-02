@@ -208,12 +208,12 @@
 #' abline(0, 0, col = "grey")
 #'}
 #'
+#' \donttest{
 #' ## Another example from
 #' ## King, Gary, James E. Alt, Nancy Elizabeth Burns and Michael Laver
 #' ## (1990).  "A Unified Model of Cabinet Dissolution in Parliamentary
 #' ## Democracies", _American Journal of Political Science_, **34**, 846-870
 #'
-#' \donttest{
 #' data("coalition", package = "brglm2")
 #' # The maximum likelihood fit with log link
 #' coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
@@ -235,17 +235,17 @@
 #' anorexBR_mean <- update(anorexML, method = "brglmFit")
 #' anorexBR_median <- update(anorexML, method = "brglmFit", type = "AS_median")
 #'
-#' ## All methods return the same estimates for the regression
-#' ## parameters because the maximum likelihood estimator is normally
-#' ## distributed around the `true` value under the model (hence, both
-#' ## mean and component-wise median unbiased). The Wald tests for
-#' ## anorexBC and anorexBR_mean differ from anorexML
-#' ## because the bias-reduced estimator of the dispersion is the
-#' ## unbiased, by degree of freedom adjustment (divide by n - p),
-#' ## estimator of the residual variance. The Wald tests from
-#' ## anorexBR_median are based on the median bias-reduced estimator
-#' ## of the dispersion that results from a different adjustment of the
-#' ## degrees of freedom (divide by n - p - 2/3)
+#' # All methods return the same estimates for the regression
+#' # parameters because the maximum likelihood estimator is normally
+#' # distributed around the `true` value under the model (hence, both
+#' # mean and component-wise median unbiased). The Wald tests for
+#' # anorexBC and anorexBR_mean differ from anorexML because the
+#' # bias-reduced estimator of the dispersion is the unbiased, by
+#' # degree of freedom adjustment (divide by n - p), estimator of the
+#' # residual variance. The Wald tests from anorexBR_median are based
+#' # on the median bias-reduced estimator of the dispersion that
+#' # results from a different adjustment of the degrees of freedom
+#' # (divide by n - p - 2/3)
 #' summary(anorexML)
 #' summary(anorexBC)
 #' summary(anorexBR_mean)

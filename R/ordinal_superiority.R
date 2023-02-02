@@ -46,6 +46,7 @@
 #' *Biometrics*, **73** 214-219. \doi{10.1111/biom.12565}.
 #'
 #' @examples
+#'
 #' data("stemcell", package = "brglm2")
 #'
 #' # Adjacent category logit (proportional odds)
