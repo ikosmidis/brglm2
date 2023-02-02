@@ -46,7 +46,7 @@
 #'
 #' @details
 #'
-#' The supported methods throgh the `type` argument are:
+#' The supported methods through the `type` argument are:
 #'
 #' * `"ML"`: the estimates of the exponentiated parameters are
 #' \eqn{\exp(\hat\theta_j)}, where \eqn{\theta_j} is the maximum

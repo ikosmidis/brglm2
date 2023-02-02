@@ -58,7 +58,7 @@ covariate in a relative risk regression model (\code{family = binomial("log")} i
 among others.
 }
 \details{
-The supported methods throgh the \code{type} argument are:
+The supported methods through the \code{type} argument are:
 \itemize{
 \item \code{"ML"}: the estimates of the exponentiated parameters are
 \eqn{\exp(\hat\theta_j)}, where \eqn{\theta_j} is the maximum
