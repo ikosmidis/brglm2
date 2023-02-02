@@ -62,6 +62,18 @@ for (met in start_methods) {
     expect_equal(med$se, or_ses_med, check.attributes = FALSE)
 }
 
+## starting from a glm object
+expo_methods <- c("ML", "correction*", "correction+", "Lylesetal2012", "AS_median")
+lfit_glm <- glm(cbind(grahami, opalinus) ~ height + diameter +
+                    light + time, family = binomial(), data=lizards)
+for (met in expo_methods) {
+    out_brglmFit <- expo(lfit_med, type = met)[keep]
+    out_glm <- expo(lfit_glm, type = met)[keep]
+    expect_equal(out_brglmFit, out_glm, tolerance = 1e-06)
+}
+
+
+
 ## library(parallel)
 ## nsimu <- 1000
 ## set.seed(123)

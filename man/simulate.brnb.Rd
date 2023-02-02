@@ -19,7 +19,7 @@ used.}
 }
 \description{
 Simulate one or more responses from the distribution corresponding
-to a fitted model \link{brnb} object.
+to a fitted model \code{\link[=brnb]{"brnb"}} object.
 }
 \examples{
 # Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum

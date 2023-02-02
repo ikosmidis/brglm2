@@ -8,7 +8,7 @@
 }
 \arguments{
 \item{object}{a fitted object of class inheriting from
-\link{brmultinom}.}
+\code{\link[=brmultinom]{"brmultinom"}}.}
 
 \item{newdata}{optionally, a data frame in which to look for
 variables with which to predict.  If omitted, the fitted linear

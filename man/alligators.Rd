@@ -25,7 +25,7 @@ Alligator food choice data
 }
 \references{
 Agresti A (2002). \emph{Categorical Data Analysis}.  Wiley Series in
-Probability and Statistics. Wiley
+Probability and Statistics. Wiley.
 }
 \seealso{
 \code{\link[=brmultinom]{brmultinom()}}

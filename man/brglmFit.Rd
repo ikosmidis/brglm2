@@ -152,7 +152,7 @@ The null deviance is evaluated based on the fitted values using the
 method specified by the \code{type} argument (see \code{\link[=brglmControl]{brglmControl()}}).
 
 The \code{family} argument of the current version of \code{\link[=brglmFit]{brglmFit()}} can
-accept any combination of \link{family} objects and link functions,
+accept any combination of \code{\link[=family]{"family"}} objects and link functions,
 including families with user-specified link functions, \code{\link[=mis]{mis()}}
 links, and \code{\link[=power]{power()}} links, but excluding \code{\link[=quasi]{quasi()}},
 \code{\link[=quasipoisson]{quasipoisson()}} and \code{\link[=quasibinomial]{quasibinomial()}} families.
@@ -275,33 +275,33 @@ summary(endometrialBR_median)
 \references{
 Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 and shrinkage in binomial-response generalized linear
-models. \emph{Biometrika}, \strong{108}, 71-82 \doi{10.1093/biomet/asaa052}
+models. \emph{Biometrika}, \strong{108}, 71-82. \doi{10.1093/biomet/asaa052}.
 
 Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 reduction in generalized linear models. \emph{Statistics and Computing},
-\strong{30}, 43-59 \doi{10.1007/s11222-019-09860-6}
+\strong{30}, 43-59. \doi{10.1007/s11222-019-09860-6}.
 
 Cordeiro G M, McCullagh P (1991). Bias correction in generalized
 linear models. \emph{Journal of the Royal Statistical Society. Series B
-(Methodological)}, \strong{53}, 629-643 \doi{10.1111/j.2517-6161.1991.tb01852.x}
+(Methodological)}, \strong{53}, 629-643. \doi{10.1111/j.2517-6161.1991.tb01852.x}.
 
 Firth D (1993). Bias reduction of maximum likelihood estimates.
-\emph{Biometrika}. \strong{80}, 27-38 \doi{10.2307/2336755}
+\emph{Biometrika}. \strong{80}, 27-38. \doi{10.2307/2336755}.
 
 Kenne Pagui E C, Salvan A, Sartori N (2017). Median bias
 reduction of maximum likelihood estimates. \emph{Biometrika}, \strong{104},
-923–938 \doi{10.1093/biomet/asx046}
+923–938. \doi{10.1093/biomet/asx046}.
 
 Kosmidis I, Firth D (2009). Bias reduction in exponential family
-nonlinear models. \emph{Biometrika}, \strong{96}, 793-804 \doi{10.1093/biomet/asp055}
+nonlinear models. \emph{Biometrika}, \strong{96}, 793-804. \doi{10.1093/biomet/asp055}.
 
 Kosmidis I, Firth D (2010). A generic algorithm for reducing
 bias in parametric estimation. \emph{Electronic Journal of Statistics},
-\strong{4}, 1097-1112 \doi{10.1214/10-EJS579}
+\strong{4}, 1097-1112. \doi{10.1214/10-EJS579}.
 
 Kosmidis I (2014). Bias in parametric estimation: reduction and
 useful side-effects. \emph{WIRE Computational Statistics}, \strong{6},
-185-196 \doi{10.1002/wics.1296}
+185-196. \doi{10.1002/wics.1296}.
 }
 \seealso{
 \code{\link[=brglmControl]{brglmControl()}}, \code{\link[=glm.fit]{glm.fit()}}, \code{\link[=glm]{glm()}}

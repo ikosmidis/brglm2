@@ -112,7 +112,7 @@
 #' method specified by the `type` argument (see [brglmControl()]).
 #'
 #' The `family` argument of the current version of [brglmFit()] can
-#' accept any combination of [family] objects and link functions,
+#' accept any combination of [`"family"`][family] objects and link functions,
 #' including families with user-specified link functions, [mis()]
 #' links, and [power()] links, but excluding [quasi()],
 #' [quasipoisson()] and [quasibinomial()] families.
@@ -137,33 +137,33 @@
 #'
 #' Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 #' and shrinkage in binomial-response generalized linear
-#' models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
+#' models. *Biometrika*, **108**, 71-82. \doi{10.1093/biomet/asaa052}.
 #'
 #' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 #' reduction in generalized linear models. *Statistics and Computing*,
-#' **30**, 43-59 \doi{10.1007/s11222-019-09860-6}
+#' **30**, 43-59. \doi{10.1007/s11222-019-09860-6}.
 #'
 #' Cordeiro G M, McCullagh P (1991). Bias correction in generalized
 #' linear models. *Journal of the Royal Statistical Society. Series B
-#' (Methodological)*, **53**, 629-643 \doi{10.1111/j.2517-6161.1991.tb01852.x}
+#' (Methodological)*, **53**, 629-643. \doi{10.1111/j.2517-6161.1991.tb01852.x}.
 #'
 #' Firth D (1993). Bias reduction of maximum likelihood estimates.
-#' *Biometrika*. **80**, 27-38 \doi{10.2307/2336755}
+#' *Biometrika*. **80**, 27-38. \doi{10.2307/2336755}.
 #'
 #' Kenne Pagui E C, Salvan A, Sartori N (2017). Median bias
 #' reduction of maximum likelihood estimates. *Biometrika*, **104**,
-#' 923–938 \doi{10.1093/biomet/asx046}
+#' 923–938. \doi{10.1093/biomet/asx046}.
 #'
 #' Kosmidis I, Firth D (2009). Bias reduction in exponential family
-#' nonlinear models. *Biometrika*, **96**, 793-804 \doi{10.1093/biomet/asp055}
+#' nonlinear models. *Biometrika*, **96**, 793-804. \doi{10.1093/biomet/asp055}.
 #'
 #' Kosmidis I, Firth D (2010). A generic algorithm for reducing
 #' bias in parametric estimation. *Electronic Journal of Statistics*,
-#' **4**, 1097-1112 \doi{10.1214/10-EJS579}
+#' **4**, 1097-1112. \doi{10.1214/10-EJS579}.
 #'
 #' Kosmidis I (2014). Bias in parametric estimation: reduction and
 #' useful side-effects. *WIRE Computational Statistics*, **6**,
-#' 185-196 \doi{10.1002/wics.1296}
+#' 185-196. \doi{10.1002/wics.1296}.
 #'
 #' @examples
 #' ## The lizards example from ?brglm::brglm
@@ -1118,7 +1118,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
          class = "brglmFit")
 }
 
-#' Extract model coefficients from [brglmFit] objects
+#' Extract model coefficients from [`"brglmFit"`][brglmFit] objects
 #'
 #' @inheritParams stats::coef
 #' @param model one of `"mean"` (default), `"dispersion"`, `"full",
@@ -1167,9 +1167,9 @@ coef.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) 
 #'
 #' @inheritParams stats::summary.glm
 #'
-#' @details The interface of the summary method for [brglmFit()]
-#'     objects is identical to that of [glm()] objects. The summary
-#'     method for [brglmFit()] objects computes the p-values of the
+#' @details The interface of the summary method for [`"brglmFit"`][brglmFit]
+#'     objects is identical to that of [`"glm"`][glm] objects. The summary
+#'     method for [`"brglmFit"`][brglmFit] objects computes the p-values of the
 #'     individual Wald statistics based on the standard normal
 #'     distribution, unless the family is Gaussian, in which case a t
 #'     distribution with appropriate degrees of freedom is used.
@@ -1200,7 +1200,7 @@ summary.brglmFit <- function(object, dispersion = NULL,
 }
 
 #' Method for computing confidence intervals for one or more
-#' regression parameters in a [brglmFit()] object
+#' regression parameters in a [`"brglmFit"`][brglmFit] object
 #'
 #' @inheritParams stats::confint
 #'

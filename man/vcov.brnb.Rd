@@ -2,12 +2,12 @@
 % Please edit documentation in R/brnb.R
 \name{vcov.brnb}
 \alias{vcov.brnb}
-\title{Extract model variance-covariance matrix from \link{brnb} objects}
+\title{Extract model variance-covariance matrix from \code{\link[=brnb]{"brnb"}} objects}
 \usage{
 \method{vcov}{brnb}(object, model = c("mean", "full", "dispersion"), complete = TRUE, ...)
 }
 \arguments{
-\item{object}{an object of class \link{brnb}, typically, a result of a call to \code{\link[=brnb]{brnb()}}.}
+\item{object}{an object of class \code{\link[=brnb]{"brnb"}}, typically, a result of a call to \code{\link[=brnb]{brnb()}}.}
 
 \item{model}{character specifying for which component of the model variance-covariance matrix should be extracted.}
 
@@ -25,7 +25,7 @@
     \code{dispersion} parameter.}
 }
 \description{
-Extract model variance-covariance matrix from \link{brnb} objects
+Extract model variance-covariance matrix from \code{\link[=brnb]{"brnb"}} objects
 }
 \details{
 The options for \code{model} are \code{"mean"} for mean regression only

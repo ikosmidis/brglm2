@@ -2,7 +2,7 @@
 % Please edit documentation in R/brnb.R
 \name{coef.brnb}
 \alias{coef.brnb}
-\title{Extract model coefficients from \link{brnb} objects}
+\title{Extract model coefficients from \code{\link[=brnb]{"brnb"}} objects}
 \usage{
 \method{coef}{brnb}(object, model = c("mean", "full", "dispersion"), ...)
 }
@@ -18,7 +18,7 @@ parameter only, respectively.}
 \item{...}{other arguments.}
 }
 \description{
-Extract model coefficients from \link{brnb} objects
+Extract model coefficients from \code{\link[=brnb]{"brnb"}} objects
 }
 \details{
 See \code{\link[=coef]{coef()}} for more details.

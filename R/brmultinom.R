@@ -88,23 +88,23 @@
 #'
 #' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 #' reduction in generalized linear models. *Statistics and Computing*,
-#' **30**, 43-59 \doi{10.1007/s11222-019-09860-6}
+#' **30**, 43-59. \doi{10.1007/s11222-019-09860-6}.
 #'
 #' Agresti A (2002). *Categorical data analysis* (2nd edition). Wiley
 #' Series in Probability and Statistics. Wiley.
 #'
 #' Albert A, Anderson J A (1984). On the Existence of Maximum
 #' Likelihood Estimates in Logistic Regression Models. *Biometrika*,
-#' **71** 1--10, \doi{10.2307/2336390}
+#' **71** 1--10. \doi{10.2307/2336390}.
 #'
 #' Kosmidis I, Firth D (2011). Multinomial logit bias reduction
-#' via the Poisson log-linear model. *Biometrika*, **98**, 755-759
-#' \doi{10.1093/biomet/asr026}
+#' via the Poisson log-linear model. *Biometrika*, **98**, 755-759.
+#' \doi{10.1093/biomet/asr026}.
 #'
 #' Palmgren, J (1981). The Fisher Information Matrix for Log Linear
 #' Models Arguing Conditionally on Observed Explanatory
-#' Variables. *Biometrika*, **68**, 563-566
-#' \doi{10.1093/biomet/68.2.563}
+#' Variables. *Biometrika*, **68**, 563-566.
+#' \doi{10.1093/biomet/68.2.563}.
 #'
 #' @examples
 #'
@@ -412,7 +412,7 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
 #' category logits model.
 #'
 #' @param object a fitted object of class inheriting from
-#'     [brmultinom].
+#'     [`"brmultinom"`][brmultinom].
 #' @param newdata optionally, a data frame in which to look for
 #'     variables with which to predict.  If omitted, the fitted linear
 #'     predictors are used.
@@ -454,8 +454,7 @@ print.summary.brmultinom <- function(x, digits = x$digits, ...)
 #'
 #' @method predict brmultinom
 #' @export
-predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...)
-{
+predict.brmultinom <- function(object, newdata, type = c("class", "probs"), ...) {
     ## Adapted from nnet:::predict.multinom
     if (!inherits(object, "brmultinom"))
         stop("not a \"brmultinom\" fit")
@@ -506,7 +505,7 @@ model.matrix.brmultinom <- function(object, data, ...) {
 
 
 #' Method for computing confidence intervals for one or more
-#' regression parameters in a [brmultinom()] object
+#' regression parameters in a [`"brmultinom"`][brmultinom] object
 #'
 #' @inheritParams stats::confint
 #'
@@ -546,15 +545,15 @@ confint.brmultinom <- function (object, parm, level = 0.95, ...)  {
 }
 
 
-#' Method for simulating a data set from [brmultinom()] and [bracl()]
+#' Method for simulating a data set from [`"brmultinom"`][brmultinom] and [`"bracl"`][bracl]
 #' objects
 #'
-#' @param object an object of class [brmultinom()] or [bracl()].
+#' @param object an object of class [`"brmultinom"`][brmultinom] or [`"bracl"`][bracl].
 #' @param ... currently not used.
 #'
 #' @return
 #'
-#' A [data.frame] with `object$ncat` times the rows that
+#' A [`"data.frame"`][data.frame] with `object$ncat` times the rows that
 #' `model.frame(object)` have and the same variables. If `weights` has
 #' been specified in the call that generated `object`, then the
 #' simulate frequencies will populate the weights variable. Otherwise,

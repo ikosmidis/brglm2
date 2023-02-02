@@ -99,16 +99,16 @@ process. See \code{\link[=brglmControl]{brglmControl()}} for details.}
   }
 }
 \value{
-A fitted model object of class \link{brnb} inheriting from
-\link{negbin} and \link{brglmFit}. The object is similar to the output of
-\code{\link[=brglmFit]{brglmFit()}} but contains four additional components: \code{theta}
-for the maximum likelihood estimate of the dispersion parameter
-as in \code{\link[MASS:glm.nb]{MASS::glm.nb()}}, \code{vcov.mean} for the estimated
-variance-covariance matrix of the regression coefficients,
-\code{vcov.dispersion} for the estimated variance of the dispersion
-parameter in the chosen parameterization (using the expected
-information), and \code{twologlik} for twice the log-likelihood
-function.
+A fitted model object of class \code{\link[=brnb]{"brnb"}} inheriting
+from \code{\link[=negbin]{"negbin"}} and \code{\link[=brglmFit]{"brglmFit"}}. The
+object is similar to the output of \code{\link[=brglmFit]{brglmFit()}} but contains
+four additional components: \code{theta} for the maximum likelihood
+estimate of the dispersion parameter as in \code{\link[MASS:glm.nb]{MASS::glm.nb()}},
+\code{vcov.mean} for the estimated variance-covariance matrix of the
+regression coefficients, \code{vcov.dispersion} for the estimated
+variance of the dispersion parameter in the chosen
+parameterization (using the expected information), and
+\code{twologlik} for twice the log-likelihood function.
 }
 \description{
 \code{\link[=brnb]{brnb()}} is a function that fits negative binomial regression
@@ -228,22 +228,23 @@ sapply(fits, coef, model = "full")
 
 }
 \references{
-Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
-linear models. \emph{Journal of the Royal Statistical Society. Series B(Methodological)},
-\strong{53}, 629-643.
+Cordeiro G M, McCullagh P (1991). Bias correction in generalized
+linear models. \emph{Journal of the Royal Statistical Society. Series B
+(Methodological)}, \strong{53}, 629-643. \doi{10.1111/j.2517-6161.1991.tb01852.x}.
 
-Firth D (1993). Bias reduction of maximum likelihood estimates,
-Biometrika. \strong{80}, 27-38.
+Firth D (1993). Bias reduction of maximum likelihood estimates.
+\emph{Biometrika}. \strong{80}, 27-38. \doi{10.2307/2336755}.
 
-Kenne Pagui EC, Salvan A, and Sartori N (2017). Median bias
+Kenne Pagui E C, Salvan A, Sartori N (2017). Median bias
 reduction of maximum likelihood estimates. \emph{Biometrika}, \strong{104},
-923--938
+923–938. \doi{10.1093/biomet/asx046}.
 
-Kosmidis I, Kenne Pagui EC, Sartori N (2020). Mean and median bias
-reduction in generalized linear models. \emph{Statistics and Computing}, \strong{30} 43--59.
+Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
+reduction in generalized linear models. \emph{Statistics and Computing},
+\strong{30}, 43-59. \doi{10.1007/s11222-019-09860-6}.
 
-Kosmidis I and Firth D (2009). Bias reduction in exponential family
-nonlinear models. \emph{Biometrika}, \strong{96}, 793-804.
+Kosmidis I, Firth D (2009). Bias reduction in exponential family
+nonlinear models. \emph{Biometrika}, \strong{96}, 793-804. \doi{10.1093/biomet/asp055}.
 }
 \author{
 Euloge Clovis Kenne Pagui \link{ctb} \email{kenne@stat.unipd.it}, Ioannis Kosmidis \link{aut, cre} \email{ioannis.kosmidis@warwick.ac.uk}

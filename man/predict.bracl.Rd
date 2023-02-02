@@ -7,7 +7,7 @@
 \method{predict}{bracl}(object, newdata, type = c("class", "probs"), ...)
 }
 \arguments{
-\item{object}{a fitted object of class inheriting from \link{bracl}.}
+\item{object}{a fitted object of class inheriting from \code{\link[=bracl]{"bracl"}}.}
 
 \item{newdata}{optionally, a data frame in which to look for
 variables with which to predict.  If omitted, the fitted linear

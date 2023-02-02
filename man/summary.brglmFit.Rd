@@ -49,9 +49,9 @@
 \code{\link[=summary]{summary()}} method for \link{brglmFit} objects
 }
 \details{
-The interface of the summary method for \code{\link[=brglmFit]{brglmFit()}}
-objects is identical to that of \code{\link[=glm]{glm()}} objects. The summary
-method for \code{\link[=brglmFit]{brglmFit()}} objects computes the p-values of the
+The interface of the summary method for \code{\link[=brglmFit]{"brglmFit"}}
+objects is identical to that of \code{\link[=glm]{"glm"}} objects. The summary
+method for \code{\link[=brglmFit]{"brglmFit"}} objects computes the p-values of the
 individual Wald statistics based on the standard normal
 distribution, unless the family is Gaussian, in which case a t
 distribution with appropriate degrees of freedom is used.

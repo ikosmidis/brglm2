@@ -13,9 +13,9 @@
 #  A copy of the GNU General Public License is available at
 #  http://www.r-project.org/Licenses/
 
-#' A [link-glm] object for misclassified responses in binomial regression models
+#' A [`"link-glm"`][link-glm] object for misclassified responses in binomial regression models
 #'
-#' [mis()] is a [link-glm] object that specifies the link function in Neuhaus (1999, expression (8)) for handling misclassified responses in binomial regression models using maximum likelihood. A prior specification of the sensitivity and specificity is required.
+#' [mis()] is a [`"link-glm"`][link-glm] object that specifies the link function in Neuhaus (1999, expression (8)) for handling misclassified responses in binomial regression models using maximum likelihood. A prior specification of the sensitivity and specificity is required.
 #'
 #' @param link the baseline link to be used.
 #' @param sensitivity the probability of observing a success given that a success actually took place given any covariate values.
@@ -30,10 +30,10 @@
 #' @references
 #'
 #' Neuhaus J M (1999). Bias and efficiency loss due to misclassified
-#' responses in binary regression. Biometrika, **86**, 843-855
-#' \url{https://www.jstor.org/stable/2673589}
+#' responses in binary regression. Biometrika, **86**, 843-855.
+#' \url{https://www.jstor.org/stable/2673589}.
 #'
-#' @seealso [stats::glm()], [brglm_fit()]
+#' @seealso [glm()], [brglm_fit()]
 #'
 #' @examples
 #'

@@ -134,14 +134,14 @@
 #'
 #' Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 #' and shrinkage in binomial-response generalized linear
-#' models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
+#' models. *Biometrika*, **108**, 71-82. \doi{10.1093/biomet/asaa052}.
 #'
 #' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 #' reduction in generalized linear models. *Statistics and Computing*,
-#' **30**, 43-59 \doi{10.1007/s11222-019-09860-6}
+#' **30**, 43-59. \doi{10.1007/s11222-019-09860-6}.
 #'
 #' Firth D (1993). Bias reduction of maximum likelihood estimates.
-#' Biometrika, **80**, 27-38 \doi{10.2307/2336755}
+#' Biometrika, **80**, 27-38. \doi{10.2307/2336755}.
 #'
 #' @examples
 #'

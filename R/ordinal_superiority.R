@@ -22,7 +22,7 @@
 #' corrected.
 #'
 #' @param object a fitted object from an ordinal regression
-#'     model. Currently only models from class [bracl] are supported.
+#'     model. Currently only models from class [`"bracl"`][bracl] are supported.
 #' @param formula a RHS formula indicating the group variable to use.
 #' @param data an optional data frame in which to look for variables
 #'     with which to compute ordinal superiority measures.  If
@@ -41,7 +41,7 @@
 #'
 #' Agresti, A., Kateri, M. (2017). Ordinal probability effect measures
 #' for group comparisons in multinomial cumulative link models.
-#' *Biometrics*, **73** 214-219 #' \doi{10.1111/biom.12565}
+#' *Biometrics*, **73** 214-219. \doi{10.1111/biom.12565}.
 #'
 #' @examples
 #' data("stemcell", package = "brglm2")

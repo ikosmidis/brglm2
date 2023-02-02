@@ -23,16 +23,16 @@
 #'     `"sqrt"` or `"identity"`.
 #' @param control a list of parameters for controlling the fitting
 #'     process. See [brglmControl()] for details.
-#' @return A fitted model object of class [brnb] inheriting from
-#'     [negbin] and [brglmFit]. The object is similar to the output of
-#'     [brglmFit()] but contains four additional components: `theta`
-#'     for the maximum likelihood estimate of the dispersion parameter
-#'     as in [MASS::glm.nb()], `vcov.mean` for the estimated
-#'     variance-covariance matrix of the regression coefficients,
-#'     `vcov.dispersion` for the estimated variance of the dispersion
-#'     parameter in the chosen parameterization (using the expected
-#'     information), and `twologlik` for twice the log-likelihood
-#'     function.
+#' @return A fitted model object of class [`"brnb"`][brnb] inheriting
+#'     from [`"negbin"`][negbin] and [`"brglmFit"`][brglmFit]. The
+#'     object is similar to the output of [brglmFit()] but contains
+#'     four additional components: `theta` for the maximum likelihood
+#'     estimate of the dispersion parameter as in [MASS::glm.nb()],
+#'     `vcov.mean` for the estimated variance-covariance matrix of the
+#'     regression coefficients, `vcov.dispersion` for the estimated
+#'     variance of the dispersion parameter in the chosen
+#'     parameterization (using the expected information), and
+#'     `twologlik` for twice the log-likelihood function.
 #'
 #' @details
 #'
@@ -76,22 +76,23 @@
 #'
 #' @references
 #'
-#' Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
-#' linear models. *Journal of the Royal Statistical Society. Series B(Methodological)*,
-#'  **53**, 629-643.
+#' Cordeiro G M, McCullagh P (1991). Bias correction in generalized
+#' linear models. *Journal of the Royal Statistical Society. Series B
+#' (Methodological)*, **53**, 629-643. \doi{10.1111/j.2517-6161.1991.tb01852.x}.
 #'
-#' Firth D (1993). Bias reduction of maximum likelihood estimates,
-#' Biometrika. **80**, 27-38.
+#' Firth D (1993). Bias reduction of maximum likelihood estimates.
+#' *Biometrika*. **80**, 27-38. \doi{10.2307/2336755}.
 #'
-#' Kenne Pagui EC, Salvan A, and Sartori N (2017). Median bias
+#' Kenne Pagui E C, Salvan A, Sartori N (2017). Median bias
 #' reduction of maximum likelihood estimates. *Biometrika*, **104**,
-#' 923--938
+#' 923–938. \doi{10.1093/biomet/asx046}.
 #'
-#' Kosmidis I, Kenne Pagui EC, Sartori N (2020). Mean and median bias
-#' reduction in generalized linear models. *Statistics and Computing*, **30** 43--59.
+#' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
+#' reduction in generalized linear models. *Statistics and Computing*,
+#' **30**, 43-59. \doi{10.1007/s11222-019-09860-6}.
 #'
-#' Kosmidis I and Firth D (2009). Bias reduction in exponential family
-#' nonlinear models. *Biometrika*, **96**, 793-804.
+#' Kosmidis I, Firth D (2009). Bias reduction in exponential family
+#' nonlinear models. *Biometrika*, **96**, 793-804. \doi{10.1093/biomet/asp055}.
 #'
 #' @examples
 #' # Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
@@ -842,7 +843,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
 }
 
 
-#' Extract model coefficients from [brnb] objects
+#' Extract model coefficients from [`"brnb"`][brnb] objects
 #'
 #' @inheritParams stats::coef
 #' @param model one of `"mean"` (default), `"full"`, `"dispersion"`,
@@ -861,11 +862,11 @@ coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
     coef.brglmFit(object, model, ...)
 }
 
-#' Extract model variance-covariance matrix from [brnb] objects
+#' Extract model variance-covariance matrix from [`"brnb"`][brnb] objects
 #'
 #'
 #' @inheritParams stats::vcov.glm
-#' @param object an object of class [brnb], typically, a result of a call to [brnb()].
+#' @param object an object of class [`"brnb"`][brnb], typically, a result of a call to [brnb()].
 #' @param model character specifying for which component of the model variance-covariance matrix should be extracted.
 #'
 #' @details
@@ -886,15 +887,18 @@ vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete 
     vcov.brglmFit(object, model , complete , ...)
 }
 
-#' [summary()] method for [brnb] objects
+#' [summary()] method for [`"brnb"`][brnb] objects
 #'
 #' @inheritParams stats::summary.glm
-#' @param object an object of class [brnb], typically, a result of a
-#'     call to [brnb()].
-#' @details The interface of the summary method for [brnb] objects is
-#'     similar to that of [brglmFit()] objects with additional
-#'     information. The summary method for [brnb()] objects computes
-#'     the p-values of the individual Wald statistics based on the
+#' @param object an object of class [`"brnb"`][brnb], typically, a
+#'     result of a call to [brnb()].
+#' @param x an object of class [‘"summary.brnb"’][summary.brnb],
+#'     usually, a result of a call to [summary.brnb].
+#' @details The interface of the summary method for [`"brnb"`][brnb]
+#'     objects is similar to that of [`"brglmFit"`][brglmFit] objects
+#'     with additional information.
+#'
+#'     p-values of the individual Wald statistics are based on the
 #'     standard normal distribution.
 #'
 #' @seealso [summary.brglmFit()] and [glm()]
@@ -930,24 +934,7 @@ summary.brnb <- function(object, ...) {
     object
 }
 
-#' Summarizing [brnb] fits
-#'
-#' print summary output for class [brnb]
-#'
-#' @param x an object of class [summary.brnb], usually, a result of a
-#'     call to [summary.brnb()].
-#' @param digits the number of significant digits to use when
-#'     printing.
-#' @param ... extra arguments to passed to methods. Not used
-#'     currently.
-#' @details [print.summary.brnb] tries to be smart about formatting
-#'     the coefficients, standard errors, and additionally gives
-#'     "significant stars". The `coefficients` components of the
-#'     result gives the estimated coefficients and their estimated
-#'     standard errors, together with their ratio (`z`). A fourth
-#'     column gives the two-tailed p-value corresponding to the `z`
-#'     statistics based on Normal reference distribution.
-#'
+#' @rdname summary.brnb
 #' @method print summary.brnb
 #' @export
 print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
@@ -982,6 +969,7 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
     invisible(x)
 }
 
+
 #' @method print brnb
 #' @export
 print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
@@ -1007,7 +995,7 @@ print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
 }
 
 #' Method for computing Wald confidence intervals for one or more
-#' regression parameters in a [brnb] object
+#' regression parameters in a [`"brnb"`][brnb] object
 #'
 #' @inheritParams stats::confint
 #'
@@ -1020,7 +1008,7 @@ confint.brnb <- function(object, parm, level = 0.95, ...) {
 #' Simulate Responses
 #'
 #' Simulate one or more responses from the distribution corresponding
-#' to a fitted model [brnb] object.
+#' to a fitted model [`"brnb"`][brnb] object.
 #' @param object an object representing a fitted model.
 #' @param nsim number of response vectors to simulate. Defaults to 1.
 #' @param seed an object specifying if and how the random number

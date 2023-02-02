@@ -28,7 +28,7 @@ religious beliefs, stratified by gender.
 }
 \references{
 Agresti A (2010). \emph{Analysis of Ordinal Categorical Data} (2nd edition).  Wiley Series in
-Probability and Statistics. Wiley
+Probability and Statistics. Wiley.
 }
 \seealso{
 \code{\link[=bracl]{bracl()}}

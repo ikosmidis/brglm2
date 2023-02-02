@@ -15,7 +15,7 @@
 }
 \arguments{
 \item{object}{a fitted object from an ordinal regression
-model. Currently only models from class \link{bracl} are supported.}
+model. Currently only models from class \code{\link[=bracl]{"bracl"}} are supported.}
 
 \item{formula}{a RHS formula indicating the group variable to use.}
 
@@ -67,5 +67,5 @@ ordinal_superiority(fit_bracl_p, ~ gender, bc = TRUE, level = 0.99)
 \references{
 Agresti, A., Kateri, M. (2017). Ordinal probability effect measures
 for group comparisons in multinomial cumulative link models.
-\emph{Biometrics}, \strong{73} 214-219 #' \doi{10.1111/biom.12565}
+\emph{Biometrics}, \strong{73} 214-219. \doi{10.1111/biom.12565}.
 }

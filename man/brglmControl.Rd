@@ -177,14 +177,14 @@ coef(coalitionBRc, model = "dispersion")
 \references{
 Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 and shrinkage in binomial-response generalized linear
-models. \emph{Biometrika}, \strong{108}, 71-82 \doi{10.1093/biomet/asaa052}
+models. \emph{Biometrika}, \strong{108}, 71-82. \doi{10.1093/biomet/asaa052}.
 
 Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 reduction in generalized linear models. \emph{Statistics and Computing},
-\strong{30}, 43-59 \doi{10.1007/s11222-019-09860-6}
+\strong{30}, 43-59. \doi{10.1007/s11222-019-09860-6}.
 
 Firth D (1993). Bias reduction of maximum likelihood estimates.
-Biometrika, \strong{80}, 27-38 \doi{10.2307/2336755}
+Biometrika, \strong{80}, 27-38. \doi{10.2307/2336755}.
 }
 \seealso{
 \code{\link[=brglm_fit]{brglm_fit()}} and \code{\link[=glm.fit]{glm.fit()}}

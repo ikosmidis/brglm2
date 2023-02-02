@@ -55,15 +55,15 @@
 #' @references
 #'
 #' Agresti A (2015). *Foundations of Linear and Generalized Linear
-#' Models*.  Wiley Series in Probability and Statistics. Wiley
+#' Models*.  Wiley Series in Probability and Statistics. Wiley.
 #'
 #' Heinze G, Schemper M (2002). A Solution to the Problem of
 #' Separation in Logistic Regression. *Statistics in Medicine*,
-#' **21**, 2409–2419 \doi{10.1002/sim.1047}
+#' **21**, 2409–2419. \doi{10.1002/sim.1047}.
 #'
 #' Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 #' and shrinkage in binomial-response generalized linear
-#' models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
+#' models. *Biometrika*, **108**, 71-82. \doi{10.1093/biomet/asaa052}.
 #'
 #'
 "endometrial"
@@ -84,7 +84,7 @@
 #'  King G, Alt J E, Burns N E, Laver M. (1990). A Unified
 #'  Model of Cabinet Dissolution in Parliamentary
 #'  Democracies. *American Journal of Political Science*, **34**,
-#'  846-870. \doi{10.2307/2111401}
+#'  846-870. \doi{10.2307/2111401}.
 #'
 #'  King G, Alt J E, Burns N E, Laver M. ICPSR
 #'  Publication Related Archive, 1115.
@@ -114,7 +114,7 @@
 #' @references
 #'
 #' Agresti A (2002). *Categorical Data Analysis*.  Wiley Series in
-#' Probability and Statistics. Wiley
+#' Probability and Statistics. Wiley.
 #'
 "alligators"
 
@@ -147,6 +147,6 @@
 #' @references
 #'
 #' Agresti A (2010). *Analysis of Ordinal Categorical Data* (2nd edition).  Wiley Series in
-#' Probability and Statistics. Wiley
+#' Probability and Statistics. Wiley.
 #'
 "stemcell"

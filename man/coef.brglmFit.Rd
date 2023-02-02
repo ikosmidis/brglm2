@@ -2,7 +2,7 @@
 % Please edit documentation in R/brglmFit.R
 \name{coef.brglmFit}
 \alias{coef.brglmFit}
-\title{Extract model coefficients from \link{brglmFit} objects}
+\title{Extract model coefficients from \code{\link[=brglmFit]{"brglmFit"}} objects}
 \usage{
 \method{coef}{brglmFit}(object, model = c("mean", "full", "dispersion"), ...)
 }
@@ -18,7 +18,7 @@ or both, respectively.}
 \item{...}{other arguments.}
 }
 \description{
-Extract model coefficients from \link{brglmFit} objects
+Extract model coefficients from \code{\link[=brglmFit]{"brglmFit"}} objects
 }
 \details{
 See \code{\link[=coef]{coef()}} for more details.

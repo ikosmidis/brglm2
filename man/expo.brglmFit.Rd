@@ -3,6 +3,7 @@
 \name{expo.brglmFit}
 \alias{expo.brglmFit}
 \alias{brglmFit_expo}
+\alias{expo.glm}
 \title{Estimate exponentiated parameters of generalized linear models
 using various methods}
 \usage{
@@ -11,9 +12,16 @@ using various methods}
   type = c("correction*", "correction+", "Lylesetal2012", "AS_median", "ML"),
   level = 0.95
 )
+
+\method{expo}{glm}(
+  object,
+  type = c("correction*", "correction+", "Lylesetal2012", "AS_median", "ML"),
+  level = 0.95
+)
 }
 \arguments{
-\item{object}{an object of class \code{\link[=brglmFit]{brglmFit()}},}
+\item{object}{an object of class \code{\link[=brglmFit]{"brglmFit"}} or
+\code{\link[=glm]{"glm"}}.}
 
 \item{type}{the type of correction to be used. The available
 options are \code{"correction*"} (explicit mean bias correction with
@@ -26,7 +34,7 @@ reduction), and \code{"ML"} (maximum likelihood). See Details.}
 \item{level}{the confidence level required. Default is \code{0.95}.}
 }
 \value{
-a list inheriting from class \link{brglmFit_expo} with
+a list inheriting from class \code{\link[=brglmFit_expo]{"brglmFit_expo"}} with
 components \code{coef} (the estimates of the exponentiated
 regression parameters), \code{se} (the corresponding estimated
 stadnard errors for the exponentiated parameters), \code{ci}
@@ -35,31 +43,79 @@ parameters), and \code{type} for the \code{type} of correction that has
 been requested.
 }
 \description{
-\code{\link[=expo]{expo()}} updates the supplied \code{\link[=brglmFit]{brglmFit()}}
-object to estimate exponentiated parameters of generalized linear
-models with maximum likelihood or various mean and median bias
-reduction methods.
+\code{\link[=expo]{expo()}} uses the supplied \code{\link[=brglmFit]{"brglmFit"}} or
+\code{\link[=glm]{"glm"}} object to estimate exponentiated parameters of
+generalized linear models with maximum likelihood or various mean
+and median bias reduction methods.
 }
 \details{
-The supported methods are:
+The supported methods throgh the \code{type} argument are:
+\itemize{
+\item \code{"ML"}: the estimates of the exponentiated parameters are
+\eqn{\exp(\hat\theta_j)}, where \eqn{\theta_j} is the maximum
+likelihood estimates for the \eqn{j}th regression parameter.
+\item \code{"correction*"}: the estimates of the exponentiated parameters
+are \eqn{\exp(\hat\theta_j) / (1 + \hat{v}_j / 2)}, where
+\eqn{\hat\theta_j} is the estimate of the \eqn{j}th regression
+parameter using \code{type = "AS_mixed"} in \code{\link[=brglmFit]{brglmFit()}}.
+\item \code{"correction+"}: the estimates of the exponentiated parameters
+are \eqn{\exp(\hat\theta_j) (1 - \hat{v}_j / 2)}, where
+\eqn{\hat\theta_j} is the estimate of the \eqn{j}th regression
+parameter using \code{type = "AS_mixed"} in \code{\link[=brglmFit]{brglmFit()}}.
+\item \code{"Lylesetal2012"}: the estimates of the exponentiated parameters
+are \eqn{\exp(\hat\theta_j) exp(- \hat{v}_j / 2)}, where
+\eqn{\hat\theta_j} is the estimate of the \eqn{j}th regression
+parameter using \code{type = "AS_mixed"} in \code{\link[=brglmFit]{brglmFit()}}. This estimator
+has been proposed in Lyles et al. (2012).
+\item \code{"AS_median"}: the estimates of the exponentiated parameters are
+\eqn{\exp(\hat\theta_j)}, where \eqn{\hat\theta_j} is the estimate
+of the \eqn{j}th regression parameter using \code{type = "AS_median"} in
+\code{\link[=brglmFit]{brglmFit()}}.
+}
 
-COMPLETE ME
+\code{"correction*"} and \code{"correction+"} are based on multiplicative and
+additive adjustments, respectively, of the exponential of a
+reduced-bias estimator (like the ones coming from \code{\link[=brglmFit]{brglmFit()}} with
+\code{type = "AS_mixed"}, \code{type = "AS_mean"}, and \code{type = "correction"}). The form of those adjustments results from the
+expression of the first-term in the mean bias expansion of the
+exponential of a reduced-bias estimator. See, for example, Di
+Caterina & Kosmidis (2019, expression 12) for the general form of
+the first-term of the mean bias of a smooth transformation of a
+reduced-bias estimator.
+
+The estimators from \code{"correction+"}, \code{"correction*"},
+\code{"Lylesetal2012"} have asymptotic mean bias of order smaller than
+than of the maximum likelihood estimator. The estimators from
+\code{"AS_median"} are asymptotically closed to being median unbiased
+than the maximum likelihood estimator is.
+
+Estimated standard errors are computed using the delta method,
+where both the Jacobin and the information matrix are evaluated at
+the logarithm of the estimates of the exponentiated parameters.
+
+Confidence intervals results from exponentiating the limits of
+standard Wald-type intervals computed at the logarithm of the
+estimates of the exponentiated parameters.
 }
 \examples{
 
-COMPLETE ME
+1 + 1
 
 
 
 }
 \references{
+Di Caterina C, Kosmidis I (2019). Location-Adjusted Wald Statistics for Scalar
+Parameters. \emph{Computational Statistics & Data Analysis}, \strong{138},
+126-142. \doi{10.1016/j.csda.2019.04.004}.
+
 Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 reduction in generalized linear models. \emph{Statistics and Computing},
-\strong{30}, 43-59 \doi{10.1007/s11222-019-09860-6}
+\strong{30}, 43-59. \doi{10.1007/s11222-019-09860-6}.
 
 Cordeiro G M, McCullagh P (1991). Bias correction in generalized
 linear models. \emph{Journal of the Royal Statistical Society. Series B
-(Methodological)}, \strong{53}, 629-643 \doi{10.1111/j.2517-6161.1991.tb01852.x}
+(Methodological)}, \strong{53}, 629-643. \doi{10.1111/j.2517-6161.1991.tb01852.x}.
 
 Lyles R H, Guo Y, Greenland S (2012). Reducing bias and mean
 squared error associated with regression-based odds ratio

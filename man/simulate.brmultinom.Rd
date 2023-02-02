@@ -2,18 +2,18 @@
 % Please edit documentation in R/brmultinom.R
 \name{simulate.brmultinom}
 \alias{simulate.brmultinom}
-\title{Method for simulating a data set from \code{\link[=brmultinom]{brmultinom()}} and \code{\link[=bracl]{bracl()}}
+\title{Method for simulating a data set from \code{\link[=brmultinom]{"brmultinom"}} and \code{\link[=bracl]{"bracl"}}
 objects}
 \usage{
 \method{simulate}{brmultinom}(object, ...)
 }
 \arguments{
-\item{object}{an object of class \code{\link[=brmultinom]{brmultinom()}} or \code{\link[=bracl]{bracl()}}.}
+\item{object}{an object of class \code{\link[=brmultinom]{"brmultinom"}} or \code{\link[=bracl]{"bracl"}}.}
 
 \item{...}{currently not used.}
 }
 \value{
-A \link{data.frame} with \code{object$ncat} times the rows that
+A \code{\link[=data.frame]{"data.frame"}} with \code{object$ncat} times the rows that
 \code{model.frame(object)} have and the same variables. If \code{weights} has
 been specified in the call that generated \code{object}, then the
 simulate frequencies will populate the weights variable. Otherwise,
@@ -21,7 +21,7 @@ the resulting \link{data.frame} will have a \code{".weights"} variable with
 the simulated multinomial counts.
 }
 \description{
-Method for simulating a data set from \code{\link[=brmultinom]{brmultinom()}} and \code{\link[=bracl]{bracl()}}
+Method for simulating a data set from \code{\link[=brmultinom]{"brmultinom"}} and \code{\link[=bracl]{"bracl"}}
 objects
 }
 \examples{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/expo.R
 \name{coef.brglmFit_expo}
 \alias{coef.brglmFit_expo}
-\title{Extract estimates from \link{brglmFit_expo} objects}
+\title{Extract estimates from \code{\link[=brglmFit_expo]{"brglmFit_expo"}} objects}
 \usage{
 \method{coef}{brglmFit_expo}(object, ...)
 }
@@ -13,5 +13,5 @@
 \item{...}{other arguments.}
 }
 \description{
-Extract estimates from \link{brglmFit_expo} objects
+Extract estimates from \code{\link[=brglmFit_expo]{"brglmFit_expo"}} objects
 }
