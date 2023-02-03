@@ -1,5 +1,3 @@
-context("agreement with mbrglm when estimating binomial response models")
-
 data("lizards", package = "brglm2")
 
 data("endometrial",package = "brglm2")
@@ -17,7 +15,7 @@ for (l in seq_along(links)) {
                                        method = "mbrglm.fit",
                                        control.mbrglm = mbrglmControl)
     expect_warning(lizardsMBR <- glm(lizardsFormula, family = binomial(links[[l]]), data = lizards,
-                                    method = "brglmFit", type="AS_median", epsilon = 1e-10, maxit = 1000))
+                                     method = "brglmFit", type="AS_median", epsilon = 1e-10, maxit = 1000))
 
     ## Endometrial
     endoFormula <- HG ~ NV + PI + EH
@@ -32,9 +30,8 @@ for (l in seq_along(links)) {
     c1 <- coef(summary(endoMBRlegacy))
     c2 <- coef(summary(endoMBR))
 
-    test_that(paste("glm with brglmFit method and mbrglm return the same coefficients when link is", links[[l]]$name), {
-        expect_equal(coef(lizardsMBR), coef(lizardsMBRlegacy), tolerance = tol)
-        expect_equal(c1, c2, tolerance = tol)
-    })
+    ## glm with brglmFit method and mbrglm return the same coefficients when link is" links[[l]]$name
+    expect_equal(coef(lizardsMBR), coef(lizardsMBRlegacy), tolerance = tol)
+    expect_equal(c1, c2, tolerance = tol)
 }
 

@@ -1,5 +1,3 @@
-context("exponentiating regression coefficients")
-
 ## source(system.file("inst", "brglm0/brglm0.R", package = "brglm2"))
 data("lizards", package = "brglm2")
 

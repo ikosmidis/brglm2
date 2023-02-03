@@ -1,6 +1,3 @@
-context("agreement with brglm when estimating binomial resposne models")
-
-## source(system.file("inst", "brglm0/brglm0.R", package = "brglm2"))
 data("lizards", package = "brglm2")
 
 links <- lapply(c("logit", "probit", "cloglog", "cauchit"), make.link)
@@ -19,9 +16,8 @@ for (l in seq_along(links)) {
                              light + time, family = binomial(links[[l]]), data=lizards,
                          method = "brglmFit", epsilon = 1e-10, maxit = 1000)
     )
-    test_that(paste("glm with brglm.fit method and brglm_0 return the same coefficients for the lizards when link is", links[[l]]$name), {
-        expect_equal(coef(lizardsBR), coef(lizardsBRlegacy), tolerance = tol)
-    })
+    ## glm with brglm.fit method and brglm_0 return the same coefficients for the lizards when link is links[[l]]$name)
+    expect_equal(coef(lizardsBR), coef(lizardsBRlegacy), tolerance = tol)
 }
 
 ## Performance comparisons BR versus ML

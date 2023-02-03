@@ -15,5 +15,5 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
-Suggests: detectseparation, testthat, knitr, rmarkdown, covr
+Suggests: detectseparation, knitr, rmarkdown, covr, tinytest
 VignetteBuilder: knitr

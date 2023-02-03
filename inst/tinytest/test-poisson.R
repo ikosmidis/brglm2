@@ -1,6 +1,5 @@
-context("comparison of brglmFit with method = 'AS_mean' for Poisson with brpr from the supplementary material of Kosmidis & Firth (2010)")
-
-source(system.file("brpr", "brpr.R", package = "brglm2"))
+## source(system.file("brpr", "brpr.R", package = "brglm2"))
+source("brpr.R")
 
 ## Dobson (1990) Page 93: Randomized Controlled Trial :
 counts <- c(18,17,15,20,10,20,25,13,12)
@@ -9,16 +8,16 @@ treatment <- gl(3,3)
 dobson <- data.frame(counts, outcome, treatment)
 
 tol <- 1e-06
-test_that("BR estimates and std. errors from brglmFit and from brpr are the same for poisson", {
-    expect_warning({
-        br1 <- summary(glm(counts ~ outcome + treatment, family = poisson(), method = "brglmFit"))
-        br2 <- summary(brpr(counts ~ outcome + treatment, data = dobson))
-    })
-    c1 <- coef(br1)
-    c2 <- coef(br2)
-    c2 <- c2[rownames(c1), ]
-    expect_equal(c1,c2, tolerance = tol)
+## BR estimates and std. errors from brglmFit and from brpr are the same for poisson
+expect_warning({
+    br1 <- summary(glm(counts ~ outcome + treatment, family = poisson(), method = "brglmFit"))
+    br2 <- summary(brpr(counts ~ outcome + treatment, data = dobson))
 })
+c1 <- coef(br1)
+c2 <- coef(br2)
+c2 <- c2[rownames(c1), ]
+expect_equal(c1,c2, tolerance = tol)
+
 
 ## ## mbest::firthglm.fit crashes for this example
 ## ## A Gamma example, from McCullagh & Nelder (1989, pp. 300-2)

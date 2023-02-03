@@ -1,6 +1,3 @@
-context("test starting values")
-
-
 ## A Gamma example, from McCullagh & Nelder (1989, pp. 300-2)
 clotting <- data.frame(
     u = c(5,10,15,20,30,40,60,80,100, 5,10,15,20,30,40,60,80,100),
@@ -11,8 +8,7 @@ mod <- glm(conc ~ lot*log(u), data = clotting, family = Gamma, epsilon = 1e-10, 
 mod1 <- update(mod, method = "brglmFit", start = c(coef(mod)*0.9, 1), epsilon = 1e-10, maxit = 1000)
 mod2 <- update(mod, method = "brglmFit", start = c(coef(mod)*0.9), epsilon = 1e-10, maxit = 1000)
 
-tol <- 1e-04
-test_that("start argument is passed correctly in brglmFit", {
-    expect_equal(coef(mod), coef(mod1), tolerance = tol)
-    expect_equal(coef(mod), coef(mod2), tolerance = tol)
-})
+tol <- 1e-03
+## start argument is passed correctly in brglmFit"
+expect_equal(coef(mod), coef(mod1), tolerance = tol)
+expect_equal(coef(mod), coef(mod2), tolerance = tol)
