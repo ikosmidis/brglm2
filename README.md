@@ -38,7 +38,7 @@ multinomial responses (both ordinal and nominal), the adjusted score
 equations return estimates with improved frequentist properties, that
 are also always finite, even in cases where the maximum likelihood
 estimates are infinite (e.g. complete and quasi-complete separation).
-See, [Kosmidis & Firth (2020)](https://doi.org/10.1093/biomet/asaa052)
+See, [Kosmidis & Firth (2021)](https://doi.org/10.1093/biomet/asaa052)
 for the proof of the latter result in the case of mean bias reduction
 for logistic regression (and, for more general binomial-response models
 where the likelihood is penalized by a power of the Jeffreys’ invariant
