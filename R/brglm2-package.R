@@ -42,8 +42,9 @@
 #' The core model fitters are implemented by the functions
 #' [brglm_fit()] (univariate generalized linear models),
 #' [brmultinom()] (baseline category logit models for nominal
-#' multinomial responses), and [bracl()] (adjacent category logit
-#' models for ordinal multinomial responses).
+#' multinomial responses), [bracl()] (adjacent category logit models
+#' for ordinal multinomial responses), and [brnb()] for negative
+#' binomial regression.
 #'
 #' @details
 #'

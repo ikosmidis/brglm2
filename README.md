@@ -17,8 +17,9 @@ Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](c
 estimation and inference from generalized linear models using various
 methods for bias reduction. **brglm2** supports all generalized linear
 models supported in R, and provides methods for multinomial logistic
-regression (nominal responses) and adjacent category models (ordinal
-responses).
+regression (nominal responses), adjacent category models (ordinal
+responses), and negative binomial regression (for potentially
+overdispered count responses).
 
 Reduction of estimation bias is achieved by solving either the mean-bias
 reducing adjusted score equations in [Firth
@@ -43,6 +44,12 @@ for the proof of the latter result in the case of mean bias reduction
 for logistic regression (and, for more general binomial-response models
 where the likelihood is penalized by a power of the Jeffreys’ invariant
 prior).
+
+The core model fitters are implemented by the functions `brglm_fit()`
+(univariate generalized linear models), `brmultinom()` (baseline
+category logit models for nominal multinomial responses), `bracl()`
+(adjacent category logit models for ordinal multinomial responses), and
+`brnb()` for negative binomial regression.
 
 ## Installation
 
@@ -100,11 +107,6 @@ R package
 
     # install.packages("detectseparation")
     library("detectseparation")
-    #> 
-    #> Attaching package: 'detectseparation'
-    #> The following objects are masked from 'package:brglm2':
-    #> 
-    #>     check_infinite_estimates, detect_separation
     update(modML, method = "detect_separation")
     #> Implementation: ROI | Solver: lpsolve 
     #> Separation: TRUE 
