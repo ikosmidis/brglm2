@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
+
 # brglm2 <img src="man/figures/hex_brglm2.svg" width="320" align="right">
 
 <!-- badges: start -->
@@ -167,18 +168,14 @@ implicit is as given in [Kosmidis
 
 ## References and resources
 
-**brglm2** was presented by [Ioannis Kosmidis](https://www.ikosmidis.com) at the useR! 2016 international
+**brglm2** was presented by [Ioannis
+Kosmidis](https://www.ikosmidis.com) at the useR! 2016 international
 conference at University of Stanford on 16 June 2016. The presentation
 was titled "Reduced-bias inference in generalized linear models".
-<!-- and -->
-<!-- can be watched online at this -->
-<!-- [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models). -->
 
 Motivation, details and discussion on the methods that **brglm2** implements are provided in
 
-Kosmidis, I, Kenne Pagui, E C, Sartori N. (2020). Mean and median bias
-reduction in generalized linear models. [*Statistics and
-Computing*](https://doi.org/10.1007/s11222-019-09860-6) *30*, 43–59.
+Kosmidis, I, Kenne Pagui, E C, Sartori N. (2020). Mean and median bias reduction in generalized linear models. [*Statistics and Computing*](https://doi.org/10.1007/s11222-019-09860-6) *30*, 43–59.
 
 ## Code of Conduct
 

@@ -40,7 +40,7 @@
 #' * `HG` histology grade with coding 0 for low grade and 1 for high grade
 #'
 #' @source The packaged data set was downloaded in `.dat` format from
-#'     \url{http://www.stat.ufl.edu/~aa/glm/data}. The latter link
+#'     \url{https://users.stat.ufl.edu/~aa/glm/data/}. The latter link
 #'     provides the data sets used in Agresti (2015).
 #'
 #'     The endometrial data set was first analyzed in Heinze and

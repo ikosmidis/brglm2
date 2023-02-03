@@ -31,8 +31,9 @@ are provided.
 The core model fitters are implemented by the functions
 \code{\link[=brglm_fit]{brglm_fit()}} (univariate generalized linear models),
 \code{\link[=brmultinom]{brmultinom()}} (baseline category logit models for nominal
-multinomial responses), and \code{\link[=bracl]{bracl()}} (adjacent category logit
-models for ordinal multinomial responses).
+multinomial responses), \code{\link[=bracl]{bracl()}} (adjacent category logit models
+for ordinal multinomial responses), and \code{\link[=brnb]{brnb()}} for negative
+binomial regression.
 
 The similarly named \strong{brglm} R package can only handle generalized
 linear models with binomial responses. Special care has been taken

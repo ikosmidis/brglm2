@@ -28,4 +28,4 @@ anova.R
 README_cache
 ^codecov\.yml$
 ^CRAN-RELEASE$
-^CODE_OF_CONDUCT\.md$
+^code_of_conduct\.md$

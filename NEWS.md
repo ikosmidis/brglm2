@@ -12,7 +12,7 @@
 
 * Moved unit tests to [**tinytest**](https://cran.r-project.org/package=tinytest).
 
-* Moved documentation to markdown markup through [**roxygen2**](http://cran.r-project.org/package=roxygen2).
+* Moved documentation to markdown markup through [**roxygen2**](https://cran.r-project.org/package=roxygen2).
 
 * New vignette titled "Estimating the exponential of regression parameters using **brglm2**", to demonstrate the `expo()` method.
 

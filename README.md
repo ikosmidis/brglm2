@@ -204,8 +204,6 @@ is as given in [Kosmidis (2014)](https://doi.org/10.1002/wics.1296).
 Kosmidis](https://www.ikosmidis.com) at the useR! 2016 international
 conference at University of Stanford on 16 June 2016. The presentation
 was titled “Reduced-bias inference in generalized linear models”.
-<!-- and --> <!-- can be watched online at this -->
-<!-- [link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models). -->
 
 Motivation, details and discussion on the methods that **brglm2**
 implements are provided in
