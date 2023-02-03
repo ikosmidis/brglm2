@@ -5,7 +5,7 @@
 \alias{brglmFit_expo}
 \alias{expo}
 \alias{expo.glm}
-\title{Estimate exponentiated parameters of generalized linear models
+\title{Estimate the exponential of parameters of generalized linear models
 using various methods}
 \usage{
 \method{expo}{brglmFit}(
@@ -45,7 +45,7 @@ been requested.
 }
 \description{
 The \code{\link[=expo]{expo()}} method uses the supplied \code{\link[=brglmFit]{"brglmFit"}} or
-\code{\link[=glm]{"glm"}} object to estimate exponentiated parameters of
+\code{\link[=glm]{"glm"}} object to estimate the exponential of parameters of
 generalized linear models with maximum likelihood or various mean
 and median bias reduction methods. \code{\link[=expo]{expo()}} is useful for computing
 (corrected) estimates of the multiplicative impact of a unit

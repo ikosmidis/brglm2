@@ -13,11 +13,11 @@
 #  A copy of the GNU General Public License is available at
 #  http://www.r-project.org/Licenses/
 
-#' Estimate exponentiated parameters of generalized linear models
+#' Estimate the exponential of parameters of generalized linear models
 #' using various methods
 #'
 #' The [expo()] method uses the supplied [`"brglmFit"`][brglmFit] or
-#' [`"glm"`][glm] object to estimate exponentiated parameters of
+#' [`"glm"`][glm] object to estimate the exponential of parameters of
 #' generalized linear models with maximum likelihood or various mean
 #' and median bias reduction methods. [expo()] is useful for computing
 #' (corrected) estimates of the multiplicative impact of a unit

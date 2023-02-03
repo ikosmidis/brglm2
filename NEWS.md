@@ -1,8 +1,8 @@
-# brglm2 0.8.2-999
+# brglm2 0.9.0
 
 ## New functionality
 
-* The `expo()` method for `brglmFit` objects estimates exponentiated parameters of generalized linear models with maximum likelihood or various mean and median bias reduction methods (see `?expo` for details). Particularly useful for regression-based odds ratio estimators. 
+* The `expo()` method for `brglmFit` and `glm` objects estimates the exponential of parameters of generalized linear models with maximum likelihood or various mean and median bias reduction methods (see `?expo` for details). The `expo()` method is particularly useful for computing (corrected) estimates of the multiplicative impact of a unit increase on a covariate on the mean of a Poisson log-linear model (`family = poisson("log")` in `glm()`) while adjusting for other covariates, the odds ratio associated with a unit increase on a covariate in a logistic regression model (`family = binomial("logit")` in `glm()`) while adjusting for other covariates, the relative risk associated with a unit increase on a covariate in a relative risk regression model (`family = binomial("log")` in `glm()`) while adjusting for other covariates, among others.
 
 ## Bug fixes
 
@@ -10,9 +10,11 @@
 
 ## Other improvements, updates and additions
 
-* Added `expo` methods for `brglmFit` objects, which computes estimates, standard errors and confidence intervals for various corrective methods (currently `"ML"`, `"correction+"`, `"correction*"`, `"Lylesetal2012"`, `"AS_median"`).
+* Moved unit tests to [**tinytest**](https://cran.r-project.org/package=tinytest).
 
 * Moved documentation to markdown markup through [**roxygen2**](http://cran.r-project.org/package=roxygen2).
+
+* New vignette titled "Estimating the exponential of regression parameters using **brglm2**", to demonstrate the `expo()` method.
 
 * Various documentation fixes.
 
