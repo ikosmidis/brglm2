@@ -28,7 +28,6 @@ Raphson
 Salvan
 Schemper
 TWD
-Zeilig
 al
 arteria
 arxiv
@@ -42,6 +41,7 @@ brglmFit
 brmultinom
 brnb
 bugreports
+ciep
 codebase
 coercible
 cran
@@ -55,6 +55,7 @@ et
 finiteness
 foodchoice
 frac
+fract
 github
 grahami
 http
@@ -68,6 +69,7 @@ misclassified
 mutagenicity
 nd
 neovasculization
+numst
 opalinus
 pre
 priori
