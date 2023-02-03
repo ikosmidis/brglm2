@@ -71,9 +71,23 @@
 
 #' Coalition data
 #'
+#' This data set contains survival data on government coalitions in
+#' parliamentary democracies (Belgium, Canada, Denmark, Finland,
+#' France, Iceland, Ireland, Israel, Italy, Netherlands, Norway,
+#' Portugal, Spain, Sweden, and the United Kingdom) for the period
+#' 1945-1987.  For parsimony, country indicator variables are omitted
+#' in the sample data.
+#'
+#' @format
+#'
+#' A data frame with 314 rows and the 7 variables "duration",
+#' "ciep12", "invest", "fract", "polar", "numst2", and "crisis".  For
+#' variable descriptions, please refer to King et al (1990).
+#'
 #' @note
 #'
-#' Data is as provided in the Zeilig R package (\url{https://cran.r-project.org/package=Zelig})
+#' Data is as it was provided in the
+#' [\pkg{Zeilig}](https://cran.r-project.org/package=Zelig) R package.
 #'
 #' @seealso
 #'
@@ -91,6 +105,39 @@
 #'
 "coalition"
 
+#' The effects of AZT in slowing the development of AIDS symptoms
+#'
+#' The data is from a 3-year study on the effects of AZT in slowing the
+#' development of AIDS symptoms. 338 veterans whose immune systems
+#' were beginning to falter after infection with the AIDS virus were
+#' randomly assigned either to receive AZT immediately or to wait
+#' until their T cells showed severe immune weakness.
+#'
+#' @format A data frame with 4 rows and 4 variables:
+#'
+#' * `symptomatic`: counts of veterans showing AIDS symptoms during the 3-year study
+#'
+#' * `asymptomatic`: counts of veterans not showing AIDS symptoms during the 3-year study
+#'
+#' * `race`: the race of the veterans with levels `"White"` and `"Black"`
+#'
+#' * `AZT_use`: whether the veterans received AZT immediately (`"Yes"`)
+#' or waited until their T cells showed severe immune weakness (`"No"`)
+#'
+#' @source
+#'
+#' The data set is analyzed in Agresti (2002, Subsection 5.4.2). Its
+#' original source is New York Times, Feb. 15, 1991.
+#'
+#' @seealso
+#'
+#' [brmultinom()]
+#'
+#' @references
+#'
+#' Agresti A (2002). *Categorical Data Analysis*.  Wiley Series in
+#' Probability and Statistics. Wiley.
+"aids"
 
 #' Alligator food choice data
 #'
