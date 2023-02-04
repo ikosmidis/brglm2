@@ -180,6 +180,19 @@ asymptotic mean and median bias, that are also guaranteed to be finite.
 For example,
 
     expoRB <- expo(modML, type = "correction*")
+    expoRB
+    #> 
+    #> Call:
+    #> expo.glm(object = modML, type = "correction*")
+    #> 
+    #>              Estimate Std. Error     2.5 %  97.5 %
+    #> (Intercept) 20.671826  33.136511  0.893142 478.451
+    #> NV           8.496974   7.825240  1.397511  51.662
+    #> PI           0.965089   0.036795  0.895602   1.040
+    #> EH           0.056848   0.056344  0.008148   0.397
+    #> 
+    #> 
+    #> Type of estimator: correction* (explicit mean bias correction with a multiplicative adjustment)
 
 The `correction*` method for mean bias reduction (see `?expo` for
 details), gives that the odds ratio between presence of neovasculation

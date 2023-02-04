@@ -147,6 +147,7 @@ estimators with smaller asymptotic mean and median bias, that are also
 guaranteed to be finite. For example, 
 ```{r, echo = TRUE, eval = TRUE}
 expoRB <- expo(modML, type = "correction*")
+expoRB
 ```
 The `correction*` method for mean bias reduction (see `?expo` for
 details), gives that the odds ratio between presence of neovasculation
