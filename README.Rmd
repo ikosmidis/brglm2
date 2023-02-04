@@ -160,12 +160,10 @@ expoRB
 ```
 
 The odds ratio between presence of neovasculation and high histology
-grade (`HG`) is estimated to be `r coef(expoRB)["NV"]`, while
+grade (`HG`) is estimated to be `r round(coef(expoRB)["NV"], 2)`, while
 controlling for PI and EH. So, for each value of `PI` and `EH`, the
-estimated odds of high histology grade are about `r
-round(coef(expoRB)["NV"], 1)` times higher when neovasculation is
-present. An approximate 95\% interval for the latter odds ratio is `r
-paste0("(", paste(round(expoRB$ci["NV",], 1), collapse = ", "), ")")`
+estimated odds of high histology grade are about `r round(coef(expoRB)["NV"], 1)` times higher when neovasculation is present. An approximate 95\% interval for the latter odds ratio is 
+`r paste0("(", paste(round(expoRB$ci["NV",], 1), collapse = ", "), ")")`
 providing evidence of association between `NV` and `HG` while
 controlling for `PI` and `EH`.
 
