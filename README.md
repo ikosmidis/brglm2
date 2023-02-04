@@ -65,38 +65,38 @@ or the development version from github:
 ## Example
 
 Below we follow the example of [Heinze and Schemper
-(2002)](https://doi.org/10.1002/sim.1047) and fit a probit regression
+(2002)](https://doi.org/10.1002/sim.1047) and fit a logistic regression
 model using maximum likelihood (ML) to analyze data from a study on
 endometrial cancer (see `?brglm2::endometrial` for details and
 references).
 
     library("brglm2")
     data("endometrial", package = "brglm2")
-    modML <- glm(HG ~ NV + PI + EH, family = binomial("probit"), data = endometrial)
+    modML <- glm(HG ~ NV + PI + EH, family = binomial("logit"), data = endometrial)
     summary(modML)
     #> 
     #> Call:
-    #> glm(formula = HG ~ NV + PI + EH, family = binomial("probit"), 
+    #> glm(formula = HG ~ NV + PI + EH, family = binomial("logit"), 
     #>     data = endometrial)
     #> 
     #> Deviance Residuals: 
     #>      Min        1Q    Median        3Q       Max  
-    #> -1.47007  -0.67917  -0.32978   0.00008   2.74898  
+    #> -1.50137  -0.64108  -0.29432   0.00016   2.72777  
     #> 
     #> Coefficients:
-    #>              Estimate Std. Error z value Pr(>|z|)    
-    #> (Intercept)   2.18093    0.85732   2.544 0.010963 *  
-    #> NV            5.80468  402.23641   0.014 0.988486    
-    #> PI           -0.01886    0.02360  -0.799 0.424066    
-    #> EH           -1.52576    0.43308  -3.523 0.000427 ***
+    #>               Estimate Std. Error z value Pr(>|z|)    
+    #> (Intercept)    4.30452    1.63730   2.629 0.008563 ** 
+    #> NV            18.18556 1715.75089   0.011 0.991543    
+    #> PI            -0.04218    0.04433  -0.952 0.341333    
+    #> EH            -2.90261    0.84555  -3.433 0.000597 ***
     #> ---
     #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     #> 
     #> (Dispersion parameter for binomial family taken to be 1)
     #> 
-    #>     Null deviance: 104.90  on 78  degrees of freedom
-    #> Residual deviance:  56.47  on 75  degrees of freedom
-    #> AIC: 64.47
+    #>     Null deviance: 104.903  on 78  degrees of freedom
+    #> Residual deviance:  55.393  on 75  degrees of freedom
+    #> AIC: 63.393
     #> 
     #> Number of Fisher Scoring iterations: 17
 
@@ -119,7 +119,7 @@ The reported, apparently finite estimate
 `r round(coef(summary(modML))["NV", "Estimate"], 3)` for `NV` is merely
 due to false convergence of the iterative estimation procedure for ML.
 The same is true for the estimated standard error, and, hence the value
-0.014 for the *z*-statistic cannot be trusted for inference on the size
+0.011 for the *z*-statistic cannot be trusted for inference on the size
 of the effect for `NV`.
 
 As mentioned earlier, many of the estimation methods implemented in
@@ -136,30 +136,30 @@ mean bias reduction.
     summary(update(modML, method = "brglm_fit"))
     #> 
     #> Call:
-    #> glm(formula = HG ~ NV + PI + EH, family = binomial("probit"), 
+    #> glm(formula = HG ~ NV + PI + EH, family = binomial("logit"), 
     #>     data = endometrial, method = "brglm_fit")
     #> 
     #> Deviance Residuals: 
     #>     Min       1Q   Median       3Q      Max  
-    #> -1.4436  -0.7016  -0.3783   0.3146   2.6218  
+    #> -1.4740  -0.6706  -0.3411   0.3252   2.6123  
     #> 
     #> Coefficients:
     #>             Estimate Std. Error z value Pr(>|z|)    
-    #> (Intercept)  1.91460    0.78877   2.427 0.015210 *  
-    #> NV           1.65892    0.74730   2.220 0.026427 *  
-    #> PI          -0.01520    0.02089  -0.728 0.466793    
-    #> EH          -1.37988    0.40329  -3.422 0.000623 ***
+    #> (Intercept)  3.77456    1.48869   2.535 0.011229 *  
+    #> NV           2.92927    1.55076   1.889 0.058902 .  
+    #> PI          -0.03475    0.03958  -0.878 0.379914    
+    #> EH          -2.60416    0.77602  -3.356 0.000791 ***
     #> ---
     #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     #> 
     #> (Dispersion parameter for binomial family taken to be 1)
     #> 
     #>     Null deviance: 104.903  on 78  degrees of freedom
-    #> Residual deviance:  57.587  on 75  degrees of freedom
-    #> AIC:  65.587
+    #> Residual deviance:  56.575  on 75  degrees of freedom
+    #> AIC:  64.575
     #> 
     #> Type of estimator: AS_mixed (mixed bias-reducing adjusted score equations)
-    #> Number of Fisher Scoring iterations: 4
+    #> Number of Fisher Scoring iterations: 6
 
 A quick comparison of the output from mean bias reduction to that from
 ML reveals a dramatic change in the *z*-statistic for `NV`, now that
@@ -172,6 +172,23 @@ estimation methods for generalized linear models, including median bias
 reduction and maximum penalized likelihood with Jeffreys’ prior penalty.
 Also do not forget to take a look at the vignettes
 (`vignette(package = "brglm2")`) for details and more case studies.
+
+See, also `?expo` for a method to estimate the exponential of regression
+parameters, such as odds ratios, while controlling for other covariate
+information, using maximum likelihood or various estimators with smaller
+asymptotic mean and median bias, that are also guaranteed to be finite.
+For example,
+
+    expoRB <- expo(modML, type = "correction*")
+
+The `correction*` method for mean bias reduction (see `?expo` for
+details), gives that the odds ratio between presence of neovasculation
+and high histology grade (`HG`) is estimated to be
+`r coef(expoRB)["NV"]`, while controlling for PI and EH. So, for each
+value of `PI` and `EH`, the estimated odds of high histology grade are
+about 8 times higher when neovasculation is present. An approximate 95%
+interval for the latter odds ratio is 1, 52 providing evidence of
+association between `NV` and `HG` while controlling for `PI` and `EH`.
 
 ## Solving adjusted score equations using quasi-Fisher scoring
 
