@@ -183,8 +183,8 @@ information, using maximum likelihood or various estimators with smaller
 asymptotic mean and median bias, that are also guaranteed to be finite.
 For example, `modML` is a logistic regresison fit, so the exponential of
 each coefficient is an odds ratio while controlling for other
-covariates. To estimator those odds ratios using the The `correction*`
-method for mean bias reduction (see `?expo` for details) we do
+covariates. To estimate those odds ratios using the `correction*` method
+for mean bias reduction (see `?expo` for details) we do
 
     expoRB <- expo(modML, type = "correction*")
     expoRB
@@ -204,9 +204,11 @@ method for mean bias reduction (see `?expo` for details) we do
 The odds ratio between presence of neovasculation and high histology
 grade (`HG`) is estimated to be 8.4969743, while controlling for PI and
 EH. So, for each value of `PI` and `EH`, the estimated odds of high
-histology grade are about 8.5 times higher when neovasculation is
-present. An approximate 95% interval for the latter odds ratio is (1.4,
-51.7) providing evidence of association between `NV` and `HG` while
+histology grade are about `r round(coef(expoRB)["NV"], 1)` times higher
+when neovasculation is present. An approximate 95% interval for the
+latter odds ratio is
+`r paste0("(", paste(round(expoRB$ci["NV",], 1), collapse = ", "), ")")`
+providing evidence of association between `NV` and `HG` while
 controlling for `PI` and `EH`.
 
 ## Solving adjusted score equations using quasi-Fisher scoring
