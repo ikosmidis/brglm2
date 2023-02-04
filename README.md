@@ -202,7 +202,7 @@ for mean bias reduction (see `?expo` for details) we do
     #> Type of estimator: correction* (explicit mean bias correction with a multiplicative adjustment)
 
 The odds ratio between presence of neovasculation and high histology
-grade (`HG`) is estimated to be 8.5, while controlling for PI and EH.
+grade (`HG`) is estimated to be 8.497, while controlling for PI and EH.
 So, for each value of `PI` and `EH`, the estimated odds of high
 histology grade are about 8.5 times higher when neovasculation is
 present. An approximate 95% interval for the latter odds ratio is (1.4,
