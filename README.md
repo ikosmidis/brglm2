@@ -64,7 +64,7 @@ or the development version from github:
 
 ## Example
 
-### Estimation of binomial-response models with separated data
+### Estimation of binomial-response GLMs with separated data
 
 Below we follow the example of [Heinze and Schemper
 (2002)](https://doi.org/10.1002/sim.1047) and fit a logistic regression
@@ -209,7 +209,7 @@ present. An approximate 95% interval for the latter odds ratio is (1.4,
 51.7) providing evidence of association between `NV` and `HG` while
 controlling for `PI` and `EH`. Note here that, the maximum likelihood
 estimate of the odds ratio is not as useful as the the `correction*`
-estimates, because it is  + ∞ with an infinite standard error (see
+estimate, because it is  + ∞ with an infinite standard error (see
 previous section).
 
 ## Solving adjusted score equations using quasi-Fisher scoring
