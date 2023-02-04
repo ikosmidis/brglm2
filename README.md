@@ -204,7 +204,7 @@ and high histology grade (`HG`) is estimated to be 8.4969743, while
 controlling for PI and EH. So, for each value of `PI` and `EH`, the
 estimated odds of high histology grade are about 8.5 times higher when
 neovasculation is present. An approximate 95% interval for the latter
-odds ratio is 1.4, 51.7 providing evidence of association between `NV`
+odds ratio is (1.4, 51.7) providing evidence of association between `NV`
 and `HG` while controlling for `PI` and `EH`.
 
 ## Solving adjusted score equations using quasi-Fisher scoring
