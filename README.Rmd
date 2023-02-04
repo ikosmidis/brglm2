@@ -165,7 +165,7 @@ controlling for PI and EH. So, for each value of `PI` and `EH`, the
 estimated odds of high histology grade are about `r round(coef(expoRB)["NV"], 1)` times higher when neovasculation is present. An approximate 95\% interval for the latter odds ratio is 
 `r paste0("(", paste(round(expoRB$ci["NV",], 1), collapse = ", "), ")")`
 providing evidence of association between `NV` and `HG` while
-controlling for `PI` and `EH`.
+controlling for `PI` and `EH`. Note here that, the maximum likelihood estimate of the odds ratio is not as useful as the the `correction*` estimates, because it is $+\infty$ with an infinite standard error (see previous section). 
 
 ## Solving adjusted score equations using quasi-Fisher scoring
 
