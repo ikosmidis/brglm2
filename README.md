@@ -178,13 +178,15 @@ Also do not forget to take a look at the vignettes
 ### Improved estimation of the exponential of regression parameters
 
 See, also `?expo` for a method to estimate the exponential of regression
-parameters, such as odds ratios, while controlling for other covariate
-information, using maximum likelihood or various estimators with smaller
-asymptotic mean and median bias, that are also guaranteed to be finite.
-For example, `modML` is a logistic regresison fit, so the exponential of
-each coefficient is an odds ratio while controlling for other
-covariates. To estimate those odds ratios using the `correction*` method
-for mean bias reduction (see `?expo` for details) we do
+parameters, such as odds ratios from logistic regression models, while
+controlling for other covariate information. Estimation can be performed
+using maximum likelihood or various estimators with smaller asymptotic
+mean and median bias, that are also guaranteed to be finite, even if the
+corresponding maximum likelihood estimates are infinite. For example,
+`modML` is a logistic regression fit, so the exponential of each
+coefficient is an odds ratio while controlling for other covariates. To
+estimate those odds ratios using the `correction*` method for mean bias
+reduction (see `?expo` for details) we do
 
     expoRB <- expo(modML, type = "correction*")
     expoRB
@@ -208,7 +210,7 @@ histology grade are about 8.5 times higher when neovasculation is
 present. An approximate 95% interval for the latter odds ratio is (1.4,
 51.7) providing evidence of association between `NV` and `HG` while
 controlling for `PI` and `EH`. Note here that, the maximum likelihood
-estimate of the odds ratio is not as useful as the the `correction*`
+estimate of the odds ratio is not as useful as the `correction*`
 estimate, because it is  + ∞ with an infinite standard error (see
 previous section).
 
