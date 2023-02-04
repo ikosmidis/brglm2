@@ -83,6 +83,8 @@ remotes::install_github("ikosmidis/brglm2", ref = "develop")
 
 ## Example
 
+### Estimation of binomial-response models with separated data
+
 Below we follow the example of [Heinze and Schemper
 (2002)](https://doi.org/10.1002/sim.1047) and fit a logistic
 regression model using maximum likelihood (ML) to analyze data from a
@@ -139,6 +141,8 @@ estimation methods for generalized linear models, including median
 bias reduction and maximum penalized likelihood with Jeffreys' prior
 penalty. Also do not forget to take a look at the vignettes
 (`vignette(package = "brglm2")`) for details and more case studies.
+
+### Improved estimation of the exponential of regression parameters
 
 See, also `?expo` for a method to estimate the exponential of
 regression parameters, such as odds ratios, while controlling for
