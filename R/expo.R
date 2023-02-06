@@ -166,27 +166,31 @@ expo.brglmFit <- function(object, type = c("correction*", "correction+", "Lylese
             object <- update(object, type = type, data = object$data)
         }
     }
+
     info_fun <- get_information_function(object)
     dispersion <- object$dispersion
     coefs <- coef(object, model = "mean")
-    ses <- sqrt(diag(solve(info_fun(coefs, dispersion))))
+    ses <- sqrt(diag(solve(info_fun(coefs, dispersion))))[seq_along(coefs)]
     trans_coefs <- exp(coefs) * switch(type,
                                        "ML" = 1,
                                        "AS_median" = 1,
                                        "Lylesetal2012" = exp(- ses^2/2),
                                        "correction*" = 1 / (1 + ses^2/2),
                                        "correction+" = (1 - ses^2/2))
+
     if (to_correct) {
         ## Recompute coefs and ses on the original scale from trans_coefs if method is not invariant
         coefs <- log(trans_coefs)
-        ses <- sqrt(diag(solve(info_fun(coefs, dispersion))))
+        ses <- sqrt(diag(solve(info_fun(coefs, dispersion))))[seq_along(coefs)]
     }
+
     trans_ses <- trans_coefs * ses
     a <- (1 - level)/2
     ci <- coefs + qnorm(a) * cbind(ses, -ses)
     colnames(ci) <- paste(format(100 * c(a, 1 - a), trim = TRUE, scientific = FALSE, digits = 3), "%")
     out <- list(coef = trans_coefs, se = trans_ses, ci = exp(ci), type = type)
     out$call <- match.call()
+    out$family <- object$family
     class(out) <- c("brglmFit_expo", class(out))
     out
 }
@@ -212,9 +216,20 @@ expo.glm <- function(object, type = c("correction*", "correction+", "Lylesetal20
 #' @export
 print.brglmFit_expo <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
     cmat <- cbind(x$coef, x$se, x$ci)
+    fam_link <- paste0(x$family$family, x$family$link)
+    interpr <- switch(fam_link,
+                      "binomiallogit" = "Odds ratios",
+                      "poissonlog" = "Multiplicative effects to the mean",
+                      "Gammalog" = "Multiplicative effects to the mean",
+                      "binomiallog" = "Relative risks",
+                      "inverse.gaussianlog"= "Multiplicative effects to the mean",
+                      NA)
     colnames(cmat) <- c("Estimate", "Std. Error", colnames(x$ci))
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
         "\n\n", sep = "")
+    if (!is.na(interpr)) {
+        cat(interpr, "\n")
+    }
     printCoefmat(cmat, digits = digits, ...)
     cat("\n\nType of estimator:", x$type, get_type_description(x$type), "\n")
 }
