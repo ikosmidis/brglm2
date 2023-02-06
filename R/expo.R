@@ -194,7 +194,14 @@ expo.brglmFit <- function(object, type = c("correction*", "correction+", "Lylese
 #' @rdname expo.brglmFit
 #' @export
 expo.glm <- function(object, type = c("correction*", "correction+", "Lylesetal2012", "AS_median", "ML"), level = 0.95) {
-    object <- update(object, method = brglmFit, type = "AS_mixed")
+    type <- match.arg(type)
+    fit_type <- switch(type,
+                       "correction*" = "AS_mixed",
+                       "correction+" = "AS_mixed",
+                       "Lylesetal2012" = "AS_mixed",
+                       "AS_median" = "AS_median",
+                       "ML" = "ML")
+    object <- update(object, method = brglmFit, type = fit_type)
     out <- expo(object, type, level)
     out$call <- match.call()
     out

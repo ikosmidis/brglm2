@@ -619,13 +619,13 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     x <- as.matrix(x)
     betas_names <- dimnames(x)[[2L]]
     nvars <- ncol(x)
-    if (is.null(betas_names)) {
+    EMPTY <- nvars == 0
+    if (is.null(betas_names) & !EMPTY) {
         betas_names <- colnames(x) <- paste0("x", seq.int(nvars))
     }
     ynames <- if (is.matrix(y)) rownames(y) else names(y)
     converged <- FALSE
     nobs <- NROW(y)
-    EMPTY <- nvars == 0
     if (is.null(weights)) {
         weights <- rep.int(1, nobs)
     }
@@ -714,6 +714,9 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         betas_all <- numeric()
         rank <- 0
         iter <- 0L
+        keep <- weights > 0
+        nkeep <- sum(keep)
+        df_residual <- nkeep
     } else {
         boundary <- converged <- FALSE
         ## Detect aliasing
