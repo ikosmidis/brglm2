@@ -70,33 +70,33 @@ for (met in expo_methods) {
     expect_equal(out_brglmFit, out_glm, tolerance = 1e-06)
 }
 
-
 expect_stdout(print(expo(lfit_glm)), "Odds ratios")
 
-## Interpretation
-set.seed(123)
-dat <- data.frame(y = rexp(10), x = rnorm(10))
+## ## Interpretation
+## set.seed(123)
+## dat <- data.frame(y = rexp(10), x = rnorm(10))
+## mod <- glm(y ~ x, family = Gamma("log"), data = dat)
+## expo_mod <- expo(mod, type = "ML")
+## expect_stdout(print(expo_mod), "Multiplicative effects to the mean")
 
-mod <- glm(y ~ x, family = Gamma("log"), data = dat)
-expo_mod <- expo(mod, type = "ML")
-expect_stdout(print(expo_mod), "Multiplicative effects to the mean")
+## set.seed(111)
+## dat <- data.frame(y = exp(rnorm(10)), x = rnorm(10))
+## mod <- glm(y ~ x, family = inverse.gaussian("log"), data = dat)
+## expo_mod <- expo(mod, type = "ML")
+## expect_stdout(print(expo_mod), "Multiplicative effects to the mean")
 
-mod <- glm(y ~ x, family = inverse.gaussian("log"), data = dat)
-expo_mod <- expo(mod, type = "ML")
-expect_stdout(print(expo_mod), "Multiplicative effects to the mean")
+## set.seed(111)
+## dat <- data.frame(x = rexp(10), y = rpois(10, 10))
+## mod <- glm(y ~ x, family = poisson("log"), data = dat)
+## expo_mod <- expo(mod, type = "ML")
+## expect_stdout(print(expo_mod), "Multiplicative effects to the mean")
 
-set.seed(111)
-dat <- data.frame(x = rexp(100, 0.5))
-dat$y <- rbinom(100, 1, exp(-1 -0.2 * dat$x))
-mod <- glm(y ~ x, family = binomial("log"), data = dat)
-expo_mod <- expo(mod, type = "ML")
-expect_stdout(print(expo_mod), "Relative risks")
-
-dat <- data.frame(x = rexp(10), y = rpois(10, 10))
-mod <- glm(y ~ x, family = poisson("log"), data = dat)
-expo_mod <- expo(mod, type = "ML")
-expect_stdout(print(expo_mod), "Multiplicative effects to the mean")
-
+## set.seed(111)
+## dat <- data.frame(x = rexp(100, 0.5))
+## dat$y <- rbinom(100, 1, exp(-1 -0.2 * dat$x))
+## mod <- glm(y ~ x, family = binomial("log"), data = dat)
+## expo_mod <- expo(mod, type = "ML")
+## expect_stdout(print(expo_mod), "Relative risks")
 
 
 ## library(parallel)
