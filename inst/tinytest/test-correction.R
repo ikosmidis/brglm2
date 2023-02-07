@@ -1,5 +1,3 @@
-context("implementation of bias correction")
-
 library("enrichwith")
 
 ## A Gamma example, from McCullagh & Nelder (1989, pp. 300-2)
@@ -18,6 +16,6 @@ attributes(coefs_bc) <- NULL
 
 mod_bc <- glm(conc ~ lot*log(u), data = clotting, family = Gamma, method = "brglmFit", type = "correction")
 
-test_that("bias corrected estimates computed using enrichwith are the same as those when having type = 'correction' in brglmFit", {
-    expect_equal(unname(coefs_bc), unname(coef(mod_bc, model = "full")), check.attributes = FALSE, tolerance = 1e-06)
-})
+## bias corrected estimates computed using enrichwith are the same as those when having type = 'correction' in brglmFit
+expect_equal(unname(coefs_bc), unname(coef(mod_bc, model = "full")), check.attributes = FALSE, tolerance = 1e-06)
+

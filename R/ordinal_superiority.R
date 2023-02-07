@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Ioannis Kosmidis
+# Copyright (C) 2021- Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -13,9 +13,60 @@
 #  A copy of the GNU General Public License is available at
 #  http://www.r-project.org/Licenses/
 
-
-
-#' @rdname ordinal_superiority
+#' Ordinal superiority scores of Agresti and Kateri (2017)
+#'
+#' [ordinal_superiority()] is a method for the estimation and
+#' inference about model-based ordinal superiority scores introduced
+#' in Agresti and Kateri (2017, Section 5) from fitted objects. The
+#' mean bias of the estimates of the ordinal superiority scores can be
+#' corrected.
+#'
+#' @aliases ordinal_superiority
+#'
+#' @param object a fitted object from an ordinal regression
+#'     model. Currently only models from class [`"bracl"`][bracl] are supported.
+#' @param formula a RHS formula indicating the group variable to use.
+#' @param data an optional data frame in which to look for variables
+#'     with which to compute ordinal superiority measures.  If
+#'     omitted, an attempt is made to use the data that produced
+#'     `object`.
+#' @param measure either `"gamma"` (default) or `"Delta"`, specifying
+#'     the ordinal superiority measure to be returned.
+#' @param level the confidence level required when computing
+#'     confidence intervals for the ordinal superiority measures.
+#' @param bc logical. If `FALSE` (default) then the ordinal
+#'     superiority measures are computed using the estimates in
+#'     `object`. If `TRUE` then the ordinal superiority measure
+#'     estimates are corrected for mean bias.
+#'
+#' @references
+#'
+#' Agresti, A., Kateri, M. (2017). Ordinal probability effect measures
+#' for group comparisons in multinomial cumulative link models.
+#' *Biometrics*, **73** 214-219. \doi{10.1111/biom.12565}.
+#'
+#' @examples
+#'
+#' data("stemcell", package = "brglm2")
+#'
+#' # Adjacent category logit (proportional odds)
+#' stem <- within(stemcell, {nreligion = as.numeric(religion)})
+#' fit_bracl_p <- bracl(research ~ nreligion + gender, weights = frequency,
+#'                      data = stem, type = "ML", parallel = TRUE)
+#'
+#' # Estimates and 95% confidence intervals for the probabilities that the response
+#' # category for gender "female" is higher than the response category for gender "male",
+#' # while adjusting for religion.
+#' ordinal_superiority(fit_bracl_p, ~ gender)
+#'
+#' \dontrun{
+#' # And their (very-similar in value here) bias corrected versions
+#' # with 99% CIs
+#' ordinal_superiority(fit_bracl_p, ~ gender, bc = TRUE, level = 0.99)
+#' # Note that the object is refitted with type = "AS_mean"
+#'
+#' }
+#'
 #' @export
 ordinal_superiority.bracl <- function(object, formula, data,
                                       measure = c("gamma", "Delta"),
@@ -85,8 +136,7 @@ ordinal_superiority.bracl <- function(object, formula, data,
         ## out_mean <- c(2 * mean_gammas - 1, 2 * se_mean, 2 * plogis(ci_mean) - 1)
         colnames(out)[ncol(Xnoz) + 1:4] <- c("Delta", "se", pct)
         ## names(out_mean) <- c("Delta*", "se", pct)
-    }
-    else {
+    } else {
         out <- cbind(Xnoz, gammas, se, plogis(ci))
         ## out_mean <- c(mean_gammas, se_mean, plogis(ci_mean))
         colnames(out)[ncol(Xnoz) + 1:4] <- c("gamma", "se", pct)

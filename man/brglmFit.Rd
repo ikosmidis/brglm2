@@ -3,8 +3,8 @@
 \name{brglmFit}
 \alias{brglmFit}
 \alias{brglm_fit}
-\title{Fitting function for \code{\link{glm}} for reduced-bias
-estimation and inference}
+\title{Fitting function for \code{\link[=glm]{glm()}} for reduced-bias estimation and
+inference}
 \usage{
 brglmFit(
   x,
@@ -37,9 +37,9 @@ brglm_fit(
 )
 }
 \arguments{
-\item{x}{\code{x} is a design matrix of dimension \code{n * p}.}
+\item{x}{a design matrix of dimension \code{n * p}.}
 
-\item{y}{\code{y} is a vector of observations of length \code{n}.}
+\item{y}{a vector of observations of length \code{n}.}
 
 \item{weights}{an optional vector of \sQuote{prior weights} to be used
     in the fitting process.  Should be \code{NULL} or a numeric vector.}
@@ -48,15 +48,15 @@ brglm_fit(
 predictor. If \code{NULL} (default) then the maximum likelihood
 estimates are calculated and used as starting values.}
 
-\item{etastart}{applied only when start is not
-\code{NULL}. Starting values for the linear predictor to be
-passed to \code{\link{glm.fit}} when computing starting values
-using maximum likelihood.}
+\item{etastart}{applied only when start is not \code{NULL}. Starting
+values for the linear predictor to be passed to
+\code{\link[=glm.fit]{glm.fit()}} when computing starting values using maximum
+likelihood.}
 
 \item{mustart}{applied only when start is not \code{NULL}. Starting
 values for the vector of means to be passed to
-\code{\link{glm.fit}} when computing starting values using
-maximum likelihood.}
+\code{\link[=glm.fit]{glm.fit()}} when computing starting values using maximum
+likelihood.}
 
 \item{offset}{this can be used to specify an \emph{a priori} known
     component to be included in the linear predictor during fitting.
@@ -73,117 +73,101 @@ maximum likelihood.}
     family functions.)}
 
 \item{control}{a list of parameters controlling the fitting
-process. See \code{\link{brglmControl}} for details.}
+process. See \code{\link[=brglmControl]{brglmControl()}} for details.}
 
 \item{intercept}{logical. Should an intercept be included in the
     \emph{null} model?}
 
 \item{fixed_totals}{effective only when \code{family} is
-\code{poisson}. Either \code{NULL} (no effect) or a vector that
+\code{\link[=poisson]{poisson()}}. Either \code{NULL} (no effect) or a vector that
 indicates which counts must be treated as a group. See Details
-for more information and \code{\link{brmultinom}}.}
+for more information and \code{\link[=brmultinom]{brmultinom()}}.}
 
 \item{singular.ok}{logical. If \code{FALSE}, a singular model is an
 error.}
 }
 \description{
-\code{\link{brglmFit}} is a fitting method for \code{\link{glm}}
-that fits generalized linear models using implicit and explicit
-bias reduction methods (Kosmidis, 2014), and other penalized
-maximum likelihood methods. Currently supported methods include the
-mean bias-reducing adjusted scores approach in Firth (1993) and
-Kosmidis & Firth (2009), the median bias-reduction adjusted scores
-approach in Kenne Pagui et al. (2017), the correction of the asymptotic
-bias in Cordeiro & McCullagh (1991), the mixed bias-reduction
-adjusted scores approach in Kosmidis et al (2020), maximum
-penalized likelihood with powers of the Jeffreys prior as penalty,
-and maximum likelihood. Estimation is performed using a quasi
-Fisher scoring iteration (see \code{vignette("iteration",
-"brglm2")}), which, in the case of mean-bias reduction, resembles
-an iterative correction of the asymptotic bias of the Fisher
-scoring iterates.
+\code{\link[=brglmFit]{brglmFit()}} is a fitting method for \code{\link[=glm]{glm()}} that fits generalized
+linear models using implicit and explicit bias reduction methods
+(Kosmidis, 2014), and other penalized maximum likelihood
+methods. Currently supported methods include the mean bias-reducing
+adjusted scores approach in Firth (1993) and Kosmidis & Firth
+(2009), the median bias-reduction adjusted scores approach in Kenne
+Pagui et al. (2017), the correction of the asymptotic bias in
+Cordeiro & McCullagh (1991), the mixed bias-reduction adjusted
+scores approach in Kosmidis et al (2020), maximum penalized
+likelihood with powers of the Jeffreys prior as penalty, and
+maximum likelihood. Estimation is performed using a quasi Fisher
+scoring iteration (see \code{vignette("iteration", "brglm2")}, which, in
+the case of mean-bias reduction, resembles an iterative correction
+of the asymptotic bias of the Fisher scoring iterates.
 }
 \details{
 A detailed description of the supported adjustments and the quasi
 Fisher scoring iteration is given in the iteration vignette (see,
 \code{vignette("iteration", "brglm2")} or Kosmidis et al, 2020).  A
 shorter description of the quasi Fisher scoring iteration is also
-given in one of the vignettes of the *enrichwith* R package (see,
+given in one of the vignettes of the \emph{enrichwith} R package (see,
 \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
 Kosmidis and Firth (2010) describe a parallel quasi Newton-Raphson
 iteration with the same stationary point.
 
 In the special case of generalized linear models for binomial,
 Poisson and multinomial responses, the adjusted score equation
-approaches for \code{type = "AS_mixed"}, \code{type = "AS_mean"},
-and \code{type = "AS_median"} (see below for what methods each
-\code{type} corresponds) return estimates with improved frequentist
-properties, that are also always finite, even in cases where the
-maximum likelihood estimates are infinite (e.g. complete and
-quasi-complete separation in multinomial regression). See, Kosmidis
-and Firth (2021) for a proof for binomial-response GLMs with
-Jeffreys-prior penalties to the log-likelihood, which is equivalent
-to mean bias reduction for logistic regression. See, also,
-\code{\link[detectseparation]{detect_separation}} and
-\code{\link[detectseparation]{check_infinite_estimates}} for
-pre-fit and post-fit methods for the detection of infinite
-estimates in binomial response generalized linear models.
+approaches for \code{type = "AS_mixed"}, \code{type = "AS_mean"}, and \code{type = "AS_median"} (see below for what methods each \code{type} corresponds)
+return estimates with improved frequentist properties, that are
+also always finite, even in cases where the maximum likelihood
+estimates are infinite (e.g. complete and quasi-complete separation
+in multinomial regression). See, Kosmidis and Firth (2021) for a
+proof for binomial-response GLMs with Jeffreys-prior penalties to
+the log-likelihood, which is equivalent to mean bias reduction for
+logistic regression. See, also,
+\code{\link[detectseparation:detect_separation]{detectseparation::detect_separation()}} and
+\code{\link[detectseparation:check_infinite_estimates]{detectseparation::check_infinite_estimates()}} for pre-fit and
+post-fit methods for the detection of infinite estimates in
+binomial response generalized linear models.
 
 The type of score adjustment to be used is specified through the
-\code{type} argument (see \code{\link{brglmControl}} for
-details). The available options are
-
+\code{type} argument (see \code{\link[=brglmControl]{brglmControl()}} for details). The available
+options are
 \itemize{
-
 \item \code{type = "AS_mixed"}: the mixed bias-reducing score adjustments in
 Kosmidis et al (2020) that result in mean bias reduction for the
 regression parameters and median bias reduction for the dispersion
 parameter, if any; default.
-
-\item \code{type = "AS_mean"}: the mean bias-reducing score adjustments
-in Firth, 1993 and Kosmidis & Firth, 2009. \code{type = "AS_mixed"}
-and \code{type = "AS_mean"} will return the same results when
-\code{family} is \code{binomial} or \code{poisson}, i.e. when the
-dispersion is fixed)
-
+\item \code{type = "AS_mean"}: the mean bias-reducing score adjustments in
+Firth, 1993 and Kosmidis & Firth, 2009. \code{type = "AS_mixed"} and
+\code{type = "AS_mean"} will return the same results when \code{family} is
+\code{\link[=binomial]{binomial()}} or \code{\link[=poisson]{poisson()}}, i.e. when the dispersion is fixed
 \item \code{type = "AS_median"}: the median bias-reducing score
 adjustments in Kenne Pagui et al. (2017)
-
 \item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
 with powers of the Jeffreys prior as penalty.
-
 \item \code{type = "ML"}: maximum likelihood.
-
 \item \code{type = "correction"}: asymptotic bias correction, as in
 Cordeiro & McCullagh (1991).
-
 }
 
-
 The null deviance is evaluated based on the fitted values using the
-    method specified by the \code{type} argument (see
-    \code{\link{brglmControl}}).
+method specified by the \code{type} argument (see \code{\link[=brglmControl]{brglmControl()}}).
 
-The \code{family} argument of the current version of
-\code{brglmFit} can accept any combination of \code{\link{family}}
-objects and link functions, including families with user-specified
-link functions, \code{\link{mis}} links, and \code{\link{power}}
-links, but excluding \code{\link{quasi}},
-\code{\link{quasipoisson}} and \code{\link{quasibinomial}}
-families.
+The \code{family} argument of the current version of \code{\link[=brglmFit]{brglmFit()}} can
+accept any combination of \code{\link[=family]{"family"}} objects and link functions,
+including families with user-specified link functions, \code{\link[=mis]{mis()}}
+links, and \code{\link[=power]{power()}} links, but excluding \code{\link[=quasi]{quasi()}},
+\code{\link[=quasipoisson]{quasipoisson()}} and \code{\link[=quasibinomial]{quasibinomial()}} families.
 
-The description of \code{method} argument and the \code{Fitting
-functions} section in \code{\link{glm}} gives information on
-supplying fitting methods to \code{\link{glm}}.
+The description of \code{method} argument and the \verb{Fitting functions}
+section in \code{\link[=glm]{glm()}} gives information on supplying fitting
+methods to \code{\link[=glm]{glm()}}.
 
-\code{fixed_totals} to specify groups of observations for which the
-sum of the means of a Poisson model will be held fixed to the
-observed count for each group. This argument is used internally in
-\code{\link{brmultinom}} and \code{\link{bracl}} for
-baseline-category logit models and adjacent category logit models,
-respectively.
+\code{fixed_totals} specifies groups of observations for which the sum
+of the means of a Poisson model will be held fixed to the observed
+count for each group. This argument is used internally in
+\code{\link[=brmultinom]{brmultinom()}} and \code{\link[=bracl]{bracl()}} for baseline-category logit models and
+adjacent category logit models, respectively.
 
-\code{brglm_fit} is an alias to \code{brglmFit}.
+\code{\link[=brglm_fit]{brglm_fit()}} is an alias to \code{\link[=brglmFit]{brglmFit()}}.
 }
 \examples{
 ## The lizards example from ?brglm::brglm
@@ -228,12 +212,12 @@ matplot(a, t(coefs), type = "l", col = 1, lty = 1)
 abline(0, 0, col = "grey")
 }
 
+\donttest{
 ## Another example from
 ## King, Gary, James E. Alt, Nancy Elizabeth Burns and Michael Laver
 ## (1990).  "A Unified Model of Cabinet Dissolution in Parliamentary
 ## Democracies", _American Journal of Political Science_, **34**, 846-870
 
-\donttest{
 data("coalition", package = "brglm2")
 # The maximum likelihood fit with log link
 coalitionML <- glm(duration ~ fract + numst2, family = Gamma, data = coalition)
@@ -255,17 +239,17 @@ anorexBC <- update(anorexML, method = "brglmFit", type = "correction")
 anorexBR_mean <- update(anorexML, method = "brglmFit")
 anorexBR_median <- update(anorexML, method = "brglmFit", type = "AS_median")
 
-## All methods return the same estimates for the regression
-## parameters because the maximum likelihood estimator is normally
-## distributed around the `true` value under the model (hence, both
-## mean and component-wise median unbiased). The Wald tests for
-## anorexBC and anorexBR_mean differ from anorexML
-## because the bias-reduced estimator of the dispersion is the
-## unbiased, by degree of freedom adjustment (divide by n - p),
-## estimator of the residual variance. The Wald tests from
-## anorexBR_median are based on the median bias-reduced estimator
-## of the dispersion that results from a different adjustment of the
-## degrees of freedom (divide by n - p - 2/3)
+# All methods return the same estimates for the regression
+# parameters because the maximum likelihood estimator is normally
+# distributed around the `true` value under the model (hence, both
+# mean and component-wise median unbiased). The Wald tests for
+# anorexBC and anorexBR_mean differ from anorexML because the
+# bias-reduced estimator of the dispersion is the unbiased, by
+# degree of freedom adjustment (divide by n - p), estimator of the
+# residual variance. The Wald tests from anorexBR_median are based
+# on the median bias-reduced estimator of the dispersion that
+# results from a different adjustment of the degrees of freedom
+# (divide by n - p - 2/3)
 summary(anorexML)
 summary(anorexBC)
 summary(anorexBR_mean)
@@ -291,37 +275,37 @@ summary(endometrialBR_median)
 \references{
 Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 and shrinkage in binomial-response generalized linear
-models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
+models. \emph{Biometrika}, \strong{108}, 71-82. \doi{10.1093/biomet/asaa052}.
 
 Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
-reduction in generalized linear models. *Statistics and Computing*,
-**30**, 43-59 \doi{10.1007/s11222-019-09860-6}
+reduction in generalized linear models. \emph{Statistics and Computing},
+\strong{30}, 43-59. \doi{10.1007/s11222-019-09860-6}.
 
 Cordeiro G M, McCullagh P (1991). Bias correction in generalized
-linear models. *Journal of the Royal Statistical Society. Series B
-(Methodological)*, **53**, 629-643 \doi{10.1111/j.2517-6161.1991.tb01852.x}
+linear models. \emph{Journal of the Royal Statistical Society. Series B
+(Methodological)}, \strong{53}, 629-643. \doi{10.1111/j.2517-6161.1991.tb01852.x}.
 
 Firth D (1993). Bias reduction of maximum likelihood estimates.
-*Biometrika*. **80**, 27-38 \doi{10.2307/2336755}
+\emph{Biometrika}. \strong{80}, 27-38. \doi{10.2307/2336755}.
 
 Kenne Pagui E C, Salvan A, Sartori N (2017). Median bias
-reduction of maximum likelihood estimates. *Biometrika*, **104**,
-923–938 \doi{10.1093/biomet/asx046}
+reduction of maximum likelihood estimates. \emph{Biometrika}, \strong{104},
+923–938. \doi{10.1093/biomet/asx046}.
 
 Kosmidis I, Firth D (2009). Bias reduction in exponential family
-nonlinear models. *Biometrika*, **96**, 793-804 \doi{10.1093/biomet/asp055}
+nonlinear models. \emph{Biometrika}, \strong{96}, 793-804. \doi{10.1093/biomet/asp055}.
 
 Kosmidis I, Firth D (2010). A generic algorithm for reducing
-bias in parametric estimation. *Electronic Journal of Statistics*,
-**4**, 1097-1112 \doi{10.1214/10-EJS579}
+bias in parametric estimation. \emph{Electronic Journal of Statistics},
+\strong{4}, 1097-1112. \doi{10.1214/10-EJS579}.
 
 Kosmidis I (2014). Bias in parametric estimation: reduction and
-useful side-effects. *WIRE Computational Statistics*, **6**,
-185-196 \doi{10.1002/wics.1296}
+useful side-effects. \emph{WIRE Computational Statistics}, \strong{6},
+185-196. \doi{10.1002/wics.1296}.
 }
 \seealso{
-\code{\link{brglmControl}}, \code{\link{glm.fit}}, \code{\link{glm}}
+\code{\link[=brglmControl]{brglmControl()}}, \code{\link[=glm.fit]{glm.fit()}}, \code{\link[=glm]{glm()}}
 }
 \author{
-Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui \verb{[ctb]} \email{kenne@stat.unipd.it}
 }

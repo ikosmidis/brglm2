@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2021 Ioannis Kosmidis
+# Copyright (C) 2016- Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,28 +17,28 @@
 #' Bias reduction for adjacent category logit models for ordinal
 #' responses using the Poisson trick.
 #'
-#' \code{bracl} is a wrapper of \code{\link{brglmFit}} that fits
-#' adjacent category logit models with or without proportional odds
-#' using implicit and explicit bias reduction methods. See Kosmidis &
-#' Firth (2011) for details.
+#' [bracl()] is a wrapper of [brglmFit()] that fits adjacent category
+#' logit models with or without proportional odds using implicit and
+#' explicit bias reduction methods. See Kosmidis & Firth (2011) for
+#' details.
 #'
 #' @inheritParams MASS::polr
 #' @param control a list of parameters for controlling the fitting
-#'     process. See \code{\link{brglmControl}} for details.
-#' @param parallel if \code{FALSE} (default), then a non-proportional
-#'     odds adjacent category model is fit, assuming different
-#'     effects per category; if \code{TRUE} then a proportional odds
-#'     adjacent category model is fit. See Details.
+#'     process. See [brglmControl()] for details.
+#' @param parallel if `FALSE` (default), then a non-proportional odds
+#'     adjacent category model is fit, assuming different effects per
+#'     category; if `TRUE` then a proportional odds adjacent category
+#'     model is fit. See Details.
 #' @param x should the model matrix be included with in the result
-#'     (default is \code{TRUE}).
-#' @param ... arguments to be used to form the default 'control'
+#'     (default is `TRUE`).
+#' @param ... arguments to be used to form the default `control`
 #'     argument if it is not supplied directly.
 #'
 #' @details
 #'
-#' The \code{bracl} function fits adjacent category models, which
-#' assume multinomial observations with probabilities with
-#' proportional odds of the form
+#' The [bracl()] function fits adjacent category models, which assume
+#' multinomial observations with probabilities with proportional odds
+#' of the form
 #'
 #' \deqn{\log\frac{\pi_{ij}}{\pi_{ij + 1}} = \alpha_j + \beta^T x_i}{log(pi[i, j]/pi[i, j+1]) = alpha[j] + sum(beta * x[i, ])}
 #'
@@ -49,31 +49,31 @@
 #' where \eqn{x_i}{x[i, ]} is a vector of covariates and \eqn{\pi_{ij}}{pi[i, j]} is the
 #' probability that category \eqn{j} is observed at the covariate setting \eqn{i}.
 #'
-#' @author Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
 #'
-#' @seealso \code{\link[nnet]{multinom}}, \code{\link{brmultinom}}
+#' @seealso [nnet::multinom()], [brmultinom()]
 #'
 #' @references
 #'
 #' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
 #' reduction in generalized linear models. *Statistics and Computing*,
-#' **30**, 43-59 \doi{10.1007/s11222-019-09860-6}
+#' **30**, 43-59. \doi{10.1007/s11222-019-09860-6}.
 #'
 #' Agresti, A (2010). *Analysis of Ordinal Categorical Data* (2nd
 #' edition).  Wiley Series in Probability and Statistics. Wiley.
 #'
 #' Albert A, Anderson J A (1984). On the Existence of Maximum
 #' Likelihood Estimates in Logistic Regression Models. *Biometrika*,
-#' **71**, 1--10 \doi{10.2307/2336390}
+#' **71**, 1-10. \doi{10.2307/2336390}.
 #'
 #' Kosmidis I, Firth D (2011). Multinomial logit bias reduction
 #' via the Poisson log-linear model. *Biometrika*, **98**,
-#' 755-759 \doi{10.1093/biomet/asr026}
+#' 755-759. \doi{10.1093/biomet/asr026}.
 #'
 #' Palmgren J (1981). The Fisher Information Matrix for Log Linear
 #' Models Arguing Conditionally on Observed Explanatory
 #' Variables. *Biometrika*, **68**,
-#' 563-566 \doi{10.1093/biomet/68.2.563}
+#' 563-566. \doi{10.1093/biomet/68.2.563}.
 #'
 #' @examples
 #'
@@ -159,8 +159,7 @@ bracl <- function(formula, data, weights, subset, na.action,
                            Matrix::kronecker(Matrix::Diagonal(ncat)[, -ncat, drop = FALSE], X[keep, xint]),
         (ncat - cats) * Matrix::kronecker(c(rep(1, ncat - 1), 0), X[keep, -xint, drop = FALSE]))
         ofInterest <- c(paste(lev[-ncat], rep("(Intercept)", ncat - 1), sep = ":"), colnames(X)[-xint])
-    }
-    else {
+    } else {
         Xextended <- cbind(Matrix::kronecker(rep(1, ncat), Xnuisance),
                            Matrix::kronecker(Matrix::Diagonal(ncat)[, -ncat, drop = FALSE], X[keep, , drop = FALSE]))
         ofInterest <- paste(rep(lev[-ncat], each = nvar),
@@ -220,8 +219,7 @@ coef.bracl <- function(object, ...) {
                 names(coefs[intercept_names]) <- intercept_names
                 coefs
             })
-        }
-        else {
+        } else {
             with(object, {
                 coefs <- matrix(coefficients[ofInterest], ncol = ncat - 1)
                 coefs <- -apply(cbind(coefs, 0), 1, diff)
@@ -230,8 +228,7 @@ coef.bracl <- function(object, ...) {
                 coefs
             })
         }
-    }
-    else {
+    } else {
         NULL
     }
 }
@@ -261,8 +258,7 @@ vcov.bracl <- function(object, ...) {
         par_names <- c(intercept_names, beta_names)
         vc[par_names, par_names] <- rbind(cbind(vint, vintslo),
                                           cbind(t(vintslo), vbeta))
-    }
-    else {
+    } else {
         betas <- object$coefNames
         npar <- length(betas)
         for (j in 1:npar) {
@@ -330,35 +326,34 @@ print.summary.bracl <- function(x, digits = x$digits, ...) {
     invisible(x)
 }
 
-#' Predict method for \code{bracl} fits
+#' Predict method for [bracl] fits
 #'
 #' Obtain class and probability predictions from a fitted adjacent
 #' category logits model.
 #'
-#' @param object a fitted object of class inheriting from
-#'     \code{"bracl"}.
+#' @param object a fitted object of class inheriting from [`"bracl"`][bracl].
 #' @param newdata optionally, a data frame in which to look for
 #'     variables with which to predict.  If omitted, the fitted linear
 #'     predictors are used.
 #' @param type the type of prediction required. The default is
-#'     \code{"class"}, which produces predictions of the response
-#'     category at the covariate values supplied in \code{"newdata"},
-#'     selecting the category with the largest probability; the
-#'     alternative \code{"probs"} returns all category probabilities
-#'     at the covariate values supplied in \code{"newdata"}.
+#'     `"class"`, which produces predictions of the response category
+#'     at the covariate values supplied in `"newdata"`, selecting the
+#'     category with the largest probability; the alternative
+#'     `"probs"` returns all category probabilities at the covariate
+#'     values supplied in `newdata`.
 #' @param ... further arguments passed to or from other methods.
 #'
 #'
 #' @details
 #'
-#' If \code{newdata} is omitted the predictions are based on the data
+#' If `newdata` is omitted the predictions are based on the data
 #' used for the fit.
 #'
 #' @return
 #'
-#' If \code{type = "class"} a vector with the predicted response
-#' categories; if \code{type = "probs"} a matrix of probabilities for
-#' all response categories at \code{newdata}.
+#' If `type = "class"` a vector with the predicted response
+#' categories; if `type = "probs"` a matrix of probabilities for all
+#' response categories at `newdata`.
 #'
 #' @examples
 #'
@@ -399,8 +394,7 @@ predict.bracl <- function(object, newdata, type = c("class", "probs"), ...) {
         coefs <- cbind(rev(cumsum(cc[int])),
                        int * matrix(cc[sl], nrow = object$ncat - 1, ncol = length(sl), byrow = TRUE))
         rownames(coefs) <- object$lev[-object$ref]
-    }
-    else {
+    } else {
         coefs <- matrix(cc, nrow = object$ncat - 1)
         rownames(coefs) <- object$lev[-object$ref]
         coefs <- apply(coefs, 2, function(x) cumsum(rev(x)))

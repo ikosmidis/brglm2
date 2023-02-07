@@ -6,22 +6,16 @@
 \title{Opinion on Stem Cell Research and Religious Fundamentalism}
 \format{
 A data frame with 24 rows and 4 variables:
-\describe{
-
-\item{research}{opinion about funding stem cell research with levels \code{definitely}, \code{probably}, \code{probably not}, \code{definitely not}}
-
-\item{gender}{the gender of the respondent with levels \code{female} and \code{male}}
-
-\item{religion}{the fundamentalism/liberalism of one’s religious
-beliefs with levels \code{fundamentalist}, \code{moderate},
-\code{liberal}}
-
-\item{frequency}{the number of times a respondent fell in each of the combinations of levels for \code{research}, \code{religion} and \code{gender}}
-
+\itemize{
+\item \code{research}: opinion about funding stem cell research with levels \code{definitely}, \code{probably}, \verb{probably not}, \verb{definitely not}
+\item \code{gender}: the gender of the respondent with levels \code{female} and \code{male}
+\item \code{religion}: the fundamentalism/liberalism of one’s religious beliefs with levels \code{fundamentalist}, \code{moderate},
+\code{liberal}
+\code{frequency}: the number of times a respondent fell in each of the combinations of levels for \code{research}, \code{religion} and \code{gender}
 }
 }
 \source{
-The \code{stemcell} data set is analyzed in Agresti (2010, Subsection~4.1.5).
+The \code{stemcell} data set is analyzed in Agresti (2010, Subsection 4.1.5).
 }
 \usage{
 stemcell
@@ -33,10 +27,10 @@ stem cell research and the fundamentalism/liberalism of one’s
 religious beliefs, stratified by gender.
 }
 \references{
-Agresti A (2010). *Analysis of Ordinal Categorical Data* (2nd edition).  Wiley Series in
-Probability and Statistics. Wiley
+Agresti A (2010). \emph{Analysis of Ordinal Categorical Data} (2nd edition).  Wiley Series in
+Probability and Statistics. Wiley.
 }
 \seealso{
-\code{\link{bracl}}
+\code{\link[=bracl]{bracl()}}
 }
 \keyword{datasets}

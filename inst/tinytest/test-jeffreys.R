@@ -1,4 +1,4 @@
-context("implementation of Jeffreys-prior penalty")
+library("numDeriv")
 
 ## A Gamma example, from McCullagh & Nelder (1989, pp. 300-2)
 clotting <- data.frame(
@@ -20,24 +20,19 @@ penloglik <- function(pars, X, y) {
 
 modjef <- update(mod, method = "brglmFit", type = "MPL_Jeffreys", epsilon = 1e-15)
 
-test_that("the numerical gradient of the penalized log-likelihood is almost zero when evaluated at the estimates from type = 'MPL_Jeffreys'", {
-    expect_equal(grad(penloglik,
-                      x = coef(modjef, model = "full"),
-                      X = model.matrix(mod),
-                      y = model.response(mod$model)), rep(0, 5), tolerance = 1.5 * 1e-05)
-})
+## the numerical gradient of the penalized log-likelihood is almost zero when evaluated at the estimates from type = 'MPL_Jeffreys
+expect_equal(grad(penloglik,
+                  x = coef(modjef, model = "full"),
+                  X = model.matrix(mod),
+                  y = model.response(mod$model)), rep(0, 5), tolerance = 1.5 * 1e-05)
 
-test_that("the numerical gradient of the penalized log-likelihood matches that from type = 'MPL_Jeffreys'", {
-   expect_warning(g1 <- update(mod, method = "brglmFit", type = "MPL_Jeffreys", maxit = 0, start = coef(mod, model = "full"))$grad)
-    g2 <- grad(penloglik,
-               x = coef(mod, model = "full"),
-               X = model.matrix(mod),
-               y = model.response(mod$model))
-    expect_equal(unname(g1), g2, tolerance = 1e-05)
-})
-
-
-
+## the numerical gradient of the penalized log-likelihood matches that from type = 'MPL_Jeffreys'
+expect_warning(g1 <- update(mod, method = "brglmFit", type = "MPL_Jeffreys", maxit = 0, start = coef(mod, model = "full"))$grad)
+g2 <- grad(penloglik,
+           x = coef(mod, model = "full"),
+           X = model.matrix(mod),
+           y = model.response(mod$model))
+expect_equal(unname(g1), g2, tolerance = 1e-05)
 
 ## source(system.file("inst", "brglm0/brglm0.R", package = "brglm2"))
 data("lizards", package = "brglm2")
@@ -58,7 +53,6 @@ for (l in seq_along(links)) {
                              light + time, family = binomial(links[[l]]), data=lizards,
                          method = "brglmFit", epsilon = 1e-10, maxit = 1000, type = "MPL_Jeffreys")
     )
-    test_that(paste("glm with brglm.fit method and brglm_0 return the same coefficients for the lizards when link is", links[[l]]$name), {
-        expect_equal(coef(lizardsBR), coef(lizardsBRlegacy), tolerance = tol)
-    })
+    ## glm with brglm.fit method and brglm_0 return the same coefficients for the lizards when link is links[[l]]$name)
+    expect_equal(coef(lizardsBR), coef(lizardsBRlegacy), tolerance = tol)
 }

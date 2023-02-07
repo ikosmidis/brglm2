@@ -2,12 +2,12 @@
 % Please edit documentation in R/brnb.R
 \name{vcov.brnb}
 \alias{vcov.brnb}
-\title{Extract model variance-covariance matrix from \code{\link{brnb}} objects}
+\title{Extract model variance-covariance matrix from \code{\link[=brnb]{"brnb"}} objects}
 \usage{
 \method{vcov}{brnb}(object, model = c("mean", "full", "dispersion"), complete = TRUE, ...)
 }
 \arguments{
-\item{object}{an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.}
+\item{object}{an object of class \code{\link[=brnb]{"brnb"}}, typically, a result of a call to \code{\link[=brnb]{brnb()}}.}
 
 \item{model}{character specifying for which component of the model variance-covariance matrix should be extracted.}
 
@@ -25,16 +25,15 @@
     \code{dispersion} parameter.}
 }
 \description{
-Extract model variance-covariance matrix from \code{\link{brnb}} objects
+Extract model variance-covariance matrix from \code{\link[=brnb]{"brnb"}} objects
 }
 \details{
-The options for \code{model} are \code{"mean"} for mean regression
- only (default), \code{"dispersion"} for the dispersion
-parameter (in a chosen transformation; see
-\code{\link{brglmControl}}), and \code{"full"} for both the mean
-regression and the (transformed) dispersion parameters.
-See \code{\link{vcov}} for more details.
+The options for \code{model} are \code{"mean"} for mean regression only
+(default), \code{"dispersion"} for the dispersion parameter (in a
+chosen transformation; see \code{\link[=brglmControl]{brglmControl()}}, and \code{"full"} for both
+the mean regression and the (transformed) dispersion parameters.
+See \code{\link[=vcov]{vcov()}} for more details.
 }
 \seealso{
-\code{\link{vcov}}
+\code{\link[=vcov]{vcov()}}
 }

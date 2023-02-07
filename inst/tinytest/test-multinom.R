@@ -1,5 +1,3 @@
-context("tests for brmultinom and its agreement with other methods")
-
 ## pmlr needs to be installed from the archive
 ## install.packages("https://cran.r-project.org/src/contrib/Archive/pmlr/pmlr_1.0.tar.gz", repos = NULL)
 library("pmlr")
@@ -26,16 +24,14 @@ expect_warning(
                         data = hepat, weights = counts)
 )
 
-test_that("ML fails when there is separation", {
-    expect_warning(brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML"),
-        regex = "algorithm did not converge|failed to calculate score adjustment")
-})
+## ML fails when there is separation
+expect_warning(brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML"),
+               pattern = "algorithm did not converge|failed to calculate score adjustment")
 
 
 tol <- 1e-05
-test_that("brmultinom returns the same estimates as pmlr", {
-    expect_equal(coef(hepbr), t(drop(coef(heppmlr))), tolerance = tol)
-})
+## brmultinom returns the same estimates as pmlr
+expect_equal(coef(hepbr), t(drop(coef(heppmlr))), tolerance = tol)
 
 ##############
 expect_warning(
@@ -43,9 +39,8 @@ expect_warning(
                             data = hepat)
 )
 
-test_that("brmultinom returns the same estimates if counts are supplied as a matrix", {
-    expect_equal(coef(hepbr), coef(hepbr_mat), tolerance = tol)
-})
+## brmultinom returns the same estimates if counts are supplied as a matrix
+expect_equal(coef(hepbr), coef(hepbr_mat), tolerance = tol)
 
 #####################################################################
 ## Analysis of the enzymes data set in ?pmlr
@@ -78,19 +73,17 @@ enzmultinom <- nnet::multinom(Group ~ AST + GLDH, weights = counts, data = enzym
 
 
 
-test_that("confint methods works as expected", {
-    cnnet <- confint(enzmultinom, level = 0.9123)
-    ccbrm <- confint(enzbrmultinom_ml, level = 0.9123)
-    expect_equal(cnnet, ccbrm, tolerance = 1e-04)
+## confint methods works as expected
+cnnet <- confint(enzmultinom, level = 0.9123)
+ccbrm <- confint(enzbrmultinom_ml, level = 0.9123)
+expect_equal(cnnet, ccbrm, tolerance = 1e-04)
 
-    c1 <- drop(confint(enzbrmultinom_ml, level = 0.99, parm = 3))
-    c2 <- with(summary(enzbrmultinom_ml), {
-        rbind(coefficients[, "GLDH"] - qnorm(1 - 0.01/2) * standard.errors[, "GLDH"],
-              coefficients[, "GLDH"] + qnorm(1 - 0.01/2) * standard.errors[, "GLDH"])
-    })
-    expect_equal(c1, c2, tolerance = 1e-10, check.attributes = FALSE)
+c1 <- drop(confint(enzbrmultinom_ml, level = 0.99, parm = 3))
+c2 <- with(summary(enzbrmultinom_ml), {
+    rbind(coefficients[, "GLDH"] - qnorm(1 - 0.01/2) * standard.errors[, "GLDH"],
+          coefficients[, "GLDH"] + qnorm(1 - 0.01/2) * standard.errors[, "GLDH"])
 })
-
+expect_equal(c1, c2, tolerance = 1e-10, check.attributes = FALSE)
 
 aic1 <- AIC(enzbrmultinom_ml)
 aic2 <- AIC(enzmultinom)
@@ -98,33 +91,30 @@ aic3 <- -2 * logLik(enzbrmultinom_ml) + 2 * length(coef(enzbrmultinom_ml))
 aic4 <- summary(enzbrmultinom_ml)$AIC
 
 ###
-test_that("AIC with brmultinon", {
-    expect_equal(aic1, aic2, tolerance = 1e-06)
-    expect_equal(aic1, unclass(aic3), tolerance = 1e-06, check.attributes = FALSE)
-    expect_equal(aic1, aic4, tolerance = 1e-06)
-})
+## AIC with brmultinon
+expect_equal(aic1, aic2, tolerance = 1e-06)
+expect_equal(aic1, unclass(aic3), tolerance = 1e-06, check.attributes = FALSE)
+expect_equal(aic1, aic4, tolerance = 1e-06)
 
 
 ###############
-test_that("brmultinom returns the same estimates as nnet::multinom if type = 'ML'", {
-    expect_equal(coef(enzbrmultinom_ml), coef(enzmultinom), tolerance = 1e-04)
-})
+## brmultinom returns the same estimates as nnet::multinom if type = 'ML'
+expect_equal(coef(enzbrmultinom_ml), coef(enzmultinom), tolerance = 1e-04)
 
-test_that("brmultinom returns the same fitted values as nnet::multinom if type = 'ML'", {
-    expect_equal(fitted(enzbrmultinom_ml), fitted(enzmultinom), tolerance = 1e-04)
-})
+## brmultinom returns the same fitted values as nnet::multinom if type = 'ML'", {
+expect_equal(fitted(enzbrmultinom_ml), fitted(enzmultinom), tolerance = 1e-04)
 
-test_that("brmultinom returns the same model matrix as nnet::multinom", {
-    expect_equal(model.matrix(enzbrmultinom_ml), model.matrix(enzmultinom), check.attributes = FALSE)
-})
 
-test_that("brmultinom returns the same maximized loglikelihood as nnet::multinom if type = 'ML'", {
-    expect_equal(logLik(enzbrmultinom_ml), logLik(enzmultinom), tolerance = tol)
-})
+## brmultinom returns the same model matrix as nnet::multinom", {
+expect_equal(model.matrix(enzbrmultinom_ml), model.matrix(enzmultinom), check.attributes = FALSE)
 
-test_that("brmultinom returns the same standard errors as nnet::multinom if type = 'ML'", {
-    expect_equal(summary(enzbrmultinom_ml)$standard.errors, summary(enzmultinom)$standard.errors, tolerance = 1e-04)
-})
+
+## brmultinom returns the same maximized loglikelihood as nnet::multinom if type = 'ML'", {
+expect_equal(logLik(enzbrmultinom_ml), logLik(enzmultinom), tolerance = tol)
+
+
+## brmultinom returns the same standard errors as nnet::multinom if type = 'ML'", {
+expect_equal(summary(enzbrmultinom_ml)$standard.errors, summary(enzmultinom)$standard.errors, tolerance = 1e-04)
 
 
 expect_warning({
@@ -135,13 +125,14 @@ expect_warning({
     hepbr3 <- brmultinom(type ~ group * time,
                          data = hepat, weights = counts, ref = 3)
 })
-test_that("brmultinom fits are invariant to the value of ref (ref1 vs ref2)'", {
-    expect_equal(hepbr1$fitted.values, hepbr2$fitted.values, tolerance = 1e-04)
-})
 
-test_that("brmultinom fits are invariant to the value of ref  (ref1 vs ref3)'", {
-    expect_equal(hepbr1$fitted.values, hepbr3$fitted.values, tolerance = 1e-04)
-})
+## brmultinom fits are invariant to the value of ref (ref1 vs ref2)'", {
+expect_equal(hepbr1$fitted.values, hepbr2$fitted.values, tolerance = 1e-04)
+
+
+## brmultinom fits are invariant to the value of ref  (ref1 vs ref3)'", {
+expect_equal(hepbr1$fitted.values, hepbr3$fitted.values, tolerance = 1e-04)
+
 
 newdata <- data.frame(group = c("no-withhold", "withhold", "no-withhold", "withhold"),
                       time = c("pre", "pre", "post", "post"))
@@ -156,32 +147,32 @@ expect_warning({
                          data = hepat, weights = counts, ref = 3, type = "ML", maxit = 5)
 })
 
-test_that("predict.brmultinom returns the right result", {
-    expect_equal(predict(hepnnet), predict(hepml1), tolerance = 1e-04)
-    expect_equal(predict(hepnnet), predict(hepml2), tolerance = 1e-04)
-    expect_equal(predict(hepnnet), predict(hepml3), tolerance = 1e-04)
-    expect_equal(predict(hepnnet, newdata = newdata), predict(hepml1, newdata = newdata), tolerance = 1e-04)
-    expect_equal(predict(hepml1, newdata = newdata), predict(hepml2, newdata = newdata), tolerance = 1e-04)
-    expect_equal(predict(hepml1, newdata = newdata), predict(hepml3, newdata = newdata), tolerance = 1e-04)
-})
+## predict.brmultinom returns the right result", {
+expect_equal(predict(hepnnet), predict(hepml1), tolerance = 1e-04)
+expect_equal(predict(hepnnet), predict(hepml2), tolerance = 1e-04)
+expect_equal(predict(hepnnet), predict(hepml3), tolerance = 1e-04)
+expect_equal(predict(hepnnet, newdata = newdata), predict(hepml1, newdata = newdata), tolerance = 1e-04)
+expect_equal(predict(hepml1, newdata = newdata), predict(hepml2, newdata = newdata), tolerance = 1e-04)
+expect_equal(predict(hepml1, newdata = newdata), predict(hepml3, newdata = newdata), tolerance = 1e-04)
 
-test_that("simulate method returns a data frame with expected characteristics", {
-    simu_df <- simulate(hepbr1)
-    nam_mf <- names(model.frame(hepbr1))
-    nam_simu <- names(simu_df)
-    expect_identical(nrow(simu_df),
-                     nrow(hepat) * nlevels(hepat$type))
-    expect_identical(levels(simu_df$type),
-                     levels(hepat$type))
-    expect_identical(is.ordered(simu_df$type),
-                     is.ordered(hepat$type))
-    expect_identical(nam_mf[!(nam_mf %in% nam_simu)],
-                     "(weights)")
-    expect_identical(nam_simu[!(nam_simu %in% nam_mf)],
-                     as.character(hepbr1$call$weights))
-    expect_identical(nam_simu[(nam_simu %in% nam_mf)],
-                     nam_mf[(nam_mf %in% nam_simu)])
-})
+
+## simulate method returns a data frame with expected characteristics", {
+simu_df <- simulate(hepbr1)
+nam_mf <- names(model.frame(hepbr1))
+nam_simu <- names(simu_df)
+expect_identical(nrow(simu_df),
+                 nrow(hepat) * nlevels(hepat$type))
+expect_identical(levels(simu_df$type),
+                 levels(hepat$type))
+expect_identical(is.ordered(simu_df$type),
+                 is.ordered(hepat$type))
+expect_identical(nam_mf[!(nam_mf %in% nam_simu)],
+                 "(weights)")
+expect_identical(nam_simu[!(nam_simu %in% nam_mf)],
+                 as.character(hepbr1$call$weights))
+expect_identical(nam_simu[(nam_simu %in% nam_mf)],
+                 nam_mf[(nam_mf %in% nam_simu)])
+
 
 
 

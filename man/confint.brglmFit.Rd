@@ -3,7 +3,7 @@
 \name{confint.brglmFit}
 \alias{confint.brglmFit}
 \title{Method for computing confidence intervals for one or more
-regression parameters in a \code{\link{brglmFit}} object}
+regression parameters in a \code{\link[=brglmFit]{"brglmFit"}} object}
 \usage{
 \method{confint}{brglmFit}(object, parm, level = 0.95, ...)
 }
@@ -20,5 +20,5 @@ regression parameters in a \code{\link{brglmFit}} object}
 }
 \description{
 Method for computing confidence intervals for one or more
-regression parameters in a \code{\link{brglmFit}} object
+regression parameters in a \code{\link[=brglmFit]{"brglmFit"}} object
 }

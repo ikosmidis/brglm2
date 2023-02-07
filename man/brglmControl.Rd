@@ -3,8 +3,8 @@
 \name{brglmControl}
 \alias{brglmControl}
 \alias{brglm_control}
-\title{Auxiliary function for \code{\link{glm}} fitting using the
-\code{\link{brglmFit}} method.}
+\title{Auxiliary function for \code{\link[=glm]{glm()}} fitting using the \code{\link[=brglmFit]{brglmFit()}}
+method.}
 \usage{
 brglmControl(
   epsilon = 1e-06,
@@ -49,16 +49,15 @@ aliasing. Default is \code{TRUE}. See Details.}
 each iteration. Default is \code{FALSE}.}
 
 \item{type}{the type of fitting method to be used. The options are
-\code{AS_mean} (mean-bias reducing adjusted scores),
-\code{AS_median} (median-bias reducing adjusted scores),
-\code{AS_mixed} (bias reduction using mixed score adjustments;
-default), \code{correction} (asymptotic bias correction),
-\code{MPL_Jeffreys} (maximum penalized likelihood with powers
-of the Jeffreys prior as penalty) and\code{ML} (maximum
-likelihood).}
+\code{"AS_mean"} (mean-bias reducing adjusted scores), \code{"AS_median"}
+(median-bias reducing adjusted scores), \code{"AS_mixed"} (bias
+reduction using mixed score adjustments; default),
+\code{"correction"} (asymptotic bias correction), \code{"MPL_Jeffreys"}
+(maximum penalized likelihood with powers of the Jeffreys prior
+as penalty) and \code{"ML"} (maximum likelihood).}
 
 \item{transformation}{the transformation of the dispersion to be
-estimated. Default is \code{identity}. See Details.}
+estimated. Default is \code{"identity"}. See Details.}
 
 \item{slowit}{a positive real used as a multiplier for the
 stepsize. The smaller it is the smaller the steps are. Default
@@ -72,8 +71,8 @@ consider. Default is \code{12}.}
 
 \item{a}{power of the Jeffreys prior penalty. See Details.}
 
-\item{...}{further arguments passed to
-\code{\link{brglmControl}}. Currently ignored in the output.}
+\item{...}{further arguments passed to \code{\link[=brglmControl]{brglmControl()}}. Currently
+ignored in the output.}
 }
 \value{
 a list with components named as the arguments, including
@@ -81,82 +80,77 @@ symbolic expressions for the dispersion transformation
 (\code{Trans}) and its inverse (\code{inverseTrans})
 }
 \description{
-Typically only used internally by \code{\link{brglmFit}}, but may
-be used to construct a \code{control} argument.
+Typically only used internally by \code{\link[=brglmFit]{brglmFit()}}, but may be used to
+construct a \code{control} argument.
 }
 \details{
-\code{\link{brglmControl}} provides default values and sanity
-checking for the various constants that control the iteration and
-generally the behaviour of \code{\link{brglmFit}}.
+\code{\link[=brglmControl]{brglmControl()}} provides default values and sanity checking for
+the various constants that control the iteration and generally the
+behaviour of \code{\link[=brglmFit]{brglmFit()}}.
 
-When \code{trace = TRUE}, calls to \code{cat} produce the output
-for each iteration.  Hence, \code{options(digits = *)} can be used
-to increase the precision.
+When \code{trace = TRUE}, calls to \code{\link[=cat]{cat()}} produce the output for each
+iteration.  Hence, \verb{options(digits = *)} can be used to increase
+the precision.
 
-When \code{check_aliasing = TRUE} (default), a QR decomposition of
-the model matrix is computed to check for aliasing. If the model
-matrix is known to be of full rank, then \code{check_aliasing =
-FALSE} avoids the extra computational overhead of an additional QR
-decomposition, which can be substantial for large model
-matrices. However, setting \code{check_aliasing = FALSE} is tells
-\code{\link{brglmFit}} that the model matrix is full rank, and hard
-to trace back errors will result if it is rank deficient.
+When \code{check_aliasing = TRUE} (default), a QR decomposition of the
+model matrix is computed to check for aliasing. If the model matrix
+is known to be of full rank, then \code{check_aliasing = FALSE} avoids
+the extra computational overhead of an additional QR decomposition,
+which can be substantial for large model matrices. However, setting
+\code{check_aliasing = FALSE} tells \code{\link[=brglmFit]{brglmFit()}} that the model matrix
+is full rank, and hard to trace back errors will result if it is
+rank deficient.
 
 \code{transformation} sets the transformation of the dispersion
 parameter for which the bias reduced estimates are computed. Can be
-one of "identity", "sqrt", "inverse", "log" and
-"inverseSqrt". Custom transformations are accommodated by supplying
-a list of two expressions (transformation and inverse
+one of \code{"identity"}, \code{"sqrt"}, \code{"inverse"}, \code{"log"} and
+\code{"inverseSqrt"}. Custom transformations are accommodated by
+supplying a list of two expressions (transformation and inverse
 transformation). See the examples for more details.
 
-The value of \code{response_adjustment} is only relevant if
-\code{\link{brglmFit}} is called with \code{start = NULL}, and
-\code{family} is \code{\link{binomial}} or
-\code{\link{poisson}}. For those models, an initial maximum
-likelihood fit is obtained on adjusted data to provide starting
-values for the iteration in \code{brglmFit}. The value of
-\code{response_adjustment} governs how the data is
-adjusted. Specifically, if \code{family} is \code{binomial}, then
-the responses and totals are adjusted by \code{response_adjustment}
-and \code{2 * response_adjustment}, respectively; if \code{family}
-is \code{poisson}, then the responses are adjusted by and
-\code{response_adjustment}. \code{response_adjustment = NULL}
-(default) is equivalent to setting it to
-"number of parameters"/"number of observations".
+The value of \code{response_adjustment} is only relevant if \code{\link[=brglmFit]{brglmFit()}}
+is called with \code{start = NULL}, and \code{family} is \code{\link[=binomial]{binomial()}} or
+\code{\link[=poisson]{poisson()}}. For those models, an initial maximum likelihood fit is
+obtained on adjusted data to provide starting values for the
+iteration in \code{\link[=brglmFit]{brglmFit()}}. The value of \code{response_adjustment}
+governs how the data is adjusted. Specifically, if \code{family} is
+\code{\link[=binomial]{binomial()}}, then the responses and totals are adjusted by
+\code{response_adjustment} and \code{2 * response_adjustment}, respectively;
+if \code{family} is \code{\link[=poisson]{poisson()}}, then the responses are adjusted by and
+\code{response_adjustment}. \code{response_adjustment = NULL} (default)
+is equivalent to setting it to
+\code{"number of parameters" / "number of observations"}.
 
-When \code{type = "AS_mixed"} (default), mean bias reduction is
-used for the regression parameters, and median bias reduction for
-the dispersion parameter, if that is not fixed. This adjustment has
+When \code{type = "AS_mixed"} (default), mean bias reduction is used for
+the regression parameters, and median bias reduction for the
+dispersion parameter, if that is not fixed. This adjustment has
 been developed based on equivariance arguments (see, Kosmidis et
 al, 2020, Section 4) in order to produce regression parameter
 estimates that are invariant to arbitrary contrasts, and estimates
 for the dispersion parameter that are invariant to arbitrary
-non-linear transformations. \code{type = "AS_mixed"} and \code{type
-= "AS_mean"} return the same results if \code{brglmFit} is called
-with \code{family} \code{binomial} or \code{poisson} (i.e. families
-with fixed dispersion).
+non-linear transformations. \code{type = "AS_mixed"} and \code{type = "AS_mean"} return the same results if \code{\link[=brglmFit]{brglmFit()}} is called with
+\code{family} \code{\link[=binomial]{binomial()}} or \code{\link[=poisson]{poisson()}} (i.e. families with fixed
+dispersion).
 
-When \code{type = "MPL_Jeffreys"}, \code{brglmFit} will maximize
-the penalized log-likelihood \deqn{l(\beta, \phi) + a\log \det
-i(\beta, \phi)}{l(beta, phi) + a log det i(beta, phi)} where
-\eqn{i(\beta, \phi)}{i(beta, phi)} is the expected information
-matrix about the regression parameters \eqn{\beta} and the
-dispersion parameter \eqn{\phi}. See, \code{vignette("iteration",
-"brglm2")} for more information. The argument $a$ controls the
-amount of penalization and its default value is \code{a = 1/2},
-corresponding to maximum penalized likelihood using a
-Jeffreys-prior penalty. See, Kosmidis & Firth (2021) for proofs and
-discussion about the finiteness and shrinkage properties of the
-maximum penalized likelihood estimators for binomial-response
-generalized linear models.
+When \code{type = "MPL_Jeffreys"}, \code{\link[=brglmFit]{brglmFit()}} will maximize the
+penalized log-likelihood \deqn{l(\beta, \phi) + a\log \det i(\beta,
+\phi)}{l(beta, phi) + a log det i(beta, phi)} where \eqn{i(\beta,
+\phi)}{i(beta, phi)} is the expected information matrix about the
+regression parameters \eqn{\beta} and the dispersion parameter
+\eqn{\phi}. See, \code{vignette("iteration", "brglm2")} for more
+information. The argument \code{a} controls the amount of penalization
+and its default value is \code{a = 1/2}, corresponding to maximum
+penalized likelihood using a Jeffreys-prior penalty. See, Kosmidis
+& Firth (2021) for proofs and discussion about the finiteness and
+shrinkage properties of the maximum penalized likelihood estimators
+for binomial-response generalized linear models.
 
-The estimates from \code{type = "AS_mean"} and \code{type =
-"MPL_Jeffreys"} with \code{a = 1/2} (default) are identical for
+The estimates from \code{type = "AS_mean"} and \code{type = "MPL_Jeffreys"} with \code{a = 1/2} (default) are identical for
 Poisson log-linear models and logistic regression models, i.e. for
 binomial and Poisson regression models with canonical links. See,
 Firth (1993) for details.
 
-\code{brglm_control} is an alias to \code{brglmControl}.
+\code{\link[=brglm_control]{brglm_control()}} is an alias to \code{\link[=brglmControl]{brglmControl()}}.
 }
 \examples{
 
@@ -183,18 +177,18 @@ coef(coalitionBRc, model = "dispersion")
 \references{
 Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 and shrinkage in binomial-response generalized linear
-models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
+models. \emph{Biometrika}, \strong{108}, 71-82. \doi{10.1093/biomet/asaa052}.
 
 Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
-reduction in generalized linear models. *Statistics and Computing*,
-**30**, 43-59 \doi{10.1007/s11222-019-09860-6}
+reduction in generalized linear models. \emph{Statistics and Computing},
+\strong{30}, 43-59. \doi{10.1007/s11222-019-09860-6}.
 
 Firth D (1993). Bias reduction of maximum likelihood estimates.
-Biometrika, **80**, 27-38 \doi{10.2307/2336755}
+Biometrika, \strong{80}, 27-38. \doi{10.2307/2336755}.
 }
 \seealso{
-\code{\link{brglm_fit}} and \code{\link{glm.fit}}
+\code{\link[=brglm_fit]{brglm_fit()}} and \code{\link[=glm.fit]{glm.fit()}}
 }
 \author{
-Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
 }

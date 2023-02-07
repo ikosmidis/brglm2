@@ -3,7 +3,7 @@
 \name{vcov.brglmFit}
 \alias{vcov.brglmFit}
 \title{Return the variance-covariance matrix for the regression parameters
-in a \code{\link{brglmFit}} object}
+in a \code{\link[=brglmFit]{brglmFit()}} object}
 \usage{
 \method{vcov}{brglmFit}(object, model = c("mean", "full", "dispersion"), complete = TRUE, ...)
 }
@@ -30,12 +30,12 @@ in a \code{\link{brglmFit}} object}
 }
 \description{
 Return the variance-covariance matrix for the regression parameters
-in a \code{\link{brglmFit}} object
+in a \code{\link[=brglmFit]{brglmFit()}} object
 }
 \details{
-The options for \code{model} are \code{"mean"} for mean regression
-parameters only (default), \code{"dispersion"} for the dispersion
-parameter (or the transformed dispersion; see
-\code{\link{brglm_control}}), and \code{"mean"} for both the mean
-regression and the (transformed) dispersion parameters.
+The options for \code{model} are \code{"mean"} for mean regression parameters
+only (default), \code{"dispersion"} for the dispersion parameter (or the
+transformed dispersion; see \code{\link[=brglm_control]{brglm_control()}}), and \code{"full"} for
+both the mean regression and the (transformed) dispersion
+parameters.
 }

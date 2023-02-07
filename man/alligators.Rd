@@ -6,23 +6,16 @@
 \title{Alligator food choice data}
 \format{
 A data frame with 80 rows and 5 variables:
-
-\describe{
-
-\item{foodchoice}{primary food type, in volume, found in an alligator’s stomach, with levels \code{fish}, \code{invertebrate}, \code{reptile}, \code{bird}, \code{other}}
-
-\item{lake}{lake of capture with levels \code{Hancock}, \code{Oklawaha}, \code{Trafford}, \code{George}}
-
-\item{gender}{gender of the alligator with levels \code{Male} and \code{Female}}
-
-\item{size}{size of the alligator with levels \code{<=2.3} meters long and \code{>2.3} meters long}
-
-\item{freq}{number of alligators for each foodchoice, lake, gender and size combination}
-
+\itemize{
+\item \code{foodchoice}: primary food type, in volume, found in an alligator’s stomach, with levels \code{fish}, \code{invertebrate},\code{reptile}, \code{bird}, \code{other}
+\item \code{lake}: lake of capture with levels \code{Hancock}, \code{Oklawaha}, \code{Trafford}, \code{George}.
+\item \code{gender}: gender of the alligator with levels \code{Male} and \code{Female}
+\item \code{size}: size of the alligator with levels \verb{<=2.3} meters long and \verb{>2.3} meters long
+\item \code{freq}: number of alligators for each foodchoice, lake, gender and size combination
 }
 }
 \source{
-The alligators data set is analyzed in Agresti (2002, Subsection~7.1.2).
+The alligators data set is analyzed in Agresti (2002, Subsection 7.1.2).
 }
 \usage{
 alligators
@@ -31,10 +24,10 @@ alligators
 Alligator food choice data
 }
 \references{
-Agresti A (2002). *Categorical Data Analysis*.  Wiley Series in
-Probability and Statistics. Wiley
+Agresti A (2002). \emph{Categorical Data Analysis}.  Wiley Series in
+Probability and Statistics. Wiley.
 }
 \seealso{
-\code{\link{brmultinom}}
+\code{\link[=brmultinom]{brmultinom()}}
 }
 \keyword{datasets}

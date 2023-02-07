@@ -9,21 +9,18 @@
 #'
 #' @details
 #'
-#' \itemize{
+#' * [detect_separation()]: This function is defunct from \pkg{brglm2}
+#' since version 0.8.0. A new version of [detect_separation()] is now
+#' maintained in the
+#' [\pkg{detectseparation}](https://cran.r-project.org/package=detectseparation)
+#' R package.
 #'
-#' \item \code{\link{detect_separation}}: This function is defunct
-#' from \pkg{brglm2} since version 0.8.0. A new version of
-#' \code{detect_separation} is now maintained in the
-#' \pkg{detectseparation} R package at
-#' \url{https://cran.r-project.org/package=detectseparation}.
+#' * [check_infinite_estimates()] is defunct from \pkg{brglm2} since
+#' version 0.8.0. An new version of [check_infinite_estimates()] is
+#' now maintained in the
+#' [\pkg{detectseparation}](https://cran.r-project.org/package=detectseparation)
+#' R package.
 #'
-#' \item \code{check_infinite_estimates} is defunct from
-#' \pkg{brglm2} since version 0.8.0. An new version of
-#' \code{check_infinite_estimates} is now maintained in the
-#' \pkg{detectseparation} R package at
-#' \url{https://cran.r-project.org/package=detectseparation}.
-#'
-#' }
 #' @name brglm2-defunct
 NULL
 

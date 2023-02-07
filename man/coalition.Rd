@@ -5,27 +5,35 @@
 \alias{coalition}
 \title{Coalition data}
 \format{
-An object of class \code{data.frame} with 314 rows and 7 columns.
+A data frame with 314 rows and the 7 variables "duration",
+"ciep12", "invest", "fract", "polar", "numst2", and "crisis".  For
+variable descriptions, please refer to King et al (1990).
 }
 \usage{
 coalition
 }
 \description{
-Coalition data
+This data set contains survival data on government coalitions in
+parliamentary democracies (Belgium, Canada, Denmark, Finland,
+France, Iceland, Ireland, Israel, Italy, Netherlands, Norway,
+Portugal, Spain, Sweden, and the United Kingdom) for the period
+1945-1987.  For parsimony, country indicator variables are omitted
+in the sample data.
 }
 \note{
-Data is as provided in the Zeilig R package (\url{https://cran.r-project.org/package=Zelig})
+Data is as it was provided in the
+\href{https://cran.r-project.org/package=Zelig}{\pkg{Zeilig}} R package.
 }
 \references{
 King G, Alt J E, Burns N E, Laver M. (1990). A Unified
- Model of Cabinet Dissolution in Parliamentary
- Democracies. *American Journal of Political Science*, **34**,
- 846-870. \doi{10.2307/2111401}
+Model of Cabinet Dissolution in Parliamentary
+Democracies. \emph{American Journal of Political Science}, \strong{34},
+846-870. \doi{10.2307/2111401}.
 
- King G, Alt J E, Burns N E, Laver M. ICPSR
- Publication Related Archive, 1115.
+King G, Alt J E, Burns N E, Laver M. ICPSR
+Publication Related Archive, 1115.
 }
 \seealso{
-\code{\link{brglm_fit}}
+\code{\link[=brglm_fit]{brglm_fit()}}
 }
 \keyword{datasets}

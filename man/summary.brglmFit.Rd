@@ -3,7 +3,7 @@
 \name{summary.brglmFit}
 \alias{summary.brglmFit}
 \alias{print.summary.brglmFit}
-\title{\code{summary} method for \code{\link{brglmFit}} objects}
+\title{\code{\link[=summary]{summary()}} method for \link{brglmFit} objects}
 \usage{
 \method{summary}{brglmFit}(
   object,
@@ -46,21 +46,20 @@
     are printed for each coefficient.}
 }
 \description{
-\code{summary} method for \code{\link{brglmFit}} objects
+\code{\link[=summary]{summary()}} method for \link{brglmFit} objects
 }
 \details{
-The interface of the summary method for
-    \code{\link{brglmFit}} objects is identical to that of
-    \code{\link{glm}} objects. The summary method for
-    \code{\link{brglmFit}} objects computes the p-values of the
-    individual Wald statistics based on the standard normal
-    distribution, unless the family is Gaussian, in which case a t
-    distribution with appropriate degrees of freedom is used.
+The interface of the summary method for \code{\link[=brglmFit]{"brglmFit"}}
+objects is identical to that of \code{\link[=glm]{"glm"}} objects. The summary
+method for \code{\link[=brglmFit]{"brglmFit"}} objects computes the p-values of the
+individual Wald statistics based on the standard normal
+distribution, unless the family is Gaussian, in which case a t
+distribution with appropriate degrees of freedom is used.
 }
 \examples{
-## For examples see examples(brglmFit)
+## For examples see `examples(brglmFit)`
 
 }
 \seealso{
-\code{\link{summary.glm}} and \code{\link{glm}}
+\code{\link[=summary.glm]{summary.glm()}} and \code{\link[=glm]{glm()}}
 }

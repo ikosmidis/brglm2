@@ -2,7 +2,7 @@
 % Please edit documentation in R/mis-link.R
 \name{mis}
 \alias{mis}
-\title{A \code{link-glm} object for misclassified responses in binomial regression models}
+\title{A \code{\link[=make.link]{"link-glm"}} object for misclassified responses in binomial regression models}
 \usage{
 mis(link = "logit", sensitivity = 1, specificity = 1)
 }
@@ -14,12 +14,12 @@ mis(link = "logit", sensitivity = 1, specificity = 1)
 \item{specificity}{the probability of observing a failure given that a failure actually took place given any covariate values.}
 }
 \description{
-\code{\link{mis}} is a \code{link-glm} object that specifies the link function in Neuhaus (1999, expression~(8)) for handling misclassified responses in binomial regression models using maximum likelihood. A prior specification of the sensitivity and specificity is required.
+\code{\link[=mis]{mis()}} is a \code{\link[=make.link]{"link-glm"}} object that specifies the link function in Neuhaus (1999, expression (8)) for handling misclassified responses in binomial regression models using maximum likelihood. A prior specification of the sensitivity and specificity is required.
 }
 \details{
-\code{sensitivity} + \code{specificity} should be greater or equal
-to 1, otherwise it is implied that the procedure producing the
-responses performs worse than chance in terms of misclassification.
+\code{sensitivity + specificity} should be greater or equal to 1,
+otherwise it is implied that the procedure producing the responses
+performs worse than chance in terms of misclassification.
 }
 \examples{
 
@@ -48,9 +48,9 @@ update(lizardsML_mis, method = "brglmFit", type = "AS_median",
 }
 \references{
 Neuhaus J M (1999). Bias and efficiency loss due to misclassified
-responses in binary regression. Biometrika, **86**, 843-855
-\url{https://www.jstor.org/stable/2673589}
+responses in binary regression. Biometrika, \strong{86}, 843-855.
+\url{https://www.jstor.org/stable/2673589}.
 }
 \seealso{
-\code{\link[stats]{glm}}, \code{\link{brglm_fit}}
+\code{\link[=glm]{glm()}}, \code{\link[=brglm_fit]{brglm_fit()}}
 }

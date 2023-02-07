@@ -1,4 +1,4 @@
-# Copyright (C) 2020-2021 Euloge Clovis Kenne Pagui, Ioannis Kosmidis
+# Copyright (C) 2020- Euloge Clovis Kenne Pagui, Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -15,92 +15,89 @@
 
 #' Bias reduction for negative binomial regression models
 #'
-#' \code{brnb} is a function that fits negative binomial regression
+#' [brnb()] is a function that fits negative binomial regression
 #' models using implicit and explicit bias reduction methods.
 #'
 #' @inheritParams stats::glm
-#' @param link The link function. Currently must be one of \code{log},
-#'     \code{sqrt} or \code{identity}.
+#' @param link The link function. Currently must be one of `"log"`,
+#'     `"sqrt"` or `"identity"`.
 #' @param control a list of parameters for controlling the fitting
-#'     process. See \code{\link{brglmControl}} for details.
-#' @return A fitted model object of class \code{brnb} inheriting from
-#'     \code{negbin} and \code{brglmFit}. The object is similar to the
-#'     output of \code{\link{brglmFit}} but contains four additional
-#'     components: \code{theta} for the maximum likelihood estimate of
-#'     the dispersion parameter as in \code{\link[MASS]{glm.nb}}, \code{vcov.mean}
-#'     for the estimated variance-covariance matrix of the regression
-#'     coefficients, \code{vcov.dispersion} for the estimated variance
-#'     of the dispersion parameter in the chosen parameterization
-#'     (using the expected information), and \code{twologlik} for
-#'     twice the log-likelihood function.
+#'     process. See [brglmControl()] for details.
+#' @return A fitted model object of class [`"brnb"`][brnb] inheriting
+#'     from [`"negbin"`][negbin] and [`"brglmFit"`][brglmFit]. The
+#'     object is similar to the output of [brglmFit()] but contains
+#'     four additional components: `theta` for the maximum likelihood
+#'     estimate of the dispersion parameter as in [MASS::glm.nb()],
+#'     `vcov.mean` for the estimated variance-covariance matrix of the
+#'     regression coefficients, `vcov.dispersion` for the estimated
+#'     variance of the dispersion parameter in the chosen
+#'     parameterization (using the expected information), and
+#'     `twologlik` for twice the log-likelihood function.
 #'
 #' @details
 #'
 #' A detailed description of the fitting procedure is given in the
-#' iteration vignette (see, \code{vignette("iteration", "brglm2")} and
+#' iteration vignette (see, `vignette("iteration", "brglm2")` and
 #' Kosmidis et al, 2020). The number of iterations when estimating
-#' parameters are controlled by the \code{maxit} argument of
-#' \code{\link{brglmControl}}.
+#' parameters are controlled by the `maxit` argument of
+#' [brglmControl()].
 #'
 #' The type of score adjustment to be used is specified through the
-#' \code{type} argument (see \code{\link{brglmControl}} for details).
+#' `type` argument (see [brglmControl()] for details).
 #'
 #' The available options are:
 #'
-#' \itemize{
-#'
-#' \item \code{type = "AS_mixed"}: the mixed bias-reducing score
+#' * `type = "AS_mixed"`: the mixed bias-reducing score
 #' adjustments in Kosmidis et al (2020) that result in mean bias
 #' reduction for the regression parameters and median bias reduction
 #' for the dispersion parameter, if any; default.
 #'
-#' \item \code{type = "AS_mean"}: the mean bias-reducing score
+#' * `type = "AS_mean"`: the mean bias-reducing score
 #' adjustments in Firth (1993) and Kosmidis & Firth (2009).
 #'
-#' \item \code{type = "AS_median"}: the median bias-reducing score
+#' * `type = "AS_median"`: the median bias-reducing score
 #' adjustments in Kenne Pagui et al. (2017)
 #'
-#' \item \code{type = "MPL_Jeffreys"}: maximum penalized likelihood
+#' * `type = "MPL_Jeffreys"`: maximum penalized likelihood
 #' with powers of the Jeffreys prior as penalty.
 #'
-#' \item \code{type = "ML"}: maximum likelihood.
+#' * `type = "ML"`: maximum likelihood.
 #'
-#' \item \code{type = "correction"}: asymptotic bias correction, as in
+#' * `type = "correction"`: asymptotic bias correction, as in
 #' Cordeiro & McCullagh (1991).
 #'
-#' }
-#'
 #' The choice of the parameterization for the dispersion is controlled
-#' by the \code{transformation} argument (see
-#' \code{\link{brglmControl}} for details).  The default is
-#' \code{"identity"}. Using \code{transformation = "inverse"} uses the
-#' dispersion parameterization that \code{\link[MASS]{glm.nb}} uses.
+#' by the `transformation` argument (see [brglmControl()] for
+#' details).  The default is `"identity"`. Using `transformation =
+#' "inverse"` uses the dispersion parameterization that
+#' [MASS::glm.nb()] uses.
 #'
-#' @author Euloge Clovis Kenne Pagui [ctb] \email{kenne@stat.unipd.it}, Ioannis Kosmidis [aut, cre] \email{ioannis.kosmidis@warwick.ac.uk}
+#' @author Euloge Clovis Kenne Pagui `[aut]` \email{kenne@stat.unipd.it}, Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
 #'
 #' @references
 #'
-#' Cordeiro GM & McCullagh, P (1991). Bias correction in generalized
-#' linear models. *Journal of the Royal Statistical Society. Series B(Methodological)*,
-#'  **53**, 629-643.
+#' Cordeiro G M, McCullagh P (1991). Bias correction in generalized
+#' linear models. *Journal of the Royal Statistical Society. Series B
+#' (Methodological)*, **53**, 629-643. \doi{10.1111/j.2517-6161.1991.tb01852.x}.
 #'
-#' Firth D (1993). Bias reduction of maximum likelihood estimates,
-#' Biometrika. **80**, 27-38.
+#' Firth D (1993). Bias reduction of maximum likelihood estimates.
+#' *Biometrika*. **80**, 27-38. \doi{10.2307/2336755}.
 #'
-#' Kenne Pagui EC, Salvan A, and Sartori N (2017). Median bias
+#' Kenne Pagui E C, Salvan A, Sartori N (2017). Median bias
 #' reduction of maximum likelihood estimates. *Biometrika*, **104**,
-#' 923--938
+#' 923–938. \doi{10.1093/biomet/asx046}.
 #'
-#' Kosmidis I, Kenne Pagui EC, Sartori N (2020). Mean and median bias
-#' reduction in generalized linear models. *Statistics and Computing*, **30** 43--59.
+#' Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
+#' reduction in generalized linear models. *Statistics and Computing*,
+#' **30**, 43-59. \doi{10.1007/s11222-019-09860-6}.
 #'
-#' Kosmidis I and Firth D (2009). Bias reduction in exponential family
-#' nonlinear models. *Biometrika*, **96**, 793-804.
+#' Kosmidis I, Firth D (2009). Bias reduction in exponential family
+#' nonlinear models. *Biometrika*, **96**, 793-804. \doi{10.1093/biomet/asp055}.
 #'
 #' @examples
-#' # Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
-#' # likelihood estimator of the negative binomial dispersion
-#' # parameter.  Biometrics, 61, 179--185.
+#' ## Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
+#' ## likelihood estimator of the negative binomial dispersion
+#' ## parameter.  Biometrics, 61, 179--185.
 #' #
 #' # Number of revertant colonies of salmonella data
 #' salmonella <- data.frame(freq = c(15, 16, 16, 27, 33, 20,
@@ -278,14 +275,13 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         }
         res
     }
-
     ## Computation of needed expectations almost exactly
     exp_quant <- function(mu, k) {
         n <- length(mu)
         E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- numeric(n)
         if (k < 0) stop("negative value of k")
         ymax <- max(qnbinom(1 - 10 * .Machine$double.eps, mu = mu, size = 1 / k))
-                                        #if (ymax > 30000) stop("ymax too much large")  ## need control on largest value?
+        ## if (ymax > 30000) stop("ymax too much large")  ## need control on largest value?
         if (ymax > 1) {
             out <- .C('expectedValues',
                       as.double(mu),
@@ -329,7 +325,6 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     ## }
 
     ## required quantities
-
     key_quantities <- function(pars) {
         betas <- pars[1:nvars]
         phi <- pars[nvars + 1]
@@ -375,7 +370,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         })
     }
 
-                                        # score function
+    ## score function
     score <- function(pars, level = 0, fit = NULL) {
         if (is.null(fit)) {
             fit <- key_quantities(pars)
@@ -400,9 +395,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                 R_matrix <- qr.R(qr_decomposition)
                 if (inverse) {
                     return(chol2inv(R_matrix))
-                }
-                else
-                {
+                } else {
                     return(crossprod(R_matrix))
                 }
             }
@@ -410,9 +403,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                 iphiphi <- sum( weights * (E_s2 + ((2 * k * mus + 2) * log((k * mus + 1)) - k^2 * mus^2 - 2 * k * mus) / (k^4 * mus + k^3)) * d1phi^2, na.rm = TRUE )
                 if (inverse) {
                     return(1/iphiphi)
-                }
-                else
-                {
+                } else {
                     return(iphiphi)
                 }
             }
@@ -526,7 +517,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                                   correction = function(pars, ...) 0,
                                   ML = function(pars, ...) 0)
 
-  ## required components for computing the adjusted scores
+    ## required components for computing the adjusted scores
 
     compute_step_components <- function(pars, level = 0, fit = NULL) {
         if (is.null(fit)) {
@@ -582,8 +573,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         nvars <- ncol(x)
         betas_names_all <- betas_names
         betas_names <- betas_names[-aliased]
-    }
-    else {
+    } else {
         nvars_all <- nvars
         betas_names_all <- betas_names
     }
@@ -604,16 +594,14 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         options(warn = warn)
         betas <- coef(fit)
         names(betas) <- betas_names
-    }
-    else {
+    } else {
         if ((length(start) == nvars_all) & is.numeric(start) ) {
             betas_all <- start
             names(betas_all) <- betas_names_all
             if (!isTRUE(is_full_rank)) {
                 betas_all[aliased] <- NA_real_
                 betas <- betas_all[-aliased]
-            }
-            else {
+            } else {
                 betas <- betas_all
             }
             etas <- drop(x %*% betas + offset)
@@ -627,8 +615,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
             if (!isTRUE(is_full_rank)) {
                 betas_all[aliased] <- NA_real_
                 betas <- betas_all[-aliased]
-            }
-            else {
+            } else {
                 betas <- betas_all
             }
             dispersion <- start[nvars_all + 1]
@@ -681,9 +668,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     if (control$maxit == 0) {
         iter <- 0
         failed <- FALSE
-    }
-    else
-    {
+    } else {
         for (iter in seq.int(control$maxit)) {
             step_factor <- 0
             testhalf <- TRUE
@@ -724,8 +709,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
 
                 if (step_factor == 0 & iter == 1) {
                     testhalf <- TRUE
-                }
-                else {
+                } else {
                     s2 <- c(abs(step_beta), abs(step_dispersion))
                     s1 <- c(abs(step_beta_previous), abs(step_dispersion_previous))
                     testhalf <- sum(s2, na.rm = TRUE) > sum(s1,  na.rm = TRUE)
@@ -749,8 +733,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     if(iter >= control$maxit) {
         convergence <- FALSE
         warning("optimization failed to converge")
-    }
-    else
+    } else
     {
         convergence <- TRUE
     }
@@ -860,19 +843,17 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
 }
 
 
-#' Extract model coefficients from \code{\link{brnb}} objects
-#'
-#'
+#' Extract model coefficients from [`"brnb"`][brnb] objects
 #'
 #' @inheritParams stats::coef
-#' @param model one of \code{"mean"} (default), \code{"full"}, \code{"dispersion"},
+#' @param model one of `"mean"` (default), `"full"`, `"dispersion"`,
 #'     to return the estimates of the parameters in the linear
-#'     prediction only, or both, the estimate of the dispersion parameter only,
-#'      respectively.
+#'     prediction only, or both, the estimate of the dispersion
+#'     parameter only, respectively.
 #'
 #' @details
 #'
-#' See \code{\link{coef}} for more details.
+#' See [coef()] for more details.
 #'
 #' @method coef brnb
 #' @export
@@ -881,25 +862,23 @@ coef.brnb <- function(object, model = c("mean", "full", "dispersion"), ...) {
     coef.brglmFit(object, model, ...)
 }
 
-#' Extract model variance-covariance matrix from \code{\link{brnb}} objects
+#' Extract model variance-covariance matrix from [`"brnb"`][brnb] objects
 #'
 #'
 #' @inheritParams stats::vcov.glm
-#' @param object an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.
+#' @param object an object of class [`"brnb"`][brnb], typically, a result of a call to [brnb()].
 #' @param model character specifying for which component of the model variance-covariance matrix should be extracted.
 #'
 #' @details
 #'
-#' The options for \code{model} are \code{"mean"} for mean regression
-#'  only (default), \code{"dispersion"} for the dispersion
-#' parameter (in a chosen transformation; see
-#' \code{\link{brglmControl}}), and \code{"full"} for both the mean
-#' regression and the (transformed) dispersion parameters.
-#' See \code{\link{vcov}} for more details.
+#' The options for `model` are `"mean"` for mean regression only
+#'  (default), `"dispersion"` for the dispersion parameter (in a
+#'  chosen transformation; see [brglmControl()], and `"full"` for both
+#'  the mean regression and the (transformed) dispersion parameters.
+#'  See [vcov()] for more details.
 #'
-#' @seealso
+#' @seealso [vcov()]
 #'
-#' \code{\link{vcov}}
 #' @method vcov brnb
 #' @export
 vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete = TRUE, ...) {
@@ -908,21 +887,24 @@ vcov.brnb <- function(object, model = c("mean", "full", "dispersion"), complete 
     vcov.brglmFit(object, model , complete , ...)
 }
 
-#' \code{summary} method for \code{\link{brnb}} objects
+#' [summary()] method for [`"brnb"`][brnb] objects
 #'
 #' @inheritParams stats::summary.glm
-#' @param object an object of class "brnb", usually, a result of a call to \code{\link{brnb}}.
-#' @details The interface of the summary method for
-#'     \code{\link{brnb}} objects is similar to that of
-#'     \code{\link{brglmFit}} objects with minor additional informations. The summary method for
-#'     \code{\link{brnb}} objects computes the p-values of the
-#'     individual Wald statistics based on the standard normal
-#'     distribution.
+#' @param object an object of class [`"brnb"`][brnb], typically, a
+#'     result of a call to [brnb()].
+#' @param x an object of class [`"summary.brnb"`][summary.brnb],
+#'     usually, a result of a call to [summary.brnb].
+#' @details The interface of the summary method for [`"brnb"`][brnb]
+#'     objects is similar to that of [`"brglmFit"`][brglmFit] objects
+#'     with additional information.
 #'
-#' @seealso \code{\link{summary.brglmFit}} and \code{\link{glm}}
+#'     p-values of the individual Wald statistics are based on the
+#'     standard normal distribution.
+#'
+#' @seealso [summary.brglmFit()] and [glm()]
 #'
 #' @examples
-#' ## For examples see examples(brnb)
+#' # For examples see examples(brnb)
 #'
 #' @method summary brnb
 #' @export
@@ -952,25 +934,7 @@ summary.brnb <- function(object, ...) {
     object
 }
 
-#' Summarizing Linear Model Fits
-#'
-#' print summary output for class "brnb".
-#'
-#' @param x an object of class "summary.brnb", usually, a result of a
-#'     call to summary.brnb.
-#' @param digits the number of significant digits to use when
-#'     printing.
-#' @param ... extra arguments to passed to methods. Not used
-#'     currently.
-#' @details \code{print.summary.brnb} tries to be smart about
-#'     formatting the coefficients, standard errors, and additionally
-#'     gives "significant stars". The \code{coefficients} components
-#'     of the result gives the estimated coefficients and their
-#'     estimated standard errors, together with their ratio
-#'     (\code{z}). A fourth column gives the two-tailed p-value
-#'     corresponding to the \code{z} statistica based on Normal
-#'     reference distribution.
-#'
+#' @rdname summary.brnb
 #' @method print summary.brnb
 #' @export
 print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
@@ -981,8 +945,7 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
     if (NROW(x$coefficients)) {
         cat(paste("\nCoefficients (mean model with ", x$link, " link):\n", sep = ""))
         printCoefmat(x$coefficients, digits = digits, signif.legend = FALSE)
-    }
-    else {
+    } else {
         cat("\nNo coefficients (in mean model)\n")
     }
     if (getOption("show.signif.stars") & any( x$coefficients[, 4L] < 0.1)) {
@@ -991,8 +954,7 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
     if (NROW(x$coef.dispersion)) {
         cat(paste("\n(Dispersion parameter  with ", x$transformation," transformation function: ",
                   round(x$coef.dispersion[,1], 7),")\n", sep = ""))
-    }
-    else {
+    } else {
         cat("\nNo coefficients (in precision model)\n")
     }
     cat("\n", apply(cbind(paste(format(c("Null",
@@ -1007,21 +969,20 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
     invisible(x)
 }
 
+
 #' @method print brnb
 #' @export
 print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
     cat("\nCall:", deparse(x$call, width.cutoff = floor(getOption("width") * 0.85)), "", sep = "\n")
     if (!x$converged) {
-      cat("model did not converge\n")
-    }
-    else {
+        cat("model did not converge\n")
+    } else {
         if (length(x$coefficients)) {
             cat(paste("Coefficients (mean model with ", x$link, " link):\n", sep = ""))
             print.default(format(x$coefficients, digits = digits), print.gap = 2, quote = FALSE)
             cat("\n")
-        }
-        else {
-        cat("No coefficients (in mean model)\n\n")
+        } else {
+            cat("No coefficients (in mean model)\n\n")
         }
         cat("\nDegrees of Freedom:", x$df.null, "Total (i.e. Null); ",
             x$df.residual, "Residual\n")
@@ -1030,29 +991,30 @@ print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
         cat("Null Deviance:\t", format(round(x$null.deviance, digits)), "\n")
         cat("Residual Deviance:\t", format(round(x$deviance, digits)),
             "\tAIC:", format(round(x$aic, digits)), "\n")
-  }
+    }
 }
 
 #' Method for computing Wald confidence intervals for one or more
-#' regression parameters in a \code{\link{brnb}} object
+#' regression parameters in a [`"brnb"`][brnb] object
 #'
 #' @inheritParams stats::confint
 #'
 #' @method confint brnb
 #' @export
 confint.brnb <- function(object, parm, level = 0.95, ...) {
-  confint.default(object, parm, level, ...)
+    confint.default(object, parm, level, ...)
 }
 
 #' Simulate Responses
 #'
-#' Simulate one or more responses from the distribution
-#' corresponding to a fitted model \code{brnb} object.
+#' Simulate one or more responses from the distribution corresponding
+#' to a fitted model [`"brnb"`][brnb] object.
 #' @param object an object representing a fitted model.
 #' @param nsim number of response vectors to simulate. Defaults to 1.
-#' @param seed an object specifying if and how the random
-#' number generator should be initialized (``seeded'').
-#' @param ... extra arguments to be passed to methods. Not currently used.
+#' @param seed an object specifying if and how the random number
+#'     generator should be initialized; see [set.seed()] for details.
+#' @param ... extra arguments to be passed to methods. Not currently
+#'     used.
 
 #' @examples
 #' # Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
@@ -1076,25 +1038,25 @@ confint.brnb <- function(object, parm, level = 0.95, ...) {
 #' @method simulate brnb
 #' @export
 simulate.brnb <- function(object, nsim = 1, seed = NULL, ...) {
-  if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
-    runif(1)
-  if (is.null(seed))
-    RNGstate <- get(".Random.seed", envir = .GlobalEnv)
-  else {
-    R.seed <- get(".Random.seed", envir = .GlobalEnv)
-    set.seed(seed)
-    RNGstate <- structure(seed, kind = as.list(RNGkind()))
-    on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
-  }
-  theta <- object$theta
-  mus <- fitted(object)
-  n <- length(mus)
-  val <- rnegbin(n*nsim, mu = mus, theta = theta)
-  dim(val) <- c(n, nsim)
-  val <- as.data.frame(val)
-  names(val) <- paste0("sim_", seq_len(nsim))
-  attr(val, "seed") <- RNGstate
-  val
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
+        runif(1)
+    if (is.null(seed))
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
+    theta <- object$theta
+    mus <- fitted(object)
+    n <- length(mus)
+    val <- rnegbin(n*nsim, mu = mus, theta = theta)
+    dim(val) <- c(n, nsim)
+    val <- as.data.frame(val)
+    names(val) <- paste0("sim_", seq_len(nsim))
+    attr(val, "seed") <- RNGstate
+    val
 }
 
 

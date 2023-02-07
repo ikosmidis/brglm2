@@ -2,39 +2,39 @@
 % Please edit documentation in R/brmultinom.R
 \name{predict.brmultinom}
 \alias{predict.brmultinom}
-\title{Predict method for \code{brmultinom} fits}
+\title{Predict method for \link{brmultinom} fits}
 \usage{
 \method{predict}{brmultinom}(object, newdata, type = c("class", "probs"), ...)
 }
 \arguments{
 \item{object}{a fitted object of class inheriting from
-\code{"brmultinom"}.}
+\code{\link[=brmultinom]{"brmultinom"}}.}
 
 \item{newdata}{optionally, a data frame in which to look for
 variables with which to predict.  If omitted, the fitted linear
 predictors are used.}
 
 \item{type}{the type of prediction required. The default is
-\code{"class"}, which produces predictions of the response
-category at the covariate values supplied in \code{"newdata"},
-selecting the category with the largest probability; the
-alternative \code{"probs"} returns all category probabilities
-at the covariate values supplied in \code{"newdata"}.}
+\code{"class"}, which produces predictions of the response category
+at the covariate values supplied in \code{"newdata"}, selecting the
+category with the largest probability; the alternative
+\code{"probs"} returns all category probabilities at the covariate
+values supplied in \code{newdata}.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
 \value{
 If \code{type = "class"} a vector with the predicted response
-categories; if \code{type = "probs"} a matrix of probabilities for
-all response categories at \code{newdata}.
+categories; if \code{type = "probs"} a matrix of probabilities for all
+response categories at \code{newdata}.
 }
 \description{
 Obtain class and probability predictions from a fitted baseline
 category logits model.
 }
 \details{
-If \code{newdata} is omitted the predictions are based on the data
-used for the fit.
+If \code{newdata} is omitted the predictions are based on the data used
+for the fit.
 }
 \examples{
 

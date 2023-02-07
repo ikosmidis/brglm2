@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
+
 # brglm2 <img src="man/figures/hex_brglm2.svg" width="320" align="right">
 
 <!-- badges: start -->
@@ -20,6 +21,7 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/ikosmidis/brglm2/workflows/R-CMD-check/badge.svg)](https://github.com/ikosmidis/brglm2/actions)
 [![Codecov test coverage](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ikosmidis/brglm2?branch=master)
 [![Licence](https://img.shields.io/badge/licence-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html)
 <!-- badges: end -->
 
 
@@ -28,8 +30,9 @@ knitr::opts_chunk$set(
 the estimation and inference from generalized linear models using
 various methods for bias reduction. **brglm2** supports all
 generalized linear models supported in R, and provides methods for
-multinomial logistic regression (nominal responses) and adjacent
-category models (ordinal responses).
+multinomial logistic regression (nominal responses), adjacent category
+models (ordinal responses), and negative binomial regression (for
+potentially overdispered count responses).
 
 Reduction of estimation bias is achieved by solving either the
 mean-bias reducing adjusted score equations in [Firth
@@ -51,10 +54,17 @@ equations return estimates with improved frequentist properties, that
 are also always finite, even in cases where the maximum likelihood
 estimates are infinite (e.g. complete and quasi-complete
 separation). See, [Kosmidis & Firth
-(2020)](https://doi.org/10.1093/biomet/asaa052) for the proof of the
+(2021)](https://doi.org/10.1093/biomet/asaa052) for the proof of the
 latter result in the case of mean bias reduction for logistic
 regression (and, for more general binomial-response models where the
 likelihood is penalized by a power of the Jeffreys' invariant prior).
+
+The core model fitters are implemented by the functions `brglm_fit()`
+(univariate generalized linear models), `brmultinom()` (baseline
+category logit models for nominal multinomial responses), `bracl()`
+(adjacent category logit models for ordinal multinomial responses),
+and `brnb()` for negative binomial regression.
+
 
 ## Installation
 
@@ -73,16 +83,18 @@ remotes::install_github("ikosmidis/brglm2", ref = "develop")
 
 ## Example
 
+### Estimation of binomial-response GLMs with separated data
+
 Below we follow the example of [Heinze and Schemper
-(2002)](https://doi.org/10.1002/sim.1047) and fit a probit regression
-model using maximum likelihood (ML) to analyze data from a study on
-endometrial cancer (see `?brglm2::endometrial` for details and
-references).
+(2002)](https://doi.org/10.1002/sim.1047) and fit a logistic
+regression model using maximum likelihood (ML) to analyze data from a
+study on endometrial cancer (see `?brglm2::endometrial` for details
+and references).
 
 ```{r, echo = TRUE, eval = TRUE}
 library("brglm2")
 data("endometrial", package = "brglm2")
-modML <- glm(HG ~ NV + PI + EH, family = binomial("probit"), data = endometrial)
+modML <- glm(HG ~ NV + PI + EH, family = binomial("logit"), data = endometrial)
 summary(modML)
 ```
 
@@ -130,6 +142,33 @@ bias reduction and maximum penalized likelihood with Jeffreys' prior
 penalty. Also do not forget to take a look at the vignettes
 (`vignette(package = "brglm2")`) for details and more case studies.
 
+### Improved estimation of the exponential of regression parameters
+
+See, also `?expo` for a method to estimate the exponential of
+regression parameters, such as odds ratios from logistic regression
+models, while controlling for other covariate information. Estimation
+can be performed using maximum likelihood or various estimators with
+smaller asymptotic mean and median bias, that are also guaranteed to
+be finite, even if the corresponding maximum likelihood estimates are
+infinite. For example, `modML` is a logistic regression fit, so the
+exponential of each coefficient is an odds ratio while controlling for
+other covariates. To estimate those odds ratios using the
+`correction*` method for mean bias reduction (see `?expo` for details)
+we do
+
+```{r, echo = TRUE, eval = TRUE}
+expoRB <- expo(modML, type = "correction*")
+expoRB
+```
+
+The odds ratio between presence of neovasculation and high histology
+grade (`HG`) is estimated to be `r round(coef(expoRB)["NV"], 3)`, while
+controlling for PI and EH. So, for each value of `PI` and `EH`, the
+estimated odds of high histology grade are about `r round(coef(expoRB)["NV"], 1)` times higher when neovasculation is present. An approximate 95\% interval for the latter odds ratio is 
+`r paste0("(", paste(round(expoRB$ci["NV",], 1), collapse = ", "), ")")`
+providing evidence of association between `NV` and `HG` while
+controlling for `PI` and `EH`. Note here that, the maximum likelihood estimate of the odds ratio is not as useful as the `correction*` estimate, because it is $+\infty$ with an infinite standard error (see previous section). 
+
 ## Solving adjusted score equations using quasi-Fisher scoring
 
 The workhorse function in **brglm2** is
@@ -158,18 +197,15 @@ implicit is as given in [Kosmidis
 
 ## References and resources
 
-**brglm2** was presented by [Ioannis Kosmidis](https://www.ikosmidis.com) at the useR! 2016 international
+**brglm2** was presented by [Ioannis
+Kosmidis](https://www.ikosmidis.com) at the useR! 2016 international
 conference at University of Stanford on 16 June 2016. The presentation
-was titled "Reduced-bias inference in generalized linear models" and
-can be watched online at this
-[link](https://channel9.msdn.com/Events/useR-international-R-User-conference/useR2016/brglm-Reduced-bias-inference-in-generalized-linear-models).
+was titled "Reduced-bias inference in generalized linear models".
 
 Motivation, details and discussion on the methods that **brglm2** implements are provided in
 
-Kosmidis, I, Kenne Pagui, E C, Sartori N. (2020). Mean and median bias
-reduction in generalized linear models. [*Statistics and
-Computing*](https://doi.org/10.1007/s11222-019-09860-6) *30*, 43–59.
+Kosmidis, I, Kenne Pagui, E C, Sartori N. (2020). Mean and median bias reduction in generalized linear models. [*Statistics and Computing*](https://doi.org/10.1007/s11222-019-09860-6) *30*, 43–59.
 
+## Code of Conduct
 
-
-
+Please note that the **brglm2** project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.

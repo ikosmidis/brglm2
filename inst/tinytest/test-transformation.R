@@ -1,5 +1,3 @@
-context("trasnformation of dispersion")
-
 ## A Gamma example, from McCullagh & Nelder (1989, pp. 300-2)
 clotting <- data.frame(
     u = c(5,10,15,20,30,40,60,80,100, 5,10,15,20,30,40,60,80,100),
@@ -27,8 +25,7 @@ c_inverse <- coef(mod_inverse, model = "full")
 c_inverse[5] <- 1/c_inverse[5]
 
 tol <- sqrt(.Machine$double.eps)
-test_that("ML estimate of gamma dispersion from brglmFit is invariant to trasnformation", {
-    expect_equal(c_identity, c_log, tolerance = tol, check.attributes = FALSE)
-    expect_equal(c_identity, c_sqrt, tolerance = tol, check.attributes = FALSE)
-    expect_equal(c_identity, c_inverse, tolerance = tol, check.attributes = FALSE)
-})
+## ML estimate of gamma dispersion from brglmFit is invariant to trasnformation
+expect_equal(c_identity, c_log, tolerance = tol, check.attributes = FALSE)
+expect_equal(c_identity, c_sqrt, tolerance = tol, check.attributes = FALSE)
+expect_equal(c_identity, c_inverse, tolerance = tol, check.attributes = FALSE)

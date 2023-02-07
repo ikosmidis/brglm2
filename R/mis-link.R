@@ -1,4 +1,4 @@
-# Copyright (C) 2018-2021 Ioannis Kosmidis
+# Copyright (C) 2018- Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -13,9 +13,9 @@
 #  A copy of the GNU General Public License is available at
 #  http://www.r-project.org/Licenses/
 
-#' A \code{link-glm} object for misclassified responses in binomial regression models
+#' A [`"link-glm"`][make.link] object for misclassified responses in binomial regression models
 #'
-#' \code{\link{mis}} is a \code{link-glm} object that specifies the link function in Neuhaus (1999, expression~(8)) for handling misclassified responses in binomial regression models using maximum likelihood. A prior specification of the sensitivity and specificity is required.
+#' [mis()] is a [`"link-glm"`][make.link] object that specifies the link function in Neuhaus (1999, expression (8)) for handling misclassified responses in binomial regression models using maximum likelihood. A prior specification of the sensitivity and specificity is required.
 #'
 #' @param link the baseline link to be used.
 #' @param sensitivity the probability of observing a success given that a success actually took place given any covariate values.
@@ -23,17 +23,17 @@
 #'
 #' @details
 #'
-#' \code{sensitivity} + \code{specificity} should be greater or equal
-#' to 1, otherwise it is implied that the procedure producing the
-#' responses performs worse than chance in terms of misclassification.
+#' `sensitivity + specificity` should be greater or equal to 1,
+#' otherwise it is implied that the procedure producing the responses
+#' performs worse than chance in terms of misclassification.
 #'
 #' @references
 #'
 #' Neuhaus J M (1999). Bias and efficiency loss due to misclassified
-#' responses in binary regression. Biometrika, **86**, 843-855
-#' \url{https://www.jstor.org/stable/2673589}
+#' responses in binary regression. Biometrika, **86**, 843-855.
+#' \url{https://www.jstor.org/stable/2673589}.
 #'
-#' @seealso \code{\link[stats]{glm}}, \code{\link{brglm_fit}}
+#' @seealso [glm()], [brglm_fit()]
 #'
 #' @examples
 #'

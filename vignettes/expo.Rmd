@@ -1,0 +1,115 @@
+---
+title: "Estimating the exponential of regression parameters using **brglm2**"
+author: "[Ioannis Kosmidis](https://www.ikosmidis.com)"
+date: "03 February 2023"
+output: rmarkdown::html_vignette
+bibliography: brglm2.bib
+vignette: >
+  %\VignetteIndexEntry{Estimating the exponential of regression parameters using **brglm2**}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 6
+)
+```
+
+# The `expo()` method
+
+The [**brglm2**](https://github.com/ikosmidis/brglm2) R package provides the `expo()` method for estimating exponentiated parameters of generalized linear models using various methods. 
+
+The `expo()` method uses a supplied `"brglmFit"` or `"glm"` object to estimate exponentiated parameters of generalized linear models with maximum likelihood or various mean and median bias reduction methods. `expo()` is useful for computing (corrected) estimates of the multiplicative impact of a unit increase on a covariate on the mean of a Poisson log-linear model (`family = poisson("log")` in `glm()`) while adjusting for other covariates, the odds ratio associated with a unit increase on a covariate in a logistic regression model (`family = binomial("logit")` in `glm()`) while adjusting for other covariates, the relative risk associated with a unit increase on a covariate in a relative risk regression model (`family = binomial("log")` in `glm()`) while adjusting for other covariates, among others.
+
+The vignette demonstrates the use of `expo()` and the associated methods by reproducing part of the analyses in @agresti:02[, Section 5.4.2] on the effects of AZT in slowing the development of AIDS symptoms.
+
+# AIDS and AZT use
+
+The data analyzed in @agresti:02[, Section 5.4.2] is from a 3-year
+study on the effects of AZT in slowing the development of AIDS
+symptoms. 338 veterans whose immune systems were beginning to falter
+after infection with the AIDS virus were randomly assigned either to
+receive AZT immediately or to wait until their T cells showed severe
+immune weakness. See `?aids` for more details. 
+
+The `aids` data set cross-classifies the veterans' race (`race`), whether they received AZT immediately (`AZT`), and whether they developed AIDS symptoms during the 3-year study (`symptomatic` and `asymptomatic`).
+```{r, echo = TRUE}
+library("brglm2")
+data("aids", package = "brglm2")
+aids
+```
+
+We now use a logistic regression model to model the probability of developing symptoms in terms of `AZT` and `race`, and reproduce part of the compute output in @agresti:02[, Table 5.6].
+```{r, echo = TRUE}
+aids_mod <- glm(cbind(symptomatic, asymptomatic) ~ AZT + race, 
+                  family = binomial(), data = aids)
+summary(aids_mod)
+```
+
+The Wald test for the hypothesis of conditional independence of AZT treatment and development of AIDS symptoms, controlling for race, returns a p-value of `r round(coef(summary(aids_mod))["AZTYes", "Pr(>|z|)"], 3)`, showing evidence of association.
+
+The predicted probabilities for each combination of levels
+
+
+The maximum likelihood estimates of the odds ratio between immediate AZT use and development of AIDS symptoms can be inferred from `aids_mod` through the `expo()` method, which also estimates standard errors using the delta method, and returns approximate 95% confidence intervals (see `?expo` for details).
+```{r, echo = TRUE}
+expo(aids_mod, type = "ML")
+```
+
+As noted in @agresti:02[, Section 5.4.2], for each race, the estimated
+odds of symptoms are half as high for those who took AZT immediately,
+with value $0.49$ and a nominally 95\% Wald confidence interval
+$(0.28, 0.84)$.
+
+The `expo()` method can be used to estimate the odds ratios using three methods that return estimates of the odds ratios with asymptotically smaller mean bias than the maximum likelihood estimator 
+```{r, echo = TRUE}
+expo(aids_mod, type = "correction*")
+expo(aids_mod, type = "Lylesetal2012")
+expo(aids_mod, type = "correction+")
+```
+and one method that returns estimates of the odds ratios with asymptotically smaller median bias than the maximum likelihood estimator 
+```{r, echo = TRUE}
+expo(aids_mod, type = "AS_median")
+```
+
+The estimated odds ratios and associated inferences from the methods that correct for mean and median bias are similar to those from maximum likelihood.
+
+# Infinite odds ratio estimates 
+
+When `expo()` is called with `type = correction*`, `type = correction+`, `type = Lylesetal2012`, and `type = AS_median`, then the estimates of the odds ratios can be shown to be always finite and greater than zero. The reason is that the corresponding odds-ratio estimators depend on regression parameter estimates that are finite even if the maximum likelihood estimates are infinite. See, @kosmidis:2019 and @kosmidis+firth:21 for details. 
+
+As an example, consider the estimated odds ratios from a logistic regression model fitted on the `endometrial` data set using maximum likelihood. 
+```{r, echo = TRUE}
+data("endometrial", package = "brglm2")
+endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial, family = binomial())
+endometrialML
+```
+
+The estimate of the coefficient for `NV` is in reality infinite as it can be verified using the [**detectseparation**](https://cran.r-project.org/package=detectseparation) R package
+```{r, echo = TRUE}
+library("detectseparation")
+update(endometrialML, method = detect_separation)
+```
+and a naive estimate of the associated odds ratio while controlling for `PI` and `EH` is `r exp(coef(endometrialML)["NV"])`, which is in reality infinite.
+
+In contrast, `expo()` returns finite reduced-mean-bias estimates of the odds ratios 
+```{r, echo = TRUE}
+expo(endometrialML, type = "correction*")
+expo(endometrialML, type = "correction+")
+expo(endometrialML, type = "Lylesetal2012")
+```
+
+# `brglmFit` objects
+
+The `expo()` method also works seamlessly with `brglmFit` objects, returning the same results as above. For example, 
+```{r, echo = TRUE}
+aids_mod_br <- update(aids_mod, method = "brglmFit")
+expo(aids_mod_br, type = "correction*")
+```
+
+
+# References

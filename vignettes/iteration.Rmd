@@ -1,6 +1,6 @@
 ---
 title: "Bias reduction in generalized linear models"
-author: "[Ioannis Kosmidis](https://www.ikosmidis.com), [Euloge Clovis Kenne Pagui](http://homes.stat.unipd.it/eulogecloviskennepagui/en/content/home)"
+author: "[Ioannis Kosmidis](https://www.ikosmidis.com), Euloge Clovis Kenne Pagui"
 date: "29 April 2017"
 output: rmarkdown::html_vignette
 bibliography: brglm2.bib

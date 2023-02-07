@@ -57,7 +57,7 @@ the factors appearing as variables in the model formula.
 
 \item{ref}{the reference category to use for multinomial
 regression. Either an integer, in which case
-levels(response)[ref] is used as a baseline, or a character
+\code{levels(response)[ref]} is used as a baseline, or a character
 string. Default is 1.}
 
 \item{model}{
@@ -69,23 +69,23 @@ string. Default is 1.}
 (default is \code{TRUE}).}
 
 \item{control}{a list of parameters for controlling the fitting
-process. See \code{\link{brglmControl}} for details.}
+process. See \code{\link[=brglmControl]{brglmControl()}} for details.}
 
-\item{...}{arguments to be used to form the default 'control'
+\item{...}{arguments to be used to form the default \code{control}
 argument if it is not supplied directly.}
 }
 \description{
-\code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
-multinomial regression models using implicit and explicit bias
-reduction methods. See Kosmidis & Firth (2011) for details.
+\code{\link[=brmultinom]{brmultinom()}} is a wrapper of \code{\link[=brglmFit]{brglmFit()}} that fits multinomial
+regression models using implicit and explicit bias reduction
+methods. See Kosmidis & Firth (2011) for details.
 }
 \details{
-The models \code{\link{brmultinom}} handles are also known as
+The models \code{\link[=brmultinom]{brmultinom()}} handles are also known as
 baseline-category logit models (see, Agresti, 2002, Section 7.1),
 because they model the log-odds of every category against a
 baseline category. The user can control which baseline (or
 reference) category is used via the \code{ref}. By default
-\code{\link{brmultinom}} uses the first category as reference.
+\code{\link[=brmultinom]{brmultinom()}} uses the first category as reference.
 
 The maximum likelihood estimates for the parameters of
 baseline-category logit models have infinite components with
@@ -97,35 +97,35 @@ categories of complete separation, quasi-complete separation and
 overlap, and showed that infinite maximum likelihood estimates
 result when complete or quasi-complete separation occurs.
 
-The adjusted score approaches to bias reduction that
-\code{\link{brmultinom}} implements for \code{type = "AS_mean"} and
-\code{type = "AS_median"} are alternatives to maximum likelihood
-that result in estimates with smaller asymptotic mean and median
-bias, respectively, that are also *always* finite, even in cases of
-complete or quasi-complete separation.
+The adjusted score approaches to bias reduction that \code{\link[=brmultinom]{brmultinom()}}
+implements for \code{type = "AS_mean"} and \code{type = "AS_median"} are
+alternatives to maximum likelihood that result in estimates with
+smaller asymptotic mean and median bias, respectively, that are
+also \emph{always} finite, even in cases of complete or quasi-complete
+separation.
 
-\code{brmultinom} is a wrapper of \code{\link{brglmFit}} that fits
-multinomial logit regression models through the 'Poisson trick' (see, for
+\code{\link[=brmultinom]{brmultinom()}} is a wrapper of \code{\link[=brglmFit]{brglmFit()}} that fits multinomial
+logit regression models through the 'Poisson trick' (see, for
 example, Palmgren, 1981; Kosmidis & Firth, 2011).
 
-The implementation relies on the construction of an 'extended'
-model matrix for the log-linear model and constraints on the sums
-of the Poisson means. Specifically, a log-linear model is fitted on
-a Kronecker product
-(\url{https://en.wikipedia.org/wiki/Kronecker_product}) of the
+The implementation relies on the construction of an extended model
+matrix for the log-linear model and constraints on the sums of the
+Poisson means. Specifically, a log-linear model is fitted on a
+\href{https://en.wikipedia.org/wiki/Kronecker_product}{Kronecker product} of the
 original model matrix \code{X} implied by the formula, augmented by
 \code{nrow(X)} dummy variables.
 
-The extended model matrix is sparse, and the \pkg{Matrix} package
-is used for its effective storage.
+The extended model matrix is sparse, and the
+\href{https://cran.r-project.org/package=Matrix}{\pkg{Matrix}} package is
+used for its effective storage.
 
-While \code{\link{brmultinom}} can be used for analyses using
-multinomial regression models, the current implementation is more
-of a 'proof of concept' and is not expected to scale well with
-either of \code{nrow(X)}, \code{ncol(X)} or the number of levels in
-the categorical response.
+While \code{\link[=brmultinom]{brmultinom()}} can be used for analyses using multinomial
+regression models, the current implementation is more of a proof of
+concept and is not expected to scale well with either of \code{nrow(X)},
+\code{ncol(X)} or the number of levels in the categorical response.
 }
 \examples{
+## The housing data analysis from ?MASS::housing
 
 data("housing", package = "MASS")
 
@@ -153,28 +153,28 @@ houseBC3 <- update(houseML3, type = "correction")
 }
 \references{
 Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
-reduction in generalized linear models. *Statistics and Computing*,
-**30**, 43-59 \doi{10.1007/s11222-019-09860-6}
+reduction in generalized linear models. \emph{Statistics and Computing},
+\strong{30}, 43-59. \doi{10.1007/s11222-019-09860-6}.
 
-Agresti A (2002). *Categorical data analysis* (2nd edition). Wiley
+Agresti A (2002). \emph{Categorical data analysis} (2nd edition). Wiley
 Series in Probability and Statistics. Wiley.
 
 Albert A, Anderson J A (1984). On the Existence of Maximum
-Likelihood Estimates in Logistic Regression Models. *Biometrika*,
-**71** 1--10, \doi{10.2307/2336390}
+Likelihood Estimates in Logistic Regression Models. \emph{Biometrika},
+\strong{71} 1--10. \doi{10.2307/2336390}.
 
 Kosmidis I, Firth D (2011). Multinomial logit bias reduction
-via the Poisson log-linear model. *Biometrika*, **98**, 755-759
-\doi{10.1093/biomet/asr026}
+via the Poisson log-linear model. \emph{Biometrika}, \strong{98}, 755-759.
+\doi{10.1093/biomet/asr026}.
 
 Palmgren, J (1981). The Fisher Information Matrix for Log Linear
 Models Arguing Conditionally on Observed Explanatory
-Variables. *Biometrika*, **68**, 563-566
-\doi{10.1093/biomet/68.2.563}
+Variables. \emph{Biometrika}, \strong{68}, 563-566.
+\doi{10.1093/biomet/68.2.563}.
 }
 \seealso{
-\code{\link[nnet]{multinom}}, \code{\link{bracl}} for adjacent category logit models for ordinal responses
+\code{\link[nnet:multinom]{nnet::multinom()}}, \code{\link[=bracl]{bracl()}} for adjacent category logit models for ordinal responses
 }
 \author{
-Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
 }

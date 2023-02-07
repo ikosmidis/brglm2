@@ -6,26 +6,22 @@
 \title{Histology grade and risk factors for 79 cases of endometrial cancer}
 \format{
 A data frame with 79 rows and 4 variables:
-\describe{
-
-\item{NV}{neovasculization with coding 0 for absent and 1 for present}
-
-\item{PI}{pulsality index of arteria uterina}
-
-\item{EH}{endometrium height}
-
-\item{HG}{histology grade with coding 0 for low grade and 1 for high grade}
-
+\itemize{
+\item \code{NV}: neovasculization with coding 0 for absent and 1 for present
+\item \code{PI}: pulsality index of arteria uterina
+\item \code{EH}: endometrium height
+\item \code{HG} histology grade with coding 0 for low grade and 1 for high grade
 }
 }
 \source{
-The packaged data set was downloaded in \code{.dat} format
-    from \url{http://www.stat.ufl.edu/~aa/glm/data}. The latter
-    link provides the data sets used in Agresti (2015).
+The packaged data set was downloaded in \code{.dat} format from
+\url{https://users.stat.ufl.edu/~aa/glm/data/}. The latter link
+provides the data sets used in Agresti (2015).
 
-    The endometrial data set was first analyzed in Heinze and
-    Schemper (2002), and was originally provided by Dr
-    E. Asseryanis from the Medical University of Vienna.
+\if{html}{\out{<div class="sourceCode">}}\preformatted{The endometrial data set was first analyzed in Heinze and
+Schemper (2002), and was originally provided by Dr
+E. Asseryanis from the Medical University of Vienna.
+}\if{html}{\out{</div>}}
 }
 \usage{
 endometrial
@@ -34,18 +30,18 @@ endometrial
 Histology grade and risk factors for 79 cases of endometrial cancer
 }
 \references{
-Agresti A (2015). *Foundations of Linear and Generalized Linear
-Models*.  Wiley Series in Probability and Statistics. Wiley
+Agresti A (2015). \emph{Foundations of Linear and Generalized Linear
+Models}.  Wiley Series in Probability and Statistics. Wiley.
 
 Heinze G, Schemper M (2002). A Solution to the Problem of
-Separation in Logistic Regression. *Statistics in Medicine*,
-**21**, 2409–2419 \doi{10.1002/sim.1047}
+Separation in Logistic Regression. \emph{Statistics in Medicine},
+\strong{21}, 2409–2419. \doi{10.1002/sim.1047}.
 
 Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 and shrinkage in binomial-response generalized linear
-models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
+models. \emph{Biometrika}, \strong{108}, 71-82. \doi{10.1093/biomet/asaa052}.
 }
 \seealso{
-\code{\link{brglm_fit}}
+\code{\link[=brglm_fit]{brglm_fit()}}
 }
 \keyword{datasets}

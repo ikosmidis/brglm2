@@ -3,7 +3,7 @@
 \name{confint.brnb}
 \alias{confint.brnb}
 \title{Method for computing Wald confidence intervals for one or more
-regression parameters in a \code{\link{brnb}} object}
+regression parameters in a \code{\link[=brnb]{"brnb"}} object}
 \usage{
 \method{confint}{brnb}(object, parm, level = 0.95, ...)
 }
@@ -20,5 +20,5 @@ regression parameters in a \code{\link{brnb}} object}
 }
 \description{
 Method for computing Wald confidence intervals for one or more
-regression parameters in a \code{\link{brnb}} object
+regression parameters in a \code{\link[=brnb]{"brnb"}} object
 }

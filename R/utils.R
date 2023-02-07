@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2021 Ioannis Kosmidis
+# Copyright (C) 2016- Ioannis Kosmidis
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 unless_null <- function(x, if_null) {
     if (is.null(x)) {
         if_null
-    }
-    else {
+    } else {
         x
     }
 }
@@ -34,6 +33,9 @@ get_type_description <- function(type, parenthesized = TRUE) {
            "AS_mean" = pp("mean bias-reducing adjusted score equations"),
            "AS_median" = pp("median bias-reducing adjusted score equations"),
            "AS_mixed" = pp("mixed bias-reducing adjusted score equations"),
-           "MPL_Jeffreys" = pp("maximum penalized likelihood with Jeffreys'-prior penalty")
+           "MPL_Jeffreys" = pp("maximum penalized likelihood with Jeffreys'-prior penalty"),
+           "Lylesetal2012" = pp("Lyles et al., 2012; doi: 10.1016/j.jspi.2012.05.005"),
+           "correction*" = pp("explicit mean bias correction with a multiplicative adjustment"),
+           "correction+" = pp("explicit mean bias correction with an additive adjustment")
            )
 }

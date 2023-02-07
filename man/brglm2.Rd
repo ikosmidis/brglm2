@@ -23,65 +23,60 @@ and median bias reduction and maximum penalized likelihood return
 estimates with improved frequentist properties, that are also
 always finite, even in cases where the maximum likelihood estimates
 are infinite (e.g. complete and quasi-complete separation in
-multinomial regression; see also \code{\link{detect_separation}}
-and \code{\link{check_infinite_estimates}} for pre-fit and post-fit
-methods for the detection of infinite estimates in binomial
-response generalized linear models). Estimation in all cases takes
-place via a modified Fisher scoring algorithm, and S3 methods for
-the construction of confidence intervals for the reduced-bias
-estimates are provided.
+multinomial regression). Estimation in all cases takes place via a
+modified Fisher scoring algorithm, and S3 methods for the
+construction of confidence intervals for the reduced-bias estimates
+are provided.
 
 The core model fitters are implemented by the functions
-\code{\link{brglm_fit}} (univariate generalized linear models),
-\code{\link{brmultinom}} (baseline category logit models for
-nominal multinomial responses), and \code{\link{bracl}} (adjacent
-category logit models for ordinal multinomial responses).
+\code{\link[=brglm_fit]{brglm_fit()}} (univariate generalized linear models),
+\code{\link[=brmultinom]{brmultinom()}} (baseline category logit models for nominal
+multinomial responses), \code{\link[=bracl]{bracl()}} (adjacent category logit models
+for ordinal multinomial responses), and \code{\link[=brnb]{brnb()}} for negative
+binomial regression.
 
-
-
-
-The similarly named **brglm** R package can only handle generalized
+The similarly named \strong{brglm} R package can only handle generalized
 linear models with binomial responses. Special care has been taken
-when developing **brglm2** in order not to have conflicts when the
-user loads **brglm2** and **brglm** simultaneously. The development
+when developing \strong{brglm2} in order not to have conflicts when the
+user loads \strong{brglm2} and \strong{brglm} simultaneously. The development
 and maintenance of the two packages will continue in parallel,
-until **brglm2** incorporates all **brglm** functionality and gets
-an appropriate wrapper to the \code{brglm::brglm} function.
+until \strong{brglm2} incorporates all \strong{brglm} functionality and
+provides an appropriate wrapper to the \code{\link[brglm:brglm]{brglm::brglm()}} function.
 }
 \references{
 Kosmidis I, Firth D (2021). Jeffreys-prior penalty, finiteness
 and shrinkage in binomial-response generalized linear
-models. *Biometrika*, **108**, 71-82 \doi{10.1093/biomet/asaa052}
+models. \emph{Biometrika}, \strong{108}, 71-82. \doi{10.1093/biomet/asaa052}.
 
 Cordeiro G M, McCullagh P (1991). Bias correction in generalized
-linear models. *Journal of the Royal Statistical Society. Series B
-(Methodological)*, **53**, 629-643 \doi{10.1111/j.2517-6161.1991.tb01852.x}
+linear models. \emph{Journal of the Royal Statistical Society. Series B
+(Methodological)}, \strong{53}, 629-643. \doi{10.1111/j.2517-6161.1991.tb01852.x}.
 
 Firth D (1993). Bias reduction of maximum likelihood estimates,
-Biometrika, **80**, 27-38 \doi{10.2307/2336755}
+Biometrika, \strong{80}, 27-38. \doi{10.2307/2336755}.
 
 Kenne Pagui E C, Salvan A, Sartori N (2017). Median bias
-reduction of maximum likelihood estimates. *Biometrika*, **104**,
-923–938 \doi{10.1093/biomet/asx046}
+reduction of maximum likelihood estimates. \emph{Biometrika}, \strong{104},
+923–938. \doi{10.1093/biomet/asx046}.
 
 Kosmidis I, Kenne Pagui E C, Sartori N (2020). Mean and median bias
-reduction in generalized linear models. *Statistics and Computing*,
-**30**, 43-59 \doi{10.1007/s11222-019-09860-6}
+reduction in generalized linear models. \emph{Statistics and Computing},
+\strong{30}, 43-59. \doi{10.1007/s11222-019-09860-6}.
 
 Kosmidis I, Firth D (2009). Bias reduction in exponential family
-nonlinear models. *Biometrika*, **96**, 793-804 \doi{10.1093/biomet/asp055}
+nonlinear models. \emph{Biometrika}, \strong{96}, 793-804. \doi{10.1093/biomet/asp055}.
 
 Kosmidis I, Firth D (2010). A generic algorithm for reducing
-bias in parametric estimation. *Electronic Journal of Statistics*,
-**4**, 1097-1112 \doi{10.1214/10-EJS579}
+bias in parametric estimation. \emph{Electronic Journal of Statistics},
+\strong{4}, 1097-1112. \doi{10.1214/10-EJS579}.
 
 Kosmidis I (2014). Bias in parametric estimation: reduction and
-useful side-effects. *WIRE Computational Statistics*, **6**,
-185-196 \doi{10.1002/wics.1296}
+useful side-effects. \emph{WIRE Computational Statistics}, \strong{6},
+185-196. \doi{10.1002/wics.1296}.
 }
 \seealso{
-\code{\link{brglm_fit}}, \code{\link{brmultinom}}, \code{\link{bracl}}
+\code{\link[=brglm_fit]{brglm_fit()}}, \code{\link[=brmultinom]{brmultinom()}}, \code{\link[=bracl]{bracl()}}
 }
 \author{
-Ioannis Kosmidis \email{ioannis.kosmidis@warwick.ac.uk}
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
 }

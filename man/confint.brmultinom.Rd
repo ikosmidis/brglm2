@@ -3,7 +3,7 @@
 \name{confint.brmultinom}
 \alias{confint.brmultinom}
 \title{Method for computing confidence intervals for one or more
-regression parameters in a \code{\link{brmultinom}} object}
+regression parameters in a \code{\link[=brmultinom]{"brmultinom"}} object}
 \usage{
 \method{confint}{brmultinom}(object, parm, level = 0.95, ...)
 }
@@ -20,5 +20,5 @@ regression parameters in a \code{\link{brmultinom}} object}
 }
 \description{
 Method for computing confidence intervals for one or more
-regression parameters in a \code{\link{brmultinom}} object
+regression parameters in a \code{\link[=brmultinom]{"brmultinom"}} object
 }

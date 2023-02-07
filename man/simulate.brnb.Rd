@@ -11,14 +11,15 @@
 
 \item{nsim}{number of response vectors to simulate. Defaults to 1.}
 
-\item{seed}{an object specifying if and how the random
-number generator should be initialized (``seeded'').}
+\item{seed}{an object specifying if and how the random number
+generator should be initialized; see \code{\link[=set.seed]{set.seed()}} for details.}
 
-\item{...}{extra arguments to be passed to methods. Not currently used.}
+\item{...}{extra arguments to be passed to methods. Not currently
+used.}
 }
 \description{
-Simulate one or more responses from the distribution
-corresponding to a fitted model \code{brnb} object.
+Simulate one or more responses from the distribution corresponding
+to a fitted model \code{\link[=brnb]{"brnb"}} object.
 }
 \examples{
 # Example in Saha, K., & Paul, S. (2005). Bias-corrected maximum
