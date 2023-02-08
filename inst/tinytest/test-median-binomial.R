@@ -9,7 +9,6 @@ tol <- 1e-10
 mbrglmControl <- mbrglm.control(mbr.epsilon = 1e-10, mbr.maxit = 1000)
 
 for (l in seq_along(links)) {
-
     ## Lizards
     lizardsFormula <- cbind(grahami, opalinus) ~ height + diameter + light + time
     lizardsMBRlegacy <- mbrglm(lizardsFormula, family = binomial(links[[l]]), data = lizards,
