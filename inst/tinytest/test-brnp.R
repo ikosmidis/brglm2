@@ -1,3 +1,5 @@
+library("MASS")
+
 salmonella <- data.frame(freq = c(15, 16, 16, 27, 33, 20,
                                   21, 18, 26, 41, 38, 27,
                                   29, 21, 33, 60, 41, 42),
@@ -7,7 +9,7 @@ salmonella <- data.frame(freq = c(15, 16, 16, 27, 33, 20,
 
 salmonella_fm <- freq ~ dose + log(dose+10)
 
-fitML_glmnb <- MASS::glm.nb(salmonella_fm, data = salmonella)
+fitML_glmnb <- glm.nb(salmonella_fm, data = salmonella)
 fitML <- brnb(salmonella_fm, data = salmonella, link = "log", transformation = "identity", type = "ML")
 fitBR_mean <- update(fitML, type = "AS_mean")
 fitBR_median <- update(fitML, type = "AS_median")

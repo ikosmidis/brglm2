@@ -1,4 +1,5 @@
 library("numDeriv")
+library("brglm")
 
 ## A Gamma example, from McCullagh & Nelder (1989, pp. 300-2)
 clotting <- data.frame(
@@ -43,9 +44,9 @@ links <- lapply(c("logit", "probit", "cloglog", "cauchit"), make.link)
 tol <- 1e-10
 for (l in seq_along(links)) {
     expect_warning(
-        lizardsBRlegacy <- brglm::brglm(cbind(grahami, opalinus) ~ height + diameter +
-                                            light + time, family = binomial(links[[l]]), data=lizards,
-                                        method = "brglm.fit", br.epsilon = 1e-10, br.maxit = 1000, pl = TRUE)
+        lizardsBRlegacy <- brglm(cbind(grahami, opalinus) ~ height + diameter +
+                                     light + time, family = binomial(links[[l]]), data=lizards,
+                                 method = "brglm.fit", br.epsilon = 1e-10, br.maxit = 1000, pl = TRUE)
     )
 
     expect_warning(

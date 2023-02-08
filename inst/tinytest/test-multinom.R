@@ -35,7 +35,7 @@ expect_equal(coef(hepbr), t(drop(coef(heppmlr))), tolerance = tol)
 
 ##############
 expect_warning(
-    hepbr_mat <- brmultinom(counts*nnet::class.ind(type) ~ group * time,
+    hepbr_mat <- brmultinom(counts * nnet::class.ind(type) ~ group * time,
                             data = hepat)
 )
 
@@ -69,7 +69,7 @@ enzymes$counts <- rep(1, nrow(enzymes))
 expect_warning(
     enzbrmultinom_ml <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes, type = "ML")
 )
-enzmultinom <- nnet::multinom(Group ~ AST + GLDH, weights = counts, data = enzymes, trace = FALSE)
+enzmultinom <- multinom(Group ~ AST + GLDH, weights = counts, data = enzymes, trace = FALSE)
 
 
 

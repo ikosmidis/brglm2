@@ -1,17 +1,18 @@
-data("lizards", package = "brglm2")
+library("mbrglm")
 
+data("lizards", package = "brglm2")
 data("endometrial",package = "brglm2")
 
 links <- lapply(c("logit", "probit", "cloglog", "cauchit"), make.link)
 
 tol <- 1e-10
-mbrglmControl <- mbrglm::mbrglm.control(mbr.epsilon = 1e-10, mbr.maxit = 1000)
+mbrglmControl <- mbrglm.control(mbr.epsilon = 1e-10, mbr.maxit = 1000)
 
 for (l in seq_along(links)) {
 
     ## Lizards
     lizardsFormula <- cbind(grahami, opalinus) ~ height + diameter + light + time
-    lizardsMBRlegacy <- mbrglm::mbrglm(lizardsFormula, family = binomial(links[[l]]), data = lizards,
+    lizardsMBRlegacy <- mbrglm(lizardsFormula, family = binomial(links[[l]]), data = lizards,
                                        method = "mbrglm.fit",
                                        control.mbrglm = mbrglmControl)
     expect_warning(lizardsMBR <- glm(lizardsFormula, family = binomial(links[[l]]), data = lizards,
@@ -20,7 +21,7 @@ for (l in seq_along(links)) {
     ## Endometrial
     endoFormula <- HG ~ NV + PI + EH
     expect_warning({
-        endoMBRlegacy <- mbrglm::mbrglm(endoFormula, family = binomial(links[[l]]), data = endometrial,
+        endoMBRlegacy <- mbrglm(endoFormula, family = binomial(links[[l]]), data = endometrial,
                                         method = "mbrglm.fit",
                                         control.mbrglm = mbrglmControl)
         endoMBR <- glm(endoFormula, family = binomial(links[[l]]), data = endometrial,

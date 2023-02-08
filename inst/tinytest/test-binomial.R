@@ -1,14 +1,14 @@
+library("brglm")
 data("lizards", package = "brglm2")
-
 links <- lapply(c("logit", "probit", "cloglog", "cauchit"), make.link)
-
 
 tol <- 1e-10
 for (l in seq_along(links)) {
     expect_warning(
-        lizardsBRlegacy <- brglm::brglm(cbind(grahami, opalinus) ~ height + diameter +
-                                            light + time, family = binomial(links[[l]]), data=lizards,
-                                        method = "brglm.fit", br.epsilon = 1e-10, br.maxit = 1000)
+        lizardsBRlegacy <- brglm(cbind(grahami, opalinus) ~ height + diameter +
+                                     light + time, family = binomial(links[[l]]),
+                                 data = lizards, method = "brglm.fit",
+                                 br.epsilon = 1e-10, br.maxit = 1000)
     )
 
     expect_warning(
@@ -19,6 +19,7 @@ for (l in seq_along(links)) {
     ## glm with brglm.fit method and brglm_0 return the same coefficients for the lizards when link is links[[l]]$name)
     expect_equal(coef(lizardsBR), coef(lizardsBRlegacy), tolerance = tol)
 }
+
 
 ## Performance comparisons BR versus ML
 ## link1 <- "cauchit"

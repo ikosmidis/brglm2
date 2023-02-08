@@ -23,14 +23,11 @@ expect_equal(b_control$transformation, "identity")
 expect_equal(b_control$slowit, 1)
 expect_equal(b_control$max_step_factor, 12)
 
-data("sex2", package = "logistf")
-
-## brglmControl arguments can be passed directly from the brglmFit call
-expect_warning(glm(case ~ dia, data = sex2, family = binomial(), method = brglm_fit))
-## Set response_adjustment to 2 just to avoid non-integer successes warning
-m1 <- glm(case ~ dia, data = sex2, family = binomial(), method = brglm_fit, response_adjustment = 2)
-expect_equal(m1$iter, 7, tolerance = .Machine$double.eps/2)
-
+data("coalition", package = "brglm2")
+mod <- glm(duration ~ fract + numst2, family = Gamma, data = coalition, method = "brglmFit")
+expect_warning(mod <- update(mod, maxit = 7, transformation = "sqrt"), "brglmFit: algorithm did not converge")
+expect_equal(mod$iter, 7)
+expect_equal(mod$transformation, "sqrt")
 
 b_control <- brglmControl(epsilon = 1e-02, ABCDEFG123 = 1, response_adjustment = c(0.3, 0.2), trace = TRUE, )
 ## the object brglmControl returns with defaults is as expected
@@ -61,3 +58,9 @@ expect_true(is.na(coef(mod)["I(2 * log(u))"]))
 mod <- glm(clot_formula, data = clotting, family = Gamma(), method = brglm_fit)
 expect_true(is.na(coef(mod)["I(2 * log(u))"]))
 
+## data("sex2", package = "logistf")
+## ## brglmControl arguments can be passed directly from the brglmFit call
+## expect_warning(glm(case ~ dia, data = sex2, family = binomial(), method = brglm_fit))
+## ## Set response_adjustment to 2 just to avoid non-integer successes warning
+## m1 <- glm(case ~ dia, data = sex2, family = binomial(), method = brglm_fit, response_adjustment = 2)
+## expect_equal(m1$iter, 7, tolerance = .Machine$double.eps/2)

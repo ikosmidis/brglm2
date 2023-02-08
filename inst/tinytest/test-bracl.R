@@ -1,3 +1,5 @@
+library("VGAM")
+
 ### tests for bracl and its agreement with other methods
 
 ## Stem cell research data from Agresti (2017, Analysis of ordinal data, Table 4.1)
@@ -19,9 +21,7 @@ ff <- matrix(freq, nrow = 4, byrow = TRUE)
 re <- c(1, 2, 3, 1, 2, 3)
 ge <- c(1, 1, 1, 0, 0, 0)
 
-library("VGAM")
 ## With proportional odds
-
 expect_warning(
     fit_vgam_p <- vglm(cbind(ff[1, ], ff[2, ], ff[3, ], ff[4, ]) ~ re + ge, family = acat(reverse = TRUE, parallel = TRUE))
 )
@@ -41,7 +41,6 @@ tol <- 1e-06
 ## "VGAM::vglm and bracl return the same coefficients
 expect_equal(unname(coef(fit_vgam)), unname(coef(fit_bracl)), tolerance = tol)
 expect_equal(unname(coef(fit_vgam_p)), unname(coef(fit_bracl_p)), tolerance = tol)
-
 
 ## Difference in deviance is the same with VGAM::vglm and bracl
 expect_equal(logLik(fit_vgam) - logLik(fit_vgam_p),
@@ -63,7 +62,6 @@ shu <- function(dat)  dat[sample(seq.int(nrow(dat)), nrow(dat)), ]
 
 ## bracl results is invariance to shuffling of the data
 for (j in 1:10) {
-
     expect_warning(
         fit_bracl_p_r <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = TRUE)
     )
@@ -88,8 +86,8 @@ s2p <- summary(fit_vgam_p)
 
 tol <- 1e-06
 ## summary method for bracl returns the correct coef mat
-expect_equal(coef(s1), VGAM::coef(s2), tolerance = tol, check.attributes = FALSE)
-expect_equal(coef(s1p), VGAM::coef(s2p), tolerance = tol, check.attributes = FALSE)
+expect_equal(coef(s1), coef(s2), tolerance = tol, check.attributes = FALSE)
+expect_equal(coef(s1p), coef(s2p), tolerance = tol, check.attributes = FALSE)
 
 newdata <- expand.grid(gender = c("male", "female"),  religion = c("moderate", "fundamentalist"))
 ## predict.bracl works as expected

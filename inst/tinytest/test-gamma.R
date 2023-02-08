@@ -1,3 +1,5 @@
+library("MASS")
+
 ## A Gamma example, from McCullagh & Nelder (1989, pp. 300-2)
 clotting <- data.frame(
     u = c(5,10,15,20,30,40,60,80,100, 5,10,15,20,30,40,60,80,100),
@@ -10,4 +12,4 @@ tol <- sqrt(.Machine$double.eps)
 expect_equal(update(mod, method = "brglmFit", epsilon = 1e-10)$dispersion_ML, MASS::gamma.dispersion(mod), tolerance = tol)
 
 ## ML estimate of gamma shape from brglmFit and from MASS::gamma.dispersion are the same
-expect_equal(1/update(mod, method = "brglmFit", epsilon = 1e-10, transformation = "inverse")$dispersion_ML, MASS::gamma.shape(mod)$alpha, tolerance = tol)
+expect_equal(1/update(mod, method = "brglmFit", epsilon = 1e-10, transformation = "inverse")$dispersion_ML, gamma.shape(mod)$alpha, tolerance = tol)
