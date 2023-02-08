@@ -86,7 +86,7 @@
 #'
 #' @note
 #'
-#' Data is as it was provided in the
+#' Data is as it is provided by the
 #' [\pkg{Zeilig}](https://cran.r-project.org/package=Zelig) R package.
 #'
 #' @seealso
@@ -197,3 +197,100 @@
 #' Probability and Statistics. Wiley.
 #'
 "stemcell"
+
+
+#' Post-transfusion hepatitis: impact of non-A, non-B hepatitis
+#' surrogate tests
+#'
+#' Data from a randomized double-blind trial to assess whether
+#' withholding donor blood positive for the non-A, non-B (`"NANB"`)
+#' surrogate markers would reduce the frequency of post-transfusion
+#' hepatitis.  The dataset contains `4588` subjects enrolled from 1988
+#' to 1992 into two study groups that received allogenic blood from
+#' which units positive for NANB surrogate markers were withheld (n =
+#' `2311`) or not withheld (n = `2277`).  Subjects were followed up
+#' for 6 months and assessed for the presence of post-transfusion
+#' hepatitis.
+#'
+#' @format A data frame with 28 rows and the following 6 columns:
+#'
+#' * `city`: Subjects were recruited from 3 Canadian Red Cross Society
+#' Blood Centres and 13 university-affiliated hospitals in 3 cities:
+#' Toronto, Hamilton and Winnipeg.
+#'
+#' * `group`: Eligible subjects were assigned to one of two allogenic
+#' blood recipient groups.  One group received products that had only
+#' routine Canadian transfusion-transmissible disease marker screening
+#' (no-withhold).  The other group received only products that were
+#' not positive for NANB surrogate markers (withhold).
+#'
+#' * `time`: Hepatitis C (HCV) screening was introduced in Canada in
+#' May, 1990.  Subjects were recruited into the study before (pre) and
+#' after (post) the introduction of anti-HCV testing.
+#'
+#' * `HCV`: Post-transfusion HCV hepatitis present (1) or absent (0).
+#'
+#' * `nonABC`: Post-transfusion non-A, non-B, non-C hepatitis present (1) or absent (0)
+#'
+#' * `counts`: Number of subjects
+#'
+#' @source
+#'
+#' Data is from Blajchman et al. (1995), also analyzed in Bull et
+#' al. (2002), and is also provided by the
+#' [\pkg{pmlr}](https://cran.r-project.org/package=pmlr) R package.
+#'
+#' @references
+#'
+#' Bull S B, Mak C, Greenwood C M T (2002). A modified score function
+#' estimator for multinomial logistic regression in small
+#' samples. *Computational Statistics & Data Analysis*, **39**,
+#' 57-74. \doi{10.1016/S0167-9473(01)00048-2}
+#'
+#' Blajchman M A, Bull S B and Feinman S V (1995). Post-transfusion
+#' hepatitis: impact of non-A, non-B hepatitis surrogate tests. *The
+#' Lancet*, **345**, 21--25. \doi{10.1016/S0140-6736(95)91153-7}
+#'
+"hepatitis"
+
+#' Liver Enzyme Data
+#'
+#' Liver enzyme data collected from 218 patients with liver disease
+#' (Plomteux, 1980). The laboratory profile consists of enzymatic
+#' activity measured for four liver enzymes: aspartate
+#' aminotransferase (`AST`), alanine aminotransferase (`ALT`),
+#' glutamate dehydrogenase (`GLDH`) and ornithine carbamyltransferase
+#' (`OCT`).
+#'
+#' @format A data frame with 218 rows and the following 6 columns:
+#'
+#' * `Patient`: Patient ID
+#'
+#' * `Group`: Four diagnostic groups were considered: acute viral
+#' hepatitis (1), persistent chronic hepatitis (2), aggressive chronic
+#' hepatitis (3) and post-necrotic cirrhosis (4).
+#'
+#' * `AST`: Aspartate aminotransferase (in U/L)
+#'
+#' * `ALT`: Alanine aminotransferase (in U/L)
+#'
+#' * `GLDH`: Glutamate dehydrogenase (in U/L)
+#'
+#' * `OCT`: Ornithine carbamyltransferase (in U/L)
+#'
+#' @source
+#'
+#' Data from Albert and Harris (1984, Chapter 5, Appendix I), and is
+#' also provided by the
+#' [\pkg{pmlr}](https://cran.r-project.org/package=pmlr) R package.
+#'
+#' @references
+#'
+#' Albert A, Harris E K (1984). *Multivariate Interpretation of
+#' Clinical Laboratory Data*. Dekker: New York.
+#'
+#' Plomteux G (1980). Multivariate analysis of an enzyme profile for
+#' the differential diagnosis of viral hepatitis. *Clinical
+#' Chemistry*, **26**, 1897-1899.
+#'
+"enzymes"

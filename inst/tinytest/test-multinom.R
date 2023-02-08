@@ -1,12 +1,7 @@
-## pmlr needs to be installed from the archive
-## install.packages("https://cran.r-project.org/src/contrib/Archive/pmlr/pmlr_1.0.tar.gz", repos = NULL)
-library("pmlr")
 library("nnet")
 
 #####################################################################
-## Analysis of the enzymes data set in ?pmlr
-#####################################################################
-data("hepatitis", package = "pmlr")
+data("hepatitis", package = "brglm2")
 ## Construct a variable with the multinomial categories according to
 ## the HCV and nonABC columns
 hepat <- hepatitis
@@ -14,11 +9,6 @@ hepat$type <- with(hepat, factor(1 - HCV * nonABC + HCV + 2 * nonABC))
 hepat$type <- factor(hepat$type, labels = c("noDisease", "C", "nonABC"))
 contrasts(hepat$type) <- contr.treatment(3, base = 1)
 
-
-##############
-heppmlr <- pmlr(type ~ group * time,
-                data = hepat, weights = counts, method = "wald",
-                penalized = TRUE)
 expect_warning(
     hepbr <- brmultinom(type ~ group * time,
                         data = hepat, weights = counts)
@@ -28,10 +18,9 @@ expect_warning(
 expect_warning(brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML"),
                pattern = "algorithm did not converge|failed to calculate score adjustment")
 
-
-tol <- 1e-05
-## brmultinom returns the same estimates as pmlr
-expect_equal(coef(hepbr), t(drop(coef(heppmlr))), tolerance = tol)
+## brmultinom returns the same estimates as in Table 3 of Bull et al (2002)
+bulletall2002table3 <- matrix(c(-2.43, -1.57, 1.96, -0.36, -0.38, 0.26), ncol = 2)
+expect_equal(coef(hepbr)[, -1], t(bulletall2002table3), tolerance = 1e-02, check.attributes = FALSE)
 
 ##############
 expect_warning(
@@ -39,13 +28,14 @@ expect_warning(
                             data = hepat)
 )
 
+tol <- 1e-05
 ## brmultinom returns the same estimates if counts are supplied as a matrix
 expect_equal(coef(hepbr), coef(hepbr_mat), tolerance = tol)
 
 #####################################################################
 ## Analysis of the enzymes data set in ?pmlr
 #####################################################################
-data("enzymes", package = "pmlr")
+data("enzymes", package = "brglm2")
 ## Exclude patients in Group 4 (post-necrotic cirrhosis)
 enzymes <- subset(enzymes, Group != 4)
 ## Center and scale covariates
@@ -60,8 +50,6 @@ enzymes <- data.frame(Patient = enzymes$Patient,
 ## Assign Group 2 (persistent chronic hepatitis) as baseline category
 enzymes$Group <- factor(enzymes$Group, levels=c("2","1","3"))
 enzymes$counts <- rep(1, nrow(enzymes))
-## enzpmlr <- pmlr(Group ~ AST + GLDH, weights = counts, data = enzymes, method = "wald")
-## enzbrmultinom <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes)
 ##
 ## this expect_warning here is preventive for the non-integer counts
 ## warnings that are generated internally but are not visible to the

@@ -21,7 +21,7 @@ Portugal, Spain, Sweden, and the United Kingdom) for the period
 in the sample data.
 }
 \note{
-Data is as it was provided in the
+Data is as it is provided by the
 \href{https://cran.r-project.org/package=Zelig}{\pkg{Zeilig}} R package.
 }
 \references{
