@@ -149,6 +149,27 @@ houseBR3 <- update(houseML3, type = "AS_mean")
 # Bias correction
 houseBC3 <- update(houseML3, type = "correction")
 
+## Reproducing Bull et al. (2002, Table 3)
+data("hepatitis", package = "brglm2")
+
+# Construct a variable with the multinomial categories according to
+# the HCV and nonABC columns
+hepat <- hepatitis
+hepat$type <- with(hepat, factor(1 - HCV * nonABC + HCV + 2 * nonABC))
+hepat$type <- factor(hepat$type, labels = c("noDisease", "C", "nonABC"))
+contrasts(hepat$type) <- contr.treatment(3, base = 1)
+
+# Maximum likelihood estimation fails to converge because some estimates are infinite
+hepML <- brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML")
+
+# Mean bias reduction returns finite estimates
+hep_meanBR <- brmultinom(type ~ group * time, data = hepat, weights = counts, type = "AS_mean")
+# The estimates in Bull et al. (2002, Table 3, DOI: 10.1016/S0167-9473(01)00048-2)
+coef(hep_meanBR)
+
+# Median bias reduction also returns finite estimates, which are a bit larger in absolute value
+hep_medianBR <- brmultinom(type ~ group * time, data = hepat, weights = counts, type = "AS_median")
+coef(hep_medianBR)
 
 }
 \references{

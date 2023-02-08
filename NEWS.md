@@ -1,3 +1,9 @@
+# brglm2 0.9.1
+
+## Other improvements, updates and additions
+
+* Added the `enzymes` and `hepatitis` data sets (from the [*pmlr*](https://cran.r-project.org/package=pmlr)) to support examples and tests.
+
 # brglm2 0.9.0
 
 ## New functionality

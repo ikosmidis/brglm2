@@ -18,7 +18,7 @@ expect_warning(
 expect_warning(brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML"),
                pattern = "algorithm did not converge|failed to calculate score adjustment")
 
-## brmultinom returns the same estimates as in Table 3 of Bull et al (2002)
+## brmultinom returns the same estimates as in Table 3 of Bull et al. (2002)
 bulletall2002table3 <- matrix(c(-2.43, -1.57, 1.96, -0.36, -0.38, 0.26), ncol = 2)
 expect_equal(coef(hepbr)[, -1], t(bulletall2002table3), tolerance = 1e-02, check.attributes = FALSE)
 
