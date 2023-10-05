@@ -1,8 +1,16 @@
-# brglm2 0.9.999
+# brglm2 0.9.2
+
+## Improvements, updates and additions
+
+* Convergence of the `brglm_fit` iterations is now determined if the L^Inf norm of the step size (rather than the L^1 as it was previously) of the quasi-Fisher scoring procedure is less than `epsilon` (see `?brglm_control` for the definition of `epsilon`). This is more natural as `epsilon` then determines directly the precision of the reported estimates and does not depend on their number.
+
+* `brglm_control()` now checks that the supplied value of `max_step_factor` is numeric and greater or equal to `1`. If not, then it is set to the default value of `12`.
+
+
 
 # brglm2 0.9.1
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 
 * Added the `enzymes` and `hepatitis` data sets (from the [*pmlr*](https://cran.r-project.org/package=pmlr)) to support examples and tests.
 
@@ -16,7 +24,7 @@
 
 * Fixed a bug where the dispersion in the resulting object would not be transformed even if `transformation != "identity"` when `type` is `ML` or `AS_median` or `AS_mixed`.
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 
 * Moved unit tests to [**tinytest**](https://cran.r-project.org/package=tinytest).
 
@@ -28,7 +36,7 @@
 
 # brglm2 0.8.2
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 
 * Housekeeping.
 * Removed lpSolveAPI from imports.
@@ -39,7 +47,7 @@
 
 * Fixed a bug when predicting from `bracl` objects with non-identifiable parameters.
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 
 * Work on output consistently from `print()` methods for `summary.XYZ`
   objects; estimator type is now printed and other fixes.
@@ -74,7 +82,7 @@
 * `brglmFit()` iteration returns last estimates that worked if
   iteration fails.
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 
 * Documentation and example updates.
 
@@ -94,7 +102,7 @@
   (`check_aliasing = FALSE`) rank deficiency checks (through a QR
   decomposition of the model matrix), saving some computational effort.
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * updated DOI links in documentation and some http -> https fixes.
 
 # brglm2 0.7.0
@@ -106,7 +114,7 @@
 ## New functionality
 * `confint` method for `brmulitnom` objects
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * Updated reference to [Kenne Pagui et al (2017)](https://doi.org/10.1093/biomet/asx046).q
 * Updated reference to [Kosmidis and Firth (2020)](https://doi.org/10.1093/biomet/asaa052).
 * Fixed issues with references.
@@ -114,7 +122,7 @@
 
 # brglm2 0.6.2
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * `vcov.brglmFit()` now uses `vcov.summary.glm()` and supports the
   `complete` argument for controlling whether the variance covariance
   matrix should include rows and columns for aliased parameters.
@@ -132,7 +140,7 @@
   `bracl` objects.
 * `detect_separation()` now handles one-column model matrices correctly.
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * Documentation improvements and typo fixes.
 
 # brglm2 0.6
@@ -142,7 +150,7 @@
   supported generalized linear models. See the help files of
   `brglmControl()` and `brglmFit()` for details.
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * Documentation updates and improvements.
 * Updated vignettes to include maximum penalized likelihood with
   powers of the Jeffreys prior as penalty.
@@ -158,14 +166,14 @@
   for more fine-tuning of the starting values when `brglmFit()` is
   called with `start = NULL`.
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * Documentation updates and improvements.
 * Added Kosmidis et al (2019) in the description file.
 * Added tests for `brglmControl()`.
 
 # brglm2 0.5.1
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * Fixed typos in vignettes and documentation.
 * Added ORCHID for Ioannis Kosmidis in DESCRIPTION.
 
@@ -193,7 +201,7 @@ Added `residuals()` methods for `brmultinom` and `bracl` objects
   misclassification in binomial response models (Neuhaus, 1999,
   Biometrika).
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * Improved `summary()` method for `brmultinom` objects.
 * Better starting values for null fits.
 * Added references to [arxiv:1804.04085](https://arxiv.org/abs/1804.04085) in
@@ -201,7 +209,7 @@ Added `residuals()` methods for `brmultinom` and `bracl` objects
 * Updated reference to [Kenne Pagui et al (2017)](https://doi.org/10.1093/biomet/asx046).
 
 # brglm2 0.1.8
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * Improved documentation examples.
 * Removed warning about observations with non-positive weights from brmultinom.
 * Updated email address for Ioannis Kosmidis in brglmFit.
@@ -214,7 +222,7 @@ Added `residuals()` methods for `brmultinom` and `bracl` objects
 
 # brglm2 0.1.7
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * Eliminated errors from markdown chunks in multinomial vignette.
 
 # brglm2 0.1.6
@@ -222,7 +230,7 @@ Added `residuals()` methods for `brmultinom` and `bracl` objects
 ## Bug fixes
 * Compatibility with new version of enrichwith.
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * New email for Ioannis Kosmidis.
 
 # brglm2 0.1.5
@@ -239,7 +247,7 @@ Added `residuals()` methods for `brmultinom` and `bracl` objects
   `detect_separation()` methods in line with the update of
   `glm.fit()`.
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * less strict tolerance in `brglm_control()`.
 * Updates to help files.
 * Fixed typos in iteration vignette.
@@ -265,7 +273,7 @@ Added `residuals()` methods for `brmultinom` and `bracl` objects
   `detectSeparationControl()`, `detect_separation_control()`,
   `checkInfiniteEstimates()`, `check_infinite_estimates()`).
 
-## Other improvements, updates and additions
+## Improvements, updates and additions
 * Minor enhancements in the codebase.
 * The inverse expected information matrix is computed internally using
   `cho2inv()`.
@@ -274,12 +282,8 @@ Added `residuals()` methods for `brmultinom` and `bracl` objects
 
 # brglm2 0.1.3
 
-## Bug fixes
-
-## New functionality
-
-## Other improvements, updates and additions
-* Fixed typo in f_{Y_i}(y) in iteration vignette (thanks to Eugene
+## Improvements, updates and additions
+* Fixed typo in $f_{Y_i}(y)$ in iteration vignette (thanks to Eugene
   Clovis Kenne Pagui for spotting),
 
 # brglm2 0.1.2

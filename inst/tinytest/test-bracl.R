@@ -85,8 +85,8 @@ s2p <- summary(fit_vgam_p)
 
 tol <- 1e-06
 ## summary method for bracl returns the correct coef mat
-expect_equal(coef(s1), coef(s2), tolerance = tol, check.attributes = FALSE)
-expect_equal(coef(s1p), coef(s2p), tolerance = tol, check.attributes = FALSE)
+expect_equal(coef(s1), s2@coef3, tolerance = tol, check.attributes = FALSE)
+expect_equal(coef(s1p), s2p@coef3, tolerance = tol, check.attributes = FALSE)
 
 newdata <- expand.grid(gender = c("male", "female"),  religion = c("moderate", "fundamentalist"))
 ## predict.bracl works as expected
@@ -94,10 +94,10 @@ pp <- predict(fit_bracl_p, newdata = stemcell, type = "probs")
 p <- predict(fit_bracl, newdata = stemcell, type = "probs")
 expect_equal(predict(fit_vgam_p, type = "response"),
              pp[19:24, ],
-             tolerance = 1e-08, check.attributes = FALSE)
+             tolerance = 1e-06, check.attributes = FALSE)
 expect_equal(predict(fit_vgam, type = "response"),
              p[19:24, ],
-             tolerance = 1e-08, check.attributes = FALSE)
+             tolerance = 1e-06, check.attributes = FALSE)
 
 ## no intercept returns warning
 expect_warning(

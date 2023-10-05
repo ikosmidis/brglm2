@@ -41,7 +41,7 @@ data("lizards", package = "brglm2")
 links <- lapply(c("logit", "probit", "cloglog", "cauchit"), make.link)
 
 
-tol <- 1e-10
+tol <- 1e-08
 for (l in seq_along(links)) {
     expect_warning(
         lizardsBRlegacy <- brglm(cbind(grahami, opalinus) ~ height + diameter +

@@ -3,6 +3,7 @@
 \docType{package}
 \name{brglm2}
 \alias{brglm2}
+\alias{brglm2-package}
 \title{brglm2: Bias Reduction in Generalized Linear Models}
 \description{
 Estimation and inference from generalized linear models using

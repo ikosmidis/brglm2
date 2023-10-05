@@ -201,6 +201,11 @@ brglmControl <- function(epsilon = 1e-06, maxit = 100,
     }
     if (!is.numeric(epsilon) || epsilon <= 0)
         stop("value of 'epsilon' must be > 0")
+
+    if (!is.numeric(max_step_factor) || max_step_factor < 1) {
+        warning("`max_step_factor = ", deparse(max_step_factor), "` is not a permissible value. Defaulting to 12")
+        max_step_factor <- 12
+    }
     list(epsilon = epsilon, maxit = maxit, trace = trace,
          check_aliasing = check_aliasing,
          response_adjustment = response_adjustment,

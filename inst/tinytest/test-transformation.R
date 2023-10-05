@@ -24,7 +24,7 @@ c_sqrt[5] <- c_sqrt[5]^2
 c_inverse <- coef(mod_inverse, model = "full")
 c_inverse[5] <- 1/c_inverse[5]
 
-tol <- sqrt(.Machine$double.eps)
+tol <- 1e-08
 ## ML estimate of gamma dispersion from brglmFit is invariant to trasnformation
 expect_equal(c_identity, c_log, tolerance = tol, check.attributes = FALSE)
 expect_equal(c_identity, c_sqrt, tolerance = tol, check.attributes = FALSE)
