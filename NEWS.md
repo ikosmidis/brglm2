@@ -6,6 +6,7 @@
 
 * `brglm_control()` now checks that the supplied value of `max_step_factor` is numeric and greater or equal to `1`. If not, then it is set to the default value of `12`.
 
+* Vignette updates
 
 
 # brglm2 0.9.1

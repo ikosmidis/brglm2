@@ -73,12 +73,12 @@ particular model and data combination.
 
 Let's scale the frequencies in `alligators` by 3 in order to get a sparser data set. The differences between maximum likelihood and mean and median bias reduction should be more apparent on the resulting data set. Here we have to "slow-down" the Fisher scoring iteration (by scaling the step-size), because otherwise the Fisher information matrix quickly gets numerically rank-deficient. The reason is data separation [@albert:84].
 ```{r, echo = TRUE, error = TRUE}
-all_ml_sparse <- update(all_ml, weights = round(freq/3), slowit = 0.2)
+all_ml_sparse <- update(all_ml, weights = round(freq/3), slowit = 0.1)
 summary(all_ml_sparse)
 ```
 Specifically, judging from the estimated standard errors, the estimates for `(Intercept)`, `lakeHancock`, `lakeOklawaha` and `lakeTrafford` for `Reptile` and `lakeHancock` for `Bird` seem to be infinite.
 
-To quickly check if that's indeed the case we can use the `check_infinite_estimates()` method of the [**detectseparation**][https://cran.r-project.org/package=detectseparation] R package.
+To quickly check if that's indeed the case we can use the `check_infinite_estimates()` method of the [**detectseparation**](https://cran.r-project.org/package=detectseparation) R package.
 ```{r, echo = TRUE}
 library("detectseparation")
 se_ratios <- check_infinite_estimates(all_ml_sparse)

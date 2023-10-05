@@ -992,6 +992,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         ## residuals and working_weights
 
         quantities <- key_quantities(c(betas, dispersion), y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE)
+
         qr.Wx <- quantities$qr_decomposition
 
         mus <- quantities$mus

@@ -7,7 +7,7 @@ bibliography: brglm2.bib
 nocite: |
   @kosmidis:2019
 vignette: >
-  %\VignetteIndexEntry{Adjacent category logit models using brglm2}
+  %\VignetteIndexEntry{Adjacent category logit models using **brglm2**}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

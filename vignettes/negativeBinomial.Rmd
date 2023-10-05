@@ -5,7 +5,7 @@ date: "12 June 2021"
 output: rmarkdown::html_vignette
 bibliography: brglm2.bib
 vignette: >
-  %\VignetteIndexEntry{Negative Binomial regression using **brglm2**}
+  %\VignetteIndexEntry{Negative binomial regression using **brglm2**}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
