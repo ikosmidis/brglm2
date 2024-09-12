@@ -5,7 +5,7 @@
 <!-- badges: start -->
 
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/brglm2)](https://cran.r-project.org/package=brglm2)
-[![R-CMD-check](https://github.com/ikosmidis/brglm2/workflows/R-CMD-check/badge.svg)](https://github.com/ikosmidis/brglm2/actions)
+[![R-CMD-check](https://github.com/ikosmidis/brglm2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ikosmidis/brglm2/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ikosmidis/brglm2?branch=master)
 [![Licence](https://img.shields.io/badge/licence-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
@@ -81,10 +81,6 @@ references).
     #> glm(formula = HG ~ NV + PI + EH, family = binomial("logit"), 
     #>     data = endometrial)
     #> 
-    #> Deviance Residuals: 
-    #>      Min        1Q    Median        3Q       Max  
-    #> -1.50137  -0.64108  -0.29432   0.00016   2.72777  
-    #> 
     #> Coefficients:
     #>               Estimate Std. Error z value Pr(>|z|)    
     #> (Intercept)    4.30452    1.63730   2.629 0.008563 ** 
@@ -109,6 +105,11 @@ R package
 
     # install.packages("detectseparation")
     library("detectseparation")
+    #> 
+    #> Attaching package: 'detectseparation'
+    #> The following objects are masked from 'package:brglm2':
+    #> 
+    #>     check_infinite_estimates, detect_separation
     update(modML, method = "detect_separation")
     #> Implementation: ROI | Solver: lpsolve 
     #> Separation: TRUE 
@@ -149,7 +150,7 @@ mean bias reduction.
     #>             Estimate Std. Error z value Pr(>|z|)    
     #> (Intercept)  3.77456    1.48869   2.535 0.011229 *  
     #> NV           2.92927    1.55076   1.889 0.058902 .  
-    #> PI          -0.03475    0.03958  -0.878 0.379914    
+    #> PI          -0.03475    0.03958  -0.878 0.379915    
     #> EH          -2.60416    0.77602  -3.356 0.000791 ***
     #> ---
     #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -194,9 +195,10 @@ reduction (see `?expo` for details) we do
     #> Call:
     #> expo.glm(object = modML, type = "correction*")
     #> 
+    #> Odds ratios 
     #>              Estimate Std. Error     2.5 %  97.5 %
-    #> (Intercept) 20.671826  33.136511  0.893142 478.451
-    #> NV           8.496974   7.825240  1.397511  51.662
+    #> (Intercept) 20.671820  33.136501  0.893141 478.451
+    #> NV           8.496974   7.825239  1.397511  51.662
     #> PI           0.965089   0.036795  0.895602   1.040
     #> EH           0.056848   0.056344  0.008148   0.397
     #> 
@@ -211,8 +213,8 @@ present. An approximate 95% interval for the latter odds ratio is (1.4,
 51.7) providing evidence of association between `NV` and `HG` while
 controlling for `PI` and `EH`. Note here that, the maximum likelihood
 estimate of the odds ratio is not as useful as the `correction*`
-estimate, because it is  + ∞ with an infinite standard error (see
-previous section).
+estimate, because it is +∞ with an infinite standard error (see previous
+section).
 
 ## Solving adjusted score equations using quasi-Fisher scoring
 
