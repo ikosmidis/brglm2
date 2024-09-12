@@ -4,7 +4,7 @@
 
 <!-- badges: start -->
 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/brglm2)](https://cran.r-project.org/package=brglm2)
+[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/brglm2)](https://cran.r-project.org/package=brglm2)
 [![R-CMD-check](https://github.com/ikosmidis/brglm2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ikosmidis/brglm2/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ikosmidis/brglm2?branch=master)
@@ -105,11 +105,6 @@ R package
 
     # install.packages("detectseparation")
     library("detectseparation")
-    #> 
-    #> Attaching package: 'detectseparation'
-    #> The following objects are masked from 'package:brglm2':
-    #> 
-    #>     check_infinite_estimates, detect_separation
     update(modML, method = "detect_separation")
     #> Implementation: ROI | Solver: lpsolve 
     #> Separation: TRUE 
