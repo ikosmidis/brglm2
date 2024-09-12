@@ -144,7 +144,7 @@ The results in @kosmidis:2019 can be used to show that if
 \end{align*}
 then the solution of the adjusted score equations $s_\beta + A_\beta = 0_p$ and $s_\phi + A_\phi = 0$ results in estimators $\tilde\beta$ with mean bias of small asymptotic order than the maximum likelihood estimator and $\tilde\phi$ with median bias of smaller asymptotic order than the maximum likelihood estimator.
 
-### Maximum penalized likelihood with powers of Jefreys prior as penalty
+### Maximum penalized likelihood with powers of Jeffreys prior as penalty
 The likelihood penalized by a power of the Jeffreys prior
 \[
 |i_{\beta\beta}|^a |i_{\phi\phi}|^a \quad a > 0
@@ -185,7 +185,7 @@ where $\rho = (\rho_1, \ldots, \rho_n)^T$ with $\rho_i = h_i \{2 d_i'/(d_i w_i) 
 + $s_\beta$, $i_{\beta\beta}$, $A_\beta$
 + $s_\phi$, $i_{\phi\phi}$, $A_\phi$
 + Starting values $\beta^{(0)}$ and $\phi^{(0)}$
-+ $\epsilon > 0$: tolerance for the $L1$ norm of the direction before reporting convergence
++ $\epsilon > 0$: tolerance for the $L^\infty$ norm of the search direction before reporting convergence
 + $M$: maximum number of halving steps that can be taken
 
 ### Output
@@ -214,7 +214,7 @@ where $\rho = (\rho_1, \ldots, \rho_n)^T$ with $\rho_i = h_i \{2 d_i'/(d_i w_i) 
 
 8. $v_\phi^{(m)} \leftarrow \upsilon_\phi^{(k)}$
 
-9. $d \leftarrow \left|v_\beta^{(m)}\right|_1 + \left|v_\phi^{(m)}\right|$
+9. $d \leftarrow \left|\left|(v_\beta^{(m)}, v_\phi^{(m)})\right|\right|_\infty$
 
 *Update parameters*
 
@@ -230,7 +230,7 @@ where $\rho = (\rho_1, \ldots, \rho_n)^T$ with $\rho_i = h_i \{2 d_i'/(d_i w_i) 
 
 *Continue or break halving within inner loop*
 
-14. if $m + 1 < M$ and $\left|v_\beta^{(m + 1)}\right|_1 + \left|v_\phi^{(m + 1)}\right| > d$
+14. if $m + 1 < M$ and $\left|\left|(v_\beta^{(m + 1)}, v_\phi^{(m + 1)})\right|\right|_\infty > d$
 
 	14.1. $m \leftarrow m + 1$
 
@@ -248,7 +248,7 @@ where $\rho = (\rho_1, \ldots, \rho_n)^T$ with $\rho_i = h_i \{2 d_i'/(d_i w_i) 
 
 *Continue or break outer loop*
 
-16. if $k + 1 < K$ and $\left|\upsilon_\beta^{(k + 1)}\right|_1 + \left|\upsilon_\phi^{(k + 1)}\right| > \epsilon$
+16. if $k + 1 < K$ and $\left|\left|(\upsilon_\beta^{(k + 1)}, \upsilon_\phi^{(k + 1)})\right|\right|_\infty > \epsilon$
 
 	16.1 $k \leftarrow k + 1$
 

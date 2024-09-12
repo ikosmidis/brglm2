@@ -160,7 +160,7 @@ hepat$type <- factor(hepat$type, labels = c("noDisease", "C", "nonABC"))
 contrasts(hepat$type) <- contr.treatment(3, base = 1)
 
 # Maximum likelihood estimation fails to converge because some estimates are infinite
-hepML <- brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML")
+hepML <- brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML", slowit = 0.1)
 
 # Mean bias reduction returns finite estimates
 hep_meanBR <- brmultinom(type ~ group * time, data = hepat, weights = counts, type = "AS_mean")

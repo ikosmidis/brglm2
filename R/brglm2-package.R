@@ -96,6 +96,7 @@
 #' 185-196. \doi{10.1002/wics.1296}.
 #'
 #' @docType package
+#' @aliases brglm2-package
 #' @name brglm2
 #' @import stats
 #' @import enrichwith

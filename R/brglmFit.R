@@ -876,29 +876,35 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
             for (iter in seq.int(control$maxit)) {
                 step_factor <- 0
                 testhalf <- TRUE
+
                 ## Inner iteration
                 while (testhalf & step_factor < control$max_step_factor) {
                     ## store previous values
-                    betas0 <- betas; dispersion0 <- dispersion
+                    ## betas0 <- betas
+                    ## dispersion0 <- dispersion
                     step_beta_previous <- step_beta
                     step_zeta_previous <- step_zeta
+
                     ## Update betas
                     betas <- betas + slowit * 2^(-step_factor) * step_beta
+
                     ## Update zetas
                     if (!no_dispersion & df_residual > 0) {
                         transformed_dispersion <- eval(control$Trans)
                         transformed_dispersion <- transformed_dispersion + 2^(-step_factor) * step_zeta
                         dispersion <- eval(control$inverseTrans)
                     }
+
                     ## Compute key quantities
                     theta <- c(betas, dispersion)
                     transformed_dispersion <- eval(control$Trans)
-                    ## Mean quantities
 
+                    ## Mean quantities
                     quantities <- try(key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE), silent = TRUE)
                     ## This is to capture qr failing and revering to previous estimates
                     if (failed_adjustment_beta <- inherits(quantities, "try-error")) {
-                        betas <- betas0; dispersion <- dispersion0
+                        ## betas <- betas0
+                        ## dispersion <- dispersion0
                         warning("failed to calculate score adjustment")
                         break
                     }
@@ -912,10 +918,9 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                         warning("failed to calculate score adjustment")
                         break
                     }
-                    adjusted_grad_beta <- with(step_components_beta, {
-                        grad + adjustment
-                    })
+                    adjusted_grad_beta <- with(step_components_beta, grad + adjustment)
                     step_beta <- drop(step_components_beta$inverse_info %*% adjusted_grad_beta)
+
                     ## Dispersion quantities
                     if (no_dispersion) {
                         adjusted_grad_zeta <- step_zeta <- NA_real_
@@ -929,28 +934,28 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                             warning("failed to calculate score adjustment")
                             break
                         }
-                        adjusted_grad_zeta <- with(step_components_zeta, {
-                            grad + adjustment
-                        })
+                        adjusted_grad_zeta <- with(step_components_zeta, grad + adjustment)
                         step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
                     }
+
+                    ## Convergence criteria
+                    linf_current <- max(abs(c(step_beta, step_zeta)), na.rm = TRUE)
+                    linf_previous <- max(abs(c(step_beta_previous, step_zeta_previous)), na.rm = TRUE)
+                    testhalf <- linf_current > linf_previous
+
                     ## Continue inner loop
-                    if (step_factor == 0 & iter == 1)  {
-                        testhalf <- TRUE
-                    } else {
-                        s2 <- c(abs(step_beta), abs(step_zeta))
-                        s1 <- c(abs(step_beta_previous), abs(step_zeta_previous))
-                        testhalf <- sum(s2, na.rm = TRUE) > sum(s1, na.rm = TRUE)
-                    }
+                    ## if (step_factor == 0 & iter == 1)  {
+                    ##     testhalf <- TRUE
+                    ## }
                     step_factor <- step_factor + 1
+
                     ##  Trace here
                     if (control$trace) {
-
                         trace_iteration()
                     }
                 }
                 failed <- failed_adjustment_beta | failed_inversion_beta | failed_adjustment_zeta | failed_inversion_zeta
-                if (failed | sum(abs(c(step_beta, step_zeta)), na.rm = TRUE) < control$epsilon) {
+                if (failed | linf_current < control$epsilon) {
                     break
                 }
             }
@@ -987,6 +992,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         ## residuals and working_weights
 
         quantities <- key_quantities(c(betas, dispersion), y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE)
+
         qr.Wx <- quantities$qr_decomposition
 
         mus <- quantities$mus
