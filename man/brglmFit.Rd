@@ -171,7 +171,7 @@ adjacent category logit models, respectively.
 }
 \examples{
 ## The lizards example from ?brglm::brglm
-data("lizards")
+data("lizards", package = "brglm2")
 # Fit the model using maximum likelihood
 lizardsML <- glm(cbind(grahami, opalinus) ~ height + diameter +
                  light + time, family = binomial(logit), data = lizards,

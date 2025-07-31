@@ -24,7 +24,7 @@
 #' @param control a list of parameters for controlling the fitting
 #'     process. See [brglmControl()] for details.
 #' @return A fitted model object of class [`"brnb"`][brnb] inheriting
-#'     from [`"negbin"`][negbin] and [`"brglmFit"`][brglmFit]. The
+#'     from [`"negbin"`][MASS::glm.nb()] and [`"brglmFit"`][brglmFit()]. The
 #'     object is similar to the output of [brglmFit()] but contains
 #'     four additional components: `theta` for the maximum likelihood
 #'     estimate of the dispersion parameter as in [MASS::glm.nb()],
