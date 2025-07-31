@@ -1,3 +1,17 @@
+# brglm2 0.9.3
+
+## Bug fixes
+
+* Added `add1()` and `drop1()` methods for `brglmFit` objects, so that
+  `step()` does not default to the methods for `glm` objects (which
+  returns wrong step results; thanks to jamiahuswalton@github
+  (https://github.com/ikosmidis/brglm2/issues/33) for reporting the
+  issue.
+
+## Improvements, updates and additions
+
+* Documentation updates
+
 # brglm2 0.9.2
 
 ## Improvements, updates and additions
