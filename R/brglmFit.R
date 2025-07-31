@@ -1124,6 +1124,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
          transformation = control$transformation,
          ## cov.unscaled = tcrossprod(R_matrix),
          type = control$type,
+         control = control,
          class = "brglmFit")
 }
 
