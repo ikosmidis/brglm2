@@ -107,7 +107,7 @@
 #' @importFrom numDeriv grad
 #' @useDynLib brglm2
 #'
-NULL
+"_PACKAGE"
 
 ## NAMESPACE should have import(stats), import(Matrix)
 
