@@ -31,7 +31,7 @@ nomites <- 0:8
 noleaves <- c(70, 38, 17, 10, 9, 3, 2, 1, 0)
 fit_glmnb <- MASS::glm.nb(nomites~1,link="identity",weights = noleaves)
 fit_brnb <- brnb(nomites ~ 1, link = "identity", transformation = "inverse",
-                 type = "ML",weights = noleaves)
+                 type = "ML", weights = noleaves)
 ## Let us simulate 10 response vectors
 sim_glmnb <- simulate(fit_glmnb, nsim = 10, seed = 123)
 sim_brnb <-  simulate(fit_brnb, nsim = 10, seed = 123)

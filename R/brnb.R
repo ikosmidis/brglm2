@@ -616,13 +616,11 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         }
     }
 
-
     adjusted_grad_all <- rep(NA_real_, nvars_all + 1)
     names(adjusted_grad_all) <- c(betas_names_all, "dispersion")
     names(dispersion) <- "dispersion"
     par <- c(betas, dispersion)
     quantities <- key_quantities(par)
-
     step_components_beta <- compute_step_components(par, level = 0, fit = quantities)
     step_components_dispersion <- compute_step_components(par, level = 1, fit = quantities)
     if (step_components_beta$failed_inversion) {
@@ -658,12 +656,10 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                 step_dispersion_previous <- step_dispersion
                 betas <- betas + control$slowit * 2^(-step_factor) * step_beta
                 dispersion <- dispersion + 2^(-step_factor) * step_dispersion
-
                 ## If negative dispersion reset to 1
                 if (linkinv_disp(dispersion) < 0) {
                     dispersion <- linkfun_disp(1)
                 }
-
                 par <- c(betas, dispersion)
                 quantities <- key_quantities(par)
                 step_components_beta <- compute_step_components(par, level = 0, fit = quantities)
@@ -680,7 +676,6 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                     grad + adjustment
                 })
                 step_beta <- drop(step_components_beta$inverse_info %*%  adjusted_grad_beta)
-
                 if (failed_inversion_dispersion <- step_components_dispersion$failed_inversion) {
                     warning("failed to invert the information matrix")
                     break
@@ -693,7 +688,6 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                     grad + adjustment
                 })
                 step_dispersion <- as.vector(adjusted_grad_dispersion * step_components_dispersion$inverse_info)
-
                 if (step_factor == 0 & iter == 1) {
                     testhalf <- TRUE
                 } else {
