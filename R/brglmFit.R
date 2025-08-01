@@ -954,8 +954,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                         trace_iteration()
                     }
                 }
-                failed <- failed_adjustment_beta | failed_inversion_beta | failed_adjustment_zeta | failed_inversion_zeta
-                if (failed | linf_current < control$epsilon) {
+                failed <- failed_adjustment_beta || failed_inversion_beta || failed_adjustment_zeta || failed_inversion_zeta
+                if (failed || linf_current < control$epsilon) {
                     break
                 }
             }
