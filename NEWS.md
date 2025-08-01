@@ -4,9 +4,15 @@
 
 * Added `add1()` and `drop1()` methods for `brglmFit` objects, so that
   `step()` does not default to the methods for `glm` objects (which
-  returns wrong step results; thanks to jamiahuswalton@github
+  would return nonsense results); thanks to jamiahuswalton@github
   (https://github.com/ikosmidis/brglm2/issues/33) for reporting the
   issue.
+
+* Sane staring values, graceful failing, updates to optimization
+  procedure, and improvements to methods for `brnb()`; thanks to
+  cperk@github (https://github.com/ikosmidis/brglm2/issues/31) for
+  reporting issues with `brnb()` when infinite ML estimates are
+  encountered.
 
 ## Improvements, updates and additions
 
