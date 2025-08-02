@@ -22,7 +22,6 @@ vignettes/iteration.pdf
 ^\.Rproj\.user$
 ^\.travis\.yml$
 
-anova.R
 ^CRAN-RELEASE$
 ^README\.Rmd$
 README_cache
@@ -32,3 +31,5 @@ README_cache
 ^CRAN-SUBMISSION$
 ^doc$
 ^Meta$
+
+R/mdyplFit.R

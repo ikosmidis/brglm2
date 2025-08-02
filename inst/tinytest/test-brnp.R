@@ -92,3 +92,22 @@ expect_false(isTRUE(all.equal(coef(flog, model = "dispersion"),
 ## error is produced for not implemented transformations
 expect_error(update(fitBR_mean, transformation = "asd"))
 
+
+
+## From https://github.com/ikosmidis/brglm2/issues/31
+## Infinite estimates
+## df1 <- data.frame(production=c(15, 12, 10, 9, 6, 8, 9, 5, 3, 3, 2, 1, 0, 0, 0, 0),
+##                   Treatment_Num=c(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4),
+##                   Treatment=c("Fresh", "Fresh", "Fresh", "Fresh", "low", "low", "low", "low", "med", "med", "med", "med", "high", "high", "high", "high"),
+##                   Genotype=c(1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2),
+##                   Source_Salinity=c("Fresh", "Fresh", "Brackish", "Brackish", "Fresh", "Fresh", "Brackish", "Brackish", "Fresh", "Fresh", "Brackish", "Brackish", "Fresh", "Fresh", "Brackish", "Brackish"),
+##                   Days_to_death <- c(500,  500,  500,  500,  400,  350,  300,  500,  200,  202,  260,  280,  150, 150, 160, 140),
+##                   censored <- c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0))
+
+
+## salmonella_fm <- production ~ Treatment
+## mbr_inv <- brglm2::brnb(salmonella_fm, data = df1, link = "log", transformation = "inverse", type = "AS_mean")
+## mbr_log <- brglm2::brnb(salmonella_fm, data = df1, link = "log", transformation = "log", type = "AS_mean")
+## transformation = "identity" fails with default starting values
+## mbr_sqrt <- brglm2::brnb(salmonella_fm, data = df1, link = "log", transformation = "identity", type = "AS_mean")
+

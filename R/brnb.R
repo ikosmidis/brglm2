@@ -24,10 +24,10 @@
 #' @param control a list of parameters for controlling the fitting
 #'     process. See [brglmControl()] for details.
 #' @return A fitted model object of class [`"brnb"`][brnb] inheriting
-#'     from [`"negbin"`][negbin] and [`"brglmFit"`][brglmFit]. The
-#'     object is similar to the output of [brglmFit()] but contains
-#'     four additional components: `theta` for the maximum likelihood
-#'     estimate of the dispersion parameter as in [MASS::glm.nb()],
+#'     from [`"negbin"`][MASS::glm.nb()] and
+#'     [`"brglmFit"`][brglmFit()]. The object is similar to the output
+#'     of [brglmFit()] but contains four additional components:
+#'     `theta` for the estimate of the dispersion parameter,
 #'     `vcov.mean` for the estimated variance-covariance matrix of the
 #'     regression coefficients, `vcov.dispersion` for the estimated
 #'     variance of the dispersion parameter in the chosen
@@ -275,11 +275,15 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         }
         res
     }
+
     ## Computation of needed expectations almost exactly
     exp_quant <- function(mu, k) {
         n <- length(mu)
         E_s2 <-  E_s2y <- E_s1s2 <- E_s3 <- numeric(n)
-        if (k < 0) stop("negative value of k")
+        if (k < 0) {
+            ## stop("Negative value of k was encountered during optimization")
+            return(list(E_s2 = NA, E_s2y = NA, E_s1s2 = NA, E_s3 = NA))
+        }
         ymax <- max(qnbinom(1 - 10 * .Machine$double.eps, mu = mu, size = 1 / k))
         ## if (ymax > 30000) stop("ymax too much large")  ## need control on largest value?
         if (ymax > 1) {
@@ -508,7 +512,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
         })
     }
 
-    ## adjustment term function ##
+    ## adjustment term function
     adjustment_function <- switch(control$type,
                                   AS_mean = AS_mean_adjustment,
                                   AS_median = AS_median_adjustment,
@@ -518,21 +522,20 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                                   ML = function(pars, ...) 0)
 
     ## required components for computing the adjusted scores
-
     compute_step_components <- function(pars, level = 0, fit = NULL) {
         if (is.null(fit)) {
             fit <- key_quantities(pars)
         }
         if (level == 0) {
             grad <- score(pars, level = 0, fit = fit)
-            inverse_info <- try(information(pars, level = 0, inverse = TRUE,fit = fit))
+            inverse_info <- try(information(pars, level = 0, inverse = TRUE,fit = fit), silent = TRUE)
             failed_inversion <- inherits(inverse_info, "try-error")
             adjustment <- adjustment_function(pars, level = 0, fit = fit)
             failed_adjustment <- any(is.na(adjustment))
         }
         if (level == 1) {
             grad <- score(pars, level = 1, fit = fit)
-            inverse_info <- try(information(pars, level = 1, inverse = TRUE,fit = fit))
+            inverse_info <- try(information(pars, level = 1, inverse = TRUE,fit = fit), silent = TRUE)
             failed_inversion <- inherits(inverse_info, "try-error")
             adjustment <- adjustment_function(pars, level = 1, fit = fit)
             failed_adjustment <- any(is.na(adjustment))
@@ -581,35 +584,23 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     keep <- weights > 0
     nkeep <- sum(keep)
     df_residual <- nkeep - rank
-    warn <- getOption("warn")
-    options(warn = -1)
-
     if (is.null(start)) {
-        fit<- glm.fit(x = x, y = y, weights = weights,
-                      start = start, offset = offset, family =fam0,
-                      control = list(epsilon = control$epsilon, maxit = 100,
-                                     trace = FALSE), intercept =  intercept)
-        dispersion <- linkfun_disp(1/as.vector(MASS::theta.ml(y = y, mu = fitted(fit), n = nobs, weights = weights,
-                                                              trace = control$trace > 2)))
-        options(warn = warn)
-        betas <- coef(fit)
+        start_fit <- glm.fit(x = x, y = y, weights = weights,
+                             start = start, offset = offset, family =fam0,
+                             control = list(epsilon = control$epsilon, maxit = 100, trace = FALSE),
+                             intercept =  intercept)
+        start <- coef(start_fit)
+        sd <- sqrt(diag(solve(crossprod(start_fit$R))))
+        inds <- sd > 100
+        start[inds] <- sign(start[inds]) * 2
+        ## dispersion <- linkfun_disp(1 / as.vector(MASS::theta.ml(y = y, mu = linkinv(x %*% start),
+        ##                                                         n = nobs, weights = weights,
+        ##                                                         trace = control$trace > 2)))
+        dispersion <- linkfun_disp(1)
+        betas <- start
         names(betas) <- betas_names
     } else {
-        if ((length(start) == nvars_all) & is.numeric(start) ) {
-            betas_all <- start
-            names(betas_all) <- betas_names_all
-            if (!isTRUE(is_full_rank)) {
-                betas_all[aliased] <- NA_real_
-                betas <- betas_all[-aliased]
-            } else {
-                betas <- betas_all
-            }
-            etas <- drop(x %*% betas + offset)
-            dispersion <- linkfun_disp(1/as.vector(MASS::theta.ml(y = y, mu = linkinv(etas), n = nobs, weights = weights,
-                                                                  trace = control$trace > 2)))
-        }
-
-        if ((length(start) == nvars_all+1) & is.numeric(start) ) {
+        if (is.numeric(start) && (length(start) == nvars_all + 1)) {
             betas_all <- start[seq.int(nvars_all)]
             names(betas_all) <- betas_names_all
             if (!isTRUE(is_full_rank)) {
@@ -619,13 +610,9 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                 betas <- betas_all
             }
             dispersion <- start[nvars_all + 1]
-        }
-
-        if (length(start) > nvars_all + 1 | length(start) < nvars_all ) {
-            stop(paste(paste(gettextf("length of 'start' should be equal to %d and correspond to initial betas for %s",
-                                      nvars_all, paste(deparse(betas_names_all),
-                                                       collapse = ", "), "or", gettextf("to %d and also include a starting value for the transformed dispersion",
-                                                                                        nvars_all)))), domain = NA_real_)
+        } else {
+            stop(gettextf("length of 'start' should be equal to %d with initial values for the coefficients of %s and a starting value for the transformed dispersion parameter",
+                          nvars_all + 1, paste(betas_names_all, collapse = ", ")))
         }
     }
 
@@ -634,14 +621,6 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     names(dispersion) <- "dispersion"
     par <- c(betas, dispersion)
     quantities <- key_quantities(par)
-    ## keeped to test
-                                        # if (control$type == "MPL_Jeffreys"){
-                                        #   opt <- try(nlminb(par, loglikMPL,fit = NULL,lower = c(rep(-Inf,nvars),10^{-8}), upper = rep(+Inf, nvars + 1) ),TRUE)
-                                        #   #betas <-opt$par[-(nvars + 1)]
-                                        #   #dispersion <- opt$par[nvars + 1]
-                                        #   cat("\n","Estimates par. with Jeff obtained with nlminb as test: ","\n\n")
-                                        #   print(opt)
-                                        # }
     step_components_beta <- compute_step_components(par, level = 0, fit = quantities)
     step_components_dispersion <- compute_step_components(par, level = 1, fit = quantities)
     if (step_components_beta$failed_inversion) {
@@ -677,6 +656,10 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                 step_dispersion_previous <- step_dispersion
                 betas <- betas + control$slowit * 2^(-step_factor) * step_beta
                 dispersion <- dispersion + 2^(-step_factor) * step_dispersion
+                ## If negative dispersion reset to 1
+                if (linkinv_disp(dispersion) < 0) {
+                    dispersion <- linkfun_disp(1)
+                }
                 par <- c(betas, dispersion)
                 quantities <- key_quantities(par)
                 step_components_beta <- compute_step_components(par, level = 0, fit = quantities)
@@ -693,7 +676,6 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                     grad + adjustment
                 })
                 step_beta <- drop(step_components_beta$inverse_info %*%  adjusted_grad_beta)
-
                 if (failed_inversion_dispersion <- step_components_dispersion$failed_inversion) {
                     warning("failed to invert the information matrix")
                     break
@@ -706,7 +688,6 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                     grad + adjustment
                 })
                 step_dispersion <- as.vector(adjusted_grad_dispersion * step_components_dispersion$inverse_info)
-
                 if (step_factor == 0 & iter == 1) {
                     testhalf <- TRUE
                 } else {
@@ -719,9 +700,9 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
                     trace_iteration()
                 }
             }
-            failed <- failed_adjustment_beta | failed_inversion_beta |
-                failed_adjustment_dispersion| failed_inversion_dispersion
-            if (failed | sum(abs(c(step_beta, step_dispersion)),na.rm = TRUE) < control$epsilon) {
+            failed <- failed_adjustment_beta || failed_inversion_beta ||
+                failed_adjustment_dispersion || failed_inversion_dispersion
+            if (failed || max(abs(c(step_beta, step_dispersion)), na.rm = TRUE) < control$epsilon) {
                 break
             }
         }
@@ -730,11 +711,10 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     adjusted_grad_all["dispersion"] <- adjusted_grad_dispersion
     betas_all[betas_names] <- betas
 
-    if(iter >= control$maxit) {
+    if(iter >= control$maxit || failed) {
         convergence <- FALSE
         warning("optimization failed to converge")
-    } else
-    {
+    } else {
         convergence <- TRUE
     }
     if (!isTRUE(is_full_rank)) {
@@ -745,17 +725,16 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     }
 
     par <- c(betas, dispersion)
-    if (is_correction)
-    {
-        bias <- c(- step_components_beta$inverse_info%*%AS_mean_adjustment(par, level = 0, fit = quantities),
-                  - step_components_dispersion$inverse_info%*%AS_mean_adjustment(par, level = 1, fit = quantities))
+    if (is_correction) {
+        bias <- c(-step_components_beta$inverse_info %*% AS_mean_adjustment(par, level = 0, fit = quantities),
+                  -step_components_dispersion$inverse_info %*% AS_mean_adjustment(par, level = 1, fit = quantities))
         par <- par - bias
         betas <- par[-(nvars + 1)]
         dispersion <-par[(nvars + 1)]
     }
     quantities <- key_quantities(par)
     step_components_beta <- compute_step_components(par, level = 0, fit = quantities)
-    step_components_dispersion<- compute_step_components(par, level = 1, fit = quantities)
+    step_components_dispersion <- compute_step_components(par, level = 1, fit = quantities)
 
     qr.Wx <- quantities$qr_decomposition
     mus <- quantities$mus
@@ -766,23 +745,29 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     wt[keep] <- working_weights[keep]
     names(wt) <- names(residuals) <- names(mus) <- names(etas) <- names(weights) <- names(y) <- ynames
 
-    fam <- do.call("negative.binomial",list(theta = 1 / linkinv_disp(dispersion),
-                                            link = link))
+    fam <- do.call("negative.binomial", list(theta = 1 / linkinv_disp(dispersion),
+                                             link = link))
 
-    if (attr(Terms, "intercept") & missing_offset) {
-        nullFit <- glm.fit(x[, "(Intercept)", drop = FALSE], y, weights,
-                           offset = rep(0, nobs), family = fam, control = list(maxit = control$maxit,
-                                                                               epsilon = control$epsilon, trace = control$trace > 1), intercept = TRUE)
+    if (attr(Terms, "intercept")) {
+        if (missing_offset) {
+            nullFit <- try(glm.fit(x[, "(Intercept)", drop = FALSE], y, weights,
+                                   offset = rep(0, nobs), family = fam,
+                                   control = list(maxit = control$maxit,
+                                                  epsilon = control$epsilon, trace = control$trace),
+                               intercept = TRUE), silent = TRUE)
+        } else {
+            nullFit <- try(glm.fit(x[, "(Intercept)", drop = FALSE], y, weights,
+                                   offset = offset, family = fam,
+                                   control = list(maxit = control$maxit,
+                                                  epsilon = control$epsilon, trace = control$trace > 1),
+                                   intercept = TRUE), silent = TRUE)
+        }
+        if (inherits(nullFit, "try-error")) {
+            stop("Computation of null deviance failed")
+        }
         nullmus <- nullFit$fitted
-    }
-    if (!attr(Terms, "intercept")) {
+    } else {
         nullmus <- linkinv(offset)
-    }
-    if (attr(Terms, "intercept") & !missing_offset) {
-        nullFit <- glm.fit(x[, "(Intercept)", drop = FALSE], y, weights,
-                           offset = offset, family = fam, control = list(maxit = control$maxit,
-                                                                         epsilon = control$epsilon, trace = control$trace > 1), intercept = TRUE)
-        nullmus <- nullFit$fitted
     }
 
     th <- 1 / linkinv_disp(dispersion)
@@ -838,7 +823,7 @@ brnb <- function(formula, data, subset, weights = NULL, offset = NULL,
     out$xlevels <- .getXlevels(Terms,mf)
     out$control <- control
     out$offset <- offset
-    class(out)<-c("brnb","negbin","glm")
+    class(out)<-c("brnb", "negbin", "glm")
     out
 }
 
@@ -940,7 +925,7 @@ summary.brnb <- function(object, ...) {
 print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
     cat("\nCall:", deparse(x$call, width.cutoff = floor(getOption("width") * 0.85)), "", sep = "\n")
     if (!x$converged) {
-        cat("model did not converge\n")
+        cat("Estimation procedure did not converge\n")
     }
     if (NROW(x$coefficients)) {
         cat(paste("\nCoefficients (mean model with ", x$link, " link):\n", sep = ""))
@@ -965,7 +950,7 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
                     1, paste, collapse = " "), sep = "")
     cat(paste("AIC:", round(x$aic,digits)))
     cat("\n\nType of estimator:", x$type, get_type_description(x$type))
-    cat("\n", "Number of quasi-Fisher scoring iterations:", x$iter, "\n", sep = "")
+    cat("\n", "Number of quasi-Fisher scoring iterations:", x$iter, "\n")
     invisible(x)
 }
 
@@ -975,7 +960,7 @@ print.summary.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...)
 print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
     cat("\nCall:", deparse(x$call, width.cutoff = floor(getOption("width") * 0.85)), "", sep = "\n")
     if (!x$converged) {
-        cat("model did not converge\n")
+        cat("Estimation procedure did not converge\n")
     } else {
         if (length(x$coefficients)) {
             cat(paste("Coefficients (mean model with ", x$link, " link):\n", sep = ""))
@@ -992,6 +977,7 @@ print.brnb <- function(x, digits = max(3, getOption("digits") - 3), ...) {
         cat("Residual Deviance:\t", format(round(x$deviance, digits)),
             "\tAIC:", format(round(x$aic, digits)), "\n")
     }
+    cat("\nType of estimator:", x$type, get_type_description(x$type), "\n")
 }
 
 #' Method for computing Wald confidence intervals for one or more
@@ -1026,7 +1012,7 @@ confint.brnb <- function(object, parm, level = 0.95, ...) {
 #' noleaves <- c(70, 38, 17, 10, 9, 3, 2, 1, 0)
 #' fit_glmnb <- MASS::glm.nb(nomites~1,link="identity",weights = noleaves)
 #' fit_brnb <- brnb(nomites ~ 1, link = "identity", transformation = "inverse",
-#'                  type = "ML",weights = noleaves)
+#'                  type = "ML", weights = noleaves)
 #' ## Let us simulate 10 response vectors
 #' sim_glmnb <- simulate(fit_glmnb, nsim = 10, seed = 123)
 #' sim_brnb <-  simulate(fit_brnb, nsim = 10, seed = 123)

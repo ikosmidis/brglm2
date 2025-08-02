@@ -100,10 +100,10 @@ process. See \code{\link[=brglmControl]{brglmControl()}} for details.}
 }
 \value{
 A fitted model object of class \code{\link[=brnb]{"brnb"}} inheriting
-from \code{\link[=negbin]{"negbin"}} and \code{\link[=brglmFit]{"brglmFit"}}. The
-object is similar to the output of \code{\link[=brglmFit]{brglmFit()}} but contains
-four additional components: \code{theta} for the maximum likelihood
-estimate of the dispersion parameter as in \code{\link[MASS:glm.nb]{MASS::glm.nb()}},
+from \code{\link[MASS:glm.nb]{"negbin"}} and
+\code{\link[=brglmFit]{"brglmFit"}}. The object is similar to the output
+of \code{\link[=brglmFit]{brglmFit()}} but contains four additional components:
+\code{theta} for the estimate of the dispersion parameter,
 \code{vcov.mean} for the estimated variance-covariance matrix of the
 regression coefficients, \code{vcov.dispersion} for the estimated
 variance of the dispersion parameter in the chosen

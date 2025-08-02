@@ -1,16 +1,19 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # brglm2 <img src="man/figures/hex_brglm2.svg" width="320" align="right">
 
 <!-- badges: start -->
 
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/brglm2)](https://cran.r-project.org/package=brglm2)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/brglm2)](https://cran.r-project.org/package=brglm2)
 [![R-CMD-check](https://github.com/ikosmidis/brglm2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ikosmidis/brglm2/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/ikosmidis/brglm2/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ikosmidis/brglm2?branch=master)
 [![Licence](https://img.shields.io/badge/licence-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![Contributor
 Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html)
+[![Codecov test
+coverage](https://codecov.io/gh/ikosmidis/brglm2/graph/badge.svg)](https://app.codecov.io/gh/ikosmidis/brglm2)
 <!-- badges: end -->
 
 [**brglm2**](https://github.com/ikosmidis/brglm2) provides tools for the
@@ -55,12 +58,16 @@ category logit models for nominal multinomial responses), `bracl()`
 
 Install the current version from CRAN:
 
-    install.packages("brglm2")
+``` r
+install.packages("brglm2")
+```
 
 or the development version from github:
 
-    # install.packages("remotes")
-    remotes::install_github("ikosmidis/brglm2", ref = "develop")
+``` r
+# install.packages("remotes")
+remotes::install_github("ikosmidis/brglm2", ref = "develop")
+```
 
 ## Example
 
@@ -72,52 +79,61 @@ model using maximum likelihood (ML) to analyze data from a study on
 endometrial cancer (see `?brglm2::endometrial` for details and
 references).
 
-    library("brglm2")
-    data("endometrial", package = "brglm2")
-    modML <- glm(HG ~ NV + PI + EH, family = binomial("logit"), data = endometrial)
-    summary(modML)
-    #> 
-    #> Call:
-    #> glm(formula = HG ~ NV + PI + EH, family = binomial("logit"), 
-    #>     data = endometrial)
-    #> 
-    #> Coefficients:
-    #>               Estimate Std. Error z value Pr(>|z|)    
-    #> (Intercept)    4.30452    1.63730   2.629 0.008563 ** 
-    #> NV            18.18556 1715.75089   0.011 0.991543    
-    #> PI            -0.04218    0.04433  -0.952 0.341333    
-    #> EH            -2.90261    0.84555  -3.433 0.000597 ***
-    #> ---
-    #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    #> 
-    #> (Dispersion parameter for binomial family taken to be 1)
-    #> 
-    #>     Null deviance: 104.903  on 78  degrees of freedom
-    #> Residual deviance:  55.393  on 75  degrees of freedom
-    #> AIC: 63.393
-    #> 
-    #> Number of Fisher Scoring iterations: 17
+``` r
+library("brglm2")
+data("endometrial", package = "brglm2")
+modML <- glm(HG ~ NV + PI + EH, family = binomial("logit"), data = endometrial)
+summary(modML)
+#> 
+#> Call:
+#> glm(formula = HG ~ NV + PI + EH, family = binomial("logit"), 
+#>     data = endometrial)
+#> 
+#> Coefficients:
+#>               Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)    4.30452    1.63730   2.629 0.008563 ** 
+#> NV            18.18556 1715.75089   0.011 0.991543    
+#> PI            -0.04218    0.04433  -0.952 0.341333    
+#> EH            -2.90261    0.84555  -3.433 0.000597 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 104.903  on 78  degrees of freedom
+#> Residual deviance:  55.393  on 75  degrees of freedom
+#> AIC: 63.393
+#> 
+#> Number of Fisher Scoring iterations: 17
+```
 
 The ML estimate of the parameter for `NV` is actually infinite, as can
 be quickly verified using the
 [**detectseparation**](https://cran.r-project.org/package=detectseparation)
 R package
 
-    # install.packages("detectseparation")
-    library("detectseparation")
-    update(modML, method = "detect_separation")
-    #> Implementation: ROI | Solver: lpsolve 
-    #> Separation: TRUE 
-    #> Existence of maximum likelihood estimates
-    #> (Intercept)          NV          PI          EH 
-    #>           0         Inf           0           0 
-    #> 0: finite value, Inf: infinity, -Inf: -infinity
+``` r
+# install.packages("detectseparation")
+library("detectseparation")
+#> 
+#> Attaching package: 'detectseparation'
+#> The following objects are masked from 'package:brglm2':
+#> 
+#>     check_infinite_estimates, detect_separation
+update(modML, method = "detect_separation")
+#> Implementation: ROI | Solver: lpsolve 
+#> Separation: TRUE 
+#> Existence of maximum likelihood estimates
+#> (Intercept)          NV          PI          EH 
+#>           0         Inf           0           0 
+#> 0: finite value, Inf: infinity, -Inf: -infinity
+```
 
 The reported, apparently finite estimate
 `r round(coef(summary(modML))["NV", "Estimate"], 3)` for `NV` is merely
 due to false convergence of the iterative estimation procedure for ML.
 The same is true for the estimated standard error, and, hence the value
-0.011 for the *z*-statistic cannot be trusted for inference on the size
+0.011 for the $z$-statistic cannot be trusted for inference on the size
 of the effect for `NV`.
 
 As mentioned earlier, many of the estimation methods implemented in
@@ -131,36 +147,38 @@ category logit models for ordinal responses). For example, the code
 chunk below refits the model on the endometrial cancer study data using
 mean bias reduction.
 
-    summary(update(modML, method = "brglm_fit"))
-    #> 
-    #> Call:
-    #> glm(formula = HG ~ NV + PI + EH, family = binomial("logit"), 
-    #>     data = endometrial, method = "brglm_fit")
-    #> 
-    #> Deviance Residuals: 
-    #>     Min       1Q   Median       3Q      Max  
-    #> -1.4740  -0.6706  -0.3411   0.3252   2.6123  
-    #> 
-    #> Coefficients:
-    #>             Estimate Std. Error z value Pr(>|z|)    
-    #> (Intercept)  3.77456    1.48869   2.535 0.011229 *  
-    #> NV           2.92927    1.55076   1.889 0.058902 .  
-    #> PI          -0.03475    0.03958  -0.878 0.379915    
-    #> EH          -2.60416    0.77602  -3.356 0.000791 ***
-    #> ---
-    #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    #> 
-    #> (Dispersion parameter for binomial family taken to be 1)
-    #> 
-    #>     Null deviance: 104.903  on 78  degrees of freedom
-    #> Residual deviance:  56.575  on 75  degrees of freedom
-    #> AIC:  64.575
-    #> 
-    #> Type of estimator: AS_mixed (mixed bias-reducing adjusted score equations)
-    #> Number of Fisher Scoring iterations: 6
+``` r
+summary(update(modML, method = "brglm_fit"))
+#> 
+#> Call:
+#> glm(formula = HG ~ NV + PI + EH, family = binomial("logit"), 
+#>     data = endometrial, method = "brglm_fit")
+#> 
+#> Deviance Residuals: 
+#>     Min       1Q   Median       3Q      Max  
+#> -1.4740  -0.6706  -0.3411   0.3252   2.6123  
+#> 
+#> Coefficients:
+#>             Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)  3.77456    1.48869   2.535 0.011229 *  
+#> NV           2.92927    1.55076   1.889 0.058902 .  
+#> PI          -0.03475    0.03958  -0.878 0.379915    
+#> EH          -2.60416    0.77602  -3.356 0.000791 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 104.903  on 78  degrees of freedom
+#> Residual deviance:  56.575  on 75  degrees of freedom
+#> AIC:  64.575
+#> 
+#> Type of estimator: AS_mixed (mixed bias-reducing adjusted score equations)
+#> Number of Fisher Scoring iterations: 6
+```
 
 A quick comparison of the output from mean bias reduction to that from
-ML reveals a dramatic change in the *z*-statistic for `NV`, now that
+ML reveals a dramatic change in the $z$-statistic for `NV`, now that
 estimates and estimated standard errors are finite. In particular, the
 evidence against the null of `NV` not contributing to the model in the
 presence of the other covariates being now stronger.
@@ -184,21 +202,23 @@ coefficient is an odds ratio while controlling for other covariates. To
 estimate those odds ratios using the `correction*` method for mean bias
 reduction (see `?expo` for details) we do
 
-    expoRB <- expo(modML, type = "correction*")
-    expoRB
-    #> 
-    #> Call:
-    #> expo.glm(object = modML, type = "correction*")
-    #> 
-    #> Odds ratios 
-    #>              Estimate Std. Error     2.5 %  97.5 %
-    #> (Intercept) 20.671820  33.136501  0.893141 478.451
-    #> NV           8.496974   7.825239  1.397511  51.662
-    #> PI           0.965089   0.036795  0.895602   1.040
-    #> EH           0.056848   0.056344  0.008148   0.397
-    #> 
-    #> 
-    #> Type of estimator: correction* (explicit mean bias correction with a multiplicative adjustment)
+``` r
+expoRB <- expo(modML, type = "correction*")
+expoRB
+#> 
+#> Call:
+#> expo.glm(object = modML, type = "correction*")
+#> 
+#> Odds ratios 
+#>              Estimate Std. Error     2.5 %  97.5 %
+#> (Intercept) 20.671820  33.136501  0.893141 478.451
+#> NV           8.496974   7.825239  1.397511  51.662
+#> PI           0.965089   0.036795  0.895602   1.040
+#> EH           0.056848   0.056344  0.008148   0.397
+#> 
+#> 
+#> Type of estimator: correction* (explicit mean bias correction with a multiplicative adjustment)
+```
 
 The odds ratio between presence of neovasculation and high histology
 grade (`HG`) is estimated to be 8.497, while controlling for PI and EH.
@@ -208,8 +228,8 @@ present. An approximate 95% interval for the latter odds ratio is (1.4,
 51.7) providing evidence of association between `NV` and `HG` while
 controlling for `PI` and `EH`. Note here that, the maximum likelihood
 estimate of the odds ratio is not as useful as the `correction*`
-estimate, because it is +∞ with an infinite standard error (see previous
-section).
+estimate, because it is $+\infty$ with an infinite standard error (see
+previous section).
 
 ## Solving adjusted score equations using quasi-Fisher scoring
 

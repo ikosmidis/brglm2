@@ -167,7 +167,7 @@
 #'
 #' @examples
 #' ## The lizards example from ?brglm::brglm
-#' data("lizards")
+#' data("lizards", package = "brglm2")
 #' # Fit the model using maximum likelihood
 #' lizardsML <- glm(cbind(grahami, opalinus) ~ height + diameter +
 #'                  light + time, family = binomial(logit), data = lizards,
@@ -954,8 +954,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                         trace_iteration()
                     }
                 }
-                failed <- failed_adjustment_beta | failed_inversion_beta | failed_adjustment_zeta | failed_inversion_zeta
-                if (failed | linf_current < control$epsilon) {
+                failed <- failed_adjustment_beta || failed_inversion_beta || failed_adjustment_zeta || failed_inversion_zeta
+                if (failed || linf_current < control$epsilon) {
                     break
                 }
             }
@@ -1070,7 +1070,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                             control = control0[c("epsilon", "maxit", "type", "transformation", "slowit")],
                             start = if (no_dispersion) linkfun(mean(y)) else c(linkfun(mean(y)), 1))
         ## FIX: Starting values above are hard-coded. Change in future versions
-        nullmus <- nullFit$fitted
+        nullmus <- nullFit$fitted.values
     }
     ## If there is an offset but not an intercept then the fitted
     ## value is the inverse link evaluated at the offset
@@ -1124,6 +1124,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
          transformation = control$transformation,
          ## cov.unscaled = tcrossprod(R_matrix),
          type = control$type,
+         control = control,
          class = "brglmFit")
 }
 
