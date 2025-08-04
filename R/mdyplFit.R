@@ -24,7 +24,7 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 
     nobs <- NROW(y)
     if (!isTRUE(family$family == "binomial" && family$link == "logit")) {
-        stop('`mdyplFit` only supports `binomial` family with `"logit"` link')
+        stop('`mdyplFit` currently supports only `binomial` family with `"logit"` link')
     }
 
     control <- do.call("mdyplControl", control)
@@ -54,7 +54,7 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 
     out <- glm.fit(x = x, y = y_adj, weights = weights,
                    etastart = etastart, mustart = mustart,
-                   offset = offset, family = family,
+                   offset = offset, family = quasibinomial(),
                    control = list(epsilon = control$epsilon,
                                   maxit = control$maxit, trace = control$trace),
                    intercept = intercept, singular.ok = singular.ok)
@@ -80,6 +80,8 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         ## as null
     }
 
+    out$family <- family
+
     ## Reset quantities in terms of original responses
     dev.resids <- family$dev.resids
     out$null.deviance <- sum(dev.resids(y, nullmus, weights))
@@ -88,10 +90,11 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     out$deviance <- sum(dev.resids(y, mus, weights))
     out$aic <- family$aic(y, n, mus, weights, deviance) + 2 * out$rank
     out$alpha <- alpha
+    out$type <- "MPL_DY"
+
 
     out$class <- c("mdyplFit", "brglmFit")
     out
-
 }
 
 #' Auxiliary function for [glm()] fitting using the [brglmFit()]
