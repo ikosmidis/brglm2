@@ -92,7 +92,6 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     out$alpha <- alpha
     out$type <- "MPL_DY"
 
-
     out$class <- c("mdyplFit", "brglmFit")
     out
 }
@@ -129,8 +128,32 @@ mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALS
     out
 }
 
+#' Estimate the corrupted signal strength in a model with
+#' (sub-)Gaussian covariates
+#'
+#' @param object an [`"mdyplFit"`][mdyplFit()] object.
+#'
+#'
+#' @details
+#'
+#' The Signal Strength Leave-One-Out Estimator (SLOE) is defined in
+#' Yadlowsky et al. (2021) when the model is estimated using maximum
+#' likelihood. The SLOE adaptation when estimation is through maximum
+#' Diaconis-Ylvisaker prior penalized likelihood ([mdypl_fit()]) has
+#' been done in Sterzinger & Kosmidis (2025).
+#'
+#' @references
+#'
+#' Yadlowsky S, Yun T, McLean C, D'Amour A (2021). SLOE: a faster
+#' method for statistical inference in high-dimensional logistic
+#' regression. In
+#' "Proceedings of the 35th International Conference on Neural Information Processing Systems",
+#' NIPS '21. Curran Associates Inc., Red Hook, NY, USA. ISBN
+#' 9781713845393.
+#'
+#'
 #' @export
-sloe <- function(object, ...) {
+sloe <- function(object) {
     mu <- fitted(object)
     v <- mu * (1 - mu)
     h <- hatvalues(object)

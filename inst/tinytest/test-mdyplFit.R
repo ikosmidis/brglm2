@@ -22,9 +22,11 @@ adj_lizards <- lizards |>
     transform(g_y = grahami / totals) |>
     transform(grahami = alpha * grahami + totals * (1 - alpha) / 2) |>
     transform(opalinus = totals - grahami)
-temp_fit <- glm(cbind(grahami, opalinus) ~ height + diameter +
+expect_warning(
+    temp_fit <- glm(cbind(grahami, opalinus) ~ height + diameter +
                         light + time, family = binomial(),
-                data = adj_lizards)
+                    data = adj_lizards)
+)
 
 ## Correct alpha
 expect_equal(a, liz_fit_DY$alpha)
@@ -53,4 +55,11 @@ xx <- model.matrix(liz_fit_DY)
 vv <- solve(crossprod(xx * sqrt(v)))
 expect_equal(sqrt(diag(vv)), coef(summary(liz_fit_DY))[, "Std. Error"])
 
-##
+## Test naming conventions
+liz_fit_DY1 <- update(liz_fit_DY, method = "mdypl_fit")
+objs <- names(liz_fit_DY)
+objs <- objs[!(objs %in% c("call", "method"))]
+for (what in objs) {
+    print(expect_equal(liz_fit_DY1[[what]],
+                       liz_fit_DY[[what]]))
+}

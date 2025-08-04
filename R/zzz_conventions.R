@@ -23,10 +23,21 @@ brglm_control <- brglmControl
 #' @export
 brglm_fit <- brglmFit
 
+#' @rdname mdyplFit
+#' @export
+mdypl_fit <- mdyplFit
+
+#' @rdname mdyplControl
+#' @export
+mdypl_control <- mdyplControl
+
+
+
 #### Method conventions
 
 #' @rdname residuals.brmultinom
 #' @method residuals bracl
 #' @export
 residuals.bracl <- residuals.brmultinom
+
 
