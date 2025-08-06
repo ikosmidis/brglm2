@@ -46,7 +46,7 @@
 #' @details
 #'
 #' `init_iter` iterations of [optim()] with `method = init_method` are
-#' used towards minimizing `sum(se)^2`, where se is a vector of the
+#' used towards minimizing `sum(se)^2`, where `se` is a vector of the
 #' state evolution functions. The solution is then passed to
 #' `nleqslv::nleqslv()` for a more aggressive iteration.
 #'
@@ -67,7 +67,7 @@
 #' the value of `corrupted`. If `corrupted = FALSE`, `intercept`
 #' represents the oracle value of $\theta$, otherwise it represents
 #' the limit of the MDYPL estimator of $\theta$ as computed by
-#' [mdyplFit()] shrinkage parameter `alpha`.
+#' [mdyplFit()] with shrinkage parameter `alpha`.
 #'
 #' @export
 solve_se <- function(kappa, ss, alpha, intercept = NULL, start, corrupted = FALSE, gh = NULL, prox_tol = 1e-10, transform = TRUE, init_method = "Nelder-Mead", init_iter = 50, ...) {
@@ -143,7 +143,7 @@ nleqslv_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, 
     soln
 }
 
-nleqslv_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
+nleqslv_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
     no_intercept <- is.null(iota)
     if (no_intercept) {
         stopifnot(length(start) == 3)
@@ -153,7 +153,7 @@ nleqslv_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NUL
                 mu <- pars[1]
                 b <- pars[2]
                 sigma <- pars[3]
-                gamma <- sqrt(eta^2 - kappa * sigma^2) / mu
+                gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
                 if (is.na(gamma)) return(rep(NA, 3))
                 se0(mu = mu, b = b, sigma = sigma, kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol)
             }
@@ -163,7 +163,7 @@ nleqslv_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NUL
                 mu <- pars[1]
                 b <- pars[2]
                 sigma <- pars[3]
-                gamma <- sqrt(eta^2 - kappa * sigma^2) / mu
+                gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
                 if (is.na(gamma)) return(rep(NA, 3))
                 se0(mu = mu, b = b, sigma = sigma, kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol)
             }
@@ -177,7 +177,7 @@ nleqslv_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NUL
                 mu <- pars[1]
                 b <- pars[2]
                 sigma <- pars[3]
-                gamma <- sqrt(eta^2 - kappa * sigma^2) / mu
+                gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
                 if (is.na(gamma)) return(rep(NA, 4))
                 se1(mu = mu, b = b, sigma = sigma, iota = iota, kappa = kappa, gamma = gamma, alpha = alpha, intercept = pars[4], gh = gh, prox_tol = prox_tol)
             }
@@ -187,7 +187,7 @@ nleqslv_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NUL
                 mu <- pars[1]
                 b <- pars[2]
                 sigma <- pars[3]
-                gamma <- sqrt(eta^2 - kappa * sigma^2) / mu
+                gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
                 if (is.na(gamma)) return(rep(NA, 4))
                 se1(mu = mu, b = b, sigma = sigma, iota = iota, kappa = kappa, gamma = gamma, alpha = alpha, intercept = pars[4], gh = gh, prox_tol = prox_tol)
             }
@@ -247,7 +247,7 @@ optim_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, pr
     soln
 }
 
-optim_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NULL, prox_tol = 1e-10, transform = FALSE, ...) {
+optim_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, prox_tol = 1e-10, transform = FALSE, ...) {
     ssq <- function(x) sum(x^2)
     no_intercept <- is.null(iota)
     if (no_intercept) {
@@ -257,7 +257,7 @@ optim_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NULL,
             mu <- pars[1]
             b <- pars[2]
             sigma <- pars[3]
-            gamma <- sqrt(eta^2 - kappa * sigma^2) / mu
+            gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
             if (is.na(gamma)) return(NA)
             se0(mu = mu, b = b, sigma = sigma, kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol)
         }
@@ -271,7 +271,7 @@ optim_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NULL,
             mu <- pars[1]
             b <- pars[2]
             sigma <- pars[3]
-            gamma <- sqrt(eta^2 - kappa * sigma^2) / mu
+            gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
             if (is.na(gamma)) return(NA)
             se1(mu = mu, b = b, sigma = sigma, iota = iota, kappa = kappa, gamma = gamma, alpha = alpha, intercept = pars[4], gh = gh, prox_tol = prox_tol)
         }
@@ -340,7 +340,7 @@ optim_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NULL,
 ##     soln
 ## }
 
-## trust_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NULL, prox_tol = 1e-10, transform = FALSE, ...) {
+## trust_se_est <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, prox_tol = 1e-10, transform = FALSE, ...) {
 ##     ssq <- function(x) sum(x^2)
 ##     no_intercept <- is.null(iota)
 ##     if (no_intercept) {
@@ -350,7 +350,7 @@ optim_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NULL,
 ##             mu <- pars[1]
 ##             b <- pars[2]
 ##             sigma <- pars[3]
-##             gamma <- sqrt(eta^2 - kappa * sigma^2) / mu
+##             gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
 ##             if (is.na(gamma)) return(NA)
 ##             se0(mu = mu, b = b, sigma = sigma, kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol) |> ssq()
 ##         }
@@ -364,7 +364,7 @@ optim_se_corrupted <- function(kappa, eta, alpha, iota = NULL, start, gh = NULL,
 ##             mu <- pars[1]
 ##             b <- pars[2]
 ##             sigma <- pars[3]
-##             gamma <- sqrt(eta^2 - kappa * sigma^2) / mu
+##             gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
 ##             if (is.na(gamma)) return(NA)
 ##             se1(mu = mu, b = b, sigma = sigma, iota = iota, kappa = kappa, gamma = gamma, alpha = alpha, intercept = pars[4], gh = gh, prox_tol = prox_tol) |> ssq()
 ##         }
