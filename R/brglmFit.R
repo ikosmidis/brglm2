@@ -129,6 +129,12 @@
 #'
 #' [brglm_fit()] is an alias to [brglmFit()].
 #'
+#' @return
+#'
+#' An object inheriting from [`"brglmFit"`][brglmlFit()] object, which
+#' is a list having the same elements to the list that
+#' [stats::glm.fit()] returns, with a few extra arguments.
+#'
 #' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}, Euloge Clovis Kenne Pagui `[ctb]` \email{kenne@stat.unipd.it}
 #'
 #' @seealso [brglmControl()], [glm.fit()], [glm()]

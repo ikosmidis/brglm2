@@ -33,9 +33,27 @@ get_type_description <- function(type, parenthesized = TRUE) {
            "AS_mean" = pp("mean bias-reducing adjusted score equations"),
            "AS_median" = pp("median bias-reducing adjusted score equations"),
            "AS_mixed" = pp("mixed bias-reducing adjusted score equations"),
-           "MPL_Jeffreys" = pp("maximum penalized likelihood with Jeffreys'-prior penalty"),
+           "MPL_Jeffreys" = pp("maximum Jeffreys' prior penalized likelihood"),
+           "MPL_DY" = pp("maximum Diaconis-Ylvisaker prior penalized likelihood"),
            "Lylesetal2012" = pp("Lyles et al., 2012; doi: 10.1016/j.jspi.2012.05.005"),
            "correction*" = pp("explicit mean bias correction with a multiplicative adjustment"),
            "correction+" = pp("explicit mean bias correction with an additive adjustment")
            )
+}
+
+
+## Just the inverse logistic link aoviding conventions in `plogis()`
+plogis2 <- function(x) 1 / (1 + exp(-x))
+
+## Vectorized version (in x and b) of the proximal operator arg min_u
+## {b * log(1 + e^u) + (x - u)^2 / 2}
+prox <- function(x, b, tol) {
+    u <- 0
+    g0 <- x - b / 2
+    while (!isTRUE(all(abs(g0) < tol))) {
+        pr <- plogis2(u)
+        g0 <- x - u - b * pr
+        u <- u + g0 / (b * pr * (1 - pr) + 1)
+    }
+    u
 }

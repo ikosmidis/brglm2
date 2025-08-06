@@ -86,6 +86,11 @@ for more information and \code{\link[=brmultinom]{brmultinom()}}.}
 \item{singular.ok}{logical. If \code{FALSE}, a singular model is an
 error.}
 }
+\value{
+An object inheriting from \code{\link[=brglmlFit]{"brglmFit"}} object, which
+is a list having the same elements to the list that
+\code{\link[stats:glm]{stats::glm.fit()}} returns, with a few extra arguments.
+}
 \description{
 \code{\link[=brglmFit]{brglmFit()}} is a fitting method for \code{\link[=glm]{glm()}} that fits generalized
 linear models using implicit and explicit bias reduction methods

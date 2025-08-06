@@ -1,22 +1,70 @@
+#' Fitting function for [glm()] for maximum Diaconis-Ylvisaker prior
+#' penalized likelihood estimation of logistic regression models
+#'
+#' [mdyplFit()] is a fitting method for [glm()] that fits logistic
+#' regression models using maximum Diaconis-Ylvisaker prior penalized
+#' likelihood estimation.
+#'
+#' @inheritParams stats::glm.fit
+#' @aliases mdypl_fit
+#' @param x a design matrix of dimension `n * p`.
+#' @param y a vector of observations of length `n`.
+#' @param control a list of parameters controlling the fitting
+#'     process. See [mdyplControl()] for details.
+#'
+#' @details
+#'
+#' [mdyplFit()] uses [stats::glm.fit()] to fit a logistic regression
+#' model on responses `alpha * y + (1 - alpha) / 2`, where `y` are the
+#' orginal binomial responses scaled by the binomial totals.
+#'
+#' [mdypl_fit()] is an alias to [mdyplFit()].
+#'
+#' @return
+#'
+#' An object inheriting from [`"mdyplFit"`][mdyplFit()] object, which
+#' is a list having the same elements to the list that
+#' [stats::glm.fit()] returns, with a few extra arguments. By default,
+#' `alpha = m / (p + m)` is used, where `m` is the sum of the binomial
+#' totals. Alternative values of `alpha` can be passed to the
+#' `control` argument; see [mdyplControl()] for setting up the list
+#' passed to `control`.
+#'
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
+#'
+#' @seealso [mdyPLcontrol()], [glm.fit()], [glm()]
 #'
 #' @examples
 #'
-#' ## A data set like that in Section 4.3 of
-#' #https://doi.org/10.1016/j.spl.2023.109901
+#' ## A simulated data set as in Section 4.3 of
+#' ## https://doi.org/10.1016/j.spl.2023.109901
+#' set.seed(123)
 #' n <- 1000
-#' p <- 400
-#' gamma <- 3
+#' p <- 200
+#' gamma <- 5
 #' X <- matrix(rnorm(n * p, 0, 1), nrow = n, ncol = p)
-#' betas0 <- rep(c(-3, -3/2, 0, 3/2, 3), each = p / 5)
+#' betas0 <- rep(c(-1, -1/2, 0, 2, 3), each = p / 5)
 #' betas <- gamma * betas0 / sqrt(sum(betas0^2))
-#'
 #' probs <- plogis(drop(X %*% betas))
 #' y <- rbinom(n, 1, probs)
-#'
 #' fit_mdypl <- glm(y ~ -1 + X, family = binomial(), method = "mdyplFit")
-#' plot(betas, type = "l", ylim = c(-0.5, 0.5))
-#' points(coef(fit_mdypl), type ="l")
 #'
+#' ## The default value of `alpha` is `n / (n + p)` here
+#' identical(n / (n + p), fit_mdypl$alpha)
+#'
+#' cols <- hcl.colors(3, alpha = 0.2)
+#' par(mfrow = c(1, 2))
+#' plot(betas, type = "l", ylim = c(-1, 1),
+#'      main = "MDYPL estimates",
+#'      xlab = "Parameter index", ylab = NA)
+#' points(coef(fit_mdypl), col = NA, bg = cols[1], pch = 21)
+#' sc_betas <- hd_correct.mdyplFit(fit_mdypl, se_start = c(0.5, 1, 1))
+#' plot(betas, type = "l", ylim = c(-1, 1),
+#'      main = "corrected MDYPL estimates",
+#'      xlab = "Parameter index", ylab = NA)
+#' points(sc_betas, col = NA, bg = cols[2], pch = 21)
+#'
+#' @export
 mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
                      mustart = NULL, offset = rep(0, nobs), family = binomial(),
                      control = list(), intercept = TRUE,
@@ -76,7 +124,7 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     if (intercept & !missing_offset) {
         nullmus <- mus
         ## doen't really matter what nullmus is set to. glm will make
-        ## a new call to brglmFit and use the deviance from that call
+        ## a new call to mdyplFit and use the deviance from that call
         ## as null
     }
 
@@ -116,9 +164,16 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 #' @param trace logical indicating if output should be produced for
 #'     each iteration. Default is `FALSE`.
 #'
+#' @details
+#'
+#' Internally, [mdyplFit()] uses [stats::glm.fit()] to fit a logistic
+#' regression model on responses `alpha * y + (1 - alpha) / 2`, where
+#' `y` are the orginal binomial responses scaled by the binomial
+#' totals. `epsilon`, `maxit` and `trace` control the
+#' [stats::glm.fit()] call; see [stats::glm.control()].
+#'
 #' @export
-mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALSE)
-{
+mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALSE) {
     out <- glm.control(epsilon, maxit, trace)
     if (!is.null(alpha)) {
         if (!(is.numeric(alpha)) || isTRUE(alpha < 0) || isTRUE(alpha > 1))
@@ -151,7 +206,6 @@ mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALS
 #' NIPS '21. Curran Associates Inc., Red Hook, NY, USA. ISBN
 #' 9781713845393.
 #'
-#'
 #' @export
 sloe <- function(object) {
     mu <- fitted(object)
@@ -162,7 +216,45 @@ sloe <- function(object) {
 }
 
 
-#' @export
-correct.mdyplFit <- function(object, ...) {
+taus <- function(object) {
+    X <- model.matrix(object)
+    df <- object$df.residual + 1
+    L <- qr.R(qr(X))
+    RSS <- 1 / colSums(backsolve(L, diag(ncol(X)), transpose = TRUE)^2)
+    sqrt(RSS / df)
+}
 
+#' High-dimensionality correction of estimates and Wald statistics
+#' from [mdyplFit()] objects.
+#'
+#' @param object an [`"mdyplFit"`][mdyplFit()] object.
+#' @param se_start starting values for the parameters of the state
+#'     evoultion equations; see [solve_se()].
+#' @param null a vector of null values for the parameters estimated in
+#'     `object`. Default is `0`.
+#'
+#' @return
+#'
+#' A table of corrected coefficients, Wald statistics and p-values
+#'
+#' @export
+hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
+    coefs <- coef(object)
+    has_intercept <- as.logical(attr(terms(fit_mdypl), "intercept"))
+    nobs <- sum(object$prior.weights)
+    has_intercept <- attr(terms(object), "intercept")
+    p <- length(coefs) - has_intercept
+    eta_sloe <- sloe(object)
+    se_pars <- solve_se(kappa = p / nobs, ss = eta_sloe, alpha = object$alpha,
+                        intercept = if (has_intercept) coef(object)["(Intercept)"] else NULL,
+                        start = se_start,
+                        corrupted = TRUE,
+                        ...)
+    tt <- taus(object)
+    adj_z <- sqrt(nobs) * tt * (coef(object) - se_pars[1] * null) / se_pars[3]
+    adj_coef <- coefs / se_pars[1]
+    pv <- 2 * pnorm(-abs(adj_z))
+    coef_table <- cbind(adj_coef, adj_z, pv)
+    dimnames(coef_table) <- list(names(coefs), c("Rescaled-estimate", "z value", "Pr(>|z|)"))
+    coef_table
 }
