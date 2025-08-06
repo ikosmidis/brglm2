@@ -58,11 +58,11 @@
 #'      main = "MDYPL estimates",
 #'      xlab = "Parameter index", ylab = NA)
 #' points(coef(fit_mdypl), col = NA, bg = cols[1], pch = 21)
-#' sc_betas <- hd_correct.mdyplFit(fit_mdypl, se_start = c(0.5, 1, 1))
+#' sc_betas <- hd_summary.mdyplFit(fit_mdypl, se_start = c(0.5, 1, 1))
 #' plot(betas, type = "l", ylim = c(-1, 1),
 #'      main = "corrected MDYPL estimates",
 #'      xlab = "Parameter index", ylab = NA)
-#' points(sc_betas, col = NA, bg = cols[2], pch = 21)
+#' points(sc_betas[, "Rescaled-estimate"], col = NA, bg = cols[2], pch = 21)
 #'
 #' @export
 mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
@@ -218,7 +218,7 @@ sloe <- function(object) {
 
 taus <- function(object) {
     X <- model.matrix(object)
-    df <- object$df.residual + 1
+    df <- object$df.residual + 1 ## FIXME:: If there is an intercept then add 2
     L <- qr.R(qr(X))
     RSS <- 1 / colSums(backsolve(L, diag(ncol(X)), transpose = TRUE)^2)
     sqrt(RSS / df)
