@@ -102,6 +102,8 @@
 #' @import enrichwith
 #' @import Matrix
 #' @import MASS
+#' @import nleqslv
+#' @importFrom statmod gauss.quad
 #' @importFrom graphics plot
 #' @importFrom nnet class.ind
 #' @importFrom numDeriv grad

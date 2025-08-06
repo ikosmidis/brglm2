@@ -71,13 +71,9 @@
 #'
 #' @export
 solve_se <- function(kappa, ss, alpha, intercept = NULL, start, corrupted = FALSE, gh = NULL, prox_tol = 1e-10, transform = TRUE, init_method = "Nelder-Mead", init_iter = 50, ...) {
-    if (isTRUE(corrupted)) {
-        init_solver <- optim_se_corrupted
-        main_solver <- nleqslv_se_corrupted
-    } else {
-        init_solver <- optim_se
-        main_solver <- nleqslv_se
-    }
+    is_corrupted <- isTRUE(corrupted)
+    init_solver <- if (is_corrupted) optim_se_corrupted else optim_se
+    main_solver <- if (is_corrupted) nleqslv_se_corrupted else nleqslv_se
     if (isTRUE(init_iter == "only")) {
         start <- init_solver(kappa, ss, alpha, intercept, start, gh, prox_tol, method = init_method, ...)
         opt_chain <- paste0("optim(method = ", init_method, ")")
@@ -95,43 +91,97 @@ solve_se <- function(kappa, ss, alpha, intercept = NULL, start, corrupted = FALS
     start
 }
 
-
-nleqslv_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
-    no_intercept <- is.null(intercept)
-    if (no_intercept) {
-        stopifnot(length(start) == 3)
-        if (transform) {
-            g <- function(pars) {
-                pars <- exp(pars)
-                se0(mu = pars[1], b = pars[2], sigma = pars[3], kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol)
+se_funcs <- function(kappa, ss, alpha, intercept = NULL, iota = NULL,
+                     gh, prox_tol, corrupted = FALSE, transform = TRUE) {
+    ## corrupted signal strength
+    if (isTRUE(corrupted)) {
+        if (is.null(iota)) {
+            if (transform) {
+                g <- function(pars) {
+                    pars <- exp(pars)
+                    mu <- pars[1]
+                    b <- pars[2]
+                    sigma <- pars[3]
+                    gamma <- sqrt(ss^2 - kappa * sigma^2) / mu
+                    if (is.na(gamma)) return(rep(NA, 3))
+                    se0(mu = mu, b = b, sigma = sigma, kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol)
+                }
+            } else {
+                g <- function(pars) {
+                    mu <- pars[1]
+                    b <- pars[2]
+                    sigma <- pars[3]
+                    gamma <- sqrt(ss^2 - kappa * sigma^2) / mu
+                    if (is.na(gamma)) return(rep(NA, 3))
+                    se0(mu = mu, b = b, sigma = sigma, kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol)
+                }
             }
-            start <- log(start)
         } else {
-            g <- function(pars) {
-                se0(mu = pars[1], b = pars[2], sigma = pars[3], kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol)
+            no_int <- 1:3
+            if (transform) {
+                g <- function(pars) {
+                    pars[no_int] <- exp(pars[no_int])
+                    mu <- pars[1]
+                    b <- pars[2]
+                    sigma <- pars[3]
+                    gamma <- sqrt(ss^2 - kappa * sigma^2) / mu
+                    if (is.na(gamma)) return(rep(NA, 4))
+                    se1(mu = mu, b = b, sigma = sigma, iota = iota, kappa = kappa, gamma = gamma, alpha = alpha, intercept = pars[4], gh = gh, prox_tol = prox_tol)
+                }
+            } else {
+                g <- function(pars) {
+                    mu <- pars[1]
+                    b <- pars[2]
+                    sigma <- pars[3]
+                    gamma <- sqrt(ss^2 - kappa * sigma^2) / mu
+                    if (is.na(gamma)) return(rep(NA, 4))
+                    se1(mu = mu, b = b, sigma = sigma, iota = iota, kappa = kappa, gamma = gamma, alpha = alpha, intercept = pars[4], gh = gh, prox_tol = prox_tol)
+                }
             }
         }
     } else {
-        stopifnot(length(start) == 4)
-        no_int <- 1:3
-        if (transform) {
-            g <- function(pars) {
-                pars[no_int] <- exp(pars[no_int])
-                se1(mu = pars[1], b = pars[2], sigma = pars[3], iota = pars[4], kappa = kappa, gamma = gamma, alpha = alpha, intercept = intercept, gh = gh, prox_tol = prox_tol)
+        ## signal strength
+        if (is.null(intercept)) {
+            if (transform) {
+                g <- function(pars) {
+                    pars <- exp(pars)
+                    se0(mu = pars[1], b = pars[2], sigma = pars[3], kappa = kappa, gamma = ss, alpha = alpha, gh = gh, prox_tol = prox_tol)
+                }
+            } else {
+                g <- function(pars) {
+                    se0(mu = pars[1], b = pars[2], sigma = pars[3], kappa = kappa, gamma = ss, alpha = alpha, gh = gh, prox_tol = prox_tol)
+                }
             }
-            start[no_int] <- log(start[no_int])
         } else {
-            g <- function(pars) {
-                se1(mu = pars[1], b = pars[2], sigma = pars[3], iota = pars[4], kappa = kappa, gamma = gamma, alpha = alpha, intercept = intercept, gh = gh, prox_tol = prox_tol)
+            no_int <- 1:3
+            if (transform) {
+                g <- function(pars) {
+                    pars[no_int] <- exp(pars[no_int])
+                    se1(mu = pars[1], b = pars[2], sigma = pars[3], iota = pars[4], kappa = kappa, gamma = ss, alpha = alpha, intercept = intercept, gh = gh, prox_tol = prox_tol)
+                }
+            } else {
+                g <- function(pars) {
+                    se1(mu = pars[1], b = pars[2], sigma = pars[3], iota = pars[4], kappa = kappa, gamma = ss, alpha = alpha, intercept = intercept, gh = gh, prox_tol = prox_tol)
+                }
             }
         }
     }
+    g
+}
+
+nleqslv_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
+    no_intercept <- is.null(intercept)
+    g <- se_funcs(kappa, gamma, alpha, intercept, iota = NULL, gh, prox_tol, corrupted = FALSE, transform)
+    npar <- 3 + !no_intercept
+    stopifnot(length(start) == npar)
+    start <- c(if (transform) log(start[1:3]) else start[1:3],
+               if (no_intercept) NULL else start[4])
     res <- nleqslv(start, g, ...)
     if (transform) {
         if (no_intercept) {
             soln <- exp(res$x)
         } else {
-            soln <- c(exp(res$x[no_int]), res$x[4])
+            soln <- c(exp(res$x[1:3]), res$x[4])
         }
     } else {
         soln <- res$x
@@ -145,60 +195,17 @@ nleqslv_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, 
 
 nleqslv_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
     no_intercept <- is.null(iota)
-    if (no_intercept) {
-        stopifnot(length(start) == 3)
-        if (transform) {
-            g <- function(pars) {
-                pars <- exp(pars)
-                mu <- pars[1]
-                b <- pars[2]
-                sigma <- pars[3]
-                gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
-                if (is.na(gamma)) return(rep(NA, 3))
-                se0(mu = mu, b = b, sigma = sigma, kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol)
-            }
-            start <- log(start)
-        } else {
-            g <- function(pars) {
-                mu <- pars[1]
-                b <- pars[2]
-                sigma <- pars[3]
-                gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
-                if (is.na(gamma)) return(rep(NA, 3))
-                se0(mu = mu, b = b, sigma = sigma, kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol)
-            }
-        }
-    } else {
-        stopifnot(length(start) == 4)
-        no_int <- 1:3
-        if (transform) {
-            g <- function(pars) {
-                pars[no_int] <- exp(pars[no_int])
-                mu <- pars[1]
-                b <- pars[2]
-                sigma <- pars[3]
-                gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
-                if (is.na(gamma)) return(rep(NA, 4))
-                se1(mu = mu, b = b, sigma = sigma, iota = iota, kappa = kappa, gamma = gamma, alpha = alpha, intercept = pars[4], gh = gh, prox_tol = prox_tol)
-            }
-            start[no_int] <- log(start[no_int])
-        } else {
-            g <- function(pars) {
-                mu <- pars[1]
-                b <- pars[2]
-                sigma <- pars[3]
-                gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
-                if (is.na(gamma)) return(rep(NA, 4))
-                se1(mu = mu, b = b, sigma = sigma, iota = iota, kappa = kappa, gamma = gamma, alpha = alpha, intercept = pars[4], gh = gh, prox_tol = prox_tol)
-            }
-        }
-    }
+    g <- se_funcs(kappa, nu, alpha, intercept = NULL, iota, gh, prox_tol, corrupted = TRUE, transform)
+    npar <- 3 + !no_intercept
+    stopifnot(length(start) == npar)
+    start <- c(if (transform) log(start[1:3]) else start[1:3],
+               if (no_intercept) NULL else start[4])
     res <- nleqslv(start, g, ...)
     if (transform) {
         if (no_intercept) {
             soln <- exp(res$x)
         } else {
-            soln <- c(exp(res$x[no_int]), res$x[4])
+            soln <- c(exp(res$x[1:3]), res$x[4])
         }
     } else {
         soln <- res$x
@@ -211,34 +218,20 @@ nleqslv_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL
 }
 
 
-optim_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, prox_tol = 1e-10, transform = FALSE, ...) {
-    ssq <- function(x) sum(x^2)
+optim_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
     no_intercept <- is.null(intercept)
-    if (no_intercept) {
-        npars <- 3
-        g <- function(pars) {
-            pars <- exp(pars)
-            se0(mu = pars[1], b = pars[2], sigma = pars[3], kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol)
-        }
-        start <- log(start)
-    } else {
-        npars <- 4
-        stopifnot(length(start) == 4)
-        no_int <- 1:3
-        g <- function(pars) {
-            pars[no_int] <- exp(pars[no_int])
-            se1(mu = pars[1], b = pars[2], sigma = pars[3], iota = pars[4], kappa = kappa, gamma = gamma, alpha = alpha, intercept = intercept, gh = gh, prox_tol = prox_tol)
-        }
-        start[no_int] <- log(start[no_int])
-    }
+    g <- se_funcs(kappa, gamma, alpha, intercept, iota = NULL, gh, prox_tol, corrupted = FALSE, transform = TRUE)
+    npar <- 3 + !no_intercept
+    stopifnot(length(start) == npar)
+    start <- c(log(start[1:3]), if (no_intercept) NULL else start[4])
     obj <- function(pars) {
-        ssq(g(pars))
+        sum(g(pars)^2)
     }
     res <- optim(start, obj, ...)
     if (no_intercept) {
         soln <- exp(res$par)
     } else {
-        soln <- c(exp(res$par[no_int]), res$par[4])
+        soln <- c(exp(res$par[1:3]), res$par[4])
     }
     attr(soln, "objective") <- res$value
     attr(soln, "iter") <- res$counts
@@ -247,44 +240,20 @@ optim_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, pr
     soln
 }
 
-optim_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, prox_tol = 1e-10, transform = FALSE, ...) {
-    ssq <- function(x) sum(x^2)
+optim_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
     no_intercept <- is.null(iota)
-    if (no_intercept) {
-        npars <- 3
-        g <- function(pars) {
-            pars <- exp(pars)
-            mu <- pars[1]
-            b <- pars[2]
-            sigma <- pars[3]
-            gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
-            if (is.na(gamma)) return(NA)
-            se0(mu = mu, b = b, sigma = sigma, kappa = kappa, gamma = gamma, alpha = alpha, gh = gh, prox_tol = prox_tol)
-        }
-        start <- log(start)
-    } else {
-        npars <- 4
-        stopifnot(length(start) == 4)
-        no_int <- 1:3
-        g <- function(pars) {
-            pars[no_int] <- exp(pars[no_int])
-            mu <- pars[1]
-            b <- pars[2]
-            sigma <- pars[3]
-            gamma <- sqrt(nu^2 - kappa * sigma^2) / mu
-            if (is.na(gamma)) return(NA)
-            se1(mu = mu, b = b, sigma = sigma, iota = iota, kappa = kappa, gamma = gamma, alpha = alpha, intercept = pars[4], gh = gh, prox_tol = prox_tol)
-        }
-        start[no_int] <- log(start[no_int])
-    }
+    g <- se_funcs(kappa, nu, alpha, intercept = NULL, iota, gh, prox_tol, corrupted = TRUE, transform = TRUE)
+    npar <- 3 + !no_intercept
+    stopifnot(length(start) == npar)
+    start <- c(log(start[1:3]), if (no_intercept) NULL else start[4])
     obj <- function(pars) {
-        ssq(g(pars))
+        sum(g(pars)^2)
     }
     res <- optim(start, obj, ...)
     if (no_intercept) {
         soln <- exp(res$par)
     } else {
-        soln <- c(exp(res$par[no_int]), res$par[4])
+        soln <- c(exp(res$par[1:3]), res$par[4])
     }
     attr(soln, "funcs") <- g(soln)
     attr(soln, "iter") <- res$counts

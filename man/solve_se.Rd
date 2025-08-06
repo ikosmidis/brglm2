@@ -80,7 +80,7 @@ intercept, with signal strength or contaminated signal strength
 }
 \details{
 \code{init_iter} iterations of \code{\link[=optim]{optim()}} with \code{method = init_method} are
-used towards minimizing \code{sum(se)^2}, where se is a vector of the
+used towards minimizing \code{sum(se)^2}, where \code{se} is a vector of the
 state evolution functions. The solution is then passed to
 \code{nleqslv::nleqslv()} for a more aggressive iteration.
 
@@ -101,5 +101,5 @@ x_i^T \beta}). In that case, what \code{intercept} represents depends on
 the value of \code{corrupted}. If \code{corrupted = FALSE}, \code{intercept}
 represents the oracle value of $\theta$, otherwise it represents
 the limit of the MDYPL estimator of $\theta$ as computed by
-\code{\link[=mdyplFit]{mdyplFit()}} shrinkage parameter \code{alpha}.
+\code{\link[=mdyplFit]{mdyplFit()}} with shrinkage parameter \code{alpha}.
 }
