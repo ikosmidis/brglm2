@@ -1,3 +1,18 @@
+# brglm2 0.9.4
+
+## Improvements, updates and additions
+
+* Implemented the `mdyplFit()` method for the `glm()` function, which
+  estimates logistic regression models using maximum
+  Diaconis-Ylvisaker prior penalized likelihood, and associated
+  methods. Corrections to estimates, estimated standard errors, z
+  statistics, and so on, can be performed using the developments
+  Sterzinger & Kosmidis (2024, arXiv:2311.07419v2) using
+  `hd_correction = TRUE` in the `summary()` and `confint()` methods
+  for `"mdyplFit"` objects.
+  
+* Documentation updates
+
 # brglm2 0.9.3
 
 ## Bug fixes
