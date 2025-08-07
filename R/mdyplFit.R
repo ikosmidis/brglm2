@@ -51,11 +51,11 @@
 #' @examples
 #'
 #' ## A simulated data set as in Rigon & Aliverti (2023, Section 4.3)
-#'
+#' \dontrun{
 #' set.seed(123)
 #' n <- 1000
-#' p <- 200
-#' gamma <- 5
+#' p <- 500
+#' gamma <- sqrt(5)
 #' X <- matrix(rnorm(n * p, 0, 1), nrow = n, ncol = p)
 #' betas0 <- rep(c(-1, -1/2, 0, 2, 3), each = p / 5)
 #' betas <- gamma * betas0 / sqrt(sum(betas0^2))
@@ -66,18 +66,11 @@
 #' ## The default value of `alpha` is `n / (n + p)` here
 #' identical(n / (n + p), fit_mdypl$alpha)
 #'
-#' cols <- hcl.colors(3, alpha = 0.2)
-#' par(mfrow = c(1, 2))
-#' plot(betas, type = "l", ylim = c(-1, 1),
-#'      main = "MDYPL estimates",
-#'      xlab = "Parameter index", ylab = NA)
-#' points(coef(fit_mdypl), col = NA, bg = cols[1], pch = 21)
-#' sc_betas <- hd_summary.mdyplFit(fit_mdypl, se_start = c(0.5, 1, 1))
-#' plot(betas, type = "l", ylim = c(-1, 1),
-#'      main = "rescaled MDYPL estimates",
-#'      xlab = "Parameter index", ylab = NA)
-#' points(sc_betas[, "Rescaled-estimate"], col = NA, bg = cols[2], pch = 21)
-#'
+#' ## Aggregate bias of MDYPL and rescaled MDYPL estimators
+#' ag_bias <- function(estimates, beta) mean(estimates - beta)
+#' ag_bias(coef(summary(fit_mdypl))[, "Estimate"], betas)
+#' ag_bias(coef(summary(fit_mdypl, hd_correction = TRUE))[, "Estimate"], betas)
+#' }
 #' @export
 mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
                      mustart = NULL, offset = rep(0, nobs), family = binomial(),
@@ -154,7 +147,7 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     out$alpha <- alpha
     out$type <- "MPL_DY"
 
-    out$class <- c("mdyplFit", "brglmFit")
+    out$class <- c("mdyplFit")
     out
 }
 
@@ -278,15 +271,209 @@ hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
     p <- length(coefs) - has_intercept
     eta_sloe <- sloe(object)
     se_pars <- solve_se(kappa = p / nobs, ss = eta_sloe, alpha = object$alpha,
-                        intercept = if (has_intercept) coef(object)["(Intercept)"] else NULL,
+                        intercept = if (has_intercept) coefs["(Intercept)"] else NULL,
                         start = se_start,
-                        corrupted = TRUE,
-                        ...)
+                        corrupted = TRUE)
     tt <- taus(object)
     adj_z <- sqrt(nobs) * tt * (coef(object) - se_pars[1] * null) / se_pars[3]
     adj_coef <- coefs / se_pars[1]
     pv <- 2 * pnorm(-abs(adj_z))
     coef_table <- cbind(adj_coef, adj_z, pv)
     dimnames(coef_table) <- list(names(coefs), c("Rescaled-estimate", "z value", "Pr(>|z|)"))
-    coef_table
+    list(coef_table, se_pars, eta_sloe, nobs, p)
+}
+
+#' Summary method for [`"mdyplFit"`][mdyplFit()] objects
+#'
+#' @inheritParams stats::summary.glm
+#' @inheritParams solve_se
+#' @param hd_correction if `FALSE` (default), then the summary
+#'     corresponding to standard asymptotics is computed. If `TRUE`
+#'     then the high-dimensionality corrections in Sterzinger &
+#'     Kosmidis (2024) are employed to updates estimates, estimated
+#'     standard errors, z-statistics. See Details.
+#' @param se_start a vector of starting values for the state evolution
+#'     equations. See the `start` argument in [solve_se()].
+#'
+#' @details
+#'
+#' If `hd_correction = TRUE`, the [sloe()] estimator of the square
+#' root of the corrupted signal strength is estimated from `object`,
+#' as are the conditional variances of each covariate given the others
+#' (excluding the intercept). The latter are estimates using residual
+#' sums of squares from linear regression mdoels, as proposed in Zhao
+#' et al (2021, Section 5.1). Then the appropriate state evolution
+#' equations are solved using [solve_se()] with `corrupted = TRUE`,
+#' and the obtained constants are used to rescale the estimates,
+#' adjusted estimated standard errors, and adjusted z-statistics as in
+#' Sterzinger & Kosmidis (2024).
+#'
+#' The key assumptions under which the rescaled estmiates and rescaled
+#' standard errors and z-statistics are asymptotically valid are that
+#' the covariates have sub-Gaussian distributions, and that the signal
+#' strength, which is the limit \deqn{\gamma^2} of \eqn{var(X \beta)}
+#' is finite as \eqn{p / n \to \kappa \in (0, 1)}, with $\kappa \in
+#' (0, 1)$. See Sterzinger & Kosmidis (2024).
+#'
+#' If `hd_correction = TRUE`, and the model has an intercept, then the
+#' result gives only an adjusted estimate of the intercept with no
+#' accompanying standard error, z-statistic, and p-value. Also,
+#' `vcov(summary(object, hd_correction = TRUE))` is always
+#' `NULL`. Populating those objects is the subject of current work.
+#'
+#' @return
+#'
+#' A list with objects as in the result of [stats::summary.glm()],
+#' with extra component `se_parameters`, which is the vector of the
+#' solution to the state evolution equations with extra attributes
+#' (see [se_solve()]).
+#'
+#' @references
+#'
+#' Zhao Q, Sur P, Candes E J (2022). The asymptotic distribution of
+#' the MLE in high-dimensional logistic models: Arbitrary
+#' covariance. *Bernoulli*, **28**,
+#' 1835–1861. \doi{10.3150/21-BEJ1401}.
+#'
+#' #' Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
+#' penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
+#' regression. *arXiv*:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
+#'
+#' @examples
+#'
+#' ## A simulated data set
+#' \dontrun{
+#' set.seed(123)
+#' n <- 2000
+#' p <- 400
+#' set.seed(123)
+#' betas <- c(rnorm(p / 2, mean = 7, sd = 1), rep(0, p / 2))
+#' X <- matrix(rnorm(n * p, 0, 1/sqrt(n)), nrow = n, ncol = p)
+#' probs <- plogis(drop(X %*% betas))
+#' y <- rbinom(n, 1, probs)
+#' fit_mdypl <- glm(y ~ -1 + X, family = binomial(), method = "mdyplFit")
+#'
+#' st_summary <- summary(fit_mdypl)
+#' hd_summary <- summary(fit_mdypl, hd_correction = TRUE)
+#'
+#' cols <- hcl.colors(3, alpha = 0.2)
+#' par(mfrow = c(1, 2))
+#' plot(betas, type = "l", ylim = c(-3, 14),
+#'      main = "MDYPL estimates",
+#'      xlab = "Parameter index", ylab = NA)
+#' points(coef(st_summary)[, "Estimate"], col = NA, bg = cols[1], pch = 21)
+#'
+#' plot(betas, type = "l", ylim = c(-3, 14),
+#'      main = "rescaled MDYPL estimates",
+#'      xlab = "Parameter index", ylab = NA)
+#' points(coef(hd_summary)[, "Estimate"], col = NA, bg = cols[2], pch = 21)
+#'
+#' ## z-statistics
+#' qqnorm(coef(st_summary)[betas == 0, "z value"], col = NA, bg = cols[1], pch = 21, main = "z value")
+#' abline(0, 1, lty = 2)
+#' qqnorm(coef(hd_summary)[betas == 0, "z value"], col = NA, bg = cols[2], pch = 21, main = "adjusted z value")
+#' abline(0, 1, lty = 2)
+#'}
+#' @method summary mdyplFit
+#' @export
+summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
+                             gh = NULL, prox_tol = 1e-10, transform = TRUE,
+                             init_iter = 50,
+                             init_method = "Nelder-Mead", ...) {
+    ## Get summary object
+    summ <- summary.glm(object, ...)
+    if (isTRUE(hd_correction)) {
+        coefs <- coef(summ)
+        nobs <- sum(pw <- weights(object))
+        has_intercept <- attr(terms(object), "intercept")
+        p <- nrow(coefs) - has_intercept
+        eta_sloe <- sloe(object)
+        theta <- if (has_intercept) coefs["(Intercept)", "Estimate"] else NULL
+        if (missing(se_start)) {
+            se_start <- c(0.5, 1, 1, theta)
+        }
+        se_pars <- try(solve_se(kappa = p / nobs, ss = eta_sloe, alpha = object$alpha,
+                                intercept = if (has_intercept) theta else NULL,
+                                start = se_start,
+                                corrupted = TRUE, gh = gh, prox_tol = prox_tol,
+                                transform = transform, init_method = init_method,
+                                init_iter = init_iter), silent = TRUE)
+        if (inherits(se_pars, "try-error")) {
+            stop(paste("Unable to solve the state evolution equations. Try to supply an alternative vector of", 3 + has_intercept, "to `se_start`, which is starting values for `mu` (in (0, 1)), `b` (> 0), `sigma` (> 0)", if (has_intercept) "and `intercept`" else NULL))
+        }
+        tt <- taus(object)
+        no_int <- !(rownames(coefs) %in% "(Intercept)")
+        coefs[no_int, "Estimate"] <- coefs[no_int, "Estimate"] / se_pars[1]
+        coefs[no_int, "Std. Error"] <- se_pars[3] / (sqrt(nobs) * tt * se_pars[1])
+        coefs[, "z value"] <- coefs[, "Estimate"] / coefs[, "Std. Error"]
+        coefs[, "Pr(>|z|)"] <- 2 * pnorm(-abs(coefs[, "z value"]))
+        if (has_intercept) {
+            coefs["(Intercept)", ] <- c(se_pars[4], NA, NA, NA)
+        }
+        summ$coefficients <- coefs
+
+        family <- object$family
+        dev.resids <- family$dev.resids
+        mus <- family$linkinv(drop(model.matrix(object) %*% coefs[, "Estimate"]))
+        y <- object$y
+        ## Null deviance is not updated
+        d_res <- sqrt(pmax(family$dev.resids(y, mus, pw), 0))
+        summ$deviance.resid <- ifelse(y > mus, d_res, -d_res)
+        summ$deviance <- sum(summ$deviance.resid^2)
+        summ$aic <- family$aic(y, n, mus, pw, summ$deviance) + 2 * object$rank
+        summ$cov.scaled <- summ$cov.unscaled <- NULL
+        summ$se_parameters <- se_pars
+    }
+    class(summ) <- c("summary.mdyplFit", class(summ))
+    summ
+}
+
+#' Method for computing confidence intervals for one or more
+#' regression parameters in a [`"mdyplFit"`][mdyplFit()] object
+#'
+#' @inheritParams stats::confint
+#' @inheritParams summary.mdyplFit
+#'
+#' @examples
+#'
+#' \dontrun{
+#' set.seed(123)
+#' n <- 2000
+#' p <- 800
+#' set.seed(123)
+#' betas <- c(rnorm(p / 4, mean = 7, sd = 1), rep(0, 3 * p / 4))
+#' X <- matrix(rnorm(n * p, 0, 1/sqrt(n)), nrow = n, ncol = p)
+#' probs <- plogis(drop(X %*% betas))
+#' y <- rbinom(n, 1, probs)
+#' fit_mdypl <- glm(y ~ -1 + X, family = binomial(), method = "mdyplFit")
+#'
+#' wald_ci <- confint(fit_mdypl)
+#' adj_wald_ci <- confint(fit_mdypl, hd_correction = TRUE)
+#' ag_coverage <- function(cis, beta) mean((cis[, 1] < beta) & (cis[, 2] > beta))
+#' ag_coverage(wald_ci, betas)
+#' ag_coverage(adj_wald_ci, betas)
+#'
+#' }
+#'
+#' @method confint mdyplFit
+#' @export
+confint.mdyplFit <- function(object, parm, level = 0.95, hd_correction = FALSE, se_start, ...) {
+    ## A modification of confint.default to use summary objects
+    summ <- summary(object, hd_correction = hd_correction, se_start, ...)
+    coefs <- coef(summ)
+    cf <- coefs[, "Estimate"]
+    pnames <- rownames(coefs)
+    if (missing(parm))
+        parm <- pnames
+    else if (is.numeric(parm))
+        parm <- pnames[parm]
+    a <- (1 - level)/2
+    a <- c(a, 1 - a)
+    ## Directly from stats:::.format_perc
+    pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
+    fac <- qnorm(a)
+    ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(parm, pct))
+    ses <- coefs[, "Std. Error"]
+    ci[] <- cf[parm] + ses %o% fac
+    ci
 }

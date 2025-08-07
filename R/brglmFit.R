@@ -1216,7 +1216,7 @@ summary.brglmFit <- function(object, dispersion = NULL,
 }
 
 #' Method for computing confidence intervals for one or more
-#' regression parameters in a [`"brglmFit"`][brglmFit] object
+#' regression parameters in a [`"brglmFit"`][brglmFit()] object
 #'
 #' @inheritParams stats::confint
 #'

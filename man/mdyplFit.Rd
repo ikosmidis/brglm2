@@ -101,11 +101,11 @@ set to zero. See Rigon & Aliverti (2023) and Sterzinger & Kosmidis
 \examples{
 
 ## A simulated data set as in Rigon & Aliverti (2023, Section 4.3)
-
+\dontrun{
 set.seed(123)
 n <- 1000
-p <- 200
-gamma <- 5
+p <- 500
+gamma <- sqrt(5)
 X <- matrix(rnorm(n * p, 0, 1), nrow = n, ncol = p)
 betas0 <- rep(c(-1, -1/2, 0, 2, 3), each = p / 5)
 betas <- gamma * betas0 / sqrt(sum(betas0^2))
@@ -116,18 +116,11 @@ fit_mdypl <- glm(y ~ -1 + X, family = binomial(), method = "mdyplFit")
 ## The default value of `alpha` is `n / (n + p)` here
 identical(n / (n + p), fit_mdypl$alpha)
 
-cols <- hcl.colors(3, alpha = 0.2)
-par(mfrow = c(1, 2))
-plot(betas, type = "l", ylim = c(-1, 1),
-     main = "MDYPL estimates",
-     xlab = "Parameter index", ylab = NA)
-points(coef(fit_mdypl), col = NA, bg = cols[1], pch = 21)
-sc_betas <- hd_summary.mdyplFit(fit_mdypl, se_start = c(0.5, 1, 1))
-plot(betas, type = "l", ylim = c(-1, 1),
-     main = "rescaled MDYPL estimates",
-     xlab = "Parameter index", ylab = NA)
-points(sc_betas[, "Rescaled-estimate"], col = NA, bg = cols[2], pch = 21)
-
+## Aggregate bias of MDYPL and rescaled MDYPL estimators
+ag_bias <- function(estimates, beta) mean(estimates - beta)
+ag_bias(coef(summary(fit_mdypl))[, "Estimate"], betas)
+ag_bias(coef(summary(fit_mdypl, hd_correction = TRUE))[, "Estimate"], betas)
+}
 }
 \references{
 Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior

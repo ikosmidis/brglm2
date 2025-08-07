@@ -97,7 +97,7 @@
 #' Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
 #' penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
 #' regression. *arXiv*:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
-
+#'
 #'
 #' @examples
 #'
@@ -126,7 +126,7 @@ solve_se <- function(kappa, ss, alpha, intercept = NULL, start, corrupted = FALS
         opt_chain <- paste0("optim(method = ", init_method, ")")
     } else {
         if (init_iter > 0) {
-            start <- init_solver(kappa, ss, alpha, intercept, start, gh, prox_tol, method = init_method, control = list(maxit = init_iter), ...);
+            start <- init_solver(kappa, ss, alpha, intercept, start, gh, prox_tol, method = init_method, control = list(maxit = init_iter));
             opt_chain <- paste0("optim(method = ", init_method, ", maxit = ", init_iter, ") -> ")
         } else {
             opt_chain <- ""
@@ -296,13 +296,13 @@ optim_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, 
     npar <- 3 + !no_intercept
     stopifnot(length(start) == npar)
     start <- c(log(start[1:3]), if (no_intercept) NULL else start[4])
-    warn0 <- getOption("warn")
-    options(warn = -1)
     obj <- function(pars) {
         sum(g(pars)^2)
     }
-    options(warn = warn0)
+    warn0 <- getOption("warn")
+    options(warn = -1)
     res <- optim(start, obj, ...)
+    options(warn = warn0)
     if (no_intercept) {
         soln <- exp(res$par)
     } else {
