@@ -60,8 +60,8 @@ liz_fit_DY1 <- update(liz_fit_DY, method = "mdypl_fit")
 objs <- names(liz_fit_DY)
 objs <- objs[!(objs %in% c("call", "method"))]
 for (what in objs) {
-    print(expect_equal(liz_fit_DY1[[what]],
-                       liz_fit_DY[[what]]))
+    expect_equal(liz_fit_DY1[[what]],
+                 liz_fit_DY[[what]])
 }
 
 

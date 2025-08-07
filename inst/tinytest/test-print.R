@@ -7,7 +7,7 @@ types <- list("ML" = "(maximum likelihood)",
                "AS_mean" = "(mean bias-reducing adjusted score equations)",
                "AS_median" = "(median bias-reducing adjusted score equations)",
                "AS_mixed" = "(mixed bias-reducing adjusted score equations)",
-               "MPL_Jeffreys" = "(maximum penalized likelihood with Jeffreys'-prior penalty)")
+               "MPL_Jeffreys" = "(maximum Jeffreys' prior penalized likelihood)")
 
 
 for (type in names(types)) {
