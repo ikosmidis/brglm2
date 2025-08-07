@@ -90,14 +90,18 @@ likelihood estimation.
 \details{
 \code{\link[=mdyplFit]{mdyplFit()}} uses \code{\link[stats:glm]{stats::glm.fit()}} to fit a logistic regression
 model on responses \code{alpha * y + (1 - alpha) / 2}, where \code{y} are the
-orginal binomial responses scaled by the binomial totals.
+orginal binomial responses scaled by the binomial totals. This is
+equivalent to penalizing the likelihood by the Diaconis-Ylvisaker
+prior with shirnkage parameter $\alpha$ and regression parameters
+set to zero. See Rigon & Aliverti (2023) and Sterzinger & Kosmidis
+(2024).
 
 \code{\link[=mdypl_fit]{mdypl_fit()}} is an alias to \code{\link[=mdyplFit]{mdyplFit()}}.
 }
 \examples{
 
-## A simulated data set as in Section 4.3 of
-## https://doi.org/10.1016/j.spl.2023.109901
+## A simulated data set as in Rigon & Aliverti (2023, Section 4.3)
+
 set.seed(123)
 n <- 1000
 p <- 200
@@ -120,10 +124,19 @@ plot(betas, type = "l", ylim = c(-1, 1),
 points(coef(fit_mdypl), col = NA, bg = cols[1], pch = 21)
 sc_betas <- hd_summary.mdyplFit(fit_mdypl, se_start = c(0.5, 1, 1))
 plot(betas, type = "l", ylim = c(-1, 1),
-     main = "corrected MDYPL estimates",
+     main = "rescaled MDYPL estimates",
      xlab = "Parameter index", ylab = NA)
 points(sc_betas[, "Rescaled-estimate"], col = NA, bg = cols[2], pch = 21)
 
+}
+\references{
+Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
+penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
+regression. \emph{arXiv}:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
+
+Rigon T, Aliverti E (2023). Conjugate priors and bias reduction for
+logistic regression models. \emph{Statistics & Probability Letters},
+\strong{202}, 109901. \doi{10.1016/j.spl.2023.109901}.
 }
 \seealso{
 \code{\link[=mdyPLcontrol]{mdyPLcontrol()}}, \code{\link[=glm.fit]{glm.fit()}}, \code{\link[=glm]{glm()}}

@@ -16,7 +16,11 @@
 #'
 #' [mdyplFit()] uses [stats::glm.fit()] to fit a logistic regression
 #' model on responses `alpha * y + (1 - alpha) / 2`, where `y` are the
-#' orginal binomial responses scaled by the binomial totals.
+#' orginal binomial responses scaled by the binomial totals. This is
+#' equivalent to penalizing the likelihood by the Diaconis-Ylvisaker
+#' prior with shirnkage parameter $\alpha$ and regression parameters
+#' set to zero. See Rigon & Aliverti (2023) and Sterzinger & Kosmidis
+#' (2024).
 #'
 #' [mdypl_fit()] is an alias to [mdyplFit()].
 #'
@@ -34,10 +38,20 @@
 #'
 #' @seealso [mdyPLcontrol()], [glm.fit()], [glm()]
 #'
+#' @references
+#'
+#' Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
+#' penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
+#' regression. *arXiv*:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
+#'
+#' Rigon T, Aliverti E (2023). Conjugate priors and bias reduction for
+#' logistic regression models. *Statistics & Probability Letters*,
+#' **202**, 109901. \doi{10.1016/j.spl.2023.109901}.
+#'
 #' @examples
 #'
-#' ## A simulated data set as in Section 4.3 of
-#' ## https://doi.org/10.1016/j.spl.2023.109901
+#' ## A simulated data set as in Rigon & Aliverti (2023, Section 4.3)
+#'
 #' set.seed(123)
 #' n <- 1000
 #' p <- 200
@@ -60,7 +74,7 @@
 #' points(coef(fit_mdypl), col = NA, bg = cols[1], pch = 21)
 #' sc_betas <- hd_summary.mdyplFit(fit_mdypl, se_start = c(0.5, 1, 1))
 #' plot(betas, type = "l", ylim = c(-1, 1),
-#'      main = "corrected MDYPL estimates",
+#'      main = "rescaled MDYPL estimates",
 #'      xlab = "Parameter index", ylab = NA)
 #' points(sc_betas[, "Rescaled-estimate"], col = NA, bg = cols[2], pch = 21)
 #'
@@ -152,11 +166,11 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 #'
 #' @aliases mdypl_control
 #' @param alpha the shrinkage parameter (in `[0, 1]`) in the
-#'     Diaconis-Ylvisaker prior penalty. Default is \code{1}, which
-#'     corresponds to maximum likelihood estimation. Setting `alpha =
-#'     NULl` will result in `alpha = m / (m + p)`, where `m` is the
-#'     sum of the binomial totals and `p` is the number of model
-#'     parameters.
+#'     Diaconis-Ylvisaker prior penalty. Default is \code{NULL}, which
+#'     results in `alpha = m / (m + p)`, where `m` is the sum of the
+#'     binomial totals and `p` is the number of model
+#'     parameters. Setting `alpha = 1` corresponds to using maximum
+#'     likelihood, i.e. no penalization. See Details.
 #' @param epsilon positive convergence tolerance epsilon. Default is
 #'     `1e-08`.
 #' @param maxit integer giving the maximal number of iterations
@@ -171,6 +185,10 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 #' `y` are the orginal binomial responses scaled by the binomial
 #' totals. `epsilon`, `maxit` and `trace` control the
 #' [stats::glm.fit()] call; see [stats::glm.control()].
+#'
+#' @return
+#'
+#' A list with components named as the arguments.
 #'
 #' @export
 mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALSE) {
@@ -193,18 +211,33 @@ mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALS
 #'
 #' The Signal Strength Leave-One-Out Estimator (SLOE) is defined in
 #' Yadlowsky et al. (2021) when the model is estimated using maximum
-#' likelihood. The SLOE adaptation when estimation is through maximum
-#' Diaconis-Ylvisaker prior penalized likelihood ([mdypl_fit()]) has
-#' been done in Sterzinger & Kosmidis (2025).
+#' likelihood (i.e. when `object$alpha = 1`; see [mdyplControl()] for
+#' what `alpha` is). The SLOE adaptation when estimation is through
+#' maximum Diaconis-Ylvisaker prior penalized likelihood
+#' ([mdypl_fit()]) has been put forward in Sterzinger & Kosmidis
+#' (2025).
+#'
+#' In partiuclar, [sloe()] computes an estimate of the corrupteed
+#' signal strength which is the limit \deqn{\nu^2} of \eqn{var(X
+#' \hat\beta(\alpha))}, where \eqn{\hat\beta(\alpha)} is the maximimum
+#' Diaconis-Ylvisaker prior penalized likelihood (MDYPL) estimator as
+#' computed by [mdyplFit()] with shirnkage parameter \eqn{alpha}.
+#'
+#' @return
+#'
+#' A scalar.
 #'
 #' @references
 #'
-#' Yadlowsky S, Yun T, McLean C, D'Amour A (2021). SLOE: a faster
-#' method for statistical inference in high-dimensional logistic
-#' regression. In
-#' "Proceedings of the 35th International Conference on Neural Information Processing Systems",
-#' NIPS '21. Curran Associates Inc., Red Hook, NY, USA. ISBN
-#' 9781713845393.
+#' Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
+#' penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
+#' regression. *arXiv*:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
+#'
+#' Yadlowsky S, Yun T, McLean CY, D' Amour A (2021). SLOE: A Faster
+#' Method for Statistical Inference in High-Dimensional Logistic
+#' Regression. In M Ranzato, A Beygelzimer, Y Dauphin, P Liang, JW
+#' Vaughan (eds.), *Advances in Neural Information Processing
+#' Systems*, **34**, 29517–29528. Curran Associates, Inc. \url{https://proceedings.neurips.cc/paper_files/paper/2021/file/f6c2a0c4b566bc99d596e58638e342b0-Paper.pdf}.
 #'
 #' @export
 sloe <- function(object) {
@@ -215,13 +248,13 @@ sloe <- function(object) {
     sd(S)
 }
 
-
 taus <- function(object) {
     X <- model.matrix(object)
-    df <- object$df.residual + 1 ## FIXME:: If there is an intercept then add 2
+    has_intercept <- attr(terms(object), "intercept")
+    if (has_intercept) X <- X[, colnames(X) != "(Intercept)"]
     L <- qr.R(qr(X))
     RSS <- 1 / colSums(backsolve(L, diag(ncol(X)), transpose = TRUE)^2)
-    sqrt(RSS / df)
+    sqrt(RSS / (nrow(X) - ncol(X) + 1))
 }
 
 #' High-dimensionality correction of estimates and Wald statistics
@@ -240,7 +273,6 @@ taus <- function(object) {
 #' @export
 hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
     coefs <- coef(object)
-    has_intercept <- as.logical(attr(terms(fit_mdypl), "intercept"))
     nobs <- sum(object$prior.weights)
     has_intercept <- attr(terms(object), "intercept")
     p <- length(coefs) - has_intercept

@@ -48,7 +48,10 @@
 #' `init_iter` iterations of [optim()] with `method = init_method` are
 #' used towards minimizing `sum(se)^2`, where `se` is a vector of the
 #' state evolution functions. The solution is then passed to
-#' `nleqslv::nleqslv()` for a more aggressive iteration.
+#' `nleqslv::nleqslv()` for a more aggressive iteration. The state
+#' evolution equations are given in expressions (8) (model without
+#' intercept) and expression (15) (model with intercept) in Sterzinger
+#' & Kosmidis (2024).
 #'
 #' If `corrupted = FALSE` (default), then `ss` is the square root of
 #' the signal strength, which is the limit \deqn{\gamma^2} of
@@ -66,9 +69,53 @@
 #' x_i^T \beta}). In that case, what `intercept` represents depends on
 #' the value of `corrupted`. If `corrupted = FALSE`, `intercept`
 #' represents the oracle value of $\theta$, otherwise it represents
-#' the limit of the MDYPL estimator of $\theta$ as computed by
+#' the limit `iota` of the MDYPL estimator of $\theta$ as computed by
 #' [mdyplFit()] with shrinkage parameter `alpha`.
 #'
+#' Note that `start` is always for `mu`, `b`,`sigma`, as is the
+#' result, regardless whether `transform = TRUE` or
+#' not. Transformations during optimization are done internally.
+#'
+#' @return
+#'
+#' If `intercept = NULL`, a vector with the values of `mu`,
+#' `b`,`sigma`. Otherwise, a vector with the values of `mu`,
+#' `b`,`sigma`, and `iota`, if `corrupted = FALSE`, or the value of
+#' the intercept otherwise. The vector has attributes the state
+#' evolution functions at the solution (`"funcs"`), the number of
+#' iterations used by the last optimization method (`"iter"`), any
+#' messages from the last optimization method (`"message"`), and
+#' information on the optimization methods used
+#' (`"optimization-chain"`).
+#'
+#' @references
+#'
+#' Zhao Q, Sur P, Candes E J (2022). The asymptotic distribution of
+#' the MLE in high-dimensional logistic models: Arbitrary
+#' covariance. *Bernoulli*, **28**, 1835–1861. \doi{10.3150/21-BEJ1401}.
+#'
+#' Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
+#' penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
+#' regression. *arXiv*:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
+
+#'
+#' @examples
+#'
+#' ## Reproducing Table 13 of Zhao et al. (2022, DOI: 10.3150/21-BEJ1401)
+#' \dontrun{
+#'
+#' thetas <- c(0, 0.5, 1, 2, 2.5)
+#' gamma0 <- 5
+#' pars3 <- matrix(NA, length(thetas), 3)
+#' pars4 <- matrix(NA, length(thetas), 4)
+#' colnames(pars4) <- c("I_mu", "I_b", "I_sigma", "I_iota")
+#' colnames(pars3) <- c("I_mu", "I_b", "I_sigma")
+#' for (i in seq_along(thetas)) {
+#'     pars3[i, ] <- solve_se(kappa = 0.2, ss = sqrt(5 + thetas[i]^2), alpha = 1, start = c(0.5, 1, 1), init_iter = 0)
+#'     pars4[i, ] <- solve_se(kappa = 0.2, ss = sqrt(5), alpha = 1, intercept = thetas[i], start = c(pars3[i, ], thetas[i]), init_iter = 0)
+#' }
+#'
+#' }
 #' @export
 solve_se <- function(kappa, ss, alpha, intercept = NULL, start, corrupted = FALSE, gh = NULL, prox_tol = 1e-10, transform = TRUE, init_method = "Nelder-Mead", init_iter = 50, ...) {
     is_corrupted <- isTRUE(corrupted)
@@ -200,7 +247,10 @@ nleqslv_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL
     stopifnot(length(start) == npar)
     start <- c(if (transform) log(start[1:3]) else start[1:3],
                if (no_intercept) NULL else start[4])
+    warn0 <- getOption("warn")
+    options(warn = -1)
     res <- nleqslv(start, g, ...)
+    options(warn = warn0)
     if (transform) {
         if (no_intercept) {
             soln <- exp(res$x)
@@ -246,9 +296,12 @@ optim_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, 
     npar <- 3 + !no_intercept
     stopifnot(length(start) == npar)
     start <- c(log(start[1:3]), if (no_intercept) NULL else start[4])
+    warn0 <- getOption("warn")
+    options(warn = -1)
     obj <- function(pars) {
         sum(g(pars)^2)
     }
+    options(warn = warn0)
     res <- optim(start, obj, ...)
     if (no_intercept) {
         soln <- exp(res$par)

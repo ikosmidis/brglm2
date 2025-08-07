@@ -10,6 +10,9 @@ sloe(object)
 \arguments{
 \item{object}{an \code{\link[=mdyplFit]{"mdyplFit"}} object.}
 }
+\value{
+A scalar.
+}
 \description{
 Estimate the corrupted signal strength in a model with
 (sub-)Gaussian covariates
@@ -17,15 +20,26 @@ Estimate the corrupted signal strength in a model with
 \details{
 The Signal Strength Leave-One-Out Estimator (SLOE) is defined in
 Yadlowsky et al. (2021) when the model is estimated using maximum
-likelihood. The SLOE adaptation when estimation is through maximum
-Diaconis-Ylvisaker prior penalized likelihood (\code{\link[=mdypl_fit]{mdypl_fit()}}) has
-been done in Sterzinger & Kosmidis (2025).
+likelihood (i.e. when \code{object$alpha = 1}; see \code{\link[=mdyplControl]{mdyplControl()}} for
+what \code{alpha} is). The SLOE adaptation when estimation is through
+maximum Diaconis-Ylvisaker prior penalized likelihood
+(\code{\link[=mdypl_fit]{mdypl_fit()}}) has been put forward in Sterzinger & Kosmidis
+(2025).
+
+In partiuclar, \code{\link[=sloe]{sloe()}} computes an estimate of the corrupteed
+signal strength which is the limit \deqn{\nu^2} of \eqn{var(X
+\hat\beta(\alpha))}, where \eqn{\hat\beta(\alpha)} is the maximimum
+Diaconis-Ylvisaker prior penalized likelihood (MDYPL) estimator as
+computed by \code{\link[=mdyplFit]{mdyplFit()}} with shirnkage parameter \eqn{alpha}.
 }
 \references{
-Yadlowsky S, Yun T, McLean C, D'Amour A (2021). SLOE: a faster
-method for statistical inference in high-dimensional logistic
-regression. In
-"Proceedings of the 35th International Conference on Neural Information Processing Systems",
-NIPS '21. Curran Associates Inc., Red Hook, NY, USA. ISBN
-9781713845393.
+Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
+penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
+regression. \emph{arXiv}:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
+
+Yadlowsky S, Yun T, McLean CY, D' Amour A (2021). SLOE: A Faster
+Method for Statistical Inference in High-Dimensional Logistic
+Regression. In M Ranzato, A Beygelzimer, Y Dauphin, P Liang, JW
+Vaughan (eds.), \emph{Advances in Neural Information Processing
+Systems}, \strong{34}, 29517–29528. Curran Associates, Inc. \url{https://proceedings.neurips.cc/paper_files/paper/2021/file/f6c2a0c4b566bc99d596e58638e342b0-Paper.pdf}.
 }

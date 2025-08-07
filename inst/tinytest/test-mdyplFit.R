@@ -20,7 +20,7 @@ liz_fit_DY <- glm(liz_fm, family = binomial(), data = lizards,
 adj_lizards <- lizards |>
     transform(totals = grahami + opalinus) |>
     transform(g_y = grahami / totals) |>
-    transform(grahami = alpha * grahami + totals * (1 - alpha) / 2) |>
+    transform(grahami = a * grahami + totals * (1 - a) / 2) |>
     transform(opalinus = totals - grahami)
 expect_warning(
     temp_fit <- glm(cbind(grahami, opalinus) ~ height + diameter +
@@ -55,7 +55,7 @@ xx <- model.matrix(liz_fit_DY)
 vv <- solve(crossprod(xx * sqrt(v)))
 expect_equal(sqrt(diag(vv)), coef(summary(liz_fit_DY))[, "Std. Error"])
 
-## Test naming conventions
+## Naming conventions
 liz_fit_DY1 <- update(liz_fit_DY, method = "mdypl_fit")
 objs <- names(liz_fit_DY)
 objs <- objs[!(objs %in% c("call", "method"))]
@@ -63,3 +63,11 @@ for (what in objs) {
     print(expect_equal(liz_fit_DY1[[what]],
                        liz_fit_DY[[what]]))
 }
+
+
+## taus
+xx <- model.matrix(liz_fit_DY)
+expect_equal(
+    sapply(2:ncol(xx), function(j) sum( lm.fit(xx[, -c(1, j)], xx[, j])$residuals^2 ) / (nrow(xx) - ncol(xx) + 2)) |> sqrt(),
+    taus(liz_fit_DY))
+

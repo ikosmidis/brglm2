@@ -12,10 +12,11 @@ mdypl_control(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALSE)
 }
 \arguments{
 \item{alpha}{the shrinkage parameter (in \verb{[0, 1]}) in the
-Diaconis-Ylvisaker prior penalty. Default is \code{1}, which
-corresponds to maximum likelihood estimation. Setting \code{alpha = NULl} will result in \code{alpha = m / (m + p)}, where \code{m} is the
-sum of the binomial totals and \code{p} is the number of model
-parameters.}
+Diaconis-Ylvisaker prior penalty. Default is \code{NULL}, which
+results in \code{alpha = m / (m + p)}, where \code{m} is the sum of the
+binomial totals and \code{p} is the number of model
+parameters. Setting \code{alpha = 1} corresponds to using maximum
+likelihood, i.e. no penalization. See Details.}
 
 \item{epsilon}{positive convergence tolerance epsilon. Default is
 \code{1e-08}.}
@@ -25,6 +26,9 @@ allowed. Default is \code{25}.}
 
 \item{trace}{logical indicating if output should be produced for
 each iteration. Default is \code{FALSE}.}
+}
+\value{
+A list with components named as the arguments.
 }
 \description{
 Typically only used internally by \code{\link[=brglmFit]{brglmFit()}}, but may be used to
