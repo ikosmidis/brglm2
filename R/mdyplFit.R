@@ -246,8 +246,8 @@ taus <- function(object) {
     has_intercept <- attr(terms(object), "intercept")
     if (has_intercept) X <- X[, colnames(X) != "(Intercept)"]
     L <- qr.R(qr(X))
-    RSS <- 1 / colSums(backsolve(L, diag(ncol(X)), transpose = TRUE)^2)
-    sqrt(RSS / (nrow(X) - ncol(X) + 1))
+    rss <- 1 / colSums(backsolve(L, diag(ncol(X)), transpose = TRUE)^2)
+    sqrt(rss / (nrow(X) - ncol(X) + 1))
 }
 
 #' High-dimensionality correction of estimates and Wald statistics
@@ -300,15 +300,15 @@ hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
 #' If `hd_correction = TRUE`, the [sloe()] estimator of the square
 #' root of the corrupted signal strength is estimated from `object`,
 #' as are the conditional variances of each covariate given the others
-#' (excluding the intercept). The latter are estimates using residual
-#' sums of squares from linear regression mdoels, as proposed in Zhao
-#' et al (2021, Section 5.1). Then the appropriate state evolution
-#' equations are solved using [solve_se()] with `corrupted = TRUE`,
-#' and the obtained constants are used to rescale the estimates,
-#' adjusted estimated standard errors, and adjusted z-statistics as in
-#' Sterzinger & Kosmidis (2024).
+#' (excluding the intercept). The latter are estimated using residual
+#' sums of squares from the linear regression of each covariate on all
+#' the others, as proposed in Zhao et al (2021, Section 5.1). Then the
+#' appropriate state evolution equations are solved using [solve_se()]
+#' with `corrupted = TRUE`, and the obtained constants are used to
+#' rescale the estimates, and adjust estimated standard errors and
+#' z-statistics as in Sterzinger & Kosmidis (2024).
 #'
-#' The key assumptions under which the rescaled estmiates and rescaled
+#' The key assumptions under which the rescaled estmiates and adjusted
 #' standard errors and z-statistics are asymptotically valid are that
 #' the covariates have sub-Gaussian distributions, and that the signal
 #' strength, which is the limit \deqn{\gamma^2} of \eqn{var(X \beta)}
@@ -316,10 +316,11 @@ hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
 #' (0, 1)$. See Sterzinger & Kosmidis (2024).
 #'
 #' If `hd_correction = TRUE`, and the model has an intercept, then the
-#' result gives only an adjusted estimate of the intercept with no
+#' result provides only an adjusted estimate of the intercept with no
 #' accompanying standard error, z-statistic, and p-value. Also,
 #' `vcov(summary(object, hd_correction = TRUE))` is always
-#' `NULL`. Populating those objects is the subject of current work.
+#' `NULL`. Populating those objects with appropriate estimates is the
+#' subject of current work.
 #'
 #' @return
 #'
@@ -335,7 +336,7 @@ hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
 #' covariance. *Bernoulli*, **28**,
 #' 1835–1861. \doi{10.3150/21-BEJ1401}.
 #'
-#' #' Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
+#' Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
 #' penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
 #' regression. *arXiv*:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
 #'
@@ -392,7 +393,8 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
         if (missing(se_start)) {
             se_start <- c(0.5, 1, 1, theta)
         }
-        se_pars <- try(solve_se(kappa = p / nobs, ss = eta_sloe, alpha = object$alpha,
+        ka <- p / nobs
+        se_pars <- try(solve_se(kappa = ka, ss = eta_sloe, alpha = object$alpha,
                                 intercept = if (has_intercept) theta else NULL,
                                 start = se_start,
                                 corrupted = TRUE, gh = gh, prox_tol = prox_tol,
@@ -423,10 +425,88 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
         summ$aic <- family$aic(y, n, mus, pw, summ$deviance) + 2 * object$rank
         summ$cov.scaled <- summ$cov.unscaled <- NULL
         summ$se_parameters <- se_pars
+        summ$signal_strength <- (eta_sloe^2 - ka * se_pars[3]^2) / se_pars[1]^2
+        summ$kappa <- ka
     }
+    summ$hd_correction <- hd_correction
+    summ$alpha <- object$alpha
+    summ$type <- object$type
     class(summ) <- c("summary.mdyplFit", class(summ))
     summ
 }
+
+## Almost all code in print.summary.mdyplFit is from
+## stats:::print.summary.glm apart from minor modifications
+#' @rdname summary.mdyplFit
+#' @method print summary.mdyplFit
+#' @export
+print.summary.mdyplFit <- function (x, digits = max(3L, getOption("digits") - 3L),
+                                    symbolic.cor = x$symbolic.cor,
+                                    signif.stars = getOption("show.signif.stars"), ...) {
+    cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
+        "\n\n", sep = "")
+    cat("Deviance Residuals: \n")
+    if (x$df.residual > 5) {
+        x$deviance.resid <- setNames(quantile(x$deviance.resid,
+                                              na.rm = TRUE), c("Min", "1Q", "Median", "3Q", "Max"))
+    }
+    xx <- zapsmall(x$deviance.resid, digits + 1L)
+    print.default(xx, digits = digits, na.print = "", print.gap = 2L)
+    if (length(x$aliased) == 0L) {
+        cat("\nNo Coefficients\n")
+    } else {
+        df <- if ("df" %in% names(x))
+                  x[["df"]]
+              else NULL
+        if (!is.null(df) && (nsingular <- df[3L] - df[1L]))
+            cat("\nCoefficients: (", nsingular, " not defined because of singularities)\n",
+                sep = "")
+        else cat("\nCoefficients:\n")
+        coefs <- x$coefficients
+        if (!is.null(aliased <- x$aliased) && any(aliased)) {
+            cn <- names(aliased)
+            coefs <- matrix(NA, length(aliased), 4L, dimnames = list(cn,
+                                                                     colnames(coefs)))
+            coefs[!aliased, ] <- x$coefficients
+        }
+        printCoefmat(coefs, digits = digits, signif.stars = signif.stars,
+                     na.print = "NA", ...)
+    }
+    cat("\n(Dispersion parameter for ", x$family$family, " family taken to be ",
+        format(x$dispersion), ")\n\n", apply(cbind(paste(format(c("Null",
+                                                                  "Residual"), justify = "right"), "deviance:"), format(unlist(x[c("null.deviance",
+                                                                                                                                   "deviance")]), digits = max(5L, digits + 1L)), " on",
+                                                   format(unlist(x[c("df.null", "df.residual")])), " degrees of freedom\n"),
+                                             1L, paste, collapse = " "), sep = "")
+    if (nzchar(mess <- naprint(x$na.action)))
+        cat("  (", mess, ")\n", sep = "")
+    cat("AIC: ", format(x$aic, digits = max(4L, digits + 1L)))
+    cat("\n\nType of estimator:", x$type, get_type_description(x$type), "with alpha =", round(x$alpha, 2))
+    cat("\n", "Number of Fisher Scoring iterations: ", x$iter, "\n", sep = "")
+    correl <- x$correlation
+    if (!is.null(correl)) {
+        p <- NCOL(correl)
+        if (p > 1) {
+            cat("\nCorrelation of Coefficients:\n")
+            if (is.logical(symbolic.cor) && symbolic.cor) {
+                print(symnum(correl, abbr.colnames = NULL))
+            } else {
+                correl <- format(round(correl, 2L), nsmall = 2L,
+                                 digits = digits)
+                correl[!lower.tri(correl)] <- ""
+                print(correl[-1, -p, drop = FALSE], quote = FALSE)
+            }
+        }
+    }
+    if (x$hd_correction) {
+        cat("\nHigh-dimensionality correction applied with")
+        cat("\nDimentionality parameter (kappa) =", round(x$kappa, 2))
+        cat("\nEstimated signal strength (gamma) =", round(x$signal_strength, 2))
+        cat("\nState evolution parameters (mu, b, sigma) =", paste0("(", paste(round(x$se_parameters[1:3], 2), collapse = ", "), ")"), "\n")
+    }
+    invisible(x)
+}
+
 
 #' Method for computing confidence intervals for one or more
 #' regression parameters in a [`"mdyplFit"`][mdyplFit()] object

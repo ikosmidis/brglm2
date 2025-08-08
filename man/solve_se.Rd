@@ -131,11 +131,17 @@ gamma0 <- 5
 pars3 <- matrix(NA, length(thetas), 3)
 pars4 <- matrix(NA, length(thetas), 4)
 colnames(pars4) <- c("I_mu", "I_b", "I_sigma", "I_iota")
-colnames(pars3) <- c("I_mu", "I_b", "I_sigma")
+colnames(pars3) <- c("II_mu", "II_b", "II_sigma")
 for (i in seq_along(thetas)) {
-    pars3[i, ] <- solve_se(kappa = 0.2, ss = sqrt(5 + thetas[i]^2), alpha = 1, start = c(0.5, 1, 1), init_iter = 0)
-    pars4[i, ] <- solve_se(kappa = 0.2, ss = sqrt(5), alpha = 1, intercept = thetas[i], start = c(pars3[i, ], thetas[i]), init_iter = 0)
+    start3 <- c(0.5, 1, 1)
+    pars3[i, ] <- solve_se(kappa = 0.2, ss = sqrt(5 + thetas[i]^2),
+                           alpha = 1, start = start3, init_iter = 0)
+    start4 <- c(pars3[i, ], thetas[i])
+    pars4[i, ] <- solve_se(kappa = 0.2, ss = sqrt(5), intercept = thetas[i],
+                           alpha = 1, start = start4, init_iter = 0)
 }
+
+cbind(pars3, pars4)
 
 }
 }
