@@ -454,7 +454,7 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
         d_res <- sqrt(pmax(family$dev.resids(y, mus, pw), 0))
         summ$deviance.resid <- ifelse(y > mus, d_res, -d_res)
         summ$deviance <- sum(summ$deviance.resid^2)
-        summ$aic <- loglist_loglik(y, object$n_init, mus, pw, summ$deviance) + 2 * object$rank
+        summ$aic <- logist_loglik(y, object$n_init, mus, pw, summ$deviance) + 2 * object$rank
         summ$cov.scaled <- summ$cov.unscaled <- NULL
         summ$se_parameters <- se_pars
         if (!isTRUE(all(abs(attr(se_pars, "funcs")) < 1e-04))) {
