@@ -412,13 +412,13 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
         nobs <- sum(pw <- weights(object))
         has_intercept <- attr(terms(object), "intercept")
         p <- nrow(coefs) - has_intercept
-        eta_sloe <- sloe(object)
+        nu_sloe <- sloe(object)
         theta <- if (has_intercept) coefs["(Intercept)", "Estimate"] else NULL
         if (missing(se_start)) {
             se_start <- c(0.5, 1, 1, theta)
         }
         ka <- p / nobs
-        se_pars <- try(solve_se(kappa = ka, ss = eta_sloe, alpha = object$alpha,
+        se_pars <- try(solve_se(kappa = ka, ss = nu_sloe, alpha = object$alpha,
                                 intercept = if (has_intercept) theta else NULL,
                                 start = se_start,
                                 corrupted = TRUE, gh = gh, prox_tol = prox_tol,
@@ -454,7 +454,7 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
             msg <- paste0("Potentially unstable solution of the state evolution equations. Try to supply an alternative vector of ", 3 + has_intercept, " to `se_start`, with starting values for `mu` (in (0, 1)), `b` (> 0), `sigma` (> 0)", if (has_intercept) ", `intercept.`" else ".")
             warning(msg)
         }
-        summ$signal_strength <- (eta_sloe^2 - ka * se_pars[3]^2) / se_pars[1]^2
+        summ$signal_strength <- (nu_sloe^2 - ka * se_pars[3]^2) / se_pars[1]^2
         summ$kappa <- ka
     }
     summ$hd_correction <- hd_correction
