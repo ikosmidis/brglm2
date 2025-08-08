@@ -17,7 +17,6 @@ mdyplFit(
   family = binomial(),
   control = list(),
   intercept = TRUE,
-  fixed_totals = NULL,
   singular.ok = TRUE
 )
 
@@ -32,7 +31,6 @@ mdypl_fit(
   family = binomial(),
   control = list(),
   intercept = TRUE,
-  fixed_totals = NULL,
   singular.ok = TRUE
 )
 }
@@ -100,7 +98,7 @@ list passed to \code{control}. If \code{alpha = 1} then
 estimation.
 
 For high-dimensionality corrected estimates, standard errors and z
-statistics, use the \code{\link[=summary.mdypFfit]{summary}} method for
+statistics, use the \code{\link[=summary.mdyplFit]{summary}} method for
 \href{mdyplFit()}{\code{"mdyplFit"}} objects with \code{hd_correction = TRUE}.
 
 \code{\link[=mdypl_fit]{mdypl_fit()}} is an alias to \code{\link[=mdyplFit]{mdyplFit()}}.

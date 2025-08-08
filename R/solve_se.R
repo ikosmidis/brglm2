@@ -1,7 +1,6 @@
 #' Solve the MDYPL state evolution equations with or without
 #' intercept, with signal strength or contaminated signal strength
 #'
-#' @param mu aggregate bias parameter.
 #' @param kappa asymptotic ratio of columns/rows of the design
 #'     matrix. `kappa` should be in `(0, 1)`.
 #' @param ss signal strength or corrupted signal strength, depending
@@ -87,6 +86,9 @@
 #' messages from the last optimization method (`"message"`), and
 #' information on the optimization methods used
 #' (`"optimization-chain"`).
+#'
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}, Federico Boiocchi `[ctb]` \email{federico.boiocchi@gmail.com}, Philipp Sterzinger `[ctb, earlier Julia code by] \email{P.Sterzinger@lse.ac.uk}
+#'
 #'
 #' @references
 #'

@@ -131,7 +131,7 @@
 #'
 #' @return
 #'
-#' An object inheriting from [`"brglmFit"`][brglmlFit()] object, which
+#' An object inheriting from [`"brglmFit"`][brglmFit()] object, which
 #' is a list having the same elements to the list that
 #' [stats::glm.fit()] returns, with a few extra arguments.
 #'

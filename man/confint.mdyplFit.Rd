@@ -54,3 +54,9 @@ ag_coverage(adj_wald_ci, betas)
 }
 
 }
+\seealso{
+\code{\link[=mdyplFit]{mdyplFit()}}, \code{\link[=summary.mdyplFit]{summary.mdyplFit()}}
+}
+\author{
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
+}

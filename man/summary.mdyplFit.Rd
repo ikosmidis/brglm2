@@ -78,7 +78,7 @@ but can also be \code{0} in which case \code{start} is directly passed to
 A list with objects as in the result of \code{\link[stats:summary.glm]{stats::summary.glm()}},
 with extra component \code{se_parameters}, which is the vector of the
 solution to the state evolution equations with extra attributes
-(see \code{\link[=se_solve]{se_solve()}}).
+(see \code{\link[=solve_se]{solve_se()}}).
 }
 \description{
 Summary method for \code{\link[=mdyplFit]{"mdyplFit"}} objects
@@ -158,4 +158,10 @@ covariance. \emph{Bernoulli}, \strong{28},
 Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
 penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
 regression. \emph{arXiv}:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
+}
+\seealso{
+\code{\link[=mdyplFit]{mdyplFit()}}, \code{\link[=solve_se]{solve_se()}}
+}
+\author{
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
 }

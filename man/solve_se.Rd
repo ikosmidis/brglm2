@@ -71,8 +71,6 @@ but can also be \code{0} in which case \code{start} is directly passed to
 \item{...}{further arguments to be passed to \code{\link[nleqslv:nleqslv]{nleqslv::nleqslv()}},
 unless \code{init_iter = "only"}, in which case \code{...} is further
 arguments to be passed to \code{\link[=optim]{optim()}}.}
-
-\item{mu}{aggregate bias parameter.}
 }
 \value{
 If \code{intercept = NULL}, a vector with the values of \code{mu},
@@ -153,4 +151,7 @@ covariance. \emph{Bernoulli}, \strong{28}, 1835–1861. \doi{10.3150/21-BEJ1401}
 Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
 penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
 regression. \emph{arXiv}:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
+}
+\author{
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}, Federico Boiocchi \verb{[ctb]} \email{federico.boiocchi@gmail.com}, Philipp Sterzinger `\link{ctb, earlier Julia code by} \email{P.Sterzinger@lse.ac.uk}
 }

@@ -41,3 +41,9 @@ regression model on responses \code{alpha * y + (1 - alpha) / 2}, where
 totals. \code{epsilon}, \code{maxit} and \code{trace} control the
 \code{\link[stats:glm]{stats::glm.fit()}} call; see \code{\link[stats:glm.control]{stats::glm.control()}}.
 }
+\seealso{
+\code{\link[=mdyplFit]{mdyplFit()}}, \code{\link[=glm.control]{glm.control()}}
+}
+\author{
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
+}

@@ -87,7 +87,7 @@ for more information and \code{\link[=brmultinom]{brmultinom()}}.}
 error.}
 }
 \value{
-An object inheriting from \code{\link[=brglmlFit]{"brglmFit"}} object, which
+An object inheriting from \code{\link[=brglmFit]{"brglmFit"}} object, which
 is a list having the same elements to the list that
 \code{\link[stats:glm]{stats::glm.fit()}} returns, with a few extra arguments.
 }

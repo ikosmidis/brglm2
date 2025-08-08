@@ -44,3 +44,9 @@ Vaughan (eds.), \emph{Advances in Neural Information Processing
 Systems}, \strong{34}, 29517–29528. Curran Associates,
 Inc. \url{https://proceedings.neurips.cc/paper_files/paper/2021/file/f6c2a0c4b566bc99d596e58638e342b0-Paper.pdf}.
 }
+\seealso{
+\code{\link[=summary.mdyplFit]{summary.mdyplFit()}}
+}
+\author{
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
+}

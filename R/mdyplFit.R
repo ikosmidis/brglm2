@@ -30,7 +30,7 @@
 #' estimation.
 #'
 #' For high-dimensionality corrected estimates, standard errors and z
-#' statistics, use the [`summary`][summary.mdypFfit()] method for
+#' statistics, use the [`summary`][summary.mdyplFit()] method for
 #' [`"mdyplFit"`](mdyplFit()) objects with `hd_correction = TRUE`.
 #'
 #' [mdypl_fit()] is an alias to [mdyplFit()].
@@ -111,7 +111,7 @@
 mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
                      mustart = NULL, offset = rep(0, nobs), family = binomial(),
                      control = list(), intercept = TRUE,
-                     fixed_totals = NULL, singular.ok = TRUE) {
+                     singular.ok = TRUE) {
 
     nobs <- NROW(y)
     if (!isTRUE(family$family == "binomial" && family$link == "logit")) {
@@ -220,6 +220,10 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 #'
 #' A list with components named as the arguments.
 #'
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
+#'
+#' @seealso [mdyplFit()], [glm.control()]
+#'
 #' @export
 mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALSE) {
     out <- glm.control(epsilon, maxit, trace)
@@ -257,6 +261,10 @@ mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALS
 #'
 #' A scalar.
 #'
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
+#'
+#' @seealso [summary.mdyplFit()]
+#'
 #' @references
 #'
 #' Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior
@@ -288,38 +296,6 @@ taus <- function(object) {
     sqrt(rss / (nrow(X) - ncol(X) + 1))
 }
 
-#' High-dimensionality correction of estimates and Wald statistics
-#' from [mdyplFit()] objects.
-#'
-#' @param object an [`"mdyplFit"`][mdyplFit()] object.
-#' @param se_start starting values for the parameters of the state
-#'     evoultion equations; see [solve_se()].
-#' @param null a vector of null values for the parameters estimated in
-#'     `object`. Default is `0`.
-#'
-#' @return
-#'
-#' A table of corrected coefficients, Wald statistics and p-values
-#'
-#' @export
-hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
-    coefs <- coef(object)
-    nobs <- sum(object$prior.weights)
-    has_intercept <- attr(terms(object), "intercept")
-    p <- length(coefs) - has_intercept
-    eta_sloe <- sloe(object)
-    se_pars <- solve_se(kappa = p / nobs, ss = eta_sloe, alpha = object$alpha,
-                        intercept = if (has_intercept) coefs["(Intercept)"] else NULL,
-                        start = se_start,
-                        corrupted = TRUE)
-    tt <- taus(object)
-    adj_z <- sqrt(nobs) * tt * (coef(object) - se_pars[1] * null) / se_pars[3]
-    adj_coef <- coefs / se_pars[1]
-    pv <- 2 * pnorm(-abs(adj_z))
-    coef_table <- cbind(adj_coef, adj_z, pv)
-    dimnames(coef_table) <- list(names(coefs), c("Rescaled-estimate", "z value", "Pr(>|z|)"))
-    list(coef_table, se_pars, eta_sloe, nobs, p)
-}
 
 #' Summary method for [`"mdyplFit"`][mdyplFit()] objects
 #'
@@ -366,7 +342,11 @@ hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
 #' A list with objects as in the result of [stats::summary.glm()],
 #' with extra component `se_parameters`, which is the vector of the
 #' solution to the state evolution equations with extra attributes
-#' (see [se_solve()]).
+#' (see [solve_se()]).
+#'
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
+#'
+#' @seealso [mdyplFit()], [solve_se()]
 #'
 #' @references
 #'
@@ -561,6 +541,10 @@ print.summary.mdyplFit <- function (x, digits = max(3L, getOption("digits") - 3L
 #'
 #' @inheritParams stats::confint
 #' @inheritParams summary.mdyplFit
+#'
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
+#'
+#' @seealso [mdyplFit()], [summary.mdyplFit()]
 #'
 #' @examples
 #'
