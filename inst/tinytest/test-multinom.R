@@ -9,10 +9,8 @@ hepat$type <- with(hepat, factor(1 - HCV * nonABC + HCV + 2 * nonABC))
 hepat$type <- factor(hepat$type, labels = c("noDisease", "C", "nonABC"))
 contrasts(hepat$type) <- contr.treatment(3, base = 1)
 
-expect_warning(
-    hepbr <- brmultinom(type ~ group * time,
-                        data = hepat, weights = counts)
-)
+hepbr <- brmultinom(type ~ group * time,
+                    data = hepat, weights = counts)
 
 ## ML fails when there is separation
 expect_warning(brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML"),
@@ -23,10 +21,8 @@ bulletall2002table3 <- matrix(c(-2.43, -1.57, 1.96, -0.36, -0.38, 0.26), ncol = 
 expect_equal(coef(hepbr)[, -1], t(bulletall2002table3), tolerance = 1e-02, check.attributes = FALSE)
 
 ##############
-expect_warning(
-    hepbr_mat <- brmultinom(counts * nnet::class.ind(type) ~ group * time,
-                            data = hepat)
-)
+hepbr_mat <- brmultinom(counts * nnet::class.ind(type) ~ group * time,
+                        data = hepat)
 
 tol <- 1e-05
 ## brmultinom returns the same estimates if counts are supplied as a matrix
@@ -54,9 +50,8 @@ enzymes$counts <- rep(1, nrow(enzymes))
 ## this expect_warning here is preventive for the non-integer counts
 ## warnings that are generated internally but are not visible to the
 ## user
-expect_warning(
-    enzbrmultinom_ml <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes, type = "ML")
-)
+enzbrmultinom_ml <- brmultinom(Group ~ AST + GLDH, weights = counts, data = enzymes, type = "ML")
+
 enzmultinom <- multinom(Group ~ AST + GLDH, weights = counts, data = enzymes, trace = FALSE)
 
 
@@ -105,14 +100,12 @@ expect_equal(logLik(enzbrmultinom_ml), logLik(enzmultinom), tolerance = tol)
 expect_equal(summary(enzbrmultinom_ml)$standard.errors, summary(enzmultinom)$standard.errors, tolerance = 1e-04)
 
 
-expect_warning({
-    hepbr1 <- brmultinom(type ~ group * time,
-                         data = hepat, weights = counts, ref = 1)
-    hepbr2 <- brmultinom(type ~ group * time,
-                         data = hepat, weights = counts, ref = 2)
-    hepbr3 <- brmultinom(type ~ group * time,
-                         data = hepat, weights = counts, ref = 3)
-})
+hepbr1 <- brmultinom(type ~ group * time,
+                     data = hepat, weights = counts, ref = 1)
+hepbr2 <- brmultinom(type ~ group * time,
+                     data = hepat, weights = counts, ref = 2)
+hepbr3 <- brmultinom(type ~ group * time,
+                     data = hepat, weights = counts, ref = 3)
 
 ## brmultinom fits are invariant to the value of ref (ref1 vs ref2)'", {
 expect_equal(hepbr1$fitted.values, hepbr2$fitted.values, tolerance = 1e-04)

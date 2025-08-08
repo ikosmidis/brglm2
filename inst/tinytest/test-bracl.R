@@ -25,16 +25,13 @@ ge <- c(1, 1, 1, 0, 0, 0)
 suppressWarnings(fit_vgam_p <- vglm(cbind(ff[1, ], ff[2, ], ff[3, ], ff[4, ]) ~ re + ge, family = acat(reverse = TRUE, parallel = TRUE)))
 
 
-expect_warning(
-    fit_bracl_p <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell, type = "ML", parallel = TRUE)
-)
+fit_bracl_p <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell, type = "ML", parallel = TRUE)
 
 
 fit_vgam <- vglm(cbind(ff[1, ], ff[2, ], ff[3, ], ff[4, ]) ~ re + ge, family = acat(reverse = TRUE, parallel = FALSE))
 ## Without proportional odds
-expect_warning(
-    fit_bracl <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell, type = "ML")
-)
+fit_bracl <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = stemcell, type = "ML")
+
 
 tol <- 1e-06
 ## "VGAM::vglm and bracl return the same coefficients
@@ -61,13 +58,9 @@ shu <- function(dat)  dat[sample(seq.int(nrow(dat)), nrow(dat)), ]
 
 ## bracl results is invariance to shuffling of the data
 for (j in 1:10) {
-    expect_warning(
-        fit_bracl_p_r <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = TRUE)
-    )
+    fit_bracl_p_r <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = TRUE)
 
-    expect_warning(
-        fit_bracl_r <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = FALSE)
-    )
+     fit_bracl_r <- bracl(research ~ as.numeric(religion) + gender, weights = frequency, data = shu(stemcell), type = "ML", parallel = FALSE)
 
     expect_equal(coef(fit_bracl), coef(fit_bracl_r), tolerance = tol)
     expect_equal(coef(fit_bracl_p), coef(fit_bracl_p_r), tolerance = tol)

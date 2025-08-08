@@ -253,10 +253,7 @@ nleqslv_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL
     stopifnot(length(start) == npar)
     start <- c(if (transform) log(start[1:3]) else start[1:3],
                if (no_intercept) NULL else start[4])
-    warn0 <- getOption("warn")
-    options(warn = -1)
-    res <- nleqslv(start, g, ...)
-    options(warn = warn0)
+    suppressWarnings(res <- nleqslv(start, g, ...))
     if (transform) {
         if (no_intercept) {
             soln <- exp(res$x)
@@ -289,7 +286,7 @@ optim_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, pr
     } else {
         soln <- c(exp(res$par[1:3]), res$par[4])
     }
-    attr(soln, "objective") <- res$value
+    attr(soln, "funcs") <- g(soln)
     attr(soln, "iter") <- res$counts
     attr(soln, "convergence") <- res$convergence
     attr(soln, "message") <- res$message
@@ -305,16 +302,13 @@ optim_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, 
     obj <- function(pars) {
         sum(g(pars)^2)
     }
-    warn0 <- getOption("warn")
-    options(warn = -1)
-    res <- optim(start, obj, ...)
-    options(warn = warn0)
+    suppressWarnings(res <- optim(start, obj, ...))
     if (no_intercept) {
         soln <- exp(res$par)
     } else {
         soln <- c(exp(res$par[1:3]), res$par[4])
     }
-    attr(soln, "funcs") <- g(soln)
+    suppressWarnings(attr(soln, "funcs") <- g(soln))
     attr(soln, "iter") <- res$counts
     attr(soln, "convergence") <- res$convergence
     attr(soln, "message") <- res$message

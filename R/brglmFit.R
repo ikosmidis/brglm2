@@ -774,18 +774,15 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                 y.adj <- y + if (family$family == "poisson") (!(is_correction)) * 0.5 * adj else 0
             }
             ## ML fit to get starting values
-            warn <- getOption("warn")
             ## Get startng values and kill warnings whilst doing that
-            options(warn = -1)
-            tempFit <- glm.fit(x = x, y = y.adj, weights = weights.adj,
-                               etastart = etastart, mustart = mustart,
-                               offset = offset, family = family,
-                               control = list(epsilon = control$epsilon,
-                                              maxit = 10000, trace = FALSE),
-                               intercept = intercept)
-
-            ## Set warn to its original value
-            options(warn = warn)
+            suppressWarnings(
+                tempFit <- glm.fit(x = x, y = y.adj, weights = weights.adj,
+                                   etastart = etastart, mustart = mustart,
+                                   offset = offset, family = family,
+                                   control = list(epsilon = control$epsilon,
+                                                  maxit = 10000, trace = FALSE),
+                                   intercept = intercept)
+            )
             betas <- coef(tempFit)
             names(betas) <- betas_names
             dispList <- estimate_dispersion(betas, y = y)

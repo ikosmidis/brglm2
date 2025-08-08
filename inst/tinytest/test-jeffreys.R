@@ -28,7 +28,9 @@ expect_equal(grad(penloglik,
                   y = model.response(mod$model)), rep(0, 5), tolerance = 1.5 * 1e-05)
 
 ## the numerical gradient of the penalized log-likelihood matches that from type = 'MPL_Jeffreys'
-expect_warning(g1 <- update(mod, method = "brglmFit", type = "MPL_Jeffreys", maxit = 0, start = coef(mod, model = "full"))$grad)
+expect_warning(
+    g1 <- update(mod, method = "brglmFit", type = "MPL_Jeffreys", maxit = 0, start = coef(mod, model = "full"))$grad
+)
 g2 <- grad(penloglik,
            x = coef(mod, model = "full"),
            X = model.matrix(mod),
@@ -49,11 +51,9 @@ for (l in seq_along(links)) {
                                  method = "brglm.fit", br.epsilon = 1e-10, br.maxit = 1000, pl = TRUE)
     )
 
-    expect_warning(
-        lizardsBR <- glm(cbind(grahami, opalinus) ~ height + diameter +
-                             light + time, family = binomial(links[[l]]), data=lizards,
-                         method = "brglmFit", epsilon = 1e-10, maxit = 1000, type = "MPL_Jeffreys")
-    )
+    lizardsBR <- glm(cbind(grahami, opalinus) ~ height + diameter +
+                         light + time, family = binomial(links[[l]]), data=lizards,
+                     method = "brglmFit", epsilon = 1e-10, maxit = 1000, type = "MPL_Jeffreys")
     ## glm with brglm.fit method and brglm_0 return the same coefficients for the lizards when link is links[[l]]$name)
     expect_equal(coef(lizardsBR), coef(lizardsBRlegacy), tolerance = tol)
 }

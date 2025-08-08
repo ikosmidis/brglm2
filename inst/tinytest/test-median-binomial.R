@@ -14,18 +14,16 @@ for (l in seq_along(links)) {
     lizardsMBRlegacy <- mbrglm(lizardsFormula, family = binomial(links[[l]]), data = lizards,
                                        method = "mbrglm.fit",
                                        control.mbrglm = mbrglmControl)
-    expect_warning(lizardsMBR <- glm(lizardsFormula, family = binomial(links[[l]]), data = lizards,
-                                     method = "brglmFit", type="AS_median", epsilon = 1e-10, maxit = 1000))
+    lizardsMBR <- glm(lizardsFormula, family = binomial(links[[l]]), data = lizards,
+                      method = "brglmFit", type= "AS_median", epsilon = 1e-10, maxit = 1000)
 
     ## Endometrial
     endoFormula <- HG ~ NV + PI + EH
-    expect_warning({
-        endoMBRlegacy <- mbrglm(endoFormula, family = binomial(links[[l]]), data = endometrial,
-                                        method = "mbrglm.fit",
-                                        control.mbrglm = mbrglmControl)
-        endoMBR <- glm(endoFormula, family = binomial(links[[l]]), data = endometrial,
-                       method = "brglmFit", type = "AS_median", epsilon = 1e-10, maxit = 1000)
-    })
+    endoMBRlegacy <- mbrglm(endoFormula, family = binomial(links[[l]]), data = endometrial,
+                            method = "mbrglm.fit",
+                            control.mbrglm = mbrglmControl)
+    endoMBR <- glm(endoFormula, family = binomial(links[[l]]), data = endometrial,
+                   method = "brglmFit", type = "AS_median", epsilon = 1e-10, maxit = 1000)
 
     c1 <- coef(summary(endoMBRlegacy))
     c2 <- coef(summary(endoMBR))

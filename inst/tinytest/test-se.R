@@ -24,10 +24,8 @@ for (st in opt_str) {
 }
 
 nu0 <- sqrt(soln0[1]^2 * gamma0^2 + kappa0 * soln0[3]^2)
-expect_warning(
-    soln0_c <- solve_se(kappa0, nu0, alpha0, start = soln0, corrupted = TRUE,
-                        init_iter = "only", init_method = "Nelder-Mead")
-)
+soln0_c <- solve_se(kappa0, nu0, alpha0, start = soln0, corrupted = TRUE,
+                    init_iter = "only", init_method = "Nelder-Mead")
 expect_equal(soln0_c, soln0, check.attributes = FALSE, tolerance = 1e-07)
 
 ## 4 par
@@ -46,10 +44,8 @@ for (st in opt_str) {
 }
 
 nu0 <- sqrt(soln1[1]^2 * gamma0^2 + kappa0 * soln1[3]^2)
-expect_warning(
-    soln1_c <- solve_se(kappa0, nu0, alpha0, soln1[4], start = soln1, corrupted = TRUE,
-                        init_iter = 44, init_method = "Nelder-Mead")
-)
+soln1_c <- solve_se(kappa0, nu0, alpha0, soln1[4], start = soln1, corrupted = TRUE,
+                    init_iter = 44, init_method = "Nelder-Mead")
 expect_equal(soln1_c[1:3], soln1[1:3], check.attributes = FALSE, tolerance = 1e-07)
 expect_equal(soln1_c[4], theta0, check.attributes = FALSE, tolerance = 1e-07)
 

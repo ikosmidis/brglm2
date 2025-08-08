@@ -61,7 +61,7 @@ but can also be \code{0} in which case \code{start} is directly passed to
 \item{init_method}{The method to be passed to \code{\link[=optim]{optim()}}. Default is
 \code{"Nelder-Mead"}.}
 
-\item{...}{further arguments passed to or from other methods.}
+\item{...}{further arguments to be passed to \code{\link[=summary.glm]{summary.glm()}}.}
 
 \item{x}{an object of class \code{"summary.glm"}, usually, a result of a
     call to \code{summary.glm}.}
@@ -95,7 +95,7 @@ with \code{corrupted = TRUE}, and the obtained constants are used to
 rescale the estimates, and adjust estimated standard errors and
 z-statistics as in Sterzinger & Kosmidis (2024).
 
-The key assumptions under which the rescaled estmiates and adjusted
+The key assumptions under which the rescaled estmiates and corrected
 standard errors and z-statistics are asymptotically valid are that
 the covariates have sub-Gaussian distributions, and that the signal
 strength, which is the limit \deqn{\gamma^2} of \eqn{var(X \beta)}
@@ -103,7 +103,7 @@ is finite as \eqn{p / n \to \kappa \in (0, 1)}, with $\kappa \in
 (0, 1)$. See Sterzinger & Kosmidis (2024).
 
 If \code{hd_correction = TRUE}, and the model has an intercept, then the
-result provides only an adjusted estimate of the intercept with no
+result provides only a corrected estimate of the intercept with no
 accompanying standard error, z-statistic, and p-value. Also,
 \code{vcov(summary(object, hd_correction = TRUE))} is always
 \code{NULL}. Populating those objects with appropriate estimates is the
@@ -111,8 +111,8 @@ subject of current work.
 }
 \examples{
 
-## A simulated data set
 \dontrun{
+
 set.seed(123)
 n <- 2000
 p <- 400
@@ -139,11 +139,15 @@ plot(betas, type = "l", ylim = c(-3, 14),
 points(coef(hd_summary)[, "Estimate"], col = NA, bg = cols[2], pch = 21)
 
 ## z-statistics
-qqnorm(coef(st_summary)[betas == 0, "z value"], col = NA, bg = cols[1], pch = 21, main = "z value")
+z_mdypl <- coef(st_summary)[betas == 0, "z value"]
+qqnorm(z_mdypl, col = NA, bg = cols[1], pch = 21, main = "z value")
 abline(0, 1, lty = 2)
-qqnorm(coef(hd_summary)[betas == 0, "z value"], col = NA, bg = cols[2], pch = 21, main = "adjusted z value")
+z_c_mdypl <- coef(hd_summary)[betas == 0, "z value"]
+qqnorm(z_c_mdypl, col = NA, bg = cols[2], pch = 21, main = "corrected z value")
 abline(0, 1, lty = 2)
+
 }
+
 }
 \references{
 Zhao Q, Sur P, Candes E J (2022). The asymptotic distribution of

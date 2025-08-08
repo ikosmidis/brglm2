@@ -34,6 +34,7 @@ regression parameters in a \code{\link[=mdyplFit]{"mdyplFit"}} object
 \examples{
 
 \dontrun{
+
 set.seed(123)
 n <- 2000
 p <- 800

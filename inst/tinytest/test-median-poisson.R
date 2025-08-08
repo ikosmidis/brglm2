@@ -14,10 +14,8 @@ dobson <- data.frame(counts, outcome, treatment)
 tol <- 1e-06
 
 ## MBR estimates and std. errors from brglmFit and from mbrpr are the same for poisson
-expect_warning(
-    br1 <- summary(fit<-glm(counts ~ outcome + treatment, family = poisson(), method = "brglmFit",
-                            type="AS_median"))
-)
+br1 <- summary(fit <- glm(counts ~ outcome + treatment, family = poisson(), method = "brglmFit",
+                          type = "AS_median"))
 
 X <- model.matrix(fit)
 y <- fit$y

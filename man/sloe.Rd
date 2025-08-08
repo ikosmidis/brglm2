@@ -41,5 +41,6 @@ Yadlowsky S, Yun T, McLean CY, D' Amour A (2021). SLOE: A Faster
 Method for Statistical Inference in High-Dimensional Logistic
 Regression. In M Ranzato, A Beygelzimer, Y Dauphin, P Liang, JW
 Vaughan (eds.), \emph{Advances in Neural Information Processing
-Systems}, \strong{34}, 29517–29528. Curran Associates, Inc. \url{https://proceedings.neurips.cc/paper_files/paper/2021/file/f6c2a0c4b566bc99d596e58638e342b0-Paper.pdf}.
+Systems}, \strong{34}, 29517–29528. Curran Associates,
+Inc. \url{https://proceedings.neurips.cc/paper_files/paper/2021/file/f6c2a0c4b566bc99d596e58638e342b0-Paper.pdf}.
 }

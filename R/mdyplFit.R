@@ -22,21 +22,28 @@
 #' set to zero. See Rigon & Aliverti (2023) and Sterzinger & Kosmidis
 #' (2024).
 #'
+#' By default, `alpha = m / (p + m)` is used, where `m` is the sum of
+#' the binomial totals. Alternative values of `alpha` can be passed to
+#' the `control` argument; see [mdyplControl()] for setting up the
+#' list passed to `control`. If `alpha = 1` then
+#' [`"mdyplFit"`][mdyplFit()] will simply do maximum likelihood
+#' estimation.
+#'
+#' For high-dimensionality corrected estimates, standard errors and z
+#' statistics, use the [`summary`][summary.mdypFfit()] method for
+#' [`"mdyplFit"`](mdyplFit()) objects with `hd_correction = TRUE`.
+#'
 #' [mdypl_fit()] is an alias to [mdyplFit()].
 #'
 #' @return
 #'
 #' An object inheriting from [`"mdyplFit"`][mdyplFit()] object, which
 #' is a list having the same elements to the list that
-#' [stats::glm.fit()] returns, with a few extra arguments. By default,
-#' `alpha = m / (p + m)` is used, where `m` is the sum of the binomial
-#' totals. Alternative values of `alpha` can be passed to the
-#' `control` argument; see [mdyplControl()] for setting up the list
-#' passed to `control`.
+#' [stats::glm.fit()] returns, with a few extra arguments.
 #'
 #' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
 #'
-#' @seealso [mdyPLcontrol()], [glm.fit()], [glm()]
+#' @seealso [mdyplControl()], [glm.fit()], [glm()]
 #'
 #' @references
 #'
@@ -50,8 +57,36 @@
 #'
 #' @examples
 #'
-#' ## A simulated data set as in Rigon & Aliverti (2023, Section 4.3)
+#' data("lizards", package = "brglm2")
+#'
+#' ## ML fit = MDYPL fit with `alpha = 1`
+#' liz_ml <- glm(liz_fm, family = binomial(), data = lizards,
+#'               method = "mdyplFit", alpha = 1)
+#' liz_ml0 <- glm(liz_fm, family = binomial(), data = lizards)
+#'
+#' ## liz_ml is the same fit as liz_ml0
+#' summ_liz_ml <- summary(liz_ml)
+#' summ_liz_ml0 <- summary(liz_ml0)
+#' all.equal(coef(summ_liz_ml), coef(summ_liz_ml0))
+#'
+#' ## MDYPL fit with default `alpha` (see `?mdyplControl`)
+#' liz_fm <- cbind(grahami, opalinus) ~ height + diameter + light + time
+#' liz_mdypl <- glm(liz_ml, family = binomial(), data = lizards,
+#'                  method = "mdyplFit")
+#'
+#' ## Comparing outputs from ML and MDYPL, with and without
+#' ## high-dimensionality corrections. #'
+#' summary(liz_mdypl)
+#' summary(liz_mdypl, hd_correction = TRUE)
+#' summ_liz_ml
+#' summary(liz_ml, hd_correction = TRUE)
+#' ## Not much difference in fits here as this is a low dimensional
+#' ## problem with dimensionality constant
+#' (liz_ml$rank - 1) / sum(weights(liz_ml))
+#'
 #' \dontrun{
+#' ## A simulated data set as in Rigon & Aliverti (2023, Section 4.3)
+#'
 #' set.seed(123)
 #' n <- 1000
 #' p <- 500
@@ -70,6 +105,7 @@
 #' ag_bias <- function(estimates, beta) mean(estimates - beta)
 #' ag_bias(coef(summary(fit_mdypl))[, "Estimate"], betas)
 #' ag_bias(coef(summary(fit_mdypl, hd_correction = TRUE))[, "Estimate"], betas)
+#'
 #' }
 #' @export
 mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
@@ -83,6 +119,7 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     }
 
     control <- do.call("mdyplControl", control)
+
     missing_offset <- is.null(offset)
 
     if (is.null(weights)) {
@@ -106,12 +143,12 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 
     ## adjust responses as per MDYPL with beta_P = 0
     y_adj <- alpha * y + (1 - alpha) / 2
-
+    control_glm <- glm.control(epsilon = control$epsilon,
+                               maxit = control$maxit, trace = control$trace)
     out <- glm.fit(x = x, y = y_adj, weights = weights,
                    etastart = etastart, mustart = mustart,
                    offset = offset, family = quasibinomial(),
-                   control = list(epsilon = control$epsilon,
-                                  maxit = control$maxit, trace = control$trace),
+                   control = control_glm,
                    intercept = intercept, singular.ok = singular.ok)
 
     mus <- out$fitted.values
@@ -146,7 +183,7 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     out$aic <- family$aic(y, n, mus, weights, deviance) + 2 * out$rank
     out$alpha <- alpha
     out$type <- "MPL_DY"
-
+    out$control <- control
     out$class <- c("mdyplFit")
     out
 }
@@ -230,7 +267,8 @@ mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALS
 #' Method for Statistical Inference in High-Dimensional Logistic
 #' Regression. In M Ranzato, A Beygelzimer, Y Dauphin, P Liang, JW
 #' Vaughan (eds.), *Advances in Neural Information Processing
-#' Systems*, **34**, 29517–29528. Curran Associates, Inc. \url{https://proceedings.neurips.cc/paper_files/paper/2021/file/f6c2a0c4b566bc99d596e58638e342b0-Paper.pdf}.
+#' Systems*, **34**, 29517–29528. Curran Associates,
+#' Inc. \url{https://proceedings.neurips.cc/paper_files/paper/2021/file/f6c2a0c4b566bc99d596e58638e342b0-Paper.pdf}.
 #'
 #' @export
 sloe <- function(object) {
@@ -294,6 +332,7 @@ hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
 #'     standard errors, z-statistics. See Details.
 #' @param se_start a vector of starting values for the state evolution
 #'     equations. See the `start` argument in [solve_se()].
+#' @param ... further arguments to be passed to [summary.glm()].
 #'
 #' @details
 #'
@@ -308,7 +347,7 @@ hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
 #' rescale the estimates, and adjust estimated standard errors and
 #' z-statistics as in Sterzinger & Kosmidis (2024).
 #'
-#' The key assumptions under which the rescaled estmiates and adjusted
+#' The key assumptions under which the rescaled estmiates and corrected
 #' standard errors and z-statistics are asymptotically valid are that
 #' the covariates have sub-Gaussian distributions, and that the signal
 #' strength, which is the limit \deqn{\gamma^2} of \eqn{var(X \beta)}
@@ -316,7 +355,7 @@ hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
 #' (0, 1)$. See Sterzinger & Kosmidis (2024).
 #'
 #' If `hd_correction = TRUE`, and the model has an intercept, then the
-#' result provides only an adjusted estimate of the intercept with no
+#' result provides only a corrected estimate of the intercept with no
 #' accompanying standard error, z-statistic, and p-value. Also,
 #' `vcov(summary(object, hd_correction = TRUE))` is always
 #' `NULL`. Populating those objects with appropriate estimates is the
@@ -342,8 +381,8 @@ hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
 #'
 #' @examples
 #'
-#' ## A simulated data set
 #' \dontrun{
+#'
 #' set.seed(123)
 #' n <- 2000
 #' p <- 400
@@ -370,11 +409,15 @@ hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
 #' points(coef(hd_summary)[, "Estimate"], col = NA, bg = cols[2], pch = 21)
 #'
 #' ## z-statistics
-#' qqnorm(coef(st_summary)[betas == 0, "z value"], col = NA, bg = cols[1], pch = 21, main = "z value")
+#' z_mdypl <- coef(st_summary)[betas == 0, "z value"]
+#' qqnorm(z_mdypl, col = NA, bg = cols[1], pch = 21, main = "z value")
 #' abline(0, 1, lty = 2)
-#' qqnorm(coef(hd_summary)[betas == 0, "z value"], col = NA, bg = cols[2], pch = 21, main = "adjusted z value")
+#' z_c_mdypl <- coef(hd_summary)[betas == 0, "z value"]
+#' qqnorm(z_c_mdypl, col = NA, bg = cols[2], pch = 21, main = "corrected z value")
 #' abline(0, 1, lty = 2)
+#'
 #'}
+#'
 #' @method summary mdyplFit
 #' @export
 summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
@@ -401,7 +444,8 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
                                 transform = transform, init_method = init_method,
                                 init_iter = init_iter), silent = TRUE)
         if (inherits(se_pars, "try-error")) {
-            stop(paste("Unable to solve the state evolution equations. Try to supply an alternative vector of", 3 + has_intercept, "to `se_start`, which is starting values for `mu` (in (0, 1)), `b` (> 0), `sigma` (> 0)", if (has_intercept) "and `intercept`" else NULL))
+            msg <- paste("Unable to solve the state evolution equations. Try to supply an alternative vector of ", 3 + has_intercept, " to `se_start`, with starting values for `mu` (in (0, 1)), `b` (> 0), `sigma` (> 0)", if (has_intercept) ", `intercept.`" else ".")
+            stop(msg)
         }
         tt <- taus(object)
         no_int <- !(rownames(coefs) %in% "(Intercept)")
@@ -425,6 +469,10 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
         summ$aic <- family$aic(y, n, mus, pw, summ$deviance) + 2 * object$rank
         summ$cov.scaled <- summ$cov.unscaled <- NULL
         summ$se_parameters <- se_pars
+        if (!isTRUE(all(abs(attr(se_pars, "funcs")) < 1e-04))) {
+            msg <- paste0("Potentially unstable solution of the state evolution equations. Try to supply an alternative vector of ", 3 + has_intercept, " to `se_start`, with starting values for `mu` (in (0, 1)), `b` (> 0), `sigma` (> 0)", if (has_intercept) ", `intercept.`" else ".")
+            warning(msg)
+        }
         summ$signal_strength <- (eta_sloe^2 - ka * se_pars[3]^2) / se_pars[1]^2
         summ$kappa <- ka
     }
@@ -502,7 +550,7 @@ print.summary.mdyplFit <- function (x, digits = max(3L, getOption("digits") - 3L
         cat("\nHigh-dimensionality correction applied with")
         cat("\nDimentionality parameter (kappa) =", round(x$kappa, 2))
         cat("\nEstimated signal strength (gamma) =", round(x$signal_strength, 2))
-        cat("\nState evolution parameters (mu, b, sigma) =", paste0("(", paste(round(x$se_parameters[1:3], 2), collapse = ", "), ")"), "\n")
+        cat("\nState evolution parameters (mu, b, sigma) =", paste0("(", paste(round(x$se_parameters[1:3], 2), collapse = ", "), ")"), "with max(|funcs|) =", max(abs(attr(x$se_parameters, "funcs"))), "\n")
     }
     invisible(x)
 }
@@ -517,6 +565,7 @@ print.summary.mdyplFit <- function (x, digits = max(3L, getOption("digits") - 3L
 #' @examples
 #'
 #' \dontrun{
+#'
 #' set.seed(123)
 #' n <- 2000
 #' p <- 800
