@@ -153,5 +153,5 @@ penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
 regression. \emph{arXiv}:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
 }
 \author{
-Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}, Federico Boiocchi \verb{[ctb]} \email{federico.boiocchi@gmail.com}, Philipp Sterzinger `\link{ctb, earlier Julia code by} \email{P.Sterzinger@lse.ac.uk}
+Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}, Federico Boiocchi \verb{[ctb]} \email{federico.boiocchi@gmail.com}, Philipp Sterzinger \verb{[ctb, earlier Julia code by]} \email{P.Sterzinger@lse.ac.uk}
 }

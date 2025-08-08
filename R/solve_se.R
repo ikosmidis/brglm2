@@ -87,7 +87,7 @@
 #' information on the optimization methods used
 #' (`"optimization-chain"`).
 #'
-#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}, Federico Boiocchi `[ctb]` \email{federico.boiocchi@gmail.com}, Philipp Sterzinger `[ctb, earlier Julia code by] \email{P.Sterzinger@lse.ac.uk}
+#' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}, Federico Boiocchi `[ctb]` \email{federico.boiocchi@gmail.com}, Philipp Sterzinger `[ctb, earlier Julia code by]` \email{P.Sterzinger@lse.ac.uk}
 #'
 #'
 #' @references

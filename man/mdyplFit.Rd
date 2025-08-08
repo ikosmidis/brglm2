@@ -106,7 +106,7 @@ statistics, use the \code{\link[=summary.mdyplFit]{summary}} method for
 \examples{
 
 data("lizards", package = "brglm2")
-
+liz_fm <- cbind(grahami, opalinus) ~ height + diameter + light + time
 ## ML fit = MDYPL fit with `alpha = 1`
 liz_ml <- glm(liz_fm, family = binomial(), data = lizards,
               method = "mdyplFit", alpha = 1)
