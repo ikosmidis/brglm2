@@ -88,7 +88,7 @@ likelihood estimation.
 model on responses \code{alpha * y + (1 - alpha) / 2}, where \code{y} are the
 orginal binomial responses scaled by the binomial totals. This is
 equivalent to penalizing the likelihood by the Diaconis-Ylvisaker
-prior with shirnkage parameter $\alpha$ and regression parameters
+prior with shirnkage parameter \eqn{\alpha} and regression parameters
 set to zero. See Rigon & Aliverti (2023) and Sterzinger & Kosmidis
 (2024).
 

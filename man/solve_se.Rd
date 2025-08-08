@@ -99,10 +99,10 @@ intercept) and expression (15) (model with intercept) in Sterzinger
 & Kosmidis (2024).
 
 If \code{corrupted = FALSE} (default), then \code{ss} is the square root of
-the signal strength, which is the limit \deqn{\gamma^2} of
+the signal strength, which is the limit \eqn{\gamma^2} of
 \eqn{var(X \beta)}. If \code{corrupted = TRUE}, then \code{ss} is the square
 root of the corrupteed signal strength which is the limit
-\deqn{\nu^2} of \eqn{var(X \hat\beta(\alpha))}, where
+\eqn{\nu^2} of \eqn{var(X \hat\beta(\alpha))}, where
 \eqn{\hat\beta(\alpha)} is the maximimum Diaconis-Ylvisaker prior
 penalized likelihood (MDYPL) estimator as computed by \code{\link[=mdyplFit]{mdyplFit()}}
 with shirnkage parameter \eqn{alpha}.
@@ -110,11 +110,11 @@ with shirnkage parameter \eqn{alpha}.
 If \code{intercept = NULL}, then the state evolution equations are
 solved for the model without intercept. If \code{intercept} is a real
 number, then the state evolution equations for the model with
-intercept are solved (i.e. with predictor \deqn{\eta_i = \theta +
+intercept are solved (i.e. with predictor \eqn{\eta_i = \theta +
 x_i^T \beta}). In that case, what \code{intercept} represents depends on
 the value of \code{corrupted}. If \code{corrupted = FALSE}, \code{intercept}
-represents the oracle value of $\theta$, otherwise it represents
-the limit \code{iota} of the MDYPL estimator of $\theta$ as computed by
+represents the oracle value of \eqn{\theta}, otherwise it represents
+the limit \code{iota} of the MDYPL estimator of \eqn{\theta} as computed by
 \code{\link[=mdyplFit]{mdyplFit()}} with shrinkage parameter \code{alpha}.
 
 Note that \code{start} is always for \code{mu}, \code{b},\code{sigma}, as is the

@@ -54,10 +54,10 @@
 #' & Kosmidis (2024).
 #'
 #' If `corrupted = FALSE` (default), then `ss` is the square root of
-#' the signal strength, which is the limit \deqn{\gamma^2} of
+#' the signal strength, which is the limit \eqn{\gamma^2} of
 #' \eqn{var(X \beta)}. If `corrupted = TRUE`, then `ss` is the square
 #' root of the corrupteed signal strength which is the limit
-#' \deqn{\nu^2} of \eqn{var(X \hat\beta(\alpha))}, where
+#' \eqn{\nu^2} of \eqn{var(X \hat\beta(\alpha))}, where
 #' \eqn{\hat\beta(\alpha)} is the maximimum Diaconis-Ylvisaker prior
 #' penalized likelihood (MDYPL) estimator as computed by [mdyplFit()]
 #' with shirnkage parameter \eqn{alpha}.
@@ -65,11 +65,11 @@
 #' If `intercept = NULL`, then the state evolution equations are
 #' solved for the model without intercept. If `intercept` is a real
 #' number, then the state evolution equations for the model with
-#' intercept are solved (i.e. with predictor \deqn{\eta_i = \theta +
+#' intercept are solved (i.e. with predictor \eqn{\eta_i = \theta +
 #' x_i^T \beta}). In that case, what `intercept` represents depends on
 #' the value of `corrupted`. If `corrupted = FALSE`, `intercept`
-#' represents the oracle value of $\theta$, otherwise it represents
-#' the limit `iota` of the MDYPL estimator of $\theta$ as computed by
+#' represents the oracle value of \eqn{\theta}, otherwise it represents
+#' the limit `iota` of the MDYPL estimator of \eqn{\theta} as computed by
 #' [mdyplFit()] with shrinkage parameter `alpha`.
 #'
 #' Note that `start` is always for `mu`, `b`,`sigma`, as is the

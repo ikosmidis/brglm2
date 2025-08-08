@@ -18,7 +18,7 @@
 #' model on responses `alpha * y + (1 - alpha) / 2`, where `y` are the
 #' orginal binomial responses scaled by the binomial totals. This is
 #' equivalent to penalizing the likelihood by the Diaconis-Ylvisaker
-#' prior with shirnkage parameter $\alpha$ and regression parameters
+#' prior with shirnkage parameter \eqn{\alpha} and regression parameters
 #' set to zero. See Rigon & Aliverti (2023) and Sterzinger & Kosmidis
 #' (2024).
 #'
@@ -351,8 +351,8 @@ hd_summary.mdyplFit <- function(object, se_start, null = 0, ...) {
 #' standard errors and z-statistics are asymptotically valid are that
 #' the covariates have sub-Gaussian distributions, and that the signal
 #' strength, which is the limit \deqn{\gamma^2} of \eqn{var(X \beta)}
-#' is finite as \eqn{p / n \to \kappa \in (0, 1)}, with $\kappa \in
-#' (0, 1)$. See Sterzinger & Kosmidis (2024).
+#' is finite as \eqn{p / n \to \kappa \in (0, 1)}, with \eqn{\kappa \in
+#' (0, 1)}. See Sterzinger & Kosmidis (2024).
 #'
 #' If `hd_correction = TRUE`, and the model has an intercept, then the
 #' result provides only a corrected estimate of the intercept with no

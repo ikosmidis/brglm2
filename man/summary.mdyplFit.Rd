@@ -99,8 +99,8 @@ The key assumptions under which the rescaled estmiates and corrected
 standard errors and z-statistics are asymptotically valid are that
 the covariates have sub-Gaussian distributions, and that the signal
 strength, which is the limit \deqn{\gamma^2} of \eqn{var(X \beta)}
-is finite as \eqn{p / n \to \kappa \in (0, 1)}, with $\kappa \in
-(0, 1)$. See Sterzinger & Kosmidis (2024).
+is finite as \eqn{p / n \to \kappa \in (0, 1)}, with \eqn{\kappa \in
+(0, 1)}. See Sterzinger & Kosmidis (2024).
 
 If \code{hd_correction = TRUE}, and the model has an intercept, then the
 result provides only a corrected estimate of the intercept with no
