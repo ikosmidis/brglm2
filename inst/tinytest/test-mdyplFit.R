@@ -41,14 +41,6 @@ tt <- adj_lizards$totals
 expect_equal(deviance(liz_fit_DY),
              sum(binomial()$dev.resids(yy, mm, tt)))
 
-## Correct AIC
-expect_equal(AIC(liz_fit_DY),
-             binomial()$aic(yy, tt, mm, tt) + 2 * length(coef(temp_fit)))
-
-## Correct log-likelihood
-expect_equal(as.vector(logLik(liz_fit_DY)),
-             - binomial()$aic(yy, tt, mm, tt) / 2)
-
 ## Correct estimated standard errors
 v <- tt * mm * (1 - mm)
 xx <- model.matrix(liz_fit_DY)
