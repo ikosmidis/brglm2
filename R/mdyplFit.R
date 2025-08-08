@@ -185,6 +185,7 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     out$type <- "MPL_DY"
     out$control <- control
     out$class <- c("mdyplFit")
+    out$n_init <- n ## needed when `hd_correction = TRUE` in summary where aic is recomputed
     out
 }
 
@@ -446,7 +447,7 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
         d_res <- sqrt(pmax(family$dev.resids(y, mus, pw), 0))
         summ$deviance.resid <- ifelse(y > mus, d_res, -d_res)
         summ$deviance <- sum(summ$deviance.resid^2)
-        summ$aic <- family$aic(y, n, mus, pw, summ$deviance) + 2 * object$rank
+        summ$aic <- family$aic(y, object$n_init, mus, pw, summ$deviance) + 2 * object$rank
         summ$cov.scaled <- summ$cov.unscaled <- NULL
         summ$se_parameters <- se_pars
         if (!isTRUE(all(abs(attr(se_pars, "funcs")) < 1e-04))) {
