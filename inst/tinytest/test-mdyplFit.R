@@ -63,3 +63,20 @@ expect_equal(
     sapply(2:ncol(xx), function(j) sum( lm.fit(xx[, -c(1, j)], xx[, j])$residuals^2 ) / (nrow(xx) - ncol(xx) + 2)) |> sqrt(),
     brglm2:::taus(liz_fit_DY))
 
+
+
+## Correct AIC
+expect_equal(AIC(liz_fit_DY)  - 2 * sum(log(choose(round(tt), round(tt * yy)))),
+             binomial()$aic(liz_fit_DY$y_adj, tt, mm, tt) + 2 * length(coef(temp_fit)))
+
+logist_loglik(yy, tt, mm, tt) + sum(log(choose(round(tt), round(tt * yy))))
+
+logist_loglik(yy, tt, mm, tt)
+
+
+## liz_fit_DY0 <- glm(cbind(grahami, opalinus) ~ height + diameter, family = binomial(), data = lizards,
+##                   method = "mdyplFit", alpha = a)
+
+## ## Correct log-likelihood
+## expect_equal(as.vector(logLik(liz_fit_DY) - logLik(liz_fit_DY0)),
+##              - (binomial()$aic(yy, tt, fitted(liz_fit_DY0), tt) - binomial()$aic(yy, tt, mm, tt)) / 2)

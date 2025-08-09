@@ -180,7 +180,7 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     out$y_adj <- y_adj
     out$y <- y
     out$deviance <- sum(dev.resids(y, mus, weights))
-    out$aic <- logist_loglik(y_adj, n, mus, weights, deviance) + 2 * out$rank
+    out$aic <- logist_aic(y_adj, n, mus, weights, deviance) + 2 * out$rank
     out$alpha <- alpha
     out$type <- "MPL_DY"
     out$control <- control
@@ -189,11 +189,13 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     out
 }
 
-logist_loglik <- function (y, n, mu, wt, dev) {
+## Similar to binomial()$aic but works with y in (0, 1)
+logist_aic <- function (y, n, mu, wt, dev) {
     m <- if (any(n > 1))
              n
          else wt
-    -2 * sum(ifelse(m > 0, (wt/m), 0) * (m * y * log(mu) + m * (1 - y) * log(1 - mu)))
+    -2 * sum(ifelse(m > 0, (wt/m), 0) * (m * y * log(mu) + m * (1 - y) * log(1 - mu) -
+                                         log(m + 1) - log(beta(m * y + 1, m * (1 - y) + 1))))
 }
 
 #' Auxiliary function for [glm()] fitting using the [brglmFit()]
@@ -454,7 +456,7 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
         d_res <- sqrt(pmax(family$dev.resids(y, mus, pw), 0))
         summ$deviance.resid <- ifelse(y > mus, d_res, -d_res)
         summ$deviance <- sum(summ$deviance.resid^2)
-        summ$aic <- logist_loglik(y, object$n_init, mus, pw, summ$deviance) + 2 * object$rank
+        summ$aic <- logist_aic(object$y_adj, object$n_init, mus, pw, summ$deviance) + 2 * object$rank
         summ$cov.scaled <- summ$cov.unscaled <- NULL
         summ$se_parameters <- se_pars
         if (!isTRUE(all(abs(attr(se_pars, "funcs")) < 1e-04))) {
