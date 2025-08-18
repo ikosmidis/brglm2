@@ -62,3 +62,15 @@ xx <- model.matrix(liz_fit_DY)
 expect_equal(
     sapply(2:ncol(xx), function(j) sum( lm.fit(xx[, -c(1, j)], xx[, j])$residuals^2 ) / (nrow(xx) - ncol(xx) + 2)) |> sqrt(),
     brglm2:::taus(liz_fit_DY))
+
+
+## logist_aic
+set.seed(111)
+tots <- c(11, 15, 5, 5, 15, 111, 8)
+succ <- c(0, 11, 3, 5, 2, 5, 7)
+fail <- tots - succ
+probs <- runif(length(fail))
+expect_equal(brglm2:::logist_aic(succ / tots, tots, probs, tots),
+             binomial()$aic(succ / tots, tots, probs, tots))
+expect_equal(-brglm2:::logist_aic(succ / tots, tots, probs, tots) / 2,
+             sum(dbinom(succ, tots, probs, log = TRUE)))
