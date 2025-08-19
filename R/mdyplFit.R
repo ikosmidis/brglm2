@@ -190,12 +190,19 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 }
 
 ## Similar to binomial()$aic but works with y in (0, 1)
-logist_aic <- function (y, n, mu, wt, dev) {
-    m <- if (any(n > 1))
-             n
-         else wt
-    -2 * sum(ifelse(m > 0, (wt/m), 0) * (m * y * log(mu) + m * (1 - y) * log(1 - mu) -
-                                         log(m + 1) - log(beta(m * y + 1, m * (1 - y) + 1))))
+
+dbinom2 <- function(x, size, prob, log = FALSE) {
+    su <- x
+    fa <- size - x
+    db <- prob^su * (1 - prob)^fa / beta(su + 1, fa + 1) / (size + 1)
+    db[size < su] <- 0
+    if (isTRUE(log)) log(db) else db
+}
+
+
+logist_aic <- function(y, n, mu, wt, dev) {
+    m <- if (any(n > 1)) n else wt
+    -2 * sum(ifelse(m > 0, (wt/m), 0) * dbinom2(m * y, m, mu, log = TRUE))
 }
 
 #' Auxiliary function for [glm()] fitting using the [brglmFit()]
