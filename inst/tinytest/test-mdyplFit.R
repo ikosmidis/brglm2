@@ -76,26 +76,26 @@ expect_equal(-brglm2:::logist_aic(succ / tots, tots, probs, tots) / 2,
              sum(dbinom(succ, tots, probs, log = TRUE)))
 
 
-expect_equal(dbinom2(succ, tots, probs, log = FALSE),
+expect_equal(brglm2:::dbinom2(succ, tots, probs, log = FALSE),
              dbinom(succ, tots, probs, log = FALSE))
 
-expect_equal(dbinom2(succ, tots, probs, log = TRUE),
+expect_equal(brglm2:::dbinom2(succ, tots, probs, log = TRUE),
              dbinom(succ, tots, probs, log = TRUE))
 
-expect_equal(dbinom2(1, 1, 0), dbinom(1, 1, 0))
-expect_equal(dbinom2(1, 1, 1), dbinom(1, 1, 1))
-expect_equal(dbinom2(0, 1, 0), dbinom(0, 1, 0))
-expect_equal(dbinom2(0, 1, 1), dbinom(0, 1, 1))
-expect_equal(dbinom2(1, 0, 0), dbinom(1, 0, 0))
-expect_equal(dbinom2(1, 0, 1), dbinom(1, 0, 1))
-expect_equal(dbinom2(0, 0, 1), dbinom(0, 0, 1))
-expect_equal(dbinom2(0, 0, 0), dbinom(0, 0, 0))
-expect_equal(dbinom2(1, 1, 0), dbinom(1, 1, 0), log = TRUE)
-expect_equal(dbinom2(1, 1, 1), dbinom(1, 1, 1), log = TRUE)
-expect_equal(dbinom2(0, 1, 0), dbinom(0, 1, 0), log = TRUE)
-expect_equal(dbinom2(0, 1, 1), dbinom(0, 1, 1), log = TRUE)
-expect_equal(dbinom2(1, 0, 0), dbinom(1, 0, 0), log = TRUE)
-expect_equal(dbinom2(1, 0, 1), dbinom(1, 0, 1), log = TRUE)
-expect_equal(dbinom2(0, 0, 1), dbinom(0, 0, 1), log = TRUE)
-expect_equal(dbinom2(0, 0, 0), dbinom(0, 0, 0), log = TRUE)
+expect_equal(brglm2:::dbinom2(1, 1, 0), dbinom(1, 1, 0))
+expect_equal(brglm2:::dbinom2(1, 1, 1), dbinom(1, 1, 1))
+expect_equal(brglm2:::dbinom2(0, 1, 0), dbinom(0, 1, 0))
+expect_equal(brglm2:::dbinom2(0, 1, 1), dbinom(0, 1, 1))
+expect_equal(brglm2:::dbinom2(1, 0, 0), dbinom(1, 0, 0))
+expect_equal(brglm2:::dbinom2(1, 0, 1), dbinom(1, 0, 1))
+expect_equal(brglm2:::dbinom2(0, 0, 1), dbinom(0, 0, 1))
+expect_equal(brglm2:::dbinom2(0, 0, 0), dbinom(0, 0, 0))
+expect_equal(brglm2:::dbinom2(1, 1, 0), dbinom(1, 1, 0), log = TRUE)
+expect_equal(brglm2:::dbinom2(1, 1, 1), dbinom(1, 1, 1), log = TRUE)
+expect_equal(brglm2:::dbinom2(0, 1, 0), dbinom(0, 1, 0), log = TRUE)
+expect_equal(brglm2:::dbinom2(0, 1, 1), dbinom(0, 1, 1), log = TRUE)
+expect_equal(brglm2:::dbinom2(1, 0, 0), dbinom(1, 0, 0), log = TRUE)
+expect_equal(brglm2:::dbinom2(1, 0, 1), dbinom(1, 0, 1), log = TRUE)
+expect_equal(brglm2:::dbinom2(0, 0, 1), dbinom(0, 0, 1), log = TRUE)
+expect_equal(brglm2:::dbinom2(0, 0, 0), dbinom(0, 0, 0), log = TRUE)
 
