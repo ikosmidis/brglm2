@@ -101,9 +101,9 @@ the signal strength, which is the limit \eqn{\gamma^2} of
 \eqn{var(X \beta)}. If \code{corrupted = TRUE}, then \code{ss} is the square
 root of the corrupteed signal strength which is the limit
 \eqn{\nu^2} of \eqn{var(X \hat\beta(\alpha))}, where
-\eqn{\hat\beta(\alpha)} is the maximimum Diaconis-Ylvisaker prior
+\eqn{\hat\beta(\alpha)} is the maximum Diaconis-Ylvisaker prior
 penalized likelihood (MDYPL) estimator as computed by \code{\link[=mdyplFit]{mdyplFit()}}
-with shirnkage parameter \eqn{alpha}.
+with shrinkage parameter \eqn{alpha}.
 
 If \code{intercept = NULL}, then the state evolution equations are
 solved for the model without intercept. If \code{intercept} is a real

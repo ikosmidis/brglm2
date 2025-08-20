@@ -28,9 +28,9 @@ maximum Diaconis-Ylvisaker prior penalized likelihood
 
 In partiuclar, \code{\link[=sloe]{sloe()}} computes an estimate of the corrupteed
 signal strength which is the limit \deqn{\nu^2} of \eqn{var(X
-\hat\beta(\alpha))}, where \eqn{\hat\beta(\alpha)} is the maximimum
+\hat\beta(\alpha))}, where \eqn{\hat\beta(\alpha)} is the maximum
 Diaconis-Ylvisaker prior penalized likelihood (MDYPL) estimator as
-computed by \code{\link[=mdyplFit]{mdyplFit()}} with shirnkage parameter \eqn{alpha}.
+computed by \code{\link[=mdyplFit]{mdyplFit()}} with shrinkage parameter \eqn{alpha}.
 }
 \references{
 Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior

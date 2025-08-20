@@ -57,9 +57,9 @@
 #' \eqn{var(X \beta)}. If `corrupted = TRUE`, then `ss` is the square
 #' root of the corrupteed signal strength which is the limit
 #' \eqn{\nu^2} of \eqn{var(X \hat\beta(\alpha))}, where
-#' \eqn{\hat\beta(\alpha)} is the maximimum Diaconis-Ylvisaker prior
+#' \eqn{\hat\beta(\alpha)} is the maximum Diaconis-Ylvisaker prior
 #' penalized likelihood (MDYPL) estimator as computed by [mdyplFit()]
-#' with shirnkage parameter \eqn{alpha}.
+#' with shrinkage parameter \eqn{alpha}.
 #'
 #' If `intercept = NULL`, then the state evolution equations are
 #' solved for the model without intercept. If `intercept` is a real
@@ -129,6 +129,8 @@ solve_se <- function(kappa, ss, alpha, intercept = NULL, start, corrupted = FALS
     is_corrupted <- isTRUE(corrupted)
     init_solver <- if (is_corrupted) optim_se_corrupted else optim_se
     main_solver <- if (is_corrupted) nleqslv_se_corrupted else nleqslv_se
+    if (is.null(gh))
+        gh <- gauss.quad(200, kind = "hermite")
     if (isTRUE(init_iter == "only")) {
         start <- init_solver(kappa, ss, alpha, intercept, start, gh, prox_tol, method = init_method, ...)
         opt_chain <- paste0("optim(method = ", init_method, ")")

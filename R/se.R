@@ -11,7 +11,7 @@
 #' @param alpha the shrinkage parameter of the MDYPL
 #'     estimator. `alpha` should be in `(0, 1)`.
 #' @param gh A list with the Gauss-Hermite quadrature nodes and
-#'     nweights, as returned from `statmod::gauss.quad()` with `kind =
+#'     weights, as returned from `statmod::gauss.quad()` with `kind =
 #'     "hermite"`. Default is `NULL`, in which case `gh` is set to
 #'     `statmod::gauss.quad(200, kind = "hermite")` is used.
 #' @param prox_tol tolerance for the computation of the proximal
@@ -52,7 +52,7 @@ se0 <- function(mu, b, sigma, kappa, gamma, alpha, gh = NULL, prox_tol = 1e-10) 
 #'     estimator. `alpha` should be in `(0, 1)`.
 #' @param intercept intercept of the logistic regression model
 #' @param gh A list with the Gauss-Hermite quadrature nodes and
-#'     nweights, as returned from `statmod::gauss.quad()` with `kind =
+#'     weights, as returned from `statmod::gauss.quad()` with `kind =
 #'     "hermite"`. Default is `NULL`, in which case `gh` is set to
 #'     `statmod::gauss.quad(200, kind = "hermite")` is used.
 #' @param prox_tol tolerance for the computation of the proximal

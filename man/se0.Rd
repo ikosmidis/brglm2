@@ -24,7 +24,7 @@ linear predictor.}
 estimator. \code{alpha} should be in \verb{(0, 1)}.}
 
 \item{gh}{A list with the Gauss-Hermite quadrature nodes and
-nweights, as returned from \code{statmod::gauss.quad()} with \code{kind = "hermite"}. Default is \code{NULL}, in which case \code{gh} is set to
+weights, as returned from \code{statmod::gauss.quad()} with \code{kind = "hermite"}. Default is \code{NULL}, in which case \code{gh} is set to
 \code{statmod::gauss.quad(200, kind = "hermite")} is used.}
 
 \item{prox_tol}{tolerance for the computation of the proximal

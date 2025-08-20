@@ -16,9 +16,9 @@
 #'
 #' [mdyplFit()] uses [stats::glm.fit()] to fit a logistic regression
 #' model on responses `alpha * y + (1 - alpha) / 2`, where `y` are the
-#' orginal binomial responses scaled by the binomial totals. This is
+#' original binomial responses scaled by the binomial totals. This is
 #' equivalent to penalizing the likelihood by the Diaconis-Ylvisaker
-#' prior with shirnkage parameter \eqn{\alpha} and regression parameters
+#' prior with shrinkage parameter \eqn{\alpha} and regression parameters
 #' set to zero. See Rigon & Aliverti (2023) and Sterzinger & Kosmidis
 #' (2024).
 #'
@@ -229,7 +229,7 @@ logist_aic <- function(y, n, mu, wt, dev) {
 #'
 #' Internally, [mdyplFit()] uses [stats::glm.fit()] to fit a logistic
 #' regression model on responses `alpha * y + (1 - alpha) / 2`, where
-#' `y` are the orginal binomial responses scaled by the binomial
+#' `y` are the original binomial responses scaled by the binomial
 #' totals. `epsilon`, `maxit` and `trace` control the
 #' [stats::glm.fit()] call; see [stats::glm.control()].
 #'
@@ -270,9 +270,9 @@ mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALS
 #'
 #' In partiuclar, [sloe()] computes an estimate of the corrupteed
 #' signal strength which is the limit \deqn{\nu^2} of \eqn{var(X
-#' \hat\beta(\alpha))}, where \eqn{\hat\beta(\alpha)} is the maximimum
+#' \hat\beta(\alpha))}, where \eqn{\hat\beta(\alpha)} is the maximum
 #' Diaconis-Ylvisaker prior penalized likelihood (MDYPL) estimator as
-#' computed by [mdyplFit()] with shirnkage parameter \eqn{alpha}.
+#' computed by [mdyplFit()] with shrinkage parameter \eqn{alpha}.
 #'
 #' @return
 #'
@@ -340,7 +340,7 @@ taus <- function(object) {
 #' rescale the estimates, and adjust estimated standard errors and
 #' z-statistics as in Sterzinger & Kosmidis (2024).
 #'
-#' The key assumptions under which the rescaled estmiates and corrected
+#' The key assumptions under which the rescaled estimates and corrected
 #' standard errors and z-statistics are asymptotically valid are that
 #' the covariates have sub-Gaussian distributions, and that the signal
 #' strength, which is the limit \deqn{\gamma^2} of \eqn{var(X \beta)}

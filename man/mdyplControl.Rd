@@ -37,7 +37,7 @@ construct a \code{control} argument.
 \details{
 Internally, \code{\link[=mdyplFit]{mdyplFit()}} uses \code{\link[stats:glm]{stats::glm.fit()}} to fit a logistic
 regression model on responses \code{alpha * y + (1 - alpha) / 2}, where
-\code{y} are the orginal binomial responses scaled by the binomial
+\code{y} are the original binomial responses scaled by the binomial
 totals. \code{epsilon}, \code{maxit} and \code{trace} control the
 \code{\link[stats:glm]{stats::glm.fit()}} call; see \code{\link[stats:glm.control]{stats::glm.control()}}.
 }

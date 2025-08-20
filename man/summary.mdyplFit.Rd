@@ -95,7 +95,7 @@ with \code{corrupted = TRUE}, and the obtained constants are used to
 rescale the estimates, and adjust estimated standard errors and
 z-statistics as in Sterzinger & Kosmidis (2024).
 
-The key assumptions under which the rescaled estmiates and corrected
+The key assumptions under which the rescaled estimates and corrected
 standard errors and z-statistics are asymptotically valid are that
 the covariates have sub-Gaussian distributions, and that the signal
 strength, which is the limit \deqn{\gamma^2} of \eqn{var(X \beta)}
