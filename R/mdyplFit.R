@@ -176,11 +176,11 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 
     ## Reset quantities in terms of original responses
     dev.resids <- family$dev.resids
-    out$null.deviance <- sum(dev.resids(y, nullmus, weights))
+    out$null.deviance <- sum(dev.resids(y_adj, nullmus, weights))
+    out$deviance <- sum(dev.resids(y_adj, mus, weights))
+    out$aic <- logist_aic(y_adj, n, mus, weights, deviance) + 2 * out$rank
     out$y_adj <- y_adj
     out$y <- y
-    out$deviance <- sum(dev.resids(y, mus, weights))
-    out$aic <- logist_aic(y_adj, n, mus, weights, deviance) + 2 * out$rank
     out$alpha <- alpha
     out$type <- "MPL_DY"
     out$control <- control

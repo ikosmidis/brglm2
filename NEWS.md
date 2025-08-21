@@ -2,32 +2,17 @@
 
 ## Improvements, updates and additions
 
-* Provides `mdyplFit()` method for the `glm()` function, which
-  estimates logistic regression models using maximum
-  Diaconis-Ylvisaker prior penalized likelihood, and associated
-  methods. Corrections to estimates, estimated standard errors, z
-  statistics, and so on, can be applied using the developments
-  Sterzinger and Kosmidis (2024, doi:10.48550/arXiv.2311.07419) by
-  setting `hd_correction = TRUE` in the calls to the `summary()` and
-  `confint()` methods for `"mdyplFit"` objects.
+* Provides `mdyplFit()` method for the `glm()` function, which estimates logistic regression models using maximum Diaconis-Ylvisaker prior penalized likelihood, and associated methods. Corrections to estimates, estimated standard errors, z statistics, and so on, can be applied using the developments Sterzinger and Kosmidis (2024, doi:10.48550/arXiv.2311.07419) by setting `hd_correction = TRUE` in the calls to the `summary()` and `confint()` methods for `"mdyplFit"` objects.
   
-* Documentation updates and new documentation
+* Documentation updates and new documentation.
 
 # brglm2 0.9.3
 
 ## Bug fixes
 
-* Added `add1()` and `drop1()` methods for `brglmFit` objects, so that
-  `step()` does not default to the methods for `glm` objects (which
-  would return nonsense results); thanks to jamiahuswalton@github
-  (https://github.com/ikosmidis/brglm2/issues/33) for reporting the
-  issue.
+* Added `add1()` and `drop1()` methods for `brglmFit` objects, so that `step()` does not default to the methods for `glm` objects (which would return nonsense results); thanks to jamiahuswalton@github (https://github.com/ikosmidis/brglm2/issues/33) for reporting the issue.
 
-* Sane staring values, graceful failing, updates to optimization
-  procedure, and improvements to methods for `brnb()`; thanks to
-  cperk@github (https://github.com/ikosmidis/brglm2/issues/31) for
-  reporting issues with `brnb()` when infinite ML estimates are
-  encountered.
+* Sane staring values, graceful failing, updates to optimization procedure, and improvements to methods for `brnb()`; thanks to cperk@github (https://github.com/ikosmidis/brglm2/issues/31) for reporting issues with `brnb()` when infinite ML estimates are encountered.
 
 ## Improvements, updates and additions
 
