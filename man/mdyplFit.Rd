@@ -97,6 +97,14 @@ list passed to \code{control}. If \code{alpha = 1} then
 \code{\link[=mdyplFit]{"mdyplFit"}} will simply do maximum likelihood
 estimation.
 
+Note that \code{null.deviance}, \code{deviance} and \code{aic} in the resulting
+object are computed at the adjusted responses. Hence, methods such
+as \link[stats:logLik]{logLik()} and \link[stats:AIC]{AIC()} use the
+penalized log-likelihood. With the default \code{alpha}, the inferential
+procedures based on penalized likelihood are asymptotically
+equivalent to the ones that use the unpenalized likelihood when
+\code{p/n} is vanishing asymptotically.
+
 For high-dimensionality corrected estimates, standard errors and z
 statistics, use the \code{\link[=summary.mdyplFit]{summary}} method for
 \href{mdyplFit()}{\code{"mdyplFit"}} objects with \code{hd_correction = TRUE}.

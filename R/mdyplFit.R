@@ -29,6 +29,14 @@
 #' [`"mdyplFit"`][mdyplFit()] will simply do maximum likelihood
 #' estimation.
 #'
+#' Note that `null.deviance`, `deviance` and `aic` in the resulting
+#' object are computed at the adjusted responses. Hence, methods such
+#' as [logLik()][stats::logLik()] and [AIC()][stats::AIC()] use the
+#' penalized log-likelihood. With the default `alpha`, the inferential
+#' procedures based on penalized likelihood are asymptotically
+#' equivalent to the ones that use the unpenalized likelihood when
+#' `p/n` is vanishing asymptotically.
+#'
 #' For high-dimensionality corrected estimates, standard errors and z
 #' statistics, use the [`summary`][summary.mdyplFit()] method for
 #' [`"mdyplFit"`](mdyplFit()) objects with `hd_correction = TRUE`.
