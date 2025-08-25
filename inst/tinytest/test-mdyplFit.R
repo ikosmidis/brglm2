@@ -39,7 +39,7 @@ yy <- adj_lizards$g_y
 mm <- fitted(temp_fit)
 tt <- adj_lizards$totals
 expect_equal(deviance(liz_fit_DY),
-             sum(binomial()$dev.resids(yy, mm, tt)))
+             sum(binomial()$dev.resids(a * yy + (1- a)/2, mm, tt)))
 
 ## Correct estimated standard errors
 v <- tt * mm * (1 - mm)
