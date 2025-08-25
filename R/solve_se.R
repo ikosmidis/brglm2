@@ -4,7 +4,7 @@
 #' @param kappa asymptotic ratio of columns/rows of the design
 #'     matrix. `kappa` should be in `(0, 1)`.
 #' @param ss signal strength or corrupted signal strength, depending
-#'     on whether `contaminated_ss = TRUE` or not. See Details.
+#'     on whether `corrupted = TRUE` or not. See Details.
 #' @param alpha the shrinkage parameter of the MDYPL
 #'     estimator. `alpha` should be in `(0, 1)`.
 #' @param intercept if `NULL` (default) then the MDYPL state evolution
@@ -55,7 +55,7 @@
 #' If `corrupted = FALSE` (default), then `ss` is the square root of
 #' the signal strength, which is the limit \eqn{\gamma^2} of
 #' \eqn{var(X \beta)}. If `corrupted = TRUE`, then `ss` is the square
-#' root of the corrupteed signal strength which is the limit
+#' root of the corrupted signal strength which is the limit
 #' \eqn{\nu^2} of \eqn{var(X \hat\beta(\alpha))}, where
 #' \eqn{\hat\beta(\alpha)} is the maximum Diaconis-Ylvisaker prior
 #' penalized likelihood (MDYPL) estimator as computed by [mdyplFit()]

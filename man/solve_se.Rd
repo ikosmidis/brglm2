@@ -25,7 +25,7 @@ solve_se(
 matrix. \code{kappa} should be in \verb{(0, 1)}.}
 
 \item{ss}{signal strength or corrupted signal strength, depending
-on whether \code{contaminated_ss = TRUE} or not. See Details.}
+on whether \code{corrupted = TRUE} or not. See Details.}
 
 \item{alpha}{the shrinkage parameter of the MDYPL
 estimator. \code{alpha} should be in \verb{(0, 1)}.}
@@ -99,7 +99,7 @@ intercept) and expression (15) (model with intercept) in Sterzinger
 If \code{corrupted = FALSE} (default), then \code{ss} is the square root of
 the signal strength, which is the limit \eqn{\gamma^2} of
 \eqn{var(X \beta)}. If \code{corrupted = TRUE}, then \code{ss} is the square
-root of the corrupteed signal strength which is the limit
+root of the corrupted signal strength which is the limit
 \eqn{\nu^2} of \eqn{var(X \hat\beta(\alpha))}, where
 \eqn{\hat\beta(\alpha)} is the maximum Diaconis-Ylvisaker prior
 penalized likelihood (MDYPL) estimator as computed by \code{\link[=mdyplFit]{mdyplFit()}}
