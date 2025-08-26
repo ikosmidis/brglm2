@@ -144,21 +144,19 @@ summary(liz_ml, hd_correction = TRUE)
 
 ## The case study in Section 8 of Sterzinger and
 ## Kosmidis (2024)
-
 data("MultipleFeatures", package = "brglm2")
 
-## Center the features
+## Center the fou.* and kar.* features
 vars <- grep("fou|kar", names(MultipleFeatures), value = TRUE)
 train_id <- which(MultipleFeatures$training)
 MultipleFeatures[train_id, vars] <- scale(MultipleFeatures[train_id, vars], scale = FALSE)
-MultipleFeatures[-train_id, vars] <- scale(MultipleFeatures[-train_id, vars], scale = FALSE)
+## Compute the MDYPL fits
 kappa <- length(vars) / sum(MultipleFeatures$training)
-alpha <- 1 / (1 + kappa)
 full_fm <- formula(paste("I(digit == 7) ~", paste(vars, collapse = " + ")))
 nest_vars <- grep("fou", vars, value = TRUE)
 nest_fm <- formula(paste("I(digit == 7) ~", paste(nest_vars, collapse = " + ")))
 full_m <- glm(full_fm, data = MultipleFeatures, family = binomial(),
-              method = mdyplFit, alpha = alpha, subset = training)
+              method = mdyplFit, alpha = 1 / (1 + kappa), subset = training)
 nest_m <- update(full_m, nest_fm)
 
 ## Apply high-dimensionaly correction under proportional asymptotics and get
