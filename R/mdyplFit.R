@@ -276,7 +276,7 @@ mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALS
 #' ([mdypl_fit()]) has been put forward in Sterzinger & Kosmidis
 #' (2025).
 #'
-#' In partiuclar, [sloe()] computes an estimate of the corrupteed
+#' In particular, [sloe()] computes an estimate of the corrupted
 #' signal strength which is the limit \deqn{\nu^2} of \eqn{var(X
 #' \hat\beta(\alpha))}, where \eqn{\hat\beta(\alpha)} is the maximum
 #' Diaconis-Ylvisaker prior penalized likelihood (MDYPL) estimator as
@@ -296,9 +296,9 @@ mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALS
 #' penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
 #' regression. *arXiv*:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
 #'
-#' Yadlowsky S, Yun T, McLean CY, D' Amour A (2021). SLOE: A Faster
+#' Yadlowsky S, Yun T, McLean C Y, D' Amour A (2021). SLOE: A Faster
 #' Method for Statistical Inference in High-Dimensional Logistic
-#' Regression. In M Ranzato, A Beygelzimer, Y Dauphin, P Liang, JW
+#' Regression. In M Ranzato, A Beygelzimer, Y Dauphin, P Liang, J W
 #' Vaughan (eds.), *Advances in Neural Information Processing
 #' Systems*, **34**, 29517–29528. Curran Associates,
 #' Inc. \url{https://proceedings.neurips.cc/paper_files/paper/2021/file/f6c2a0c4b566bc99d596e58638e342b0-Paper.pdf}.

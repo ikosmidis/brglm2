@@ -20,7 +20,7 @@
 #'     `intercept`, if numeric, is the limit of the estimator computed
 #'     by [mdyplFit()] with shrinkage parameter `alpha`. See Details.
 #' @param gh A list with the Gauss-Hermite quadrature nodes and
-#'     nweights, as returned from `statmod::gauss.quad()` with `kind =
+#'     weights, as returned from `statmod::gauss.quad()` with `kind =
 #'     "hermite"`. Default is `NULL`, in which case `gh` is set to
 #'     `statmod::gauss.quad(200, kind = "hermite")`.
 #' @param prox_tol tolerance for the computation of the proximal
@@ -56,8 +56,8 @@
 #' the signal strength, which is the limit \eqn{\gamma^2} of
 #' \eqn{var(X \beta)}. If `corrupted = TRUE`, then `ss` is the square
 #' root of the corrupted signal strength which is the limit
-#' \eqn{\nu^2} of \eqn{var(X \hat\beta(\alpha))}, where
-#' \eqn{\hat\beta(\alpha)} is the maximum Diaconis-Ylvisaker prior
+#' \eqn{\nu^2} of \eqn{var(X hat(beta)(\alpha))}, where
+#' \eqn{hat(\beta)(\alpha)} is the maximum Diaconis-Ylvisaker prior
 #' penalized likelihood (MDYPL) estimator as computed by [mdyplFit()]
 #' with shrinkage parameter \eqn{alpha}.
 #'

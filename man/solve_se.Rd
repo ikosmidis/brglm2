@@ -46,7 +46,7 @@ and \code{intercept}, if numeric, is the oracle intercept value. If
 by \code{\link[=mdyplFit]{mdyplFit()}} with shrinkage parameter \code{alpha}. See Details.}
 
 \item{gh}{A list with the Gauss-Hermite quadrature nodes and
-nweights, as returned from \code{statmod::gauss.quad()} with \code{kind = "hermite"}. Default is \code{NULL}, in which case \code{gh} is set to
+weights, as returned from \code{statmod::gauss.quad()} with \code{kind = "hermite"}. Default is \code{NULL}, in which case \code{gh} is set to
 \code{statmod::gauss.quad(200, kind = "hermite")}.}
 
 \item{prox_tol}{tolerance for the computation of the proximal
@@ -100,8 +100,8 @@ If \code{corrupted = FALSE} (default), then \code{ss} is the square root of
 the signal strength, which is the limit \eqn{\gamma^2} of
 \eqn{var(X \beta)}. If \code{corrupted = TRUE}, then \code{ss} is the square
 root of the corrupted signal strength which is the limit
-\eqn{\nu^2} of \eqn{var(X \hat\beta(\alpha))}, where
-\eqn{\hat\beta(\alpha)} is the maximum Diaconis-Ylvisaker prior
+\eqn{\nu^2} of \eqn{var(X hat(beta)(\alpha))}, where
+\eqn{hat(\beta)(\alpha)} is the maximum Diaconis-Ylvisaker prior
 penalized likelihood (MDYPL) estimator as computed by \code{\link[=mdyplFit]{mdyplFit()}}
 with shrinkage parameter \eqn{alpha}.
 

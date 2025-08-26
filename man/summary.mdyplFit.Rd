@@ -39,7 +39,7 @@ standard errors, z-statistics. See Details.}
 equations. See the \code{start} argument in \code{\link[=solve_se]{solve_se()}}.}
 
 \item{gh}{A list with the Gauss-Hermite quadrature nodes and
-nweights, as returned from \code{statmod::gauss.quad()} with \code{kind = "hermite"}. Default is \code{NULL}, in which case \code{gh} is set to
+weights, as returned from \code{statmod::gauss.quad()} with \code{kind = "hermite"}. Default is \code{NULL}, in which case \code{gh} is set to
 \code{statmod::gauss.quad(200, kind = "hermite")}.}
 
 \item{prox_tol}{tolerance for the computation of the proximal
