@@ -149,6 +149,7 @@ data("MultipleFeatures", package = "brglm2")
 
 ## Center the features
 vars <- grep("fou|kar", names(MultipleFeatures), value = TRUE)
+train_id <- which(MultipleFeatures$training)
 MultipleFeatures[train_id, vars] <- scale(MultipleFeatures[train_id, vars], scale = FALSE)
 MultipleFeatures[-train_id, vars] <- scale(MultipleFeatures[-train_id, vars], scale = FALSE)
 kappa <- length(full_vars) / sum(MultipleFeatures$training)
