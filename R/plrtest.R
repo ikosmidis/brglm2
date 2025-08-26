@@ -24,6 +24,7 @@
 #' @inheritParams summary.mdyplFit
 #' @param object1 a [`"mdyplFit"`][mdyplFit()] object
 #' @param object2 a [`"mdyplFit"`][mdyplFit()] object
+#' @param ... further arguments to be passed to methods. Currently not used.
 #'
 #' @details
 #'
@@ -38,7 +39,7 @@
 #'
 #' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
 #'
-#' @seealso [mdyplFit()], [summary.mdyplFit()], [mdyplFit_control()]
+#' @seealso [mdyplFit()], [summary.mdyplFit()], [mdypl_control()]
 #'
 #' @references
 #'
@@ -48,7 +49,7 @@
 #'
 #' @method plrtest mdyplFit
 #' @export
-plrtest.mdyplFit <- function(object1, object2, hd_correction = FALSE) {
+plrtest.mdyplFit <- function(object1, object2, hd_correction = FALSE, ...) {
     if (!inherits(object1, "mdyplFit") || !inherits(object2, "mdyplFit")) {
         stop("At least one of `object1` and `object2` is not of class `mdyplFit`")
     }

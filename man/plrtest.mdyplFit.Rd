@@ -5,7 +5,7 @@
 \alias{plrtest}
 \title{Penalized likelihood ratio test for \code{\link[=mdyplFit]{"mdyplFit"}} objects}
 \usage{
-\method{plrtest}{mdyplFit}(object1, object2, hd_correction = FALSE)
+\method{plrtest}{mdyplFit}(object1, object2, hd_correction = FALSE, ...)
 }
 \arguments{
 \item{object1}{a \code{\link[=mdyplFit]{"mdyplFit"}} object}
@@ -17,6 +17,8 @@ corresponding to standard asymptotics is computed. If \code{TRUE}
 then the high-dimensionality corrections in Sterzinger &
 Kosmidis (2024) are employed to updates estimates, estimated
 standard errors, z-statistics. See Details.}
+
+\item{...}{further arguments to be passed to methods. Currently not used.}
 }
 \description{
 Computes the Diaconis-Ylvisaker prior penalized likelihood ratio
@@ -40,7 +42,7 @@ penalized likelihood for \eqn{p/n \to \kappa \in (0,1)} logistic
 regression. \emph{arXiv}:2311.07419v2, \url{https://arxiv.org/abs/2311.07419}.
 }
 \seealso{
-\code{\link[=mdyplFit]{mdyplFit()}}, \code{\link[=summary.mdyplFit]{summary.mdyplFit()}}, \code{\link[=mdyplFit_control]{mdyplFit_control()}}
+\code{\link[=mdyplFit]{mdyplFit()}}, \code{\link[=summary.mdyplFit]{summary.mdyplFit()}}, \code{\link[=mdypl_control]{mdypl_control()}}
 }
 \author{
 Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}
