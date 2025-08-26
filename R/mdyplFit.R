@@ -104,10 +104,10 @@
 #' train_id <- which(MultipleFeatures$training)
 #' MultipleFeatures[train_id, vars] <- scale(MultipleFeatures[train_id, vars], scale = FALSE)
 #' MultipleFeatures[-train_id, vars] <- scale(MultipleFeatures[-train_id, vars], scale = FALSE)
-#' kappa <- length(full_vars) / sum(MultipleFeatures$training)
+#' kappa <- length(vars) / sum(MultipleFeatures$training)
 #' alpha <- 1 / (1 + kappa)
 #' full_fm <- formula(paste("I(digit == 7) ~", paste(vars, collapse = " + ")))
-#' nest_vars <- grep("fou", full_vars, value = TRUE)
+#' nest_vars <- grep("fou", vars, value = TRUE)
 #' nest_fm <- formula(paste("I(digit == 7) ~", paste(nest_vars, collapse = " + ")))
 #' full_m <- glm(full_fm, data = MultipleFeatures, family = binomial(),
 #'               method = mdyplFit, alpha = alpha, subset = training)
