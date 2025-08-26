@@ -169,17 +169,6 @@ plrtest(nest_m, full_m)
 ## against the model with only `fou` features
 plrtest(nest_m, full_m, hd_correction = TRUE)
 
-## Apply high-dimensionaly correction under proportional asymptotics and get
-## the solution to the state evolution equations
-s_full_m <- summary(full_m, hd_correction = TRUE)
-se_pars <- s_full_m$se_parameters
-
-## The PLR and rescaled PLR test statistics to be compared to quantiles
-## of a chi squared distribution with 64 degrees of freedom
-PLR <- 2 * as.vector(logLik(full_m) - logLik(nest_m))
-rescaled_PLR <- PLR * se_pars[2] / (kappa * se_pars[3]^2)
-c(PLR = PLR, rescaled_PLR = rescaled_PLR)
-
 
 \dontrun{
 ## A simulated data set as in Rigon & Aliverti (2023, Section 4.3)
