@@ -47,7 +47,7 @@ for (c_digit in 0:9) {
 
 }
 \references{
-Duin, R. (1998). Multiple Features \link{Dataset}. UCI Machine Learning
+Duin, R. (1998). Multiple Features Dataset. UCI Machine Learning
 Repository. \doi{10.24432/C5HC70}.
 
 Jain A, Duin R, Mao J (2000). Statistical pattern recognition: a
