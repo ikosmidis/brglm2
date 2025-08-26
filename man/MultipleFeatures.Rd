@@ -7,9 +7,9 @@
 \format{
 A data frame with 2000 rows and 382 columns:
 \itemize{
-\item \code{digit}. The digit to which the feature sets \verb{fou.*}, \verb{kar.*} and \verb{pix.*} corrrespond to.
+\item \code{digit}. The digits to which the feature sets \verb{fou.*}, \verb{kar.*} and \verb{pix.*} correspond to.
 \item \verb{fou.*}. 76 Fourier coefficients of the character shapes, which are computed to be rotation invariant.
-\item \verb{kar.*}. 64 Karhunen-Lo\'eve coefficients of the character shapes.
+\item \verb{kar.*}. 64 Karhunen-Lo\`eve coefficients of the character shapes.
 \item \verb{pix.*}. 240 pixel averages in 2 x 3 windows of each character shape.
 \item \code{training}. \code{TRUE} if the digit is part of the training set
 and \code{FALSE} if the digit is allocated to the test set.

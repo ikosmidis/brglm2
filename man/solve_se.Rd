@@ -144,7 +144,7 @@ cbind(pars3, pars4)
 }
 }
 \references{
-Zhao Q, Sur P, Candes E J (2022). The asymptotic distribution of
+Zhao Q, Sur P, Cand\`es E J (2022). The asymptotic distribution of
 the MLE in high-dimensional logistic models: Arbitrary
 covariance. \emph{Bernoulli}, \strong{28}, 1835–1861. \doi{10.3150/21-BEJ1401}.
 
