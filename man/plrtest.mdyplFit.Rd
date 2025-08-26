@@ -19,7 +19,7 @@ Kosmidis (2024) are employed to updates estimates, estimated
 standard errors, z-statistics. See Details.}
 }
 \description{
-Computes the Diaconis-Yilvsaker prior penalized likelihood ratio
+Computes the Diaconis-Ylvisaker prior penalized likelihood ratio
 test statistic or its adjusted version using high-dimensionality
 correction under proportional asymptotics. Associated p-values are
 also computed using a chi squared distribution.
