@@ -3,7 +3,7 @@
 \docType{data}
 \name{enzymes}
 \alias{enzymes}
-\title{Liver Enzyme Data}
+\title{Liver enzyme data}
 \format{
 A data frame with 218 rows and the following 6 columns:
 \itemize{

@@ -3,7 +3,7 @@
 \docType{data}
 \name{aids}
 \alias{aids}
-\title{The effects of AZT in slowing the development of AIDS symptoms}
+\title{Effects of AZT in slowing the development of AIDS symptoms}
 \format{
 A data frame with 4 rows and 4 variables:
 \itemize{

@@ -3,7 +3,7 @@
 \docType{data}
 \name{stemcell}
 \alias{stemcell}
-\title{Opinion on Stem Cell Research and Religious Fundamentalism}
+\title{Opinion on stem cell research and religious fundamentalism}
 \format{
 A data frame with 24 rows and 4 variables:
 \itemize{

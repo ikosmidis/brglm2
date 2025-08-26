@@ -105,7 +105,7 @@
 #'
 "coalition"
 
-#' The effects of AZT in slowing the development of AIDS symptoms
+#' Effects of AZT in slowing the development of AIDS symptoms
 #'
 #' The data is from a 3-year study on the effects of AZT in slowing the
 #' development of AIDS symptoms. 338 veterans whose immune systems
@@ -167,7 +167,7 @@
 
 
 
-#' Opinion on Stem Cell Research and Religious Fundamentalism
+#' Opinion on stem cell research and religious fundamentalism
 #'
 #' A data set from the 2006 General Social Survey that shows the
 #' relationship in the United States between opinion about funding
@@ -253,7 +253,7 @@
 #'
 "hepatitis"
 
-#' Liver Enzyme Data
+#' Liver enzyme data
 #'
 #' Liver enzyme data collected from 218 patients with liver disease
 #' (Plomteux, 1980). The laboratory profile consists of enzymatic
@@ -294,3 +294,56 @@
 #' Chemistry*, **26**, 1897-1899.
 #'
 "enzymes"
+
+#' Multiple features data
+#'
+#' Digits (0-9) extracted from a collection of maps from a Dutch
+#' public utility.  Two hundred `30 × 48` binary images per digit are
+#' available, which have then been used to extract feature sets; see
+#' Jain et al. (2000), for details, where that dataset is used for
+#' assessing the performance of various classifiers for digit
+#' recognition.
+#'
+#' @format A data frame with 2000 rows and 382 columns:
+#'
+#' * `digit`. The digit to which the feature sets `fou.*`, `kar.*` and `pix.*` corrrespond to.
+#' * `fou.*`. 76 Fourier coefficients of the character shapes, which are computed to be rotation invariant.
+#' * `kar.*`. 64 Karhunen-Lo\'eve coefficients of the character shapes.
+#' * `pix.*`. 240 pixel averages in 2 x 3 windows of each character shape.
+#' * `training`. `TRUE` if the digit is part of the training set
+#'      and `FALSE` if the digit is allocated to the test set.
+#'
+#' @source
+#'
+#' The data provides the `fou`, `kar` and `pix` features of the
+#' Multiple Features data set from the UCI Machine Learning Repository
+#' (Duin, 1998).
+#'
+#' @seealso
+#'
+#' [mdypl_fit()]
+#'
+#' @references
+#'
+#' Duin, R. (1998). Multiple Features [Dataset]. UCI Machine Learning
+#' Repository. \doi{10.24432/C5HC70}.
+#'
+#' Jain A, Duin R, Mao J (2000). Statistical pattern recognition: a
+#' review. IEEE Transactions on Pattern Analysis and Machine
+#' Intelligence, **22**, 4–37. \doi{10.1109/34.824819}.
+#'
+#' @examples
+#'
+#' data("MultipleFeatures", package = "brglm2")
+#'
+#' par(mfrow = c(10, 20), mar = numeric(4) + 0.1)
+#' for (c_digit in 0:9) {
+#'    df <- subset(MultipleFeatures, digit == c_digit)
+#'    df <- as.matrix(df[, paste("pix", 1:240, sep = ".")])
+#'    for (inst in 1:20) {
+#'        m <- matrix(df[inst, ], 15, 16)[, 16:1]
+#'        image(m, col = grey.colors(7, 1, 0), xaxt = "n", yaxt = "n")
+#'   }
+#'}
+#'
+"MultipleFeatures"

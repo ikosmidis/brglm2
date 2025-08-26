@@ -131,7 +131,7 @@ liz_mdypl <- glm(liz_ml, family = binomial(), data = lizards,
                  method = "mdyplFit")
 
 ## Comparing outputs from ML and MDYPL, with and without
-## high-dimensionality corrections. #'
+## high-dimensionality corrections.
 summary(liz_mdypl)
 summary(liz_mdypl, hd_correction = TRUE)
 summ_liz_ml
@@ -139,6 +139,38 @@ summary(liz_ml, hd_correction = TRUE)
 ## Not much difference in fits here as this is a low dimensional
 ## problem with dimensionality constant
 (liz_ml$rank - 1) / sum(weights(liz_ml))
+
+
+
+## The case study in Section 8 of Sterzinger and
+## Kosmidis (2024)
+
+data("MultipleFeatures", package = "brglm2")
+
+## Center the features
+vars <- grep("fou|kar", names(MultipleFeatures), value = TRUE)
+MultipleFeatures[train_id, vars] <- scale(MultipleFeatures[train_id, vars], scale = FALSE)
+MultipleFeatures[-train_id, vars] <- scale(MultipleFeatures[-train_id, vars], scale = FALSE)
+kappa <- length(full_vars) / sum(MultipleFeatures$training)
+alpha <- 1 / (1 + kappa)
+full_fm <- formula(paste("I(digit == 7) ~", paste(vars, collapse = " + ")))
+nest_vars <- grep("fou", full_vars, value = TRUE)
+nest_fm <- formula(paste("I(digit == 7) ~", paste(nest_vars, collapse = " + ")))
+full_m <- glm(full_fm, data = MultipleFeatures, family = binomial(),
+              method = mdyplFit, alpha = alpha, subset = training)
+nest_m <- update(full_m, nest_fm)
+
+## Apply high-dimensionaly correction under proportional asymptotics and get
+## the solution to the state evolution equations
+s_full_m <- summary(full_m, hd_correction = TRUE)
+se_pars <- s_full_m$se_parameters
+
+## The PLR and rescaled PLR test statistics to be compared to quantiles
+## of a chi squared distribution with 64 degrees of freedom
+PLR <- 2 * as.vector(logLik(full_m) - logLik(nest_m))
+rescaled_PLR <- PLR * se_pars[2] / (kappa * se_pars[3]^2)
+c(PLR = PLR, rescaled_PLR = rescaled_PLR)
+
 
 \dontrun{
 ## A simulated data set as in Rigon & Aliverti (2023, Section 4.3)
