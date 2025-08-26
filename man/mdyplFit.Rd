@@ -159,6 +159,16 @@ full_m <- glm(full_fm, data = MultipleFeatures, family = binomial(),
               method = mdyplFit, alpha = 1 / (1 + kappa), subset = training)
 nest_m <- update(full_m, nest_fm)
 
+## With a naive penalized likelihood ratio test we get no evidence
+## against the hypothesis that the model with only `fou` features
+## is an as good descrition of `7` as the model with both `fou` and
+## `kar` features.
+plrtest(nest_m, full_m)
+
+## With a high-dimensionality correction theres is strong evidence
+## against the model with only `fou` features
+plrtest(nest_m, full_m, hd_correction = TRUE)
+
 ## Apply high-dimensionaly correction under proportional asymptotics and get
 ## the solution to the state evolution equations
 s_full_m <- summary(full_m, hd_correction = TRUE)
@@ -205,7 +215,7 @@ logistic regression models. \emph{Statistics & Probability Letters},
 \strong{202}, 109901. \doi{10.1016/j.spl.2023.109901}.
 }
 \seealso{
-\code{\link[=mdyplControl]{mdyplControl()}}, \code{\link[=glm.fit]{glm.fit()}}, \code{\link[=glm]{glm()}}
+\code{\link[=mdyplControl]{mdyplControl()}}, \code{\link[=summary.mdyplFit]{summary.mdyplFit()}}, \code{\link[=plrtest.mdyplFit]{plrtest.mdyplFit()}}, \code{\link[=glm]{glm()}}
 }
 \author{
 Ioannis Kosmidis \verb{[aut, cre]} \email{ioannis.kosmidis@warwick.ac.uk}

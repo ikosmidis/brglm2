@@ -3,7 +3,7 @@
 \name{summary.brglmFit}
 \alias{summary.brglmFit}
 \alias{print.summary.brglmFit}
-\title{\code{\link[=summary]{summary()}} method for \link{brglmFit} objects}
+\title{\code{\link[=summary]{summary()}} method for \code{\link[=brglmFit]{"brglmFit"}} objects}
 \usage{
 \method{summary}{brglmFit}(
   object,
@@ -46,7 +46,7 @@
     are printed for each coefficient.}
 }
 \description{
-\code{\link[=summary]{summary()}} method for \link{brglmFit} objects
+\code{\link[=summary]{summary()}} method for \code{\link[=brglmFit]{"brglmFit"}} objects
 }
 \details{
 The interface of the summary method for \code{\link[=brglmFit]{"brglmFit"}}

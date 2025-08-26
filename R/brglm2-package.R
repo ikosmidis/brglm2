@@ -130,3 +130,8 @@ ordinal_superiority <- function(object, formula, data,
 expo <- function(object, type = c("ML", "correction", "AS_median", "Lylesetal2012"), level = 0.95) {
     UseMethod("expo")
 }
+
+#' @export
+plrtest <- function(object1, object2, ...) {
+    UseMethod("plrtest")
+}

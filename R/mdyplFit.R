@@ -51,7 +51,7 @@
 #'
 #' @author Ioannis Kosmidis `[aut, cre]` \email{ioannis.kosmidis@warwick.ac.uk}
 #'
-#' @seealso [mdyplControl()], [glm.fit()], [glm()]
+#' @seealso [mdyplControl()], [summary.mdyplFit()], [plrtest.mdyplFit()], [glm()]
 #'
 #' @references
 #'
@@ -110,6 +110,16 @@
 #' full_m <- glm(full_fm, data = MultipleFeatures, family = binomial(),
 #'               method = mdyplFit, alpha = 1 / (1 + kappa), subset = training)
 #' nest_m <- update(full_m, nest_fm)
+#'
+#' ## With a naive penalized likelihood ratio test we get no evidence
+#' ## against the hypothesis that the model with only `fou` features
+#' ## is an as good descrition of `7` as the model with both `fou` and
+#' ## `kar` features.
+#' plrtest(nest_m, full_m)
+#'
+#' ## With a high-dimensionality correction theres is strong evidence
+#' ## against the model with only `fou` features
+#' plrtest(nest_m, full_m, hd_correction = TRUE)
 #'
 #' ## Apply high-dimensionaly correction under proportional asymptotics and get
 #' ## the solution to the state evolution equations

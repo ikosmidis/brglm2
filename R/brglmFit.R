@@ -1176,7 +1176,7 @@ coef.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) 
     })
 }
 
-#' [summary()] method for [brglmFit] objects
+#' [summary()] method for [`"brglmFit"`][brglmFit()] objects
 #'
 #' @inheritParams stats::summary.glm
 #'
