@@ -273,6 +273,14 @@ The estimates can be corrected in terms of aggregate bias using the
 `summary()` method. 
 ```{r, echo = TRUE, eval = TRUE}
 summ_full_m <- summary(full_m, hd_correction = TRUE)
+```
+
+The correction proceeds by estimating the constant $\mu$ by which the
+estimates are divided in order to recover the asymptotic aggregate
+unbiasedness of the estimator. The figure below illustrates that the
+impact of the correction is to inflate the MDYPL estimates.
+
+```{r, echo = TRUE, eval = FALSE}
 rescaled_coefs <- coef(summ_full_m)[-1, ]
 acols <- hcl.colors(3, alpha = 0.2)
 cols <- hcl.colors(3)
@@ -296,12 +304,12 @@ abline(0, 1/summ_full_m$se_parameters[1], col = "grey")
 
 The workhorse function in **brglm2** is
 [`brglm_fit()`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R)
-(or equivalently `brglmFit()` if you like camel case), which, as we did
-in the example above, can be passed directly to the `method` argument
-of the `glm()` function. `brglm_fit()` implements a quasi [Fisher
-scoring](https://en.wikipedia.org/wiki/Scoring_algorithm) procedure,
-whose special cases result in a range of explicit and implicit bias
-reduction methods for generalized linear models for more
+(or equivalently `brglmFit()` if you like camel case), which, as we
+did in the example above, can be passed directly to the `method`
+argument of the `glm()` function. `brglm_fit()` implements a quasi
+[Fisher scoring](https://en.wikipedia.org/wiki/Scoring_algorithm)
+procedure, whose special cases result in a range of explicit and
+implicit bias reduction methods for generalized linear models for more
 details). Bias reduction for multinomial logistic regression (nominal
 responses) can be performed using the function `brmultinom()`, and for
 adjacent category models (ordinal responses) using the function

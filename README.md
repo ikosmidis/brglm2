@@ -431,6 +431,12 @@ The estimates can be corrected in terms of aggregate bias using the
 `summary()` method.
 
     summ_full_m <- summary(full_m, hd_correction = TRUE)
+
+The correction proceeds by estimating the constant *μ* by which the
+estimates are divided in order to recover the asymptotic aggregate
+unbiasedness of the estimator. The figure below illustrates that the
+impact of the correction is to inflate the MDYPL estimates.
+
     rescaled_coefs <- coef(summ_full_m)[-1, ]
     acols <- hcl.colors(3, alpha = 0.2)
     cols <- hcl.colors(3)
@@ -446,8 +452,6 @@ The estimates can be corrected in terms of aggregate bias using the
            title = "Slope")
     abline(0, 1, col = "grey", lty = 2)
     abline(0, 1/summ_full_m$se_parameters[1], col = "grey")
-
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 ## Estimation methods
 
