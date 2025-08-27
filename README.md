@@ -464,17 +464,23 @@ was titled “Reduced-bias inference in generalized linear models”.
 Motivation, details and discussion on the methods that **brglm2**
 implements are provided in
 
-Kosmidis, I, Kenne Pagui, E C, Sartori N. (2020). Mean and median bias
-reduction in generalized linear models. [*Statistics and
-Computing*](https://doi.org/10.1007/s11222-019-09860-6) *30*, 43–59.
+> Kosmidis, I, Kenne Pagui, E C, Sartori N. (2020). Mean and median bias
+> reduction in generalized linear models. [*Statistics and
+> Computing*](https://doi.org/10.1007/s11222-019-09860-6) *30*, 43–59.
+
+The [iteration
+vignette](https://cran.r-project.org/package=brglm2/vignettes/iteration.html)
+presents the iteration and give mathematical details for the
+bias-reducing adjustments to the score functions for generalized linear
+models.
 
 Maximum Diaconis-Ylvisaker prior penalized likelihood and
 high-dimensionality corrections under proportional asymptotics are
 described in
 
-Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior penalized
-likelihood for logistic regression.
-[*arXiv*:2311.07419v2](https://arxiv.org/abs/2311.07419).
+> Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior penalized
+> likelihood for logistic regression.
+> [*arXiv*:2311.07419v2](https://arxiv.org/abs/2311.07419).
 
 ## Code of Conduct
 
