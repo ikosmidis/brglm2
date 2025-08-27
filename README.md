@@ -424,7 +424,7 @@ evidence against the model with `fou` features only.
     #> Estimated signal strength (gamma) = 11.58
     #> State evolution parameters (mu, b, sigma) = (0.4, 1.84, 2.21) with max(|funcs|) = 6.300466e-09
 
-## Solving adjusted score equations using quasi-Fisher scoring
+## Estimation methods
 
 The workhorse function in **brglm2** is
 [`brglm_fit()`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R)
@@ -435,9 +435,9 @@ scoring](https://en.wikipedia.org/wiki/Scoring_algorithm) procedure,
 whose special cases result in a range of explicit and implicit bias
 reduction methods for generalized linear models for more details). Bias
 reduction for multinomial logistic regression (nominal responses) can be
-performed using the function `brmultinom`, and for adjacent category
-models (ordinal responses) using the function `bracl`. Both `brmultinom`
-and `bracl` rely on `brglm_fit`.
+performed using the function `brmultinom()`, and for adjacent category
+models (ordinal responses) using the function `bracl()`. Both
+`brmultinom()` and `bracl()` rely on `brglm_fit`.
 
 The classification of bias reduction methods into explicit and implicit
 is as given in [Kosmidis (2014)](https://doi.org/10.1002/wics.1296).
@@ -445,11 +445,12 @@ is as given in [Kosmidis (2014)](https://doi.org/10.1002/wics.1296).
 For logistic regression models, in particular, the
 [`mdypl_fit()`](https://github.com/ikosmidis/brglm2/blob/master/R/mdyplFit.R)
 function provides maximum Diaconis-Ylvisaker prior penalized likelihood
-estimation. The `summary()` method for `mdyplFit` objects, then allows
-for high-dimensional corrections of aggregate bias and of standard
-*z*-statistics under proportional asymptotics, and the `plrtest()`
-method allows for penalized likelihood ratio tests with and without
-high-dimensional corrections; see [Sterzinger and Kosmidis
+estimation, and can again be passed directly to the `method` argument of
+the `glm()` function. The `summary()` method for `mdyplFit` objects,
+then allows for high-dimensional corrections of aggregate bias and of
+standard *z*-statistics under proportional asymptotics, and the
+`plrtest()` method allows for penalized likelihood ratio tests with and
+without high-dimensional corrections; see [Sterzinger and Kosmidis
 (2024)](https://arxiv.org/abs/2311.07419), the example above, and the
 help pages of the methods.
 
