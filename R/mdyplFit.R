@@ -192,7 +192,7 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         offset <- rep.int(0, nobs)
     }
 
-    alpha <- unless_null(control$alpha, sum(weights) / (sum(weights) + ncol(x)))
+    alpha <- unless_null(control$alpha, sum(weights) / (sum(weights) + ncol(x) - intercept))
 
     ## adjust responses as per MDYPL with beta_P = 0
     y_adj <- alpha * y + (1 - alpha) / 2

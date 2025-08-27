@@ -334,6 +334,7 @@
 #'
 #' @examples
 #'
+#' \dontrun{
 #' data("MultipleFeatures", package = "brglm2")
 #'
 #' par(mfrow = c(10, 20), mar = numeric(4) + 0.1)
@@ -344,6 +345,7 @@
 #'        m <- matrix(df[inst, ], 15, 16)[, 16:1]
 #'        image(m, col = grey.colors(7, 1, 0), xaxt = "n", yaxt = "n")
 #'   }
-#'}
+#' }
 #'
+#' }
 "MultipleFeatures"
