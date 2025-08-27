@@ -35,5 +35,4 @@ c(bibentry(bibtype = "Manual",
            year = "2024",
            journal = "arXiv",
            eprint = "2311.07419v2",
-           archivePrefix = "arXiv"
-  ))
+           archivePrefix = "arXiv"))

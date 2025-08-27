@@ -47,11 +47,11 @@ for logistic regression (and, for more general binomial-response models
 where the likelihood is penalized by a power of the Jeffreys’ invariant
 prior).
 
-For logistic regression, \[**brglm2**\] also provides methods for
-maximum Diaconis-Ylvisaker prior penalized likelihood (MDYPL)
-estimation, and corresponding methods for high-dimensionality
-corrections of the aggregate bias of the estimator and the usual
-statistics used for inference; see [Sterzinger and Kosmidis,
+For logistic regression, **brglm2** also provides methods for maximum
+Diaconis-Ylvisaker prior penalized likelihood (MDYPL) estimation, and
+corresponding methods for high-dimensionality corrections of the
+aggregate bias of the estimator and the usual statistics used for
+inference; see [Sterzinger and Kosmidis,
 2024](https://arxiv.org/abs/2311.07419).
 
 The core model fitters are implemented by the functions `brglm_fit()`
@@ -426,6 +426,28 @@ evidence against the model with `fou` features only.
     #> Dimentionality parameter (kappa) = 0.14
     #> Estimated signal strength (gamma) = 11.58
     #> State evolution parameters (mu, b, sigma) = (0.4, 1.84, 2.21) with max(|funcs|) = 6.300466e-09
+
+The estimates can be corrected in terms of aggregate bias using the
+`summary()` method.
+
+    summ_full_m <- summary(full_m, hd_correction = TRUE)
+    rescaled_coefs <- coef(summ_full_m)[-1, ]
+    acols <- hcl.colors(3, alpha = 0.2)
+    cols <- hcl.colors(3)
+    plot(coef(full_m)[-1], rescaled_coefs[, "Estimate"],
+         xlim = c(-9, 9), ylim = c(-9, 9),
+         xlab = "MDYPL estimates", ylab = "rescaled MDYPL estimates",
+         pch = 21,
+         bg = acols[grepl("kar", rownames(rescaled_coefs)) + 1],
+         col = NULL)
+    legend(-9, 9, legend = c("fou", "kar"), pt.bg = cols[1:2], col = NA, pch = 21,
+           title = "Features")
+    legend(-5.4, 9, legend = expression(1, 1/hat(mu)), lty = c(2, 1), col = "grey",
+           title = "Slope")
+    abline(0, 1, col = "grey", lty = 2)
+    abline(0, 1/summ_full_m$se_parameters[1], col = "grey")
+
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 ## Estimation methods
 
