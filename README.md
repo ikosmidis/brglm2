@@ -35,10 +35,6 @@ estimator from the maximum likelihood estimates as prescribed in
 [Kosmidis et al (2020)](https://doi.org/10.1007/s11222-019-09860-6)
 provides a unifying framework and algorithms for mean and median bias
 reduction for the estimation of generalized linear models.
-\[**brglm2**\] also provides methods for the correction of the aggregate
-bias in the estimation of high-dimensional logistic regression models,
-and corresponding corrections to usual statistics used for inference
-(see [Sterzinger and Kosmidis, 2024](https://arxiv.org/abs/2311.07419)).
 
 In the special case of generalized linear models for binomial and
 multinomial responses (both ordinal and nominal), the adjusted score
@@ -50,6 +46,13 @@ for the proof of the latter result in the case of mean bias reduction
 for logistic regression (and, for more general binomial-response models
 where the likelihood is penalized by a power of the Jeffreys’ invariant
 prior).
+
+For logistic regression, in particular, \[**brglm2**\] also provides
+methods for maximum Diaconis-Ylvisaker prior penalized likelihood
+(MDYPL) estimation, and corresponding methods for high-dimensionality
+correction of the aggregate bias of the estimator and the usual
+statistics used for inference; see [Sterzinger and Kosmidis,
+2024](https://arxiv.org/abs/2311.07419).
 
 The core model fitters are implemented by the functions `brglm_fit()`
 (univariate generalized linear models) and `mdyplFit()` (logistic
@@ -218,7 +221,7 @@ estimate of the odds ratio is not as useful as the `correction*`
 estimate, because it is +∞ with an infinite standard error (see previous
 section).
 
-### Maximum Diaconis-Ylvisaker prior penalized likelihood and high-dimensionality corrections
+### MDYPL estimation and high-dimensionality corrections
 
 Consider the [Multiple Features
 dataset](https://doi.org/10.24432/C5HC70), which consists of digits
@@ -322,11 +325,11 @@ description of `7` as the model with both `fou` and `kar` features.
     #> 2       859 1.6140e-08 64 3.0047e-07        1
 
 Let’s fit the models using maximum Diaconis-Ylvisaker prior penalized
-likelihood with a shrinkage parameter `alpha` in `(0, 1)`, which always
-results in finite estimates; see `?brglm2::mdypl_fit`. The corresponding
-penalized likelihood ratio test (see `?brglm2::plrtest` and
-`?brglm2::summary.mdyplFit`) results again in no evidence against the
-hypothesis.
+likelihood (MDYPL) with a shrinkage parameter `alpha` in `(0, 1)`, which
+always results in finite estimates; see `?brglm2::mdypl_fit`. The
+corresponding penalized likelihood ratio test (see `?brglm2::plrtest`
+and `?brglm2::summary.mdyplFit`) results again in no evidence against
+the hypothesis.
 
     full_m <- update(full_sep, method = mdypl_fit)
     nest_m <- update(nest_sep, method = mdypl_fit, alpha = full_m$alpha)
