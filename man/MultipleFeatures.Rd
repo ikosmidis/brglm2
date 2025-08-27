@@ -33,6 +33,7 @@ recognition.
 }
 \examples{
 
+\dontrun{
 data("MultipleFeatures", package = "brglm2")
 
 par(mfrow = c(10, 20), mar = numeric(4) + 0.1)
@@ -45,6 +46,7 @@ for (c_digit in 0:9) {
   }
 }
 
+}
 }
 \references{
 Duin, R. (1998). Multiple Features Dataset. UCI Machine Learning
