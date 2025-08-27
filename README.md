@@ -47,10 +47,10 @@ for logistic regression (and, for more general binomial-response models
 where the likelihood is penalized by a power of the Jeffreys’ invariant
 prior).
 
-For logistic regression, in particular, \[**brglm2**\] also provides
-methods for maximum Diaconis-Ylvisaker prior penalized likelihood
-(MDYPL) estimation, and corresponding methods for high-dimensionality
-correction of the aggregate bias of the estimator and the usual
+For logistic regression, \[**brglm2**\] also provides methods for
+maximum Diaconis-Ylvisaker prior penalized likelihood (MDYPL)
+estimation, and corresponding methods for high-dimensionality
+corrections of the aggregate bias of the estimator and the usual
 statistics used for inference; see [Sterzinger and Kosmidis,
 2024](https://arxiv.org/abs/2311.07419).
 
