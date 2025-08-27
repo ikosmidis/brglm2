@@ -482,7 +482,7 @@ high-dimensionality corrections under proportional asymptotics are
 described in
 
 > Sterzinger P, Kosmidis I (2024). Diaconis-Ylvisaker prior penalized
-> likelihood for logistic regression.
+> likelihood for *p*/*n* → *κ* ∈ (0, 1) logistic regression.
 > [*arXiv*:2311.07419v2](https://arxiv.org/abs/2311.07419).
 
 ## Code of Conduct
