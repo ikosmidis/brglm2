@@ -109,7 +109,7 @@ actually infinite, as can be quickly verified using the
 ```{r, echo = TRUE, eval = TRUE}
 # install.packages("detectseparation")
 library("detectseparation")
-update(modML, method = "detect_separation")
+update(modML, method = detect_separation)
 ```
 
 The reported, apparently finite estimate `r
@@ -117,8 +117,7 @@ round(coef(summary(modML))["NV", "Estimate"], 3)` for `NV` is merely
 due to false convergence of the iterative estimation procedure for
 ML. The same is true for the estimated standard error, and, hence the
 value `r round(coef(summary(modML))["NV", "z value"], 3)` for the
-s$z$-statistic cannot be trusted for inference on the size of the
-effect for `NV`.
+$z$-statistic cannot be trusted for inference on the effect size for `NV`.
 
 As mentioned earlier, many of the estimation methods implemented in
 **brglm2** not only return estimates with improved frequentist
@@ -267,14 +266,13 @@ against the model with `fou` features only.
 plrtest(nest_m, full_m, hd_correction = TRUE)
 ```
 
-
 ## Solving adjusted score equations using quasi-Fisher scoring
 
 The workhorse function in **brglm2** is
-[`brglm_fit`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R)
-(or equivalently `brglmFit` if you like camel case), which, as we did
+[`brglm_fit()`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R)
+(or equivalently `brglmFit()` if you like camel case), which, as we did
 in the example above, can be passed directly to the `method` argument
-of the `glm` function. `brglm_fit` implements a quasi [Fisher
+of the `glm()` function. `brglm_fit()` implements a quasi [Fisher
 scoring](https://en.wikipedia.org/wiki/Scoring_algorithm) procedure,
 whose special cases result in a range of explicit and implicit bias
 reduction methods for generalized linear models for more
@@ -283,16 +281,21 @@ responses) can be performed using the function `brmultinom`, and for
 adjacent category models (ordinal responses) using the function
 `bracl`. Both `brmultinom` and `bracl` rely on `brglm_fit`.
 
-The [iteration
-vignette](https://cran.r-project.org/package=brglm2/vignettes/iteration.html)
-and [Kosmidis et al
-(2020)](https://doi.org/10.1007/s11222-019-09860-6) present the
-iteration and give mathematical details for the bias-reducing
-adjustments to the score functions for generalized linear models.
-
 The classification of bias reduction methods into explicit and
 implicit is as given in [Kosmidis
 (2014)](https://doi.org/10.1002/wics.1296).
+
+For logistic regression models, in particular, the
+[`mdypl_fit()`](https://github.com/ikosmidis/brglm2/blob/master/R/mdyplFit.R)
+function provides maximum Diaconis-Ylvisaker prior penalized
+likelihood estimation. The `summary()` method for `mdyplFit` objects,
+then allows for high-dimensional corrections of aggregate bias and of
+standard $z$-statistics under proportional asymptotics, and the
+`plrtest()` method allows for penalized likelihood ratio tests with
+and without high-dimensional corrections; see [Sterzinger and Kosmidis
+(2024)](https://arxiv.org/abs/2311.07419), the example above, and the
+help pages of the methods.
+
 
 ## References and resources
 
