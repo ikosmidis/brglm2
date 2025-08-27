@@ -27,4 +27,13 @@ c(bibentry(bibtype = "Manual",
            journal = "Statistics and Computing",
            volume = "30",
            pages = "43-59",
-           url = "https://doi.org/10.1007/s11222-019-09860-6"))
+           url = "https://doi.org/10.1007/s11222-019-09860-6"),
+  bibentry(bibtype = "article",
+           title = "Diaconis-Ylvisaker prior penalized likelihood for $p/n \to \kappa \in (0,1)$ logistic regression",
+           author = c(person(given = "Philipp", family = "Sterzinger"),
+                      person(given = "Ioannis", family = "Kosmidis")),
+           year = "2024",
+           journal = "arXiv",
+           eprint = "2311.07419v2",
+           archivePrefix = "arXiv"
+  ))
