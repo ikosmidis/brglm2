@@ -115,6 +115,11 @@ R package
 
     # install.packages("detectseparation")
     library("detectseparation")
+    #> 
+    #> Attaching package: 'detectseparation'
+    #> The following objects are masked from 'package:brglm2':
+    #> 
+    #>     check_infinite_estimates, detect_separation
     update(modML, method = detect_separation)
     #> Implementation: ROI | Solver: lpsolve 
     #> Separation: TRUE 
@@ -455,11 +460,10 @@ impact of the correction is to inflate the MDYPL estimates.
 
 ## Estimation methods
 
-The workhorse function in **brglm2** is
-[`brglm_fit()`](https://github.com/ikosmidis/brglm2/blob/master/R/brglmFit.R)
-(or equivalently `brglmFit()` if you like camel case), which, as we did
-in the example above, can be passed directly to the `method` argument of
-the `glm()` function. `brglm_fit()` implements a quasi [Fisher
+The workhorse function in **brglm2** is `brglm_fit()` (or equivalently
+`brglmFit()` if you like camel case), which, as we did in the example
+above, can be passed directly to the `method` argument of the `glm()`
+function. `brglm_fit()` implements a quasi [Fisher
 scoring](https://en.wikipedia.org/wiki/Scoring_algorithm) procedure,
 whose special cases result in a range of explicit and implicit bias
 reduction methods for generalized linear models for more details). Bias
@@ -471,8 +475,7 @@ models (ordinal responses) using the function `bracl()`. Both
 The classification of bias reduction methods into explicit and implicit
 is as given in [Kosmidis (2014)](https://doi.org/10.1002/wics.1296).
 
-For logistic regression models, in particular, the
-[`mdypl_fit()`](https://github.com/ikosmidis/brglm2/blob/master/R/mdyplFit.R)
+For logistic regression models, in particular, the `mdypl_fit()`
 function provides maximum Diaconis-Ylvisaker prior penalized likelihood
 estimation, and can again be passed directly to the `method` argument of
 the `glm()` function. The `summary()` method for `mdyplFit` objects,
