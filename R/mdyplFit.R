@@ -40,9 +40,8 @@
 #' By default, `alpha = m / (p + m)` is used, where `m` is the sum of
 #' the binomial totals. Alternative values of `alpha` can be passed to
 #' the `control` argument; see [mdyplControl()] for setting up the
-#' list passed to `control`. If `alpha = 1` then
-#' [`"mdyplFit"`][mdyplFit()] will simply do maximum likelihood
-#' estimation.
+#' list passed to `control`. If `alpha = 1` then [mdyplFit()] will
+#' simply do maximum likelihood estimation.
 #'
 #' Note that `null.deviance`, `deviance` and `aic` in the resulting
 #' object are computed at the adjusted responses. Hence, methods such
@@ -54,7 +53,7 @@
 #'
 #' For high-dimensionality corrected estimates, standard errors and z
 #' statistics, use the [`summary`][summary.mdyplFit()] method for
-#' [`"mdyplFit"`](mdyplFit()) objects with `hd_correction = TRUE`.
+#' [`"mdyplFit"`][mdyplFit()] objects with `hd_correction = TRUE`.
 #'
 #' [mdypl_fit()] is an alias to [mdyplFit()].
 #'
