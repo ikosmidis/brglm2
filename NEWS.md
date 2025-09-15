@@ -1,3 +1,11 @@
+# brglm2 1.0.1
+
+## Bug fixes
+
+* Fixed a bug that would cause an error when `summary.mdyplFit()` was
+  called with `hd_correction = TRUE` in the presence of aliased
+  parameters.
+
 # brglm2 1.0.0
 
 ## Improvements, updates and additions

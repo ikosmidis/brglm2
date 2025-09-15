@@ -356,10 +356,8 @@ sloe <- function(object) {
     sd(S)
 }
 
-taus <- function(object) {
-    X <- model.matrix(object)
-    has_intercept <- attr(terms(object), "intercept")
-    if (has_intercept) X <- X[, colnames(X) != "(Intercept)"]
+taus <- function(X) {
+    X <- X[, colnames(X) != "(Intercept)"]
     L <- qr.R(qr(X))
     rss <- 1 / colSums(backsolve(L, diag(ncol(X)), transpose = TRUE)^2)
     sqrt(rss / (nrow(X) - ncol(X) + 1))
@@ -496,7 +494,8 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
             msg <- paste("Unable to solve the state evolution equations. Try to supply an alternative vector of ", 3 + has_intercept, " to `se_start`, with starting values for `mu` (in (0, 1)), `b` (> 0), `sigma` (> 0)", if (has_intercept) ", `intercept.`" else ".")
             stop(msg)
         }
-        tt <- taus(object)
+        xx <- model.matrix(object)[, !summ$aliased]
+        tt <- taus(xx)
         no_int <- !(rownames(coefs) %in% "(Intercept)")
         coefs[no_int, "Estimate"] <- coefs[no_int, "Estimate"] / se_pars[1]
         coefs[no_int, "Std. Error"] <- se_pars[3] / (sqrt(nobs) * tt * se_pars[1])
@@ -509,7 +508,7 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
 
         family <- object$family
         dev.resids <- family$dev.resids
-        mus <- family$linkinv(drop(model.matrix(object) %*% coefs[, "Estimate"]))
+        mus <- family$linkinv(drop(xx %*% coefs[, "Estimate"]))
         y <- object$y
         ## Null deviance is not updated
         d_res <- sqrt(pmax(family$dev.resids(y, mus, pw), 0))
