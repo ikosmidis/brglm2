@@ -24,7 +24,7 @@
 #' @inheritParams summary.mdyplFit
 #' @param object1 a [`"mdyplFit"`][mdyplFit()] object
 #' @param object2 a [`"mdyplFit"`][mdyplFit()] object
-#' @param ... further arguments to be passed to methods. Currently not used.
+#' @param ... further arguments to be passed to [summary.mdyplFit()].
 #'
 #' @details
 #'
@@ -61,9 +61,9 @@ plrtest.mdyplFit <- function(object1, object2, hd_correction = FALSE, ...) {
         npars1 <- object1$rank
         npars2 <- object2$rank
         if (npars2 > npars1) {
-            summ <- summary(object2, hd_correction = TRUE)
+            summ <- summary(object2, hd_correction = TRUE, ...)
         } else {
-            summ <- summary(object1, hd_correction = TRUE)
+            summ <- summary(object1, hd_correction = TRUE, ...)
         }
         se_pars <- summ$se_parameters
         anv$Deviance <- anv$Deviance * se_pars[2] / (summ$kappa * se_pars[3]^2)
