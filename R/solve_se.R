@@ -305,7 +305,7 @@ optim_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, pr
     } else {
         soln <- c(exp(res$par[1:3]), res$par[4])
     }
-    attr(soln, "funcs") <- g(soln)
+    attr(soln, "funcs") <- g(res$par)
     attr(soln, "iter") <- res$counts
     attr(soln, "convergence") <- res$convergence
     attr(soln, "message") <- res$message
@@ -327,7 +327,7 @@ optim_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, 
     } else {
         soln <- c(exp(res$par[1:3]), res$par[4])
     }
-    suppressWarnings(attr(soln, "funcs") <- g(soln))
+    suppressWarnings(attr(soln, "funcs") <- g(res$par))
     attr(soln, "iter") <- res$counts
     attr(soln, "convergence") <- res$convergence
     attr(soln, "message") <- res$message
