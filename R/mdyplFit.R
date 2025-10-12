@@ -353,7 +353,8 @@ sloe <- function(object) {
     v <- mu * (1 - mu)
     h <- hatvalues(object)
     S <- object$linear.predictors - (object$y_adj - mu) / v * h / (1 - h)
-    sd(S)
+    inds <- is.infinite(S) | is.na(S)
+    sd(S[!inds])
 }
 
 taus <- function(X) {
@@ -393,7 +394,7 @@ taus <- function(X) {
 #' The key assumptions under which the rescaled estimates and corrected
 #' standard errors and z-statistics are asymptotically valid are that
 #' the covariates have sub-Gaussian distributions, and that the signal
-#' strength, which is the limit \deqn{\gamma^2} of \eqn{var(X \beta)}
+#' strength, which is the limit \eqn{\gamma^2} of \eqn{var(X \beta)}
 #' is finite as \eqn{p / n \to \kappa \in (0, 1)}, with \eqn{\kappa \in
 #' (0, 1)}. See Sterzinger & Kosmidis (2024).
 #'
