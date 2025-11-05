@@ -296,69 +296,143 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         }
     }
 
-    ## key_quantities, grad, info and bias are ALWAYS in beta, dispersion parameterization
-    key_quantities <- function(pars, y, level = 0, scale_totals = FALSE, qr = TRUE) {
+    # Always computes everything needed, stores it once, passes it around
+    compute_fit <- function(pars, y, x, weights, offset, family, 
+                            fixed_totals = NULL, row_totals = NULL, 
+                            no_dispersion = FALSE, nobs, nvars, keep) {
+        
+        # Extract Parameters
         betas <- pars[seq.int(nvars)]
         dispersion <- pars[nvars + 1]
-        prec <- 1/dispersion
+        precision <- 1 / dispersion
+
+        # Basic Quantities
         etas <- drop(x %*% betas + offset)
-        mus <- linkinv(etas)
-        if (scale_totals) {
-            ## Rescale mus
-            mus_totals <-  as.vector(tapply(mus, fixed_totals, sum))[fixed_totals]
-            mus <- mus * row_totals / mus_totals
-            etas <- linkfun(mus)
+        mus <- family$linkinv(etas)
+        mus_unscaled <- mus  # Keep original for gradient computation
+        if (!is.null(fixed_totals)) {
+            mus_totals <- as.vector(tapply(mus, fixed_totals, sum))[fixed_totals]
+            mus <- mus * row_totals / mus_totals  # Scaled version
+            etas <- family$linkfun(mus)  # Update etas to match scaled mus
         }
-        out <- list(precision = prec,
-                    betas = betas,
-                    dispersion = dispersion,
-                    etas = etas,
-                    mus = mus,
-                    scale_totals = scale_totals)
-        mean_quantities <- function(out) {
-            d1mus <- mu.eta(etas)
-            d2mus <- d2mu.deta(etas)
-            varmus <- variance(mus)
-            working_weights <- weights * d1mus^2 / varmus
-            wx <- sqrt(working_weights) * x
-            out$d1mus <- d1mus
-            out$d2mus <- d2mus
-            out$varmus <- varmus
-            out$d1varmus <- d1variance(mus)
-            out$working_weights <- working_weights
-            if (qr) out$qr_decomposition <- qr(wx)
-            out
-        }
-        dispersion_quantities <- function(out) {
-            zetas <- -weights * prec
-            out$zetas <- zetas
-            ## Evaluate the derivatives of the a function only for
-            ## objervations with non-zero weight
+
+        # Mean Quantities
+        d1mus <- family$mu.eta(etas)
+        d2mus <- family$d2mu.deta(etas)
+        varmus <- family$variance(mus)
+        d1varmus <- family$d1variance(mus)
+        working_weights <- weights * d1mus^2 / varmus
+
+        # QR Decomposition
+        wx <- sqrt(working_weights) * x
+        qr_decomposition <- qr(wx)
+        R_matrix <- qr.R(qr_decomposition)
+
+        # Hat Values 
+        # TODO: Avoid forming full Q? Approximate hat values?
+        Qmat <- qr.Q(qr_decomposition) 
+        hatvalues <- .rowSums(Qmat * Qmat, nobs, nvars, TRUE)
+
+        # Information Matrices
+        info_beta <- precision * crossprod(R_matrix)
+        inverse_info_beta <- dispersion * chol2inv(R_matrix)
+
+        # Dispersion Quantities (dept on family)
+        if (!no_dispersion) {
+            zetas <- -weights * precision
+            
+            # Derivatives of cumulant function (only for non-zero weights)
             d1afuns <- d2afuns <- d3afuns <- rep(NA_real_, nobs)
-            d1afuns[keep] <- d1afun(zetas[keep])
-            ## because of the way dev.resids is implemented, this is
-            ## d1afun is the expectation of dev.resids + 2 for gamma
-            ## families, so subtract 2
-            if (family$family == "Gamma") d1afuns <- d1afuns - 2
-            d2afuns[keep] <- d2afun(zetas[keep])
-            d3afuns[keep] <- d3afun(zetas[keep])
-            out$d2afuns <- d2afuns
-            out$d3afuns <- d3afuns
-            out$deviance_residuals <- dev.resids(y, mus, weights)
-            out$Edeviance_residuals <- weights * d1afuns
-            out
+            d1afuns[keep] <- family$d1afun(zetas[keep])
+            d2afuns[keep] <- family$d2afun(zetas[keep])
+            d3afuns[keep] <- family$d3afun(zetas[keep])
+            
+            # Special case for Gamma family
+            if (family$family == "Gamma") {
+                d1afuns <- d1afuns - 2
+            }
+            
+            # Deviance residuals
+            deviance_residuals <- family$dev.resids(y, mus, weights)
+            Edeviance_residuals <- weights * d1afuns
+            
+            # Information for dispersion parameter
+            info_zeta <- 0.5 * sum(weights^2 * d2afuns, na.rm = TRUE) / dispersion^4
+            inverse_info_zeta <- 1 / info_zeta
+        } else {
+            # Fixed dispersion (binomial, Poisson)
+            zetas <- d1afuns <- d2afuns <- d3afuns <- NA_real_
+            deviance_residuals <- family$dev.resids(y, mus, weights)
+            Edeviance_residuals <- NA_real_
+            info_zeta <- inverse_info_zeta <- NA_real_
         }
-        if (level == 0) {
-            out <- mean_quantities(out)
+
+        # Gradient Computation
+        # Use unscaled mus for gradient when fixed_totals is used
+        mus_for_gradient <- if (!is.null(fixed_totals)) mus_unscaled else mus
+        etas_for_gradient <- if (!is.null(fixed_totals)) family$linkfun(mus_unscaled) else etas
+        d1mus_for_gradient <- family$mu.eta(etas_for_gradient)
+        varmus_for_gradient <- family$variance(mus_for_gradient)
+        
+        score_components_beta <- weights * d1mus_for_gradient * (y - mus_for_gradient) / 
+                                varmus_for_gradient * x
+        grad_beta <- precision * .colSums(score_components_beta, nobs, nvars, TRUE)
+        
+        if (!no_dispersion) {
+            grad_zeta <- 0.5 * precision^2 * 
+                        sum(deviance_residuals - Edeviance_residuals, na.rm = TRUE)
+        } else {
+            grad_zeta <- NA_real_
         }
-        if (level == 1) {
-            out <- dispersion_quantities(out)
-        }
-        if (level > 1) {
-            out <- mean_quantities(out)
-            out <- dispersion_quantities(out)
-        }
-        out
+
+        # Return all computed quantities as class
+        structure(list(
+            # Parameters
+            betas = betas,
+            dispersion = dispersion,
+            precision = precision,
+            
+            # Basic quantities
+            etas = etas,
+            mus = mus,
+            mus_unscaled = mus_unscaled,  # For gradient with fixed_totals
+            
+            # Mean-related quantities
+            d1mus = d1mus,
+            d2mus = d2mus,
+            varmus = varmus,
+            d1varmus = d1varmus,
+            working_weights = working_weights,
+            
+            # QR decomposition and related
+            qr_decomposition = qr_decomposition,
+            R_matrix = R_matrix,
+            Q_matrix = Qmat, 
+            hatvalues = hatvalues,
+            
+            # Information matrices (pre-computed)
+            info_beta = info_beta,
+            inverse_info_beta = inverse_info_beta,
+            
+            # Dispersion-related quantities
+            zetas = zetas,
+            d1afuns = d1afuns,
+            d2afuns = d2afuns,
+            d3afuns = d3afuns,
+            deviance_residuals = deviance_residuals,
+            Edeviance_residuals = Edeviance_residuals,
+            info_zeta = info_zeta,
+            inverse_info_zeta = inverse_info_zeta,
+            
+            # Gradients (pre-computed)
+            grad_beta = grad_beta,
+            grad_zeta = grad_zeta,
+            score_components_beta = score_components_beta,
+            
+            # Metadata
+            has_fixed_totals = !is.null(fixed_totals),
+            no_dispersion = no_dispersion
+        ), class = "brglmFit_quantities")
     }
 
     gradient <- function(pars, level = 0, fit = NULL) {
