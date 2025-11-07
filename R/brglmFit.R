@@ -299,7 +299,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     # Always computes everything needed, stores it once, passes it around
     compute_fit <- function(pars, y, x, weights, offset, family, 
                             fixed_totals = NULL, row_totals = NULL, 
-                            no_dispersion = FALSE, nobs, nvars, keep) {
+                            no_dispersion = FALSE, nobs, nvars, keep,
+                            need_qr = TRUE, need_hatvalues = TRUE) {
         
         # Extract Parameters
         betas <- pars[seq.int(nvars)]
@@ -323,19 +324,26 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         d1varmus <- family$d1variance(mus)
         working_weights <- weights * d1mus^2 / varmus
 
-        # QR Decomposition
-        wx <- sqrt(working_weights) * x
-        qr_decomposition <- qr(wx)
-        R_matrix <- qr.R(qr_decomposition)
+        # QR Decomposition and Hat Values (only if needed)
+        qr_decomposition <- R_matrix <- Q_matrix <- hatvalues <- NULL
+        info_beta <- inverse_info_beta <- NULL
 
-        # Hat Values 
         # TODO: Avoid forming full Q? Approximate hat values?
-        Qmat <- qr.Q(qr_decomposition) 
-        hatvalues <- .rowSums(Qmat * Qmat, nobs, nvars, TRUE)
-
-        # Information Matrices
-        info_beta <- precision * crossprod(R_matrix)
-        inverse_info_beta <- dispersion * chol2inv(R_matrix)
+        if (need_qr) {
+            wx <- sqrt(working_weights) * x
+            qr_decomposition <- qr(wx)
+            R_matrix <- qr.R(qr_decomposition)
+            
+            # Information Matrices
+            info_beta <- precision * crossprod(R_matrix)
+            inverse_info_beta <- dispersion * chol2inv(R_matrix)
+            
+            # Hat Values (only if needed and we have QR)
+            if (need_hatvalues) {
+                Q_matrix <- qr.Q(qr_decomposition) 
+                hatvalues <- .rowSums(Q_matrix * Q_matrix, nobs, nvars, TRUE)
+            }
+        }
 
         # Dispersion Quantities (dept on family)
         if (!no_dispersion) {
@@ -407,7 +415,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
             # QR decomposition and related
             qr_decomposition = qr_decomposition,
             R_matrix = R_matrix,
-            Q_matrix = Qmat, 
+            Q_matrix = Q_matrix, 
             hatvalues = hatvalues,
             
             # Information matrices (pre-computed)
@@ -500,7 +508,9 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                                                 no_dispersion = no_dispersion,
                                                 nobs = nobs,
                                                 nvars = nvars,
-                                                keep = keep)
+                                                keep = keep,
+                                                need_qr = FALSE,
+                                                need_hatvalues = FALSE)
                     gradient(theta, level = 1, fit = cfit)
                 }, lower = .Machine$double.eps, upper = 10000, tol = control$epsilon), silent = FALSE)
                 if (inherits(dispFit, "try-error")) {
@@ -900,7 +910,9 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                     no_dispersion = no_dispersion,
                     nobs = nobs,
                     nvars = nvars,
-                    keep = keep)
+                    keep = keep,
+                    need_qr = TRUE,
+                    need_hatvalues = TRUE)
 
         step_components_beta <- compute_step_components(theta, level = 0, fit = fit, 
                                                        adjustment_function = adjustment_function,
@@ -979,7 +991,9 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                                                     no_dispersion = no_dispersion,
                                                     nobs = nobs,
                                                     nvars = nvars,
-                                                    keep = keep), silent = TRUE)
+                                                    keep = keep, 
+                                                    need_qr = TRUE,
+                                                    need_hatvalues = TRUE), silent = TRUE)
 
                     ## This is to capture qr failing and revering to previous estimates
                     if (failed_adjustment_beta <- inherits(fit, "try-error")) {
@@ -1086,7 +1100,9 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                         no_dispersion = no_dispersion,
                         nobs = nobs,
                         nvars = nvars,
-                        keep = keep)
+                        keep = keep,
+                        need_qr = TRUE,
+                        need_hatvalues = FALSE)
 
         qr.Wx <- fit$qr_decomposition
 
