@@ -24,8 +24,9 @@ solve_se(
 \item{kappa}{asymptotic ratio of columns/rows of the design
 matrix. \code{kappa} should be in \verb{(0, 1)}.}
 
-\item{ss}{signal strength or corrupted signal strength, depending
-on whether \code{corrupted = TRUE} or not. See Details.}
+\item{ss}{square root of signal strength or of corrupted signal
+strength, depending on whether \code{corrupted = TRUE} or not. See
+Details.}
 
 \item{alpha}{the shrinkage parameter of the MDYPL
 estimator. \code{alpha} should be in \verb{(0, 1)}.}
@@ -39,11 +40,12 @@ Details.}
 \item{start}{a vector with starting values for \code{mu}, \code{b},\code{sigma}
 (and \code{iota} if \code{intercept} is numeric).}
 
-\item{corrupted}{if \code{FALSE} (default) then \code{ss} is signal strength
-and \code{intercept}, if numeric, is the oracle intercept value. If
-\code{TRUE}, then \code{ss} is the corrupted signal strength, and
-\code{intercept}, if numeric, is the limit of the estimator computed
-by \code{\link[=mdyplFit]{mdyplFit()}} with shrinkage parameter \code{alpha}. See Details.}
+\item{corrupted}{if \code{FALSE} (default) then \code{ss} is the square root
+of the signal strength and \code{intercept}, if numeric, is the
+oracle intercept value. If \code{TRUE}, then \code{ss} is the square root
+of the corrupted signal strength, and \code{intercept}, if numeric,
+is the limit of the estimator computed by \code{\link[=mdyplFit]{mdyplFit()}} with
+shrinkage parameter \code{alpha}. See Details.}
 
 \item{gh}{A list with the Gauss-Hermite quadrature nodes and
 weights, as returned from \code{statmod::gauss.quad()} with \code{kind = "hermite"}. Default is \code{NULL}, in which case \code{gh} is set to

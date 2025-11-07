@@ -6,6 +6,18 @@
   called with `hd_correction = TRUE` in the presence of aliased
   parameters.
 
+* Fixed a bug on reported state evolution function values when
+  `init_iter = "only"`.
+
+## Improvements, updates and additions
+
+* `sloe()` ignores leverage `1` observations, when estimating the
+  contaminated signal strength.
+
+* `...` in `plrtest()` is further arguments to be passed
+  `summary.mdyplFit()`.
+
+
 # brglm2 1.0.0
 
 ## Improvements, updates and additions

@@ -18,7 +18,7 @@ then the high-dimensionality corrections in Sterzinger &
 Kosmidis (2024) are employed to updates estimates, estimated
 standard errors, z-statistics. See Details.}
 
-\item{...}{further arguments to be passed to methods. Currently not used.}
+\item{...}{further arguments to be passed to \code{\link[=summary.mdyplFit]{summary.mdyplFit()}}.}
 }
 \description{
 Computes the Diaconis-Ylvisaker prior penalized likelihood ratio

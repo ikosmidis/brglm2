@@ -598,7 +598,7 @@ print.summary.mdyplFit <- function (x, digits = max(3L, getOption("digits") - 3L
     if (x$hd_correction) {
         cat("\nHigh-dimensionality correction applied with")
         cat("\nDimentionality parameter (kappa) =", round(x$kappa, 2))
-        cat("\nEstimated signal strength (gamma) =", round(x$signal_strength, 2))
+        cat("\nEstimated signal strength (gamma^2) =", round(x$signal_strength, 2))
         cat("\nState evolution parameters (mu, b, sigma) =", paste0("(", paste(round(x$se_parameters[1:3], 2), collapse = ", "), ")"), "with max(|funcs|) =", max(abs(attr(x$se_parameters, "funcs"))), "\n")
     }
     invisible(x)

@@ -18,8 +18,9 @@
 #'
 #' @param kappa asymptotic ratio of columns/rows of the design
 #'     matrix. `kappa` should be in `(0, 1)`.
-#' @param ss signal strength or corrupted signal strength, depending
-#'     on whether `corrupted = TRUE` or not. See Details.
+#' @param ss square root of signal strength or of corrupted signal
+#'     strength, depending on whether `corrupted = TRUE` or not. See
+#'     Details.
 #' @param alpha the shrinkage parameter of the MDYPL
 #'     estimator. `alpha` should be in `(0, 1)`.
 #' @param intercept if `NULL` (default) then the MDYPL state evolution
@@ -29,11 +30,12 @@
 #'     Details.
 #' @param start a vector with starting values for `mu`, `b`,`sigma`
 #'     (and `iota` if `intercept` is numeric).
-#' @param corrupted if `FALSE` (default) then `ss` is signal strength
-#'     and `intercept`, if numeric, is the oracle intercept value. If
-#'     `TRUE`, then `ss` is the corrupted signal strength, and
-#'     `intercept`, if numeric, is the limit of the estimator computed
-#'     by [mdyplFit()] with shrinkage parameter `alpha`. See Details.
+#' @param corrupted if `FALSE` (default) then `ss` is the square root
+#'     of the signal strength and `intercept`, if numeric, is the
+#'     oracle intercept value. If `TRUE`, then `ss` is the square root
+#'     of the corrupted signal strength, and `intercept`, if numeric,
+#'     is the limit of the estimator computed by [mdyplFit()] with
+#'     shrinkage parameter `alpha`. See Details.
 #' @param gh A list with the Gauss-Hermite quadrature nodes and
 #'     weights, as returned from `statmod::gauss.quad()` with `kind =
 #'     "hermite"`. Default is `NULL`, in which case `gh` is set to

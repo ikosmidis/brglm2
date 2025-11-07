@@ -45,3 +45,11 @@ tots <- lizards$grahami + lizards$opalinus
 lizX <- model.matrix(liz_mdypl)
 expect_equal(summ_mdypl_c$aic,
              brglm2:::logist_aic(liz_mdypl$y_adj, weights(liz_ml), drop(plogis(lizX %*% cc)), weights(liz_ml)) + 2 * liz_mdypl$rank)
+
+
+## aliasing
+
+X <- model.matrix(liz_ml)
+glm(I(grahami / (grahami +  opalinus)) ~ -1 + X, weights = grahami + opalinus, data = lizards, family = binomial())
+
+
