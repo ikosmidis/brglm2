@@ -603,14 +603,14 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                 grad <- adjustment <- inverse_info <- NA_real_
                 failed_adjustment <- failed_inversion <- FALSE
             } else {
-                d1zeta <- eval(control$d1_transformed_dispersion)
-                d2zeta <- eval(control$d2_transformed_dispersion)
+                d1zeta <- eval(d1_transformed_dispersion)
+                d2zeta <- eval(d2_transformed_dispersion)
                 
                 grad <- fit$grad_zeta / d1zeta
                 inverse_info <- fit$inverse_info_zeta * d1zeta^2
                 adjustment <- adjustment_function(pars, fit = fit, level = 1) / d1zeta - 
                             0.5 * d2zeta / d1zeta^2
-                
+
                 failed_inversion <- !is.finite(inverse_info)
                 failed_adjustment <- is.na(adjustment)
             }
