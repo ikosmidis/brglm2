@@ -596,7 +596,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 
 
     ## compute_step_components does everything on the scale of the /transformed/ dispersion
-    compute_step_components <- function(pars, fit, level = 0, adjustment_function, control) {
+    compute_step_components <- function(pars, fit, level = 0) {
 
         if (level == 0) {
             # Beta components
@@ -914,12 +914,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                     need_qr = TRUE,
                     need_hatvalues = TRUE)
 
-        step_components_beta <- compute_step_components(theta, level = 0, fit = fit, 
-                                                       adjustment_function = adjustment_function,
-                                                       control = control)
-        step_components_zeta <- compute_step_components(theta, level = 1, fit = fit,
-                                                       adjustment_function = adjustment_function,
-                                                       control = control)
+        step_components_beta <- compute_step_components(theta, level = 0, fit = fit)
+        step_components_zeta <- compute_step_components(theta, level = 1, fit = fit)
         if (step_components_beta$failed_inversion) {
             warning("failed to invert the information matrix")
         }
@@ -1002,12 +998,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                         warning("failed to calculate score adjustment")
                         break
                     }
-                    step_components_beta <- compute_step_components(theta, level = 0, fit = fit,
-                                                                   adjustment_function = adjustment_function,
-                                                                   control = control)
-                    step_components_zeta <- compute_step_components(theta, level = 1, fit = fit,
-                                                                   adjustment_function = adjustment_function,
-                                                                   control = control)
+                    step_components_beta <- compute_step_components(theta, level = 0, fit = fit)
+                    step_components_zeta <- compute_step_components(theta, level = 1, fit = fit)
                     if (failed_inversion_beta <- step_components_beta$failed_inversion) {
                         warning("failed to invert the information matrix")
                         break
