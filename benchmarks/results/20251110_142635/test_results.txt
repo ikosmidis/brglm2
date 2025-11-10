@@ -1,0 +1,3 @@
+Original: NA tests (89.3s)
+New: NA tests (113.3s)
+Speedup: 0.79x faster
