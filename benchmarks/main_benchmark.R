@@ -17,68 +17,55 @@ tryCatch({
   cat("Timestamp:", timestamp, "\n")
   cat(separator, "\n\n")
   
-# ====== SECTION 1: Test Suite Execution ======
-cat("\n", separator, "\n")
-cat("SECTION 1: TEST SUITE EXECUTION\n")
-cat(separator, "\n\n")
+  # ====== SECTION 1: Test Suite Execution ======
+  cat("\n", separator, "\n")
+  cat("SECTION 1: TEST SUITE EXECUTION\n")
+  cat(separator, "\n\n")
 
-pkg_path <- "C:/Users/ollie/OneDrive/Desktop/UNI/Project brglm2/brglm2"
+  pkg_path <- "C:/Users/ollie/OneDrive/Desktop/UNI/Project brglm2/brglm2"
 
-# Ensure DD is available in case internal calls need it
-if (!exists("DD", mode = "function")) {
-  DD <- function(expr, name, order = 1) {
-    if(order < 1) stop("'order' must be >= 1")
-    if(order == 1) D(expr, name)
-    else DD(D(expr, name), name, order - 1)
+  # Ensure DD exists for internal brglm2 calls
+  if (!exists("DD", mode = "function")) {
+    DD <- function(expr, name, order = 1) {
+      if(order < 1) stop("'order' must be >= 1")
+      if(order == 1) D(expr, name)
+      else DD(D(expr, name), name, order - 1)
+    }
   }
-}
 
-run_test_suite <- function(libpath, label) {
-  cat("Running test suite for", label, "version...\n")
-  cat("Library path:", libpath, "\n\n")
-  
-  # Load brglm2 version
-  library(brglm2, lib.loc = libpath)
-  library(tinytest)
-  
-  # Run test suite, timing total duration
-  start <- Sys.time()
-  result <- test_all(pkg_path)
-  elapsed <- as.numeric(difftime(Sys.time(), start, units = "secs"))
-  
-  # Summarise results safely
-  sum_df <- as.data.frame(result)
-  if ("ok" %in% names(sum_df)) {
-    passes <- sum(sum_df$ok)
-    fails <- sum(!sum_df$ok)
-  } else {
-    # fallback if tinytest version differs
-    passes <- NA
-    fails <- NA
-    warning("Could not extract passes/fails from test results")
+  run_test_suite <- function(libpath, label) {
+    library(brglm2, lib.loc = libpath)
+    library(tinytest)
+    
+    cat("Running test suite for", label, "version...\n")
+    start <- Sys.time()
+    
+    result <- test_all(pkg_path)
+    elapsed <- as.numeric(difftime(Sys.time(), start, units = "secs"))
+    
+    # Summarise
+    sum_df <- as.data.frame(result)
+    n_passed <- sum(sum_df$ok)
+    n_total  <- nrow(sum_df)
+    
+    cat(sprintf("%s: %d/%d tests OK (%.1fs)\n\n", label, n_passed, n_total, elapsed))
+    
+    invisible(list(result = result, passes = n_passed, total = n_total, elapsed = elapsed))
   }
-  
-  cat(sprintf("All ok, %d results (%.1fs)\n\n", passes + fails, elapsed))
-  
-  invisible(list(result = result, passes = passes, fails = fails, elapsed = elapsed))
-}
 
-# --- Run NEW version ---
-new_results <- run_test_suite(LIB_NEW, "NEW")
+  # Run NEW version
+  new_results <- run_test_suite(LIB_NEW, "NEW")
 
-# --- Run ORIGINAL version ---
-orig_results <- run_test_suite(LIB_ORIGINAL, "ORIGINAL")
+  # Run ORIGINAL version
+  orig_results <- run_test_suite(LIB_ORIGINAL, "ORIGINAL")
 
-# --- Save summary file (concise) ---
-test_output_file <- file.path(results_dir, "test_results.txt")
-cat(sprintf(
-  "Original: %d tests (%.1fs)\nNew: %d tests (%.1fs)\nSpeedup: %.2fx faster\n",
-  orig_results$passes + orig_results$fails, orig_results$elapsed,
-  new_results$passes + new_results$fails, new_results$elapsed,
-  orig_results$elapsed / new_results$elapsed
-), file = test_output_file)
-
-cat("\nDetailed test results saved to:", test_output_file, "\n")
+  # Optional summary in CLI
+  cat(sprintf(
+    "Summary:\n  Original: %d/%d tests OK (%.1fs)\n  New: %d/%d tests OK (%.1fs)\n  Speedup: %.2fx faster\n\n",
+    orig_results$passes, orig_results$total, orig_results$elapsed,
+    new_results$passes, new_results$total, new_results$elapsed,
+    orig_results$elapsed / new_results$elapsed
+  ))
   
   # ====== SECTION 2: Microbenchmark Comparison ======
   cat("\n", separator, "\n")

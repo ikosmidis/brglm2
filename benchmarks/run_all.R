@@ -52,11 +52,6 @@ cat("======================================================================\n\n"
 cat("Total runtime:", format(difftime(end_time, start_time)), "\n")
 cat("Results directory:", file.path("benchmarks", "results"), "\n\n")
 
-cat("Next steps:\n")
-cat("  1. Review benchmark_results.txt for detailed timing\n")
-cat("  2. Check plots/ directory for visualizations\n")
-cat("  3. Review test_results.txt for test suite output\n\n")
-
 cat("Summary of improvements:\n")
 results_dir <- file.path("benchmarks", "results")
 dirs <- list.dirs(results_dir, recursive = FALSE)
