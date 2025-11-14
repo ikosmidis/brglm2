@@ -11,12 +11,13 @@
 
 ## Improvements, updates and additions
 
-* `sloe()` ignores leverage `1` observations, when estimating the
-  contaminated signal strength.
+* `summary.mdyplFit()` gets `solve_se_dots` argument to enable passing further arguments to the `...` of `solve_se()`.
 
-* `...` in `plrtest()` is further arguments to be passed
-  `summary.mdyplFit()`.
+* `sloe()` ignores leverage `1` observations, when estimating the contaminated signal strength.
 
+* `...` in `plrtest()` is further arguments to be passed `summary.mdyplFit()`.
+
+* Added the method `solve_se_ridge()` (not exported) for solving the state evolution equations for logistic ridge regression without intercept.
 
 # brglm2 1.0.0
 

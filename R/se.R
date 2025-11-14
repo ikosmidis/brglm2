@@ -88,3 +88,47 @@ se1 <- function(mu, b, sigma, iota, kappa, gamma, alpha, intercept, gh = NULL, p
 }
 
 
+#' Logistic ridge regression state evolution functions with no intercept
+#'
+#' @param mu aggregate bias parameter.
+#' @param b parameter `b` in the state evolution functions.
+#' @param sigma square root of the aggregate variance of the MDYPL
+#'     estimator.
+#' @param kappa asymptotic ratio of columns/rows of the design
+#'     matrix. `kappa` should be in `(0, 1)`.
+#' @param gamma the square root of the limit of the variance of the
+#'     linear predictor.
+#' @param lambda the shrinkage parameter of the logistic regression penalty
+#'     estimator. `lambda` should be in greater than zero.
+#' @param gh A list with the Gauss-Hermite quadrature nodes and
+#'     weights, as returned from `statmod::gauss.quad()` with `kind =
+#'     "hermite"`. Default is `NULL`, in which case `gh` is set to
+#'     `statmod::gauss.quad(200, kind = "hermite")` is used.
+#' @param prox_tol tolerance for the computation of the proximal
+#'     operator; default is `1e-10`.
+#'
+#' @details
+#'
+#' It is assumed that the ridge penalty to the logistic regression
+#' log-likelihood is `n * lambda * sum(beta^2) / (2 * length(beta))`,
+#' where `n` is the sum of the binomial totals.
+#'
+#' @export
+se0_ridge <- function(mu, b, sigma, kappa, gamma, lambda, gh = NULL, prox_tol = 1e-10) {
+    if (is.null(gh))
+        gh <- gauss.quad(200, kind = "hermite")
+    xi <- gh$nodes
+    wi <- gh$weights
+    n_quad <- length(xi)
+    q1 <- rep((sqrt(2) * gamma) * xi, times = n_quad)
+    q2 <- rep((sqrt(2) * sqrt(kappa) * sigma) * xi, each = n_quad)
+    w2pi <- rep((2 / pi) * wi, times = n_quad) * rep(wi, each = n_quad)
+    g <- mu * q1 + q2
+    prox <- prox(g, b, prox_tol)
+    p_prox <- plogis2(prox)
+    p_q1 <- plogis2(-q1)
+    c(sum(w2pi * p_q1 * (1 -  p_q1) * prox) + mu * kappa,
+      1 - kappa + b * lambda - sum(w2pi * p_q1 / (1 + b * p_prox * (1 - p_prox))),
+      (sigma * kappa)^2 - sum(w2pi * p_q1 * (g - prox)^2))
+}
+
