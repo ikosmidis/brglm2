@@ -90,7 +90,7 @@ prior with shrinkage parameter \eqn{\alpha} and regression parameters
 set to zero. See Rigon & Aliverti (2023) and Sterzinger & Kosmidis
 (2024).
 
-By default, \code{alpha = m / (p + m)} is used, where \code{m} is the sum of
+By default, \code{alpha = n / (p + n)} is used, where \code{n} is the sum of
 the binomial totals. Alternative values of \code{alpha} can be passed to
 the \code{control} argument; see \code{\link[=mdyplControl]{mdyplControl()}} for setting up the
 list passed to \code{control}. If \code{alpha = 1} then \code{\link[=mdyplFit]{mdyplFit()}} will

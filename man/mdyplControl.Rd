@@ -13,7 +13,7 @@ mdypl_control(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALSE)
 \arguments{
 \item{alpha}{the shrinkage parameter (in \verb{[0, 1]}) in the
 Diaconis-Ylvisaker prior penalty. Default is \code{NULL}, which
-results in \code{alpha = m / (m + p)}, where \code{m} is the sum of the
+results in \code{alpha = n / (n + p)}, where \code{n} is the sum of the
 binomial totals and \code{p} is the number of model
 parameters. Setting \code{alpha = 1} corresponds to using maximum
 likelihood, i.e. no penalization. See Details.}

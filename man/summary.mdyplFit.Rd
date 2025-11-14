@@ -14,6 +14,7 @@
   transform = TRUE,
   init_iter = 50,
   init_method = "Nelder-Mead",
+  solve_se_dots = list(),
   ...
 )
 
@@ -60,6 +61,9 @@ but can also be \code{0} in which case \code{start} is directly passed to
 
 \item{init_method}{The method to be passed to \code{\link[=optim]{optim()}}. Default is
 \code{"Nelder-Mead"}.}
+
+\item{solve_se_dots}{a list of further arguments to be passed to
+the \code{...} of \code{\link[=solve_se]{solve_se()}}.}
 
 \item{...}{further arguments to be passed to \code{\link[=summary.glm]{summary.glm()}}.}
 
