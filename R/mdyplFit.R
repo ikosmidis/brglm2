@@ -37,7 +37,7 @@
 #' set to zero. See Rigon & Aliverti (2023) and Sterzinger & Kosmidis
 #' (2024).
 #'
-#' By default, `alpha = m / (p + m)` is used, where `m` is the sum of
+#' By default, `alpha = n / (p + n)` is used, where `n` is the sum of
 #' the binomial totals. Alternative values of `alpha` can be passed to
 #' the `control` argument; see [mdyplControl()] for setting up the
 #' list passed to `control`. If `alpha = 1` then [mdyplFit()] will
@@ -266,7 +266,7 @@ logist_aic <- function(y, n, mu, wt, dev) {
 #' @aliases mdypl_control
 #' @param alpha the shrinkage parameter (in `[0, 1]`) in the
 #'     Diaconis-Ylvisaker prior penalty. Default is \code{NULL}, which
-#'     results in `alpha = m / (m + p)`, where `m` is the sum of the
+#'     results in `alpha = n / (n + p)`, where `n` is the sum of the
 #'     binomial totals and `p` is the number of model
 #'     parameters. Setting `alpha = 1` corresponds to using maximum
 #'     likelihood, i.e. no penalization. See Details.
@@ -376,6 +376,8 @@ taus <- function(X) {
 #'     standard errors, z-statistics. See Details.
 #' @param se_start a vector of starting values for the state evolution
 #'     equations. See the `start` argument in [solve_se()].
+#' @param solve_se_dots a list of further arguments to be passed to
+#'     the `...` of [solve_se()].
 #' @param ... further arguments to be passed to [summary.glm()].
 #'
 #' @details
@@ -471,7 +473,7 @@ taus <- function(X) {
 summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
                              gh = NULL, prox_tol = 1e-10, transform = TRUE,
                              init_iter = 50,
-                             init_method = "Nelder-Mead", ...) {
+                             init_method = "Nelder-Mead", solve_se_dots = list(), ...) {
     ## Get summary object
     summ <- summary.glm(object, ...)
     if (isTRUE(hd_correction)) {
@@ -485,12 +487,19 @@ summary.mdyplFit <- function(object, hd_correction = FALSE, se_start,
             se_start <- c(0.5, 1, 1, theta)
         }
         ka <- p / nobs
-        se_pars <- try(solve_se(kappa = ka, ss = nu_sloe, alpha = object$alpha,
-                                intercept = if (has_intercept) theta else NULL,
-                                start = se_start,
-                                corrupted = TRUE, gh = gh, prox_tol = prox_tol,
-                                transform = transform, init_method = init_method,
-                                init_iter = init_iter), silent = TRUE)
+        se_pars <- try(do.call("solve_se",
+                               c(list(kappa = ka, ss = nu_sloe, alpha = object$alpha,
+                                      intercept = if (has_intercept) theta else NULL,
+                                      start = se_start,
+                                      corrupted = TRUE, gh = gh, prox_tol = prox_tol,
+                                      transform = transform, init_method = init_method,
+                                      init_iter = init_iter), solve_se_dots)), silent = TRUE)
+        ## se_pars <- try(solve_se(kappa = ka, ss = nu_sloe, alpha = object$alpha,
+        ##                         intercept = if (has_intercept) theta else NULL,
+        ##                         start = se_start,
+        ##                         corrupted = TRUE, gh = gh, prox_tol = prox_tol,
+        ##                         transform = transform, init_method = init_method,
+        ##                         init_iter = init_iter), silent = TRUE)
         if (inherits(se_pars, "try-error")) {
             msg <- paste("Unable to solve the state evolution equations. Try to supply an alternative vector of ", 3 + has_intercept, " to `se_start`, with starting values for `mu` (in (0, 1)), `b` (> 0), `sigma` (> 0)", if (has_intercept) ", `intercept.`" else ".")
             stop(msg)
