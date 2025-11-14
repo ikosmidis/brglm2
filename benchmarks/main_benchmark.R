@@ -24,15 +24,6 @@ tryCatch({
 
   pkg_path <- "C:/Users/ollie/OneDrive/Desktop/UNI/Project brglm2/brglm2"
 
-  # Ensure DD exists for internal brglm2 calls
-  if (!exists("DD", mode = "function")) {
-    DD <- function(expr, name, order = 1) {
-      if(order < 1) stop("'order' must be >= 1")
-      if(order == 1) D(expr, name)
-      else DD(D(expr, name), name, order - 1)
-    }
-  }
-
   run_test_suite <- function(libpath, label) {
     library(brglm2, lib.loc = libpath)
     library(tinytest)
@@ -40,12 +31,15 @@ tryCatch({
     cat("Running test suite for", label, "version...\n")
     start <- Sys.time()
     
+    sink(NULL)
     result <- test_all(pkg_path)
+    sink(file.path(results_dir, "benchmark_results.txt"), append = TRUE, split = TRUE)
+
     elapsed <- as.numeric(difftime(Sys.time(), start, units = "secs"))
     
     # Summarise
     sum_df <- as.data.frame(result)
-    n_passed <- sum(sum_df$ok)
+    n_passed <- sum(sum_df$result == TRUE)
     n_total  <- nrow(sum_df)
     
     cat(sprintf("%s: %d/%d tests OK (%.1fs)\n\n", label, n_passed, n_total, elapsed))
@@ -70,7 +64,7 @@ tryCatch({
   # ====== SECTION 2: Microbenchmark Comparison ======
   cat("\n", separator, "\n")
   cat("SECTION 2: MICROBENCHMARK COMPARISON\n")
-  cat("(100 evaluations with unit: seconds)\n")
+  cat("(1000 evaluations with unit: seconds)\n")
   cat(separator, "\n\n")
   
   cat("Test: Lizards dataset (small)\n")
@@ -83,7 +77,7 @@ tryCatch({
               family = binomial(),
               method = brglm2_new,
               maxit = 200),
-    times = 100,
+    times = 1000,
     unit = "s"
   )
   print(lizards_bench)
@@ -100,7 +94,7 @@ tryCatch({
   data("endometrial", package = "brglm2")
   endo_fm <- HG ~ NV + PI + EH
   
-  cat("Microbenchmark (50 evaluations):\n")
+  cat("Microbenchmark (500 evaluations):\n")
   endo_bench <- microbenchmark(
     original = glm(endo_fm, data = endometrial,
                    family = binomial("probit"),
@@ -110,7 +104,7 @@ tryCatch({
               family = binomial("probit"),
               method = brglm2_new,
               maxit = 200),
-    times = 50,
+    times = 500,
     unit = "s"
   )
   print(endo_bench)
@@ -147,29 +141,34 @@ tryCatch({
   cat("  Number of features:", length(vars), "\n")
   cat("  Dimensionality ratio (kappa):", round(kappa, 4), "\n\n")
   
-  cat("Running single timing test...\n\n")
+  cat("Running timing tests...\n\n")
   
   cat("Original version timing:\n")
   time_mf_orig <- system.time({
+  replicate(10, {
     fit_mf_orig <- glm(full_mf_fm, data = MultipleFeatures, 
                        family = binomial(),
                        method = brglm2_original, 
                        subset = training, 
                        maxit = 200)
   })
-  print(time_mf_orig)
-  cat("\n")
+})
+
+  cat("Average time per run:", time_mf_orig["elapsed"] / 10, "s\n\n")
   
   cat("New version timing:\n")
   time_mf_new <- system.time({
-    fit_mf_new <- glm(full_mf_fm, data = MultipleFeatures, 
-                      family = binomial(),
-                      method = brglm2_new, 
-                      subset = training, 
-                      maxit = 200)
+    replicate(10, {  # Change from 10 replications
+      fit_mf_new <- glm(full_mf_fm, data = MultipleFeatures, 
+                        family = binomial(),
+                        method = brglm2_new, 
+                        subset = training, 
+                        maxit = 200)
+    })
   })
-  print(time_mf_new)
-  cat("\n")
+
+  # Divide elapsed time by number of replications for average
+  cat("Average time per run:", time_mf_orig["elapsed"] / 10, "s\n")
   
   cat("MultipleFeatures speedup:", 
       time_mf_orig["elapsed"] / time_mf_new["elapsed"], "x\n")
@@ -203,26 +202,30 @@ tryCatch({
   
   cat("Original mdyplFit timing:\n")
   time_mdypl_orig <- system.time({
-    fit_mdypl_orig <- glm(full_mf_fm, data = MultipleFeatures,
-                          family = binomial(),
-                          method = mdypl_original,
-                          alpha = alpha_val,
-                          subset = training,
-                          maxit = 200)
+    replicate(50, { 
+      fit_mdypl_orig <- glm(full_mf_fm, data = MultipleFeatures,
+                            family = binomial(),
+                            method = mdypl_original,
+                            alpha = alpha_val,
+                            subset = training,
+                            maxit = 200)
+    })
   })
-  print(time_mdypl_orig)
+  cat("Average time per run:", time_mdypl_orig["elapsed"] / 50, "s\n")
   cat("\n")
   
   cat("New mdyplFit timing:\n")
   time_mdypl_new <- system.time({
-    fit_mdypl_new <- glm(full_mf_fm, data = MultipleFeatures,
+    replicate(50, {
+      fit_mdypl_new <- glm(full_mf_fm, data = MultipleFeatures,
                          family = binomial(),
                          method = mdypl_new,
                          alpha = alpha_val,
                          subset = training,
                          maxit = 200)
+    })
   })
-  print(time_mdypl_new)
+  cat("Average time per run:", time_mdypl_new["elapsed"] / 50, "s\n")
   cat("\n")
   
   cat("MDYPL speedup:", 
@@ -234,11 +237,6 @@ tryCatch({
   cat("  Max coefficient difference:", 
       max(abs(coef(fit_mdypl_orig) - coef(fit_mdypl_new))), "\n")
   
-  # ====== SECTION 6: Summary Statistics ======
-  cat("\n", separator, "\n")
-  cat("SECTION 6: OVERALL SUMMARY\n")
-  cat(separator, "\n\n")
-  
   speedups <- c(
     "Lizards (small)" = median(lizards_bench$time[lizards_bench$expr == "original"]) / 
       median(lizards_bench$time[lizards_bench$expr == "new"]),
@@ -247,14 +245,6 @@ tryCatch({
     "MultipleFeatures (large)" = time_mf_orig["elapsed"] / time_mf_new["elapsed"],
     "MDYPL (large)" = time_mdypl_orig["elapsed"] / time_mdypl_new["elapsed"]
   )
-  
-  cat("Speedup Summary:\n")
-  for (i in seq_along(speedups)) {
-    cat(sprintf("  %-25s: %.2fx faster\n", names(speedups)[i], speedups[i]))
-  }
-  
-  cat("\nMean speedup:", round(mean(speedups), 2), "x\n")
-  cat("Median speedup:", round(median(speedups), 2), "x\n")
   
   # Save benchmark objects for plotting
   save(lizards_bench, endo_bench, 
@@ -275,6 +265,3 @@ tryCatch({
 }, finally = {
   sink()
 })
-
-cat("\nResults saved to:", file.path(results_dir, "benchmark_results.txt"), "\n")
-cat("Benchmark data saved to:", file.path(results_dir, "benchmark_data.RData"), "\n")

@@ -52,11 +52,13 @@ cat("======================================================================\n\n"
 cat("Total runtime:", format(difftime(end_time, start_time)), "\n")
 cat("Results directory:", file.path("benchmarks", "results"), "\n\n")
 
-cat("Summary of improvements:\n")
+cat("Summary of benchmarks:\n")
 results_dir <- file.path("benchmarks", "results")
 dirs <- list.dirs(results_dir, recursive = FALSE)
 latest_dir <- dirs[which.max(file.info(dirs)$mtime)]
 load(file.path(latest_dir, "benchmark_data.RData"))
+
+speedups <- c("Test suite" = orig_results$elapsed / new_results$elapsed, speedups)
 
 for (i in seq_along(speedups)) {
   cat(sprintf("  %-30s: %.2fx faster\n", names(speedups)[i], speedups[i]))

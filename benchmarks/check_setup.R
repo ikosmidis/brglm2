@@ -188,16 +188,3 @@ if (all_ok) {
 }
 
 cat("\n", strrep("=", 70), "\n\n")
-
-# ====== Helpful Commands ======
-cat("Helpful commands:\n\n")
-cat("Check current working directory:\n")
-cat("  getwd()\n\n")
-cat("Change working directory:\n")
-cat("  setwd('path/to/project')\n\n")
-cat("Install a package:\n")
-cat("  install.packages('package_name')\n\n")
-cat("List installed packages:\n")
-cat("  installed.packages()[,c('Package', 'LibPath')]\n\n")
-cat("Check where package is installed:\n")
-cat("  find.package('brglm2')\n\n")
