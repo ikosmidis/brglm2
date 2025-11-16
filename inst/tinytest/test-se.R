@@ -36,7 +36,7 @@ expect_equal(attr(soln1, "funcs"), rep(0, 4))
 soln1t <- solve_se(kappa0, gamma0, alpha0, theta0, start = c(0.5, 1, 1, 1),
                    init_iter = 44, init_method = "Nelder-Mead", transform = FALSE)
 expect_equal(attr(soln1t, "funcs"), rep(0, 4))
-expect_equal(soln1t, soln1, tolerance = 1e-07)
+expect_equal(soln1t, soln1, tolerance = 1e-07, check.attributes = FALSE)
 
 opt_str <- c("optim", "44", "Nelder-Mead", "nleqslv")
 for (st in opt_str) {

@@ -12,11 +12,11 @@
 
 \item{object2}{a \code{\link[=mdyplFit]{"mdyplFit"}} object}
 
-\item{hd_correction}{if \code{FALSE} (default), then the summary
-corresponding to standard asymptotics is computed. If \code{TRUE}
-then the high-dimensionality corrections in Sterzinger &
+\item{hd_correction}{if \code{FALSE} (default), then the corresponding
+quantities are computed according to standard asymptotics. If
+\code{TRUE} then the high-dimensionality corrections in Sterzinger &
 Kosmidis (2024) are employed to updates estimates, estimated
-standard errors, z-statistics. See Details.}
+standard errors, z-statistics, etc. See Details.}
 
 \item{...}{further arguments to be passed to \code{\link[=summary.mdyplFit]{summary.mdyplFit()}}.}
 }

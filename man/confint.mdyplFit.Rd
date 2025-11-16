@@ -5,7 +5,7 @@
 \title{Method for computing confidence intervals for one or more
 regression parameters in a \code{\link[=mdyplFit]{"mdyplFit"}} object}
 \usage{
-\method{confint}{mdyplFit}(object, parm, level = 0.95, hd_correction = FALSE, se_start, ...)
+\method{confint}{mdyplFit}(object, parm, level = 0.95, hd_correction = FALSE, ...)
 }
 \arguments{
 \item{object}{a fitted model object.}
@@ -16,14 +16,11 @@ regression parameters in a \code{\link[=mdyplFit]{"mdyplFit"}} object}
 
 \item{level}{the confidence level required.}
 
-\item{hd_correction}{if \code{FALSE} (default), then the summary
-corresponding to standard asymptotics is computed. If \code{TRUE}
-then the high-dimensionality corrections in Sterzinger &
+\item{hd_correction}{if \code{FALSE} (default), then the corresponding
+quantities are computed according to standard asymptotics. If
+\code{TRUE} then the high-dimensionality corrections in Sterzinger &
 Kosmidis (2024) are employed to updates estimates, estimated
-standard errors, z-statistics. See Details.}
-
-\item{se_start}{a vector of starting values for the state evolution
-equations. See the \code{start} argument in \code{\link[=solve_se]{solve_se()}}.}
+standard errors, z-statistics, etc. See Details.}
 
 \item{...}{additional argument(s) for methods.}
 }

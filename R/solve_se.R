@@ -143,6 +143,9 @@
 #' }
 #' @export
 solve_se <- function(kappa, ss, alpha, intercept = NULL, start, corrupted = FALSE, gh = NULL, prox_tol = 1e-10, transform = TRUE, init_method = "Nelder-Mead", init_iter = 50, ...) {
+    no_intercept <- is.null(intercept)
+    npar <- 3 + !no_intercept
+    stopifnot(length(start) == npar)
     is_corrupted <- isTRUE(corrupted)
     init_solver <- if (is_corrupted) optim_se_corrupted else optim_se
     main_solver <- if (is_corrupted) nleqslv_se_corrupted else nleqslv_se
@@ -246,8 +249,6 @@ se_funcs <- function(kappa, ss, alpha, intercept = NULL, iota = NULL,
 nleqslv_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
     no_intercept <- is.null(intercept)
     g <- se_funcs(kappa, gamma, alpha, intercept, iota = NULL, gh, prox_tol, corrupted = FALSE, transform)
-    npar <- 3 + !no_intercept
-    stopifnot(length(start) == npar)
     start <- c(if (transform) log(start[1:3]) else start[1:3],
                if (no_intercept) NULL else start[4])
     res <- nleqslv(start, g, ...)
@@ -270,8 +271,6 @@ nleqslv_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, 
 nleqslv_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
     no_intercept <- is.null(iota)
     g <- se_funcs(kappa, nu, alpha, intercept = NULL, iota, gh, prox_tol, corrupted = TRUE, transform)
-    npar <- 3 + !no_intercept
-    stopifnot(length(start) == npar)
     start <- c(if (transform) log(start[1:3]) else start[1:3],
                if (no_intercept) NULL else start[4])
     suppressWarnings(res <- nleqslv(start, g, ...))
@@ -296,8 +295,6 @@ optim_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, pr
     no_intercept <- is.null(intercept)
     g <- se_funcs(kappa, gamma, alpha, intercept, iota = NULL, gh, prox_tol, corrupted = FALSE, transform = TRUE)
     npar <- 3 + !no_intercept
-    stopifnot(length(start) == npar)
-    start <- c(log(start[1:3]), if (no_intercept) NULL else start[4])
     obj <- function(pars) {
         sum(g(pars)^2)
     }
@@ -317,8 +314,6 @@ optim_se <- function(kappa, gamma, alpha, intercept = NULL, start, gh = NULL, pr
 optim_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
     no_intercept <- is.null(iota)
     g <- se_funcs(kappa, nu, alpha, intercept = NULL, iota, gh, prox_tol, corrupted = TRUE, transform = TRUE)
-    npar <- 3 + !no_intercept
-    stopifnot(length(start) == npar)
     start <- c(log(start[1:3]), if (no_intercept) NULL else start[4])
     obj <- function(pars) {
         sum(g(pars)^2)
@@ -340,6 +335,7 @@ optim_se_corrupted <- function(kappa, nu, alpha, iota = NULL, start, gh = NULL, 
 solve_se_ridge <- function(kappa, ss, lambda, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, init_method = "Nelder-Mead", init_iter = 50, ...) {
     init_solver <- optim_se_ridge
     main_solver <- nleqslv_se_ridge
+    stopifnot(length(start) == 3)
     if (is.null(gh))
         gh <- gauss.quad(200, kind = "hermite")
     if (isTRUE(init_iter == "only")) {
@@ -360,8 +356,6 @@ solve_se_ridge <- function(kappa, ss, lambda, start, gh = NULL, prox_tol = 1e-10
 }
 
 nleqslv_se_ridge <- function(kappa, ss, lambda, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
-    npar <- 3
-    stopifnot(length(start) == npar)
     if (transform) {
         start <- log(start)
         g <- function(pars) {
@@ -387,8 +381,6 @@ nleqslv_se_ridge <- function(kappa, ss, lambda, start, gh = NULL, prox_tol = 1e-
 }
 
 optim_se_ridge <- function(kappa, ss, lambda, start, gh = NULL, prox_tol = 1e-10, transform = TRUE, ...) {
-    npar <- 3
-    stopifnot(length(start) == npar)
     if (transform) {
         start <- log(start)
         g <- function(pars) {
