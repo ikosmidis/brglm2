@@ -2,22 +2,25 @@
 
 ## Bug fixes
 
-* Fixed a bug that would cause an error when `summary.mdyplFit()` was
-  called with `hd_correction = TRUE` in the presence of aliased
-  parameters.
+* `mdyplFit()` returns Pearson residuals based on the original responses.
 
-* Fixed a bug on reported state evolution function values when
-  `init_iter = "only"`.
+* Fixed a bug that would cause an error when `summary.mdyplFit()` was called with `hd_correction = TRUE` in the presence of aliased parameters.
+
+* Fixed a bug on reported state evolution function values when `init_iter = "only"`.
 
 ## Improvements, updates and additions
 
 * `summary.mdyplFit()` gets `solve_se_dots` argument to enable passing further arguments to the `...` of `solve_se()`.
+
+* Various improvements in the internals of `solve_se()`.
 
 * `sloe()` ignores leverage `1` observations, when estimating the contaminated signal strength.
 
 * `...` in `plrtest()` is further arguments to be passed `summary.mdyplFit()`.
 
 * Added the method `solve_se_ridge()` (not exported) for solving the state evolution equations for logistic ridge regression without intercept.
+
+* Documentation updates and fixes.
 
 # brglm2 1.0.0
 
