@@ -182,9 +182,9 @@ summary.mdyplFit <- function(object, hd_correction = FALSE,
             solve_se_control$start <- c(0.5, 1, 1, theta)
         }
         solve_se_control$corrupted <- TRUE
-        se_pars <- try(do.call("solve_se", solve_se_control), silent = FALSE)
+        se_pars <- try(do.call("solve_se", solve_se_control), silent = TRUE)
         if (inherits(se_pars, "try-error")) {
-            msg <- paste("Unable to solve the state evolution equations. Use `solve_se_control = list(start = v)` to supply a vector `v` of length ", 3 + has_intercept, " with starting values for `mu` (in (0, 1)), `b` (> 0), `sigma` (> 0)", if (has_intercept) ", `intercept.`" else ".")
+            msg <- paste(se_pars, "Unable to solve the state evolution equations. See `?solve_se` and use `solve_se_control` to control the optimizer, including supplying a vector of", 3 + has_intercept, " starting values for `mu` (in (0, 1)), `b` (> 0), `sigma` (> 0)", if (has_intercept) ", `intercept.`" else ".")
             stop(msg)
         }
         xx <- model.matrix(object)[, !summ$aliased]
@@ -211,7 +211,7 @@ summary.mdyplFit <- function(object, hd_correction = FALSE,
         summ$cov.scaled <- summ$cov.unscaled <- NULL
         summ$se_parameters <- se_pars
         if (!isTRUE(all(abs(attr(se_pars, "funcs")) < 1e-04))) {
-            msg <- paste0("Potentially unstable solution of the state evolution equations. See `?solve_se` and use `solve_se_control` to control the optimizer")
+            msg <- paste("Unable to solve the state evolution equations. See `?solve_se` and use `solve_se_control` to control the optimizer, including supplying a vector of", 3 + has_intercept, " starting values for `mu` (in (0, 1)), `b` (> 0), `sigma` (> 0)", if (has_intercept) ", `intercept.`" else ".")
             warning(msg)
         }
         summ$signal_strength <- (nu_sloe^2 - ka * se_pars[3]^2) / se_pars[1]^2
