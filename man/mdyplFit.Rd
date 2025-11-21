@@ -169,7 +169,7 @@ plrtest(nest_m, full_m)
 plrtest(nest_m, full_m, hd_correction = TRUE)
 
 
-\dontrun{
+\donttest{
 ## A simulated data set as in Rigon & Aliverti (2023, Section 4.3)
 
 set.seed(123)

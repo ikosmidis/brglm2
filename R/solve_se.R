@@ -121,7 +121,7 @@
 #' @examples
 #'
 #' ## Reproducing Table 13 of Zhao et al. (2022, DOI: 10.3150/21-BEJ1401)
-#' \dontrun{
+#' \donttest{
 #'
 #' thetas <- c(0, 0.5, 1, 2, 2.5)
 #' gamma0 <- 5

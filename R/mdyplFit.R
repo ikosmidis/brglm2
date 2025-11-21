@@ -136,7 +136,7 @@
 #' plrtest(nest_m, full_m, hd_correction = TRUE)
 #'
 #'
-#' \dontrun{
+#' \donttest{
 #' ## A simulated data set as in Rigon & Aliverti (2023, Section 4.3)
 #'
 #' set.seed(123)
@@ -316,7 +316,7 @@ mdyplControl <- function(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALS
 #'
 #' @examples
 #'
-#' \dontrun{
+#' \donttest{
 #'
 #' set.seed(123)
 #' n <- 2000

@@ -334,7 +334,7 @@
 #'
 #' @examples
 #'
-#' \dontrun{
+#' \donttest{
 #' data("MultipleFeatures", package = "brglm2")
 #'
 #' par(mfrow = c(10, 20), mar = numeric(4) + 0.1)

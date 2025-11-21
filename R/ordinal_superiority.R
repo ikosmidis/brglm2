@@ -59,7 +59,7 @@
 #' # while adjusting for religion.
 #' ordinal_superiority(fit_bracl_p, ~ gender)
 #'
-#' \dontrun{
+#' \donttest{
 #' # And their (very-similar in value here) bias corrected versions
 #' # with 99% CIs
 #' ordinal_superiority(fit_bracl_p, ~ gender, bc = TRUE, level = 0.99)

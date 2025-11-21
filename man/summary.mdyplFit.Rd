@@ -80,7 +80,7 @@ subject of current work.
 }
 \examples{
 
-\dontrun{
+\donttest{
 
 set.seed(123)
 n <- 2000
