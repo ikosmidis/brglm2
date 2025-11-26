@@ -144,34 +144,42 @@ tryCatch({
   cat("Running timing tests...\n\n")
   
   cat("Original version timing:\n")
-  time_mf_orig <- system.time({
-  replicate(10, {
-    fit_mf_orig <- glm(full_mf_fm, data = MultipleFeatures, 
-                       family = binomial(),
-                       method = brglm2_original, 
-                       subset = training, 
-                       maxit = 200)
-  })
-})
+  fit_mf_orig <- glm(full_mf_fm, data = MultipleFeatures, 
+                    family = binomial(),
+                    method = brglm2_original, 
+                    subset = training, 
+                    maxit = 200)
 
-  cat("Average time per run:", time_mf_orig["elapsed"] / 10, "s\n\n")
-  
-  cat("New version timing:\n")
-  time_mf_new <- system.time({
-    replicate(10, {  # Change from 10 replications
-      fit_mf_new <- glm(full_mf_fm, data = MultipleFeatures, 
-                        family = binomial(),
-                        method = brglm2_new, 
-                        subset = training, 
-                        maxit = 200)
+  time_mf_orig <- system.time({
+    replicate(10, {
+      glm(full_mf_fm, data = MultipleFeatures, 
+          family = binomial(),
+          method = brglm2_original, 
+          subset = training, 
+          maxit = 200)
     })
   })
+  cat("Average time per run:", time_mf_orig["elapsed"] / 10, "s\n\n")
 
-  # Divide elapsed time by number of replications for average
-  cat("Average time per run:", time_mf_orig["elapsed"] / 10, "s\n")
-  
-  cat("MultipleFeatures speedup:", 
-      time_mf_orig["elapsed"] / time_mf_new["elapsed"], "x\n")
+  cat("New version timing:\n")
+  fit_mf_new <- glm(full_mf_fm, data = MultipleFeatures, 
+                    family = binomial(),
+                    method = brglm2_new, 
+                    subset = training, 
+                    maxit = 200)
+
+  time_mf_new <- system.time({
+    replicate(10, {
+      glm(full_mf_fm, data = MultipleFeatures, 
+          family = binomial(),
+          method = brglm2_new, 
+          subset = training, 
+          maxit = 200)
+    })
+  })
+  cat("Average time per run:", time_mf_new["elapsed"] / 10, "s\n\n")
+
+  cat("MultipleFeatures speedup:", time_mf_orig["elapsed"] / time_mf_new["elapsed"], "x\n")
   
   # Verify coefficients match
   cat("\nNumerical verification:\n")
@@ -201,9 +209,16 @@ tryCatch({
   cat("  Alpha value:", round(alpha_val, 4), "\n\n")
   
   cat("Original mdyplFit timing:\n")
+  fit_mdypl_orig <- glm(full_mf_fm, data = MultipleFeatures,
+                         family = binomial(),
+                         method = mdypl_original,
+                         alpha = alpha_val,
+                         subset = training,
+                         maxit = 200)
+
   time_mdypl_orig <- system.time({
     replicate(50, { 
-      fit_mdypl_orig <- glm(full_mf_fm, data = MultipleFeatures,
+      full_mdypl_orig <- glm(full_mf_fm, data = MultipleFeatures,
                             family = binomial(),
                             method = mdypl_original,
                             alpha = alpha_val,
@@ -215,9 +230,16 @@ tryCatch({
   cat("\n")
   
   cat("New mdyplFit timing:\n")
+  fit_mdypl_new <- glm(full_mf_fm, data = MultipleFeatures,
+                         family = binomial(),
+                         method = mdypl_new,
+                         alpha = alpha_val,
+                         subset = training,
+                         maxit = 200)
+
   time_mdypl_new <- system.time({
     replicate(50, {
-      fit_mdypl_new <- glm(full_mf_fm, data = MultipleFeatures,
+      full_mdypl_new <- glm(full_mf_fm, data = MultipleFeatures,
                          family = binomial(),
                          method = mdypl_new,
                          alpha = alpha_val,
