@@ -255,17 +255,17 @@ brglmFit_trustregion <- function(x, y, weights = rep(1, nobs),
         
         # Solve trust region subproblem via CG-Steihaug
         step <- cg_steihaug_subproblem(
-            grad = grad,
+            neg_grad = -grad, # Note the negative gradient for search direction
             x = x,
-            weights_sqrt = sqrt(fit$working_weights),
+            weights = fit$working_weights,
             Delta = Delta,
             tol = cg_tol,
             maxiter = cg_maxiter
         )
         
-        # Predicted reduction 
+        # Predicted reduction
         Bp <- hessian_vector_product(step$p, x, fit$working_weights)
-        pred_reduction <- -sum(grad * step$p) - 0.5 * sum(step$p * Bp)
+        pred_reduction <- -(sum(-grad * step$p) + 0.5 * sum(step$p * Bp)) 
         
         # Try the step
         betas_new <- betas + step$p
@@ -273,11 +273,11 @@ brglmFit_trustregion <- function(x, y, weights = rep(1, nobs),
         
         # Compute fit at new point (without hat values initially to save cost)
         fit_new <- try(compute_fit(pars = theta_new, y = y, x = x, 
-                                  weights = weights, offset = offset,
-                                  family = family, fixed_totals = fixed_totals,
-                                  row_totals = row_totals, no_dispersion = no_dispersion,
-                                  nobs = nobs, nvars = nvars, keep = keep,
-                                  need_qr = FALSE, need_hatvalues = FALSE),
+                                    weights = weights, offset = offset,
+                                    family = family, fixed_totals = fixed_totals,
+                                    row_totals = row_totals, no_dispersion = no_dispersion,
+                                    nobs = nobs, nvars = nvars, keep = keep,
+                                    need_qr = FALSE, need_hatvalues = FALSE),
                         silent = TRUE)
         
         if (inherits(fit_new, "try-error")) {
@@ -291,6 +291,7 @@ brglmFit_trustregion <- function(x, y, weights = rep(1, nobs),
         }
         
         # New gradient is adjusted score
+        fit_new$hatvalues <- hatvalues_cached  # Reuse cached hat values for adjustment
         grad_new <- fit_new$grad_beta + adjustment_function(theta_new, fit = fit_new, level = 0,
                                              x = x, nobs = nobs, nvars = nvars,
                                              weights = weights)
@@ -317,7 +318,6 @@ brglmFit_trustregion <- function(x, y, weights = rep(1, nobs),
             # Accept step
             betas <- betas_new
             theta <- theta_new
-            grad <- grad_new
             fit <- fit_new
             
             # Recompute hat values if needed
@@ -331,9 +331,6 @@ brglmFit_trustregion <- function(x, y, weights = rep(1, nobs),
                                             need_qr = TRUE, need_hatvalues = TRUE)
                 hatvalues_cached <- fit_with_hats$hatvalues
                 fit$hatvalues <- hatvalues_cached
-                fit$qr_decomposition <- fit_with_hats$qr_decomposition
-                fit$R_matrix <- fit_with_hats$R_matrix
-                fit$inverse_info_beta <- fit_with_hats$inverse_info_beta
             } else {
                 # Reuse cached hat values
                 fit$hatvalues <- hatvalues_cached
@@ -351,8 +348,8 @@ brglmFit_trustregion <- function(x, y, weights = rep(1, nobs),
         step_norm <- sqrt(sum(step$p^2))
         
         if (control$trace) {
-            cat(sprintf("Iter %3d: ||grad|| = %.6e, ||step|| = %.6e, Delta = %.6e, rho = %.3f, %s\n",
-                       iter, grad_norm, step_norm, Delta, rho,
+            cat(sprintf("Iter %3d: ||grad|| = %.6e, epsilon = %.6e, ||step|| = %.6e, Delta = %.6e, rho = %.3f, %s\n",
+                       iter, grad_norm, control$epsilon, step_norm, Delta, rho,
                        if (rho > eta_shrink) "ACCEPT" else "REJECT"))
         }
         
@@ -508,7 +505,7 @@ hessian_vector_product <- function(v, x, weights) {
 #' Solves: min_p { g'p + 0.5 p'Bp } subject to ||p|| <= Delta
 #' using conjugate gradient with early termination (Steihaug, 1983)
 #'
-#' @param grad Gradient vector (length p)
+#' @param grad Negative gradient vector (length p)
 #' @param x Design matrix (n x p)
 #' @param weights_sqrt Square root of working weights (length n)
 #' @param Delta Trust region radius
@@ -524,26 +521,22 @@ hessian_vector_product <- function(v, x, weights) {
 #' Steihaug, T. (1983). The conjugate gradient method and trust regions.
 #' SIAM J. Numer. Anal., 20(3), 626-637.
 #' Nocedal & Wright (2006), Algorithm 7.2
-cg_steihaug_subproblem <- function(grad, x, weights_sqrt, Delta, 
+cg_steihaug_subproblem <- function(neg_grad, x, weights, Delta, 
                                    tol = 0.1, maxiter = 50) {
     
-    p <- length(grad)
+    p <- length(neg_grad)
     
     # Initialize
     z <- numeric(p)              # Current iterate
-    r <- grad                    # Residual = grad + Bz (initially Bz = 0)
+    r <- neg_grad                # Residual (initially Bz = 0)
     d <- -r                      # Search direction
     
     on_boundary <- FALSE
-
-    # We skip initial residual check as outer loop handles if we have already converged
     
     for (j in seq_len(maxiter)) {
         
         # Compute Bd using matrix-free product
         # B = X'WX, so we need working_weights
-        # Reconstruct weights from weights_sqrt
-        weights <- weights_sqrt^2
         Bd <- hessian_vector_product(d, x, weights)
         
         # Curvature
@@ -564,7 +557,7 @@ cg_steihaug_subproblem <- function(grad, x, weights_sqrt, Delta,
         
         # Check if step would exit trust region
         z_new <- z + alpha * d
-        if (sqrt(sum(z_new * z_new)) >= Delta) {
+        if (sqrt(sum(z_new * z_new)) > Delta) {
             # Find tau such that ||z + tau*d|| = Delta
             tau <- find_boundary_step(z, d, Delta)
             z <- z + tau * d
@@ -580,7 +573,7 @@ cg_steihaug_subproblem <- function(grad, x, weights_sqrt, Delta,
         r_norm_sq_new <- sum(r * r)
         
         # Check convergence with relative tolerance (tol% of initial grad norm)
-        if (sqrt(r_norm_sq_new) < tol * sqrt(sum(grad * grad))) { 
+        if (sqrt(r_norm_sq_new) < tol * sqrt(sum(neg_grad * neg_grad))) { 
             break
         }
         
@@ -626,9 +619,15 @@ find_boundary_step <- function(z, d, Delta) {
     
     tau1 <- (-b + sqrt(discriminant)) / (2 * a)
     tau2 <- (-b - sqrt(discriminant)) / (2 * a)
-    
-    # Return the positive root (or larger if both positive)
-    if (tau1 >= 0) return(tau1)
-    if (tau2 >= 0) return(tau2)
-    return(0)  # Fallback
+
+    # Choose smallest positive root (first boundary intersection)
+    if (tau1 > 0 && tau2 > 0) {
+        return(min(tau1, tau2))
+    } else if (tau1 > 0) {
+        return(tau1)
+    } else if (tau2 > 0) {
+        return(tau2)
+    } else {
+        return(0)  # Fallback
+    }
 }
