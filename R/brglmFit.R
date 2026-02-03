@@ -334,8 +334,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                                              x = x, nobs = nobs, nvars = nvars,
                                              weights = weights)
         
-        f_current <- sum(grad^2)
-        f_new <- sum(grad_new^2)
+        f_current <- 0.5 * sum(grad^2)
+        f_new <- 0.5 * sum(grad_new^2)
         actual_reduction <- f_current - f_new
         
         # Reduction ratio
