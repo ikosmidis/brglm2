@@ -303,7 +303,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         
         # Predicted reduction
         Bp <- hessian_vector_product(step$p, x, fit$working_weights)
-        pred_reduction <- sum(grad^2) - sum((grad * Bp)^2)
+        pred_reduction <- -(sum(-grad * step$p) + 0.5 * sum(step$p * Bp))
         
         # Try the step
         betas_new <- betas + step$p
@@ -543,7 +543,7 @@ hessian_vector_product <- function(v, x, weights) {
 #' Solves: min_p { g'p + 0.5 p'Bp } subject to ||p|| <= Delta
 #' using conjugate gradient with early termination (Steihaug, 1983)
 #'
-#' @param grad Negative gradient vector (length p)
+#' @param neg_grad Negative gradient vector (length p)
 #' @param x Design matrix (n x p)
 #' @param weights_sqrt Square root of working weights (length n)
 #' @param Delta Trust region radius
