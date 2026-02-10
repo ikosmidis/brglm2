@@ -287,10 +287,27 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
     
     # Main trust region loop
     for (iter in seq_len(control$maxit)) {
+        # H <- compute_hessian(
+        #         betas = betas, y = y, x = x, weights = weights,
+        #         offset = offset, family = family,
+        #         adjustment_function = adjustment_function,
+        #         fixed_totals = fixed_totals, row_totals = row_totals,
+        #         no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+        #         keep = keep, need_qr = TRUE, need_hatvalues = TRUE
+        #    )
         
         # Should we recompute exact hat values?
         need_exact_hats <- (iter %% hat_recompute_freq == 1) || (iter == 1)
         
+        # Solve trust region subproblem via CG-Steihaug
+        # step <- cg_steihaug_subproblem_with_H(
+        #     grad = -grad, # Note the negative gradient for search direction
+        #     H = H,
+        #     Delta = Delta,
+        #     tol = cg_tol,
+        #     maxiter = cg_maxiter
+        # )
+
         # Solve trust region subproblem via CG-Steihaug
         step <- cg_steihaug_subproblem(
             neg_grad = -grad, # Note the negative gradient for search direction
@@ -303,7 +320,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         
         # Predicted reduction
         Bp <- hessian_vector_product(step$p, x, fit$working_weights)
-        pred_reduction <- -(sum(-grad * step$p) + 0.5 * sum(step$p * Bp))
+        #Bp <- drop(H %*% step$p) # H is the actual Hessian, so this is exact
+        pred_reduction <- sum(grad * step$p) - 0.5 * sum(step$p * Bp)
         
         # Try the step
         betas_new <- betas + step$p
@@ -340,6 +358,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         
         # Reduction ratio
         rho <- if (abs(pred_reduction) < 1e-16) 0 else actual_reduction / pred_reduction
+
+        #cat(rho < eta_shrink, rho > eta_expand, step$on_boundary, "\n")
         
         # Update trust region radius
         if (rho < eta_shrink) {
@@ -867,4 +887,93 @@ print.summary.brglmFit <- function (x, digits = max(3L, getOption("digits") - 3L
         }
     }
     invisible(x)
+}
+
+
+#' Compute actual Hessian of adjusted score objective
+#'
+#' @param betas Current beta estimates
+#' @param y Response
+#' @param x Design matrix  
+#' @param weights Prior weights
+#' @param offset Offset vector
+#' @param family GLM family
+#' @param adjustment_function Bias adjustment function
+#' @param ... Additional args for compute_fit and adjustment_function
+#'
+#' @return p x p Hessian matrix
+compute_hessian <- function(betas = betas, y = y, x = x, weights = weights,
+                offset = offset, family = family,
+                adjustment_function = adjustment_function,
+                fixed_totals = fixed_totals, row_totals = row_totals,
+                no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                keep = keep, need_qr = TRUE, need_hatvalues = TRUE) {
+    
+    # Define the objective function: f(beta) = ||adjusted_score(beta)||^2 / 2
+    objective <- function(beta_vec) {
+        theta <- c(beta_vec, 1)  # Fixed dispersion
+        
+        fit <- compute_fit(pars = theta, y = y, x = x, weights = weights,
+                      offset = offset, family = family,
+                      fixed_totals = fixed_totals, row_totals = row_totals,
+                      no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                      keep = keep, need_qr = TRUE, need_hatvalues = TRUE)
+        adj <- adjustment_function(theta, fit = fit, level = 0,
+                                    x = x, nobs = nobs, nvars = nvars, 
+                                    weights = weights)
+        grad <- fit$grad_beta + adj
+        
+        # Objective is sum of squares of gradient
+        return(0.5 * sum(grad^2))
+    }
+    
+    # Compute Hessian using numDeriv
+    H <- numDeriv::hessian(func = objective, x = betas)
+    
+    # Symmetrize
+    H_sym <- (H + t(H)) / 2
+    
+    return(H_sym)
+}
+
+
+cg_steihaug_subproblem_with_H <- function(grad, H, Delta, 
+                                          tol = 0.1, maxiter = 50) {
+    p <- length(grad)
+    z <- numeric(p)
+    r <- -grad
+    d <- r
+    grad_norm <- sqrt(sum(grad^2))
+    
+    for (j in seq_len(maxiter)) {
+        Bd <- drop(H %*% d)  # Use H directly
+        dBd <- sum(d * Bd)
+        
+        if (dBd <= 0) {
+            tau <- find_boundary_step(z, d, Delta)
+            return(list(p = z + tau * d, on_boundary = TRUE, cg_iter = j))
+        }
+        
+        r_norm_sq <- sum(r^2)
+        alpha <- r_norm_sq / dBd
+        z_new <- z + alpha * d
+        
+        if (sqrt(sum(z_new^2)) > Delta) {
+            tau <- find_boundary_step(z, d, Delta)
+            return(list(p = z + tau * d, on_boundary = TRUE, cg_iter = j))
+        }
+        
+        z <- z_new
+        r <- r - alpha * Bd
+        
+        if (sqrt(sum(r^2)) < tol * grad_norm) {
+            return(list(p = z, on_boundary = FALSE, cg_iter = j))
+        }
+        
+        r_norm_sq_new <- sum(r^2)
+        beta <- r_norm_sq_new / r_norm_sq
+        d <- r + beta * d
+    }
+    
+    list(p = z, on_boundary = FALSE, cg_iter = maxiter)
 }
