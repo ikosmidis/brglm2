@@ -287,14 +287,14 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
     
     # Main trust region loop
     for (iter in seq_len(control$maxit)) {
-        # H <- compute_hessian(
-        #         betas = betas, y = y, x = x, weights = weights,
-        #         offset = offset, family = family,
-        #         adjustment_function = adjustment_function,
-        #         fixed_totals = fixed_totals, row_totals = row_totals,
-        #         no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-        #         keep = keep, need_qr = TRUE, need_hatvalues = TRUE
-        #    )
+        #H <- compute_hessian(
+        #        betas = betas, y = y, x = x, weights = weights,
+        #        offset = offset, family = family,
+        #        adjustment_function = adjustment_function,
+        #        fixed_totals = fixed_totals, row_totals = row_totals,
+        #        no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+        #        keep = keep, need_qr = TRUE, need_hatvalues = TRUE
+        #   )
         
         # Should we recompute exact hat values?
         need_exact_hats <- (iter %% hat_recompute_freq == 1) || (iter == 1)
@@ -321,7 +321,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         # Predicted reduction
         Bp <- hessian_vector_product(step$p, x, fit$working_weights)
         #Bp <- drop(H %*% step$p) # H is the actual Hessian, so this is exact
-        pred_reduction <- sum(grad * step$p) - 0.5 * sum(step$p * Bp)
+        pred_reduction <- -(sum(-grad * step$p) + 0.5 * sum(step$p * Bp))
         
         # Try the step
         betas_new <- betas + step$p
@@ -930,10 +930,7 @@ compute_hessian <- function(betas = betas, y = y, x = x, weights = weights,
     # Compute Hessian using numDeriv
     H <- numDeriv::hessian(func = objective, x = betas)
     
-    # Symmetrize
-    H_sym <- (H + t(H)) / 2
-    
-    return(H_sym)
+    return(H)
 }
 
 
