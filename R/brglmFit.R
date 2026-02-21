@@ -33,13 +33,76 @@
 #' - Adaptive trust region radius
 #'
 #' Currently supports binomial family with fixed dispersion only.
+#' 
+#' @return
+#'
+#' An object inheriting from [`"brglmFit"`][brglmFit()] object, which
+#' is a list having the same elements to the list that
+#' [stats::glm.fit()] returns, with a few extra arguments.
 #'
 #' @references
 #' Nocedal, J. and Wright, S.J. (2006). Numerical Optimization (2nd ed.). Springer.
 #' Steihaug, T. (1983). The conjugate gradient method and trust regions in large
 #' scale optimization. SIAM Journal on Numerical Analysis, 20(3), 626-637.
+#' 
+#' @examples
+#' ## The lizards example from ?brglm::brglm
+#' data("lizards", package = "brglm2")
+#' # Fit the model using maximum likelihood
+#' lizardsML <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                  light + time, family = binomial(logit), data = lizards,
+#'                  method = "glm.fit")
+#' # Mean bias-reduced fit:
+#' lizardsBR_mean <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                       light + time, family = binomial(logit), data = lizards,
+#'                       method = "brglmFit")
+#' # Median bias-reduced fit:
+#' lizardsBR_median <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                         light + time, family = binomial(logit), data = lizards,
+#'                         method = "brglmFit", type = "AS_median")
+#' summary(lizardsML)
+#' summary(lizardsBR_median)
+#' summary(lizardsBR_mean)
 #'
-#' @return List with same structure as brglmFit output
+#' # Maximum penalized likelihood with Jeffreys prior penatly
+#' lizards_Jeffreys <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'                         light + time, family = binomial(logit), data = lizards,
+#'                         method = "brglmFit", type = "MPL_Jeffreys")
+#' # lizards_Jeffreys is the same fit as lizardsBR_mean (see Firth, 1993)
+#' all.equal(coef(lizardsBR_mean), coef(lizards_Jeffreys))
+#'
+#' # Maximum penalized likelihood with powers of the Jeffreys prior as
+#' # penalty. See Kosmidis & Firth (2021) for the finiteness and
+#' # shrinkage properties of the maximum penalized likelihood
+#' # estimators in binomial response models
+#' \donttest{
+#' a <- seq(0, 20, 0.5)
+#' coefs <- sapply(a, function(a) {
+#'       out <- glm(cbind(grahami, opalinus) ~ height + diameter +
+#'              light + time, family = binomial(logit), data = lizards,
+#'              method = "brglmFit", type = "MPL_Jeffreys", a = a)
+#'       coef(out)
+#' })
+#' # Illustration of shrinkage as a grows
+#' matplot(a, t(coefs), type = "l", col = 1, lty = 1)
+#' abline(0, 0, col = "grey")
+#'}
+#' 
+#' ## endometrial data from Heinze & Schemper (2002) (see ?endometrial)
+#' data("endometrial", package = "brglm2")
+#' endometrialML <- glm(HG ~ NV + PI + EH, data = endometrial,
+#'                      family = binomial("probit"))
+#' endometrialBR_mean <- update(endometrialML, method = "brglmFit",
+#'                              type = "AS_mean")
+#' endometrialBC <- update(endometrialML, method = "brglmFit",
+#'                         type = "correction")
+#' endometrialBR_median <- update(endometrialML, method = "brglmFit",
+#'                                type = "AS_median")
+#' summary(endometrialML)
+#' summary(endometrialBC)
+#' summary(endometrialBR_mean)
+#' summary(endometrialBR_median)
+#'
 #' @export
 brglmFit <- function(x, y, weights = rep(1, nobs), 
                                     start = NULL, etastart = NULL,
@@ -262,164 +325,120 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
     
     # ===== TRUST REGION ITERATION =====
     boundary <- FALSE
-    theta <- c(betas, dispersion)
     
+    #browser()
     # Initial evaluation
-    fit <- compute_fit(pars = theta, y = y, x = x, weights = weights,
-                      offset = offset, family = family,
-                      fixed_totals = fixed_totals, row_totals = row_totals,
-                      no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-                      keep = keep, need_qr = TRUE, need_hatvalues = TRUE)
-    
-    # Store hat values for reuse
-    hatvalues_cached <- fit$hatvalues
-    
-    # Compute gradient with adjustment
-    adjustment <- adjustment_function(theta, fit = fit, level = 0,
-                                    x = x, nobs = nobs, nvars = nvars, 
-                                    weights = weights)
-    grad <- fit$grad_beta + adjustment
-    
+    obj <- compute_objective(betas = betas, y = y, x = x, weights = weights,
+                            offset = offset, family = family,
+                            adjustment_function = adjustment_function,
+                            fixed_totals = fixed_totals, row_totals = row_totals,
+                            no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                            keep = keep)
+    f_current <- obj$value
+    grad <- obj$gradient 
+    H <- obj$hessian
+
     if (control$trace) {
-        cat("Trust Region Method with CG-Steihaug\n")
-        cat("Initial ||grad||:", sqrt(sum(grad^2)), "\n\n")
+        cat("Trust Region Method - Merit Function Formulation\n")
+        cat("Minimizing f(beta) = ||r(beta)||²/2 where r = adjusted_score\n")
+        cat("Initial f:", f_current, "\n")
+        cat("Initial ||r||:", sqrt(2*f_current), "\n")
+        cat("Initial ||Nabla f||:", sqrt(sum(grad^2)), "\n\n")
     }
     
     # Main trust region loop
     for (iter in seq_len(control$maxit)) {
-        #H <- compute_hessian(
-        #        betas = betas, y = y, x = x, weights = weights,
-        #        offset = offset, family = family,
-        #        adjustment_function = adjustment_function,
-        #        fixed_totals = fixed_totals, row_totals = row_totals,
-        #        no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-        #        keep = keep, need_qr = TRUE, need_hatvalues = TRUE
-        #   )
         
-        # Should we recompute exact hat values?
-        need_exact_hats <- (iter %% hat_recompute_freq == 1) || (iter == 1)
-        
-        # Solve trust region subproblem via CG-Steihaug
-        # step <- cg_steihaug_subproblem_with_H(
-        #     grad = -grad, # Note the negative gradient for search direction
-        #     H = H,
-        #     Delta = Delta,
-        #     tol = cg_tol,
-        #     maxiter = cg_maxiter
-        # )
-
-        # Solve trust region subproblem via CG-Steihaug
-        step <- cg_steihaug_subproblem(
-            neg_grad = -grad, # Note the negative gradient for search direction
-            x = x,
-            weights = fit$working_weights,
+        # Solve trust region subproblem: min_p { g'p + (1/2)p'Hp } s.t. ||p|| <= Delta
+        # Standard formulation - grad is ∇f (gradient of objective)
+        step <- cg_steihaug_subproblem_with_H(
+            grad = grad,  # Pass gradient of f 
+            H = H,
             Delta = Delta,
             tol = cg_tol,
             maxiter = cg_maxiter
         )
         
-        # Predicted reduction
-        Bp <- hessian_vector_product(step$p, x, fit$working_weights)
-        #Bp <- drop(H %*% step$p) # H is the actual Hessian, so this is exact
-        pred_reduction <- -(sum(-grad * step$p) + 0.5 * sum(step$p * Bp))
+        # Predicted reduction (standard quadratic model)
+        # pred = m(0) - m(p) = -(g'p + (1/2)p'Hp)
+        Bp <- drop(H %*% step$p)
+        pred_reduction <- -(sum(grad * step$p) + 0.5 * sum(step$p * Bp))
         
         # Try the step
         betas_new <- betas + step$p
-        theta_new <- c(betas_new, dispersion)
         
-        # Compute fit at new point (without hat values initially to save cost)
-        fit_new <- try(compute_fit(pars = theta_new, y = y, x = x, 
-                                    weights = weights, offset = offset,
-                                    family = family, fixed_totals = fixed_totals,
-                                    row_totals = row_totals, no_dispersion = no_dispersion,
-                                    nobs = nobs, nvars = nvars, keep = keep,
-                                    need_qr = FALSE, need_hatvalues = FALSE),
-                        silent = TRUE)
+        #browser()
+        # Evaluate at new point
+        obj_new <- compute_objective(betas = betas_new, y = y, x = x, weights = weights,
+                              offset = offset, family = family,
+                              adjustment_function = adjustment_function,
+                              fixed_totals = fixed_totals, row_totals = row_totals,
+                              no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                              keep = keep)
+        f_new <- obj_new$value
+        grad_new <- obj_new$gradient
+        H_new <- obj_new$hessian
         
-        if (inherits(fit_new, "try-error")) {
-            # Step failed - shrink trust region dramatically
-            Delta <- Delta * 0.1
-            if (control$trace) {
-                cat("Iter", iter, ": Step evaluation failed, shrinking Delta to", 
-                    Delta, "\n")
-            }
-            next
-        }
-        
-        # New gradient is adjusted score
-        fit_new$hatvalues <- hatvalues_cached  # Reuse cached hat values for adjustment
-        grad_new <- fit_new$grad_beta + adjustment_function(theta_new, fit = fit_new, level = 0,
-                                             x = x, nobs = nobs, nvars = nvars,
-                                             weights = weights)
-        
-        f_current <- 0.5 * sum(grad^2)
-        f_new <- 0.5 * sum(grad_new^2)
+        # Actual reduction
         actual_reduction <- f_current - f_new
         
         # Reduction ratio
-        rho <- if (abs(pred_reduction) < 1e-16) 0 else actual_reduction / pred_reduction
-
-        #cat(rho < eta_shrink, rho > eta_expand, step$on_boundary, "\n")
-        
-        # Update trust region radius
-        if (rho < eta_shrink) {
-            # Poor agreement - shrink trust region
-            Delta <- Delta * shrink_factor
-        } else if (rho > eta_expand && step$on_boundary) {
-            # Good agreement and hit boundary - expand trust region
-            Delta <- min(Delta * expand_factor, Delta_max)
+        rho <- if (abs(pred_reduction) < 1e-16) {
+            if (actual_reduction > 0) 1.0 else 0.0
+        } else {
+            actual_reduction / pred_reduction
         }
-        # Otherwise keep Delta unchanged
         
+        # Update trust region radius (aggressive for good models)
+        if (rho < eta_shrink) {
+            Delta <- shrink_factor * Delta 
+        } else if (rho > eta_expand) {
+            Delta <- min(expand_factor * Delta, Delta_max)
+        }
+
         # Accept or reject step
-        if (rho > eta_shrink) {
+        if (rho > eta_shrink) { # Try smaller factor
             # Accept step
             betas <- betas_new
-            theta <- theta_new
-            fit <- fit_new
-            
-            # Recompute hat values if needed
-            if (need_exact_hats) {
-                fit_with_hats <- compute_fit(pars = theta, y = y, x = x,
-                                            weights = weights, offset = offset,
-                                            family = family, fixed_totals = fixed_totals,
-                                            row_totals = row_totals, 
-                                            no_dispersion = no_dispersion,
-                                            nobs = nobs, nvars = nvars, keep = keep,
-                                            need_qr = TRUE, need_hatvalues = TRUE)
-                hatvalues_cached <- fit_with_hats$hatvalues
-                fit$hatvalues <- hatvalues_cached
-            } else {
-                # Reuse cached hat values
-                fit$hatvalues <- hatvalues_cached
-            }
-            
-            # Recompute adjustment with current hat values
-            adjustment <- adjustment_function(theta, fit = fit, level = 0,
-                                            x = x, nobs = nobs, nvars = nvars,
-                                            weights = weights)
-            grad <- fit$grad_beta + adjustment
+            f_current <- f_new
+            grad <- grad_new
+            H <- H_new
+            accept_status <- "ACCEPT"
+        } else {
+            # Reject step
+            accept_status <- "REJECT"
         }
-
-        # Convergence check
-        grad_norm <- sqrt(sum(grad^2))
-        step_norm <- sqrt(sum(step$p^2))
         
+        # Check for minimum radius
+        if (Delta < 1e-16) {
+            warning("Trust region radius became too small")
+            break
+        }
+        
+        # Trace output
         if (control$trace) {
-            cat(sprintf("Iter %3d: ||grad|| = %.6e, epsilon = %.6e, ||step|| = %.6e, Delta = %.6e, rho = %.3f, %s\n",
-                       iter, grad_norm, control$epsilon, step_norm, Delta, rho,
-                       if (rho > eta_shrink) "ACCEPT" else "REJECT"))
+            grad_norm <- sqrt(sum(grad^2))
+            step_norm <- sqrt(sum(step$p^2))
+            cat(sprintf("Iter %3d: f = %.6e, ||grad|| = %.6e, ||step|| = %.6e, Delta = %.3e, rho = %.3f, %s%s\n",
+                       iter, f_current, grad_norm, step_norm, Delta, rho,
+                       if (step$on_boundary) "[BOUND] " else "",
+                       accept_status))
         }
         
+        # Convergence check on GRADIENT of objective
+        # We've converged when ∇f ≈ 0, which implies r ≈ 0
+        grad_norm <- sqrt(sum(grad^2))
         if (grad_norm < control$epsilon) {
             converged <- TRUE
             break
         }
         
-        if (Delta < 1e-16) {
-            warning("Trust region radius became too small")
-            break
-        }
+        # Alternative: converge on residual norm
+        # r_norm <- sqrt(sum(r_current^2))
+        # if (r_norm < control$epsilon) {
+        #     converged <- TRUE
+        #     break
+        # }
     }
     
     # Final convergence check
@@ -446,7 +465,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                       offset = offset, family = family,
                       fixed_totals = fixed_totals, row_totals = row_totals,
                       no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-                      keep = keep, need_qr = TRUE, need_hatvalues = FALSE)
+                      keep = keep, need_qr = TRUE, need_hatvalues = TRUE)
     
     qr.Wx <- fit$qr_decomposition
     mus <- fit$mus
@@ -499,11 +518,15 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
     deviance <- sum(dev.resids(y, mus, weights))
     aic.model <- family$aic(y, nobs, mus, weights, deviance) + 2 * rank
     
-    # Gradient for output (adjusted gradient at final point)
+    # Gradient for output (residual at final point for compatibility)
+    adjustment <- adjustment_function(theta, fit = fit, level = 0,
+                                     x = x, nobs = nobs, nvars = nvars, weights = weights)
+    r_final <- fit$grad_beta + adjustment
+    
     adjusted_grad_all <- rep(NA_real_, nvars_all + 1)
     names(adjusted_grad_all) <- c(betas_names_all, "Transformed dispersion")
-    adjusted_grad_all[betas_names] <- grad
-    adjusted_grad_all["Transformed dispersion"] <- NA_real_  # No dispersion optimization
+    adjusted_grad_all[betas_names] <- r_final  # Store residual for compatibility
+    adjusted_grad_all["Transformed dispersion"] <- NA_real_
     
     # Return in brglmFit format
     list(
@@ -529,7 +552,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         boundary = boundary,
         dispersion = dispersion,
         dispersion_ML = dispersion_ML,
-        transformed_dispersion = 1,  # Identity transformation for fixed dispersion
+        transformed_dispersion = 1,
         info_transformed_dispersion = NA_real_,
         grad = adjusted_grad_all,
         transformation = control$transformation,
@@ -889,51 +912,6 @@ print.summary.brglmFit <- function (x, digits = max(3L, getOption("digits") - 3L
     invisible(x)
 }
 
-
-#' Compute actual Hessian of adjusted score objective
-#'
-#' @param betas Current beta estimates
-#' @param y Response
-#' @param x Design matrix  
-#' @param weights Prior weights
-#' @param offset Offset vector
-#' @param family GLM family
-#' @param adjustment_function Bias adjustment function
-#' @param ... Additional args for compute_fit and adjustment_function
-#'
-#' @return p x p Hessian matrix
-compute_hessian <- function(betas = betas, y = y, x = x, weights = weights,
-                offset = offset, family = family,
-                adjustment_function = adjustment_function,
-                fixed_totals = fixed_totals, row_totals = row_totals,
-                no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-                keep = keep, need_qr = TRUE, need_hatvalues = TRUE) {
-    
-    # Define the objective function: f(beta) = ||adjusted_score(beta)||^2 / 2
-    objective <- function(beta_vec) {
-        theta <- c(beta_vec, 1)  # Fixed dispersion
-        
-        fit <- compute_fit(pars = theta, y = y, x = x, weights = weights,
-                      offset = offset, family = family,
-                      fixed_totals = fixed_totals, row_totals = row_totals,
-                      no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-                      keep = keep, need_qr = TRUE, need_hatvalues = TRUE)
-        adj <- adjustment_function(theta, fit = fit, level = 0,
-                                    x = x, nobs = nobs, nvars = nvars, 
-                                    weights = weights)
-        grad <- fit$grad_beta + adj
-        
-        # Objective is sum of squares of gradient
-        return(0.5 * sum(grad^2))
-    }
-    
-    # Compute Hessian using numDeriv
-    H <- numDeriv::hessian(func = objective, x = betas)
-    
-    return(H)
-}
-
-
 cg_steihaug_subproblem_with_H <- function(grad, H, Delta, 
                                           tol = 0.1, maxiter = 50) {
     p <- length(grad)
@@ -974,3 +952,34 @@ cg_steihaug_subproblem_with_H <- function(grad, H, Delta,
     
     list(p = z, on_boundary = FALSE, cg_iter = maxiter)
 }
+
+compute_objective <- function(betas = betas, y = y, x = x, weights = weights,
+                              offset = offset, family = family,
+                              adjustment_function = adjustment_function,
+                              fixed_totals = fixed_totals, row_totals = row_totals,
+                              no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                              keep = keep, need_qr = TRUE, need_hatvalues = TRUE) {
+
+    # Define the objective function: f(beta) = ||adjusted_score(beta)||^2 / 2
+    objective <- function(beta_vec) {
+        theta <- c(beta_vec, 1)  # Fixed dispersion
+
+        fit <- compute_fit(pars = theta, y = y, x = x, weights = weights,
+                      offset = offset, family = family,
+                      fixed_totals = fixed_totals, row_totals = row_totals,
+                      no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                      keep = keep, need_qr = TRUE, need_hatvalues = TRUE)
+        adj <- adjustment_function(theta, fit = fit, level = 0,
+                                    x = x, nobs = nobs, nvars = nvars,
+                                    weights = weights)
+        r <- fit$grad_beta + adj
+        sum(r^2) / 2
+    }
+
+    ## Compute Hessian using numDeriv
+    F <- objective(betas)
+    G <- numDeriv::grad(func = objective, x = betas)
+    H <- numDeriv::hessian(func = objective, x = betas)
+
+    list(value = F, gradient = G, hessian = H)
+} 
