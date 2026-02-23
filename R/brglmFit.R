@@ -386,7 +386,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         r_new <- obj_new$residual
         
         # Actual reduction
-        actual_reduction <- 2*(f_current - f_new)
+        actual_reduction <- (f_current - f_new)
 
         #browser()
         
