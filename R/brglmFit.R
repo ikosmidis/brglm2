@@ -336,7 +336,9 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                             keep = keep)
     f_current <- obj$value
     grad <- obj$gradient 
+    J <- obj$jacobian
     H <- obj$hessian
+    r <- obj$residual
 
     if (control$trace) {
         cat("Trust Region Method - Merit Function Formulation\n")
@@ -361,9 +363,11 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         
         # Predicted reduction (standard quadratic model)
         # pred = m(0) - m(p) = -(g'p + (1/2)p'Hp)
-        Bp <- drop(H %*% step$p)
-        pred_reduction <- -(sum(grad * step$p) + 0.5 * sum(step$p * Bp))
-        
+        #Bp <- drop(H %*% step$p)
+        #pred_reduction <- -(sum(grad * step$p) + 0.5 * sum(step$p * Bp))
+        #Jp <- drop(J %*% step$p)
+        #pred_reduction <- 2*f_current - (sum((r + Jp)^2))
+
         # Try the step
         betas_new <- betas + step$p
         
@@ -378,9 +382,13 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         f_new <- obj_new$value
         grad_new <- obj_new$gradient
         H_new <- obj_new$hessian
+        J_new <- obj_new$jacobian
+        r_new <- obj_new$residual
         
         # Actual reduction
-        actual_reduction <- f_current - f_new
+        actual_reduction <- 2*(f_current - f_new)
+
+        #browser()
         
         # Reduction ratio
         rho <- if (abs(pred_reduction) < 1e-16) {
@@ -389,7 +397,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
             actual_reduction / pred_reduction
         }
         
-        # Update trust region radius (aggressive for good models)
+        # Update trust region radius
         if (rho < eta_shrink) {
             Delta <- shrink_factor * Delta 
         } else if (rho > eta_expand) {
@@ -403,6 +411,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
             f_current <- f_new
             grad <- grad_new
             H <- H_new
+            J <- J_new
+            r <- r_new
             accept_status <- "ACCEPT"
         } else {
             # Reject step
@@ -965,21 +975,58 @@ compute_objective <- function(betas = betas, y = y, x = x, weights = weights,
         theta <- c(beta_vec, 1)  # Fixed dispersion
 
         fit <- compute_fit(pars = theta, y = y, x = x, weights = weights,
-                      offset = offset, family = family,
-                      fixed_totals = fixed_totals, row_totals = row_totals,
-                      no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-                      keep = keep, need_qr = TRUE, need_hatvalues = TRUE)
+                        offset = offset, family = family,
+                        fixed_totals = fixed_totals, row_totals = row_totals,
+                        no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                        keep = keep, need_qr = TRUE, need_hatvalues = TRUE)
         adj <- adjustment_function(theta, fit = fit, level = 0,
                                     x = x, nobs = nobs, nvars = nvars,
                                     weights = weights)
+
         r <- fit$grad_beta + adj
         sum(r^2) / 2
     }
 
-    ## Compute Hessian using numDeriv
+    residual <- function(beta_vec) {
+        theta <- c(beta_vec, 1)  # Fixed dispersion
+
+        fit <- compute_fit(pars = theta, y = y, x = x, weights = weights,
+                    offset = offset, family = family,
+                    fixed_totals = fixed_totals, row_totals = row_totals,
+                    no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                    keep = keep, need_qr = TRUE, need_hatvalues = TRUE)
+        adj <- adjustment_function(theta, fit = fit, level = 0,
+                                x = x, nobs = nobs, nvars = nvars,
+                                weights = weights)
+
+        r <- fit$grad_beta + adj
+        r
+    }
+
+    theta <- c(betas, 1)
+    fit <- compute_fit(pars = theta, y = y, x = x, weights = weights,
+                        offset = offset, family = family,
+                        fixed_totals = fixed_totals, row_totals = row_totals,
+                        no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                        keep = keep, need_qr = TRUE, need_hatvalues = TRUE)
+
+    ## Computations using numDeriv
     F <- objective(betas)
     G <- numDeriv::grad(func = objective, x = betas)
-    H <- numDeriv::hessian(func = objective, x = betas)
+    H_actual <- numDeriv::hessian(func = objective, x = betas)
+    j <- numDeriv::jacobian(func = objective, x = betas)
+    J <- numDeriv::jacobian(func = residual, x = betas)
+    
+    H_Gauss <- t(J) %*% J  # Gauss-Newton approximation to Hessian
 
-    list(value = F, gradient = G, hessian = H)
+    working_weights <- fit$working_weights
+
+    info <- t(x) %*% (diag(working_weights) %*% x)
+    H_approx <- info %*% info
+
+    r <- residual(betas)
+
+    browser()
+
+    list(value = F, gradient = G, jacobian = J, hessian = H_approx, residual = r)
 } 
