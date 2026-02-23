@@ -363,10 +363,10 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         
         # Predicted reduction (standard quadratic model)
         # pred = m(0) - m(p) = -(g'p + (1/2)p'Hp)
-        #Bp <- drop(H %*% step$p)
-        #pred_reduction <- -(sum(grad * step$p) + 0.5 * sum(step$p * Bp))
+        Bp <- drop(H %*% step$p)
+        pred_reduction <- -(sum(grad * step$p) + 0.5 * sum(step$p * Bp))
         #Jp <- drop(J %*% step$p)
-        #pred_reduction <- 2*f_current - (sum((r + Jp)^2))
+        #pred_reduction <- -(2*f_current - (sum((r + Jp)^2)))
 
         # Try the step
         betas_new <- betas + step$p
@@ -1026,7 +1026,7 @@ compute_objective <- function(betas = betas, y = y, x = x, weights = weights,
 
     r <- residual(betas)
 
-    browser()
+    #browser()
 
-    list(value = F, gradient = G, jacobian = J, hessian = H_approx, residual = r)
+    list(value = F, gradient = G, jacobian = info, hessian = H_approx, residual = r)
 } 
