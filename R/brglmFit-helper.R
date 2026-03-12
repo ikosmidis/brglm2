@@ -57,6 +57,7 @@ compute_fit <- function(pars, y, x, weights, offset, family,
     # Mean Quantities
     d1mus <- family$mu.eta(etas)
     d2mus <- family$d2mu.deta(etas)
+    d3mus <- family$d3mu.deta(etas)
     varmus <- family$variance(mus)
     d1varmus <- family$d1variance(mus)
     working_weights <- weights * d1mus^2 / varmus
@@ -85,6 +86,11 @@ compute_fit <- function(pars, y, x, weights, offset, family,
     if (!no_dispersion) {
         zetas <- -weights * precision
         
+        # Diagnostic: check for non-negative zetas before calling d1afun, d2afun, d3afun
+        if (any(keep & zetas >= 0)) {
+            warning(sprintf("Non-negative zeta detected: min(zeta) = %g, max(zeta) = %g. This will cause NaNs in log(-zeta). Indices: %s", min(zetas[keep]), max(zetas[keep]), paste(which(keep & zetas >= 0), collapse=",")))
+        }
+
         # Derivatives of cumulant function (only for non-zero weights)
         d1afuns <- d2afuns <- d3afuns <- rep(NA_real_, nobs)
         d1afuns[keep] <- family$d1afun(zetas[keep])
@@ -144,6 +150,7 @@ compute_fit <- function(pars, y, x, weights, offset, family,
         # Mean-related quantities
         d1mus = d1mus,
         d2mus = d2mus,
+        d3mus = d3mus,
         varmus = varmus,
         d1varmus = d1varmus,
         working_weights = working_weights,
