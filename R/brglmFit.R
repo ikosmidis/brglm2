@@ -58,8 +58,6 @@
 #' Trust-region fitting method for bias-reduced GLMs
 #' Fits bias-reduced GLMs by trust-region optimization of the adjusted score equations.
 #' Objective: f(beta) = ||adjusted_score_beta(beta)||^2 / 2.
-#' Gradient:  nabla f  = -info_beta %*% r   (analytic, Gauss-Newton).
-#' Hessian:   H        = info_beta %*% info_beta  (Gauss-Newton, always PSD).
 #'
 #' In the special case of generalized linear models for binomial,
 #' Poisson and multinomial responses, the adjusted score equation
@@ -291,13 +289,12 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                 grad <- adjustment <- inverse_info <- NA_real_
                 failed_adjustment <- failed_inversion <- FALSE
             } else {
-                d1zeta        <- eval(d1_transformed_dispersion)
-                d2zeta        <- eval(d2_transformed_dispersion)
-                grad          <- fit$grad_zeta / d1zeta
-                inverse_info  <- fit$inverse_info_zeta * d1zeta^2
-                adjustment    <- adjustment_function(pars, fit = fit, level = 1,
-                                                     x, nobs, nvars, weights) / d1zeta -
-                                 0.5 * d2zeta / d1zeta^2
+                d1zeta <- eval(d1_transformed_dispersion)
+                d2zeta <- eval(d2_transformed_dispersion)
+                grad <- fit$grad_zeta / d1zeta
+                inverse_info <- fit$inverse_info_zeta * d1zeta^2
+                adjustment <- adjustment_function(pars, fit = fit, level = 1, x, nobs, 
+                                                  nvars, weights) / d1zeta - 0.5 * d2zeta / d1zeta^2
                 failed_inversion  <- !is.finite(inverse_info)
                 failed_adjustment <- is.na(adjustment)
             }
@@ -306,57 +303,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
              failed_adjustment = failed_adjustment, failed_inversion = failed_inversion)
     }
 
-    # Analytic gradient via Gauss-Newton
-    #
-    # r = adjusted_score_beta = grad_beta + adj
-    #
-    # Full Jacobian of r w.r.t. beta:
-    #   J = -X'WX  +  0.5 * X'OX
-    # where O_ii = -(p/n) * (d1mu_i * d3mu_i - (d2mu_i)^2)/d1mu_i^2
 
-    # grad f = J^T r,   H = J^T J  (never formed; matvec in hessian_matvec_gn)
-    compute_objective <- function(fit, pars) {
-        betas <- fit$betas
-        adj <- adjustment_function(pars, fit = fit, level = 0, x, nobs, nvars, weights)
-        r <- fit$grad_beta + adj
-        w <- fit$working_weights
-        h_scalar <- fit$hatvalues
-        #o_diag <- -h_scalar * (fit$d2mus / fit$d1mus)
-        o_diag <- h_scalar * with(fit, d3mus / d1mus - (d2mus / d1mus)^2)
-        #o_diag = numeric(nobs)
-        J <- -crossprod(fit$R_matrix)
-        grad_f <- crossprod(J, r) + 0.5 * crossprod(x, o_diag * (x %*% r))
-        #grad_f <- -crossprod(x, w * Xr) + 0.5 * crossprod(x, o_diag * Xr)
-
-        residual <- function(betas) {
-            fit <- compute_fit(pars = c(betas,1), y = y, x = x, weights = weights,
-                        offset = offset, family = family,
-                        fixed_totals = fixed_totals, row_totals = row_totals,
-                        no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-                        keep = keep, need_qr = TRUE, need_hatvalues = TRUE)
-            adj <- adjustment_function(pars, fit = fit, level = 0,
-                                    x = x, nobs = nobs, nvars = nvars,
-                                    weights = weights)
-
-            r <- fit$grad_beta + adj
-            r
-        }
-        #J_actual <- numDeriv::jacobian(func = residual, x = betas)
-
-        #g_actual <- crossprod(J_actual, r)
-        h_approx <- nvars/nobs
-        o_diag_approx <- h_approx * with(fit, d3mus / d1mus - (d2mus / d1mus)^2)
-        g_2 <- crossprod(J, r) + 0.5 * crossprod(x, o_diag_approx * (x %*% r))
-        #c1 <- c(max(abs(g_actual - grad_f)), sum((g_actual - grad_f)^2))
-        #c2 <- c(max(abs(g_actual - g_2)), sum((g_actual - g_2)^2))
-
-        #browser()
-
-        list(value    = sum(r^2) / 2,
-             gradient = grad_f,
-             residual = r,
-             o_diag   = o_diag)
-    }
 
 
     customTransformation <- is.list(control$transformation) & length(control$transformation) == 2
@@ -428,7 +375,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
     family <- enrichwith::enrich(family, with = c("d1afun", "d2afun", "d3afun", "d1variance"))
     if ((family$link %in% ok_links) | grepl("mu\\^", family$link)) {
         ## Enrich the link object with d2mu.deta and update family object
-        linkglm <- enrichwith::enrich(make.link(family$link), with = c("d2mu.deta", "d3mu.deta"))
+        linkglm <- enrichwith::enrich(make.link(family$link), with = "d2mu.deta")
         ## Put everything into the family object
         family[names(linkglm)] <- linkglm
     }
@@ -494,27 +441,27 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
             rank <- nvars_all <- nvars
             betas_names_all <- betas_names
         } else {
-            qrx          <- qr(x)
-            rank         <- qrx$rank
+            qrx <- qr(x)
+            rank <- qrx$rank
             is_full_rank <- rank == nvars
             if (!isTRUE(singular.ok) && !isTRUE(is_full_rank))
                 stop("singular fit encountered")
             if (!isTRUE(is_full_rank)) {
-                aliased         <- qrx$pivot[seq.int(qrx$rank + 1, nvars)]
-                X_all           <- x
-                x               <- x[, -aliased]
-                nvars_all       <- nvars
-                nvars           <- ncol(x)
+                aliased <- qrx$pivot[seq.int(qrx$rank + 1, nvars)]
+                X_all <- x
+                x <- x[, -aliased]
+                nvars_all <- nvars
+                nvars <- ncol(x)
                 betas_names_all <- betas_names
-                betas_names     <- betas_names[-aliased]
+                betas_names <- betas_names[-aliased]
             } else {
-                nvars_all       <- nvars
+                nvars_all <- nvars
                 betas_names_all <- betas_names
             }
         }
-        betas_all   <- structure(rep(NA_real_, nvars_all), .Names = betas_names_all)
-        keep        <- weights > 0
-        nkeep       <- sum(keep)
+        betas_all <- structure(rep(NA_real_, nvars_all), .Names = betas_names_all)
+        keep <- weights > 0
+        nkeep <- sum(keep)
         df_residual <- nkeep - rank
 
         ## Handle starting values
@@ -557,7 +504,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                 warning(sprintf("Dispersion became non-positive (%.6g); resetting to small positive value.", dispersion))
                 dispersion <- .Machine$double.eps
             }
-            dispersion_ML          <- dispList$dispersion_ML
+            dispersion_ML <- dispList$dispersion_ML
             transformed_dispersion <- eval(control$Trans)
         } else {
             if ((length(start) == nvars_all) & is.numeric(start)) {
@@ -596,8 +543,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                     betas <- betas_all
                 }
                 transformed_dispersion <- start[nvars_all + 1]
-                dispersion_ML          <- NA_real_
-                dispersion             <- eval(control$inverseTrans)
+                dispersion_ML <- NA_real_
+                dispersion <- eval(control$inverseTrans)
                 # Enforce positivity constraint
                 if (!is.na(dispersion) && dispersion <= 0) {
                     warning(sprintf("Dispersion became non-positive (%.6g); resetting to small positive value.", dispersion))
@@ -615,7 +562,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
 
         if (is_correction) {
             if (control$maxit > 0) control$maxit <- 1
-            control$slowit          <- 1
+            control$slowit <- 1
             control$max_step_factor <- 1
         }
 
@@ -630,6 +577,10 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
             transformed_dispersion <- eval(control$Trans)
         }
 
+        # Determine if we need to compute the inverse of the information matrix for the dispersion parameter
+        needs_inverse <- !no_dispersion || 
+                 control$type %in% c("AS_median", "AS_mixed", "correction")
+
         # Avoid unconstrained trust-region steps for dispersion in null/intercept-only models
         # Only update dispersion if model is not empty/null
         if (!EMPTY) {
@@ -637,7 +588,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                            offset = offset, family = family,
                            fixed_totals = fixed_totals, row_totals = row_totals,
                            no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-                           keep = keep, need_qr = TRUE, need_hatvalues = TRUE)
+                           keep = keep, need_qr = TRUE, need_hatvalues = TRUE,
+                           need_inverse = needs_inverse)
         } else {
             # For null/intercept-only models, use safe default for dispersion
             dispersion <- 1
@@ -663,7 +615,6 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         eta_expand    <- 0.75
         shrink_factor <- 0.25
         expand_factor <- 2.0
-        cg_tol        <- 0.1
         cg_maxiter    <- min(nvars, 50)
 
         failed <- FALSE
@@ -672,23 +623,37 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         } else {
             for (iter in seq.int(control$maxit)) {
 
-                obj <- compute_objective(fit = fit, pars = theta)
+                # Preconditioned CG-Steihaug trust-region step 
+                # Minimise  -r_adj' p + 0.5 p' F p  s.t. ||p|| <= Delta
+                # Uses stored fit$info_beta (p x p, O(p^2) matvec) with Jacobi
+                # diagonal preconditioner M = diag(F) to reduce inner iterations.
+                r_adj_sq  <- sum(adjusted_grad_beta^2)
 
-                # CG-Steihaug subproblem — matrix-free, never forms H explicitly
-                step <- cg_steihaug_gn(
-                    grad    = obj$gradient,
-                    fit     = fit,
-                    x       = x,
-                    o_diag  = obj$o_diag,
+                # Adaptive tolerance: loose early, tight near convergence
+                # cg_tol_adapt <- min(0.5, sqrt(sqrt(r_adj_sq))) 
+
+                # Eisenstat-Walker Choice 2 (Theorem 2.3)
+                # https://softlib.rice.edu/pub/CRPC-TRs/reports/CRPC-TR94463.pdf
+                # gamma <- 0.9; alpha <- 2.0
+                # cg_tol_ew <- if (iter == 1) 0.5 else
+                #     min(0.5, gamma * (sqrt(r_adj_sq) / r_adj_sq_prev)^alpha)
+                # r_adj_sq_prev <- r_adj_sq   # store for next iteration
+                # store only on accept? 
+
+                cg_tol = 0.1
+
+                step <- cg_steihaug_pcg(
+                    r_adj   = adjusted_grad_beta,
+                    F_info  = fit$info_beta,
                     Delta   = Delta,
                     tol     = cg_tol,
                     maxiter = cg_maxiter)
 
-                # predicted reduction: m(0) - m(p) = -(g'p + 0.5 p'Hp)
-                Bp <- hessian_matvec_gn(step$p, fit, x, obj$o_diag)
-                pred_reduction <- -(sum(obj$gradient * step$p) + 0.5 * sum(step$p * Bp))
+                # Predicted reduction (||r_adj||^2 objective) 
+                # pred = 0.5(||r_adj||^2 - ||r_adj - F p||^2), F stored as p x p.
+                r_adj_model    <- adjusted_grad_beta - drop(fit$info_beta %*% step$p) # Matrix free?
+                pred_reduction <- 0.5 * (r_adj_sq - sum(r_adj_model^2))
 
-                # dispersion held fixed so rho is a meaningful comparison
                 betas_candidate <- betas + step$p
                 theta_candidate <- c(betas_candidate, dispersion)
 
@@ -697,7 +662,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                                 offset = offset, family = family,
                                 fixed_totals = fixed_totals, row_totals = row_totals,
                                 no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-                                keep = keep, need_qr = TRUE, need_hatvalues = TRUE),
+                                keep = keep, need_qr = TRUE, need_hatvalues = TRUE,
+                                need_inverse = needs_inverse),
                     silent = TRUE)
 
                 if (inherits(fit_candidate, "try-error")) {
@@ -706,33 +672,39 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                     next
                 }
 
-                obj_candidate    <- compute_objective(fit = fit_candidate, pars = theta_candidate)
-                actual_reduction <- obj$value - obj_candidate$value
+                # Actual reduction (||r_adj||^2 objective) 
+                # Compute adjusted score at the candidate point.
+                adj_candidate   <- adjustment_function(theta_candidate, fit = fit_candidate,
+                                                       level = 0, x, nobs, nvars, weights)
+                r_adj_candidate <- fit_candidate$grad_beta + adj_candidate
+                actual_reduction <- 0.5 * (r_adj_sq - sum(r_adj_candidate^2))
 
-                # reduction ratio (Nocedal & Wright eq 4.4)
+                # Reduction ratio (Nocedal & Wright 4.4) 
+                # Avoids numerical issues when pred_reduction is small
                 rho <- if (abs(pred_reduction) < 1e-16) {
                     if (actual_reduction > 0) 1.0 else 0.0
                 } else {
                     actual_reduction / pred_reduction
                 }
 
-                # adapt radius (Nocedal & Wright Alg 4.1)
+                # adapt radius (Nocedal & Wright Algo 4.1)
                 if (rho < eta_shrink) {
                     Delta <- shrink_factor * Delta
                 } else if (rho > eta_expand) {
                     Delta <- min(expand_factor * Delta, Delta_max)
                 }
 
+                # Accept/reject candidate, 0.1 threshold is fairly loose could be tightened to 0.25
                 if (rho > 0.1) {
-                    betas                <- betas_candidate
-                    theta                <- theta_candidate
-                    fit                  <- fit_candidate
-                    obj                  <- obj_candidate
+                    # Update with candidate 
+                    betas <- betas_candidate
+                    theta <- theta_candidate
+                    fit <- fit_candidate
                     step_components_beta <- compute_step_components(theta, level = 0, fit = fit)
-                    adjusted_grad_beta   <- with(step_components_beta, grad + adjustment)
-                    accept_status        <- "ACCEPT"
+                    adjusted_grad_beta <- with(step_components_beta, grad + adjustment)
+                    accept_status <- "ACCEPT"
                 } else {
-                    accept_status        <- "REJECT"
+                    accept_status <- "REJECT"
                 }
 
                 if (Delta < 1e-16) { warning("Trust region radius became too small"); break }
@@ -741,23 +713,21 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                 adjusted_grad_zeta   <- if (no_dispersion) NA_real_ else
                                         with(step_components_zeta, grad + adjustment)
 
-                # dispersion Newton step after accept/reject - keeps rho valid within iteration,
-                # advances dispersion for the next
+                # dispersion Newton step after accept/reject
                 if (!no_dispersion & df_residual > 0 &
                     !step_components_zeta$failed_inversion &
                     !step_components_zeta$failed_adjustment) {
-                        
+
                     step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
                     transformed_dispersion <- transformed_dispersion + step_zeta
                     dispersion             <- eval(control$inverseTrans)
-                    # Enforce positivity constraint
                     if (!is.na(dispersion) && dispersion <= 0) {
                         warning(sprintf("Dispersion became non-positive (%.6g); resetting to small positive value.", dispersion))
                         dispersion <- .Machine$double.eps
                         theta <- c(betas, dispersion)
                         transformed_dispersion <- eval(control$Trans)
                     }
-                    theta                  <- c(betas, dispersion)
+                    theta <- c(betas, dispersion)
                 }
 
                 step_zeta_conv <- if (no_dispersion || df_residual < 1 ||
@@ -768,35 +738,24 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                 if (control$trace) {
                     cat(sprintf(
                         "Iter %3d: f=%.4e  ||r||=%.4e  ||p||=%.4e  dDisp=%.3e  Delta=%.3e  rho=%6.3f  %s%s\n",
-                        iter, obj$value,
-                        sqrt(sum(obj$residual^2)),
+                        iter,
+                        0.5 * r_adj_sq,
+                        sqrt(r_adj_sq),
                         sqrt(sum(step$p^2)),
                         if (is.na(step_zeta_conv)) 0 else abs(step_zeta_conv),
                         Delta, rho, accept_status,
                         if (step$on_boundary) " [BOUND]" else ""))
                 }
 
-                # Convergence: gradient norm of objective + dispersion step.
-                # Previously used step size (max|step$p|), which could fire early when
-                # the trust-region radius shrank due to poor rho -- even if r != 0.
-                # Gradient norm correctly converges only when ||J^T r|| ~ 0, i.e. r ~ 0.
-                grad_norm <- sqrt(sum(obj$gradient^2))
+                # Convergence: step-size criterion matching brglmFit_original.
                 step_zeta_conv_abs <- if (is.na(step_zeta_conv)) NA_real_ else abs(step_zeta_conv)
                 failed <- step_components_beta$failed_inversion ||
                           step_components_beta$failed_adjustment
-                beta_converged  <- grad_norm < control$epsilon
-                zeta_converged  <- no_dispersion || df_residual < 1 ||
-                                   is.na(step_zeta_conv_abs) ||
-                                   step_zeta_conv_abs < control$epsilon
+                beta_converged <- max(abs(step$p)) < control$epsilon
+                zeta_converged <- no_dispersion || df_residual < 1 ||
+                                  is.na(step_zeta_conv_abs) ||
+                                  step_zeta_conv_abs < control$epsilon
                 if (failed || (beta_converged && zeta_converged)) break
-
-                # Convergence check on GRADIENT of objective
-                # We've converged when ∇f ≈ 0, which implies r ≈ 0
-                #grad_norm <- sqrt(sum(obj$gradient^2))
-                #if (grad_norm < control$epsilon) {
-                #    converged <- TRUE
-                #    break
-                #}
             }
         }
 
@@ -948,81 +907,85 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
 }
 
 
-#' Matrix-free Hessian-vector product for Gauss-Newton trust region
+#' Preconditioned CG-Steihaug trust-region subproblem solver
 #'
-#' Computes H*v where H = J^T J and J = -X'WX + 0.5*X'OX is the full
-#' Jacobian including the d(adj)/d(beta) correction term.
-#' Never forms J or H explicitly: cost is 4*O(np) per call.
+#' Solves:  min_p { -r_adj' p + 0.5 p' F p }  s.t.  ||p|| <= Delta
+#' where F = fit$info_beta (p x p Fisher information, already formed).
 #'
-#' @param v      Vector of length p
-#' @param fit    [compute_fit()] result (provides working_weights, d2mus, d1mus)
-#' @param x      Design matrix (n x p)
-#' @param o_diag Diagonal of O matrix from [compute_objective()]
+#' Uses a Jacobi (diagonal) preconditioner  M = diag(F).  This costs
+#' one O(p) divide per inner step and replaces the CG convergence rate
+#' governed by kappa(F) with kappa(M^{-1} F), which is substantially
+#' smaller when predictors have very different scales or block-correlated
+#' structure.  In practice this halves or quarters the number of inner iterations k 
+#' relative to unpreconditioned CG, directly reducing the k * O(p^2) inner-loop cost.
 #'
-#' @return H*v as vector of length p
-hessian_matvec_gn <- function(v, fit, x, o_diag) {
-    w  <- fit$working_weights
-    Xv <- drop(x %*% v)                              # O(np)
-    Jv <- -drop(crossprod(x, w * Xv)) +
-           0.5 * drop(crossprod(x, o_diag * Xv))     # J*v
-    JJv_Xpart <- drop(x %*% Jv)                      # O(np)
-    -drop(crossprod(x, w * JJv_Xpart)) +
-     0.5 * drop(crossprod(x, o_diag * JJv_Xpart))    # J^T*(J*v)
-}
-
-#' CG-Steihaug subproblem solver with matrix-free Gauss-Newton Hessian
 #'
-#' Solves: min_p { g'p + 0.5 p'Hp } s.t. ||p|| <= Delta
-#' where H = J^T J applied via [hessian_matvec_gn()].
-#' Never forms H explicitly: cost per CG iteration is 2*O(np).
-#'
-#' @param grad    Gradient of f (length p)
-#' @param fit     [compute_fit()] result at current point
-#' @param x       Design matrix (n x p)
-#' @param o_diag  Diagonal of O matrix from [compute_objective()]
-#' @param Delta   Trust region radius
-#' @param tol     Relative CG convergence tolerance
+#' @param r_adj   Adjusted score vector (length p)
+#' @param F_info  Fisher information matrix (p x p), i.e. fit$info_beta
+#' @param Delta   Trust-region radius
+#' @param tol     Relative residual tolerance (use Eisenstat-Walker adaptive
+#'                value: min(0.5, sqrt(||r_adj||)) for best performance)
 #' @param maxiter Maximum CG iterations
 #'
-#' @references
-#' Steihaug (1983) SIAM J. Numer. Anal. 20(3), 626-637.
-#' Nocedal & Wright (2006) Algorithm 7.2.
-cg_steihaug_gn <- function(grad, fit, x, o_diag, Delta, tol = 0.1, maxiter = 50) {
-    z         <- numeric(length(grad))
-    r         <- -grad
-    d         <- r
-    grad_norm <- sqrt(sum(grad^2))
+#' @references Steihaug (1983) SIAM J. Numer. Anal. 20(3), 626-637.
+#'             Nocedal & Wright (2006) Numerical Optimization, Alg. 7.2.
+#'             Eisenstat & Walker (1996) SIAM J. Optim. 6(4), 1190-1206.
+cg_steihaug_pcg <- function(r_adj, F_info, Delta, tol = 0.1, maxiter = 50) {
+    # Jacobi preconditioner: M = diag(F), M^{-1} v = v / diag(F)
+    # Guard against near-zero diagonal entries
+    d_F <- diag(F_info)
+    d_F <- pmax(d_F, .Machine$double.eps * max(d_F))
+    Minv <- function(v) v / d_F              # O(p), just element-wise division
+
+    z <- numeric(length(r_adj))
+    r <- r_adj
+    y <- Minv(r)                       # preconditioned residual
+    d <- y
+    ry <- sum(r * y)
+    ry0 <- ry                            # for convergence check
+
     for (j in seq_len(maxiter)) {
-        Bd  <- hessian_matvec_gn(d, fit, x, o_diag)
-        dBd <- sum(d * Bd)
-        if (dBd <= 0)
-            return(list(p = z + find_boundary_step(z, d, Delta) * d,
-                        on_boundary = TRUE, cg_iter = j))
-        r_sq  <- sum(r^2)
-        alpha <- r_sq / dBd
+        Fd  <- drop(F_info %*% d)            # O(p²), maybe matrix free matvec in future?
+        dFd <- sum(d * Fd)
+
+        if (dFd <= 0) {
+            tau <- find_boundary_step(z, d, Delta)
+            return(list(p = z + tau * d, on_boundary = TRUE, cg_iter = j))
+        }
+
+        alpha <- ry / dFd
         z_new <- z + alpha * d
-        if (sqrt(sum(z_new^2)) > Delta)
-            return(list(p = z + find_boundary_step(z, d, Delta) * d,
-                        on_boundary = TRUE, cg_iter = j))
+
+        if (sqrt(sum(z_new^2)) >= Delta) {
+            tau <- find_boundary_step(z, d, Delta)
+            return(list(p = z + tau * d, on_boundary = TRUE, cg_iter = j))
+        }
+
         z <- z_new
-        r <- r - alpha * Bd
-        if (sqrt(sum(r^2)) < tol * grad_norm)
+        r <- r - alpha * Fd
+        y <- Minv(r)
+        ry_new <- sum(r * y)
+
+        # convergence in the M-norm of the residual, relative to initial
+        if (sqrt(abs(ry_new)) < tol * sqrt(abs(ry0)))
             return(list(p = z, on_boundary = FALSE, cg_iter = j))
-        d <- r + (sum(r^2) / r_sq) * d
+
+        d  <- y + (ry_new / ry) * d
+        ry <- ry_new
     }
     list(p = z, on_boundary = FALSE, cg_iter = maxiter)
 }
 
 #' Boundary step: finds tau >= 0 s.t. ||z + tau*d|| = Delta
 find_boundary_step <- function(z, d, Delta) {
-    a    <- sum(d * d)
+    a    <- sum(d^2)
     b    <- 2 * sum(z * d)
-    cc   <- sum(z * z) - Delta^2
+    cc   <- sum(z^2) - Delta^2
     disc <- b^2 - 4 * a * cc
     if (disc < 0) return(0)
-    t1   <- (-b + sqrt(disc)) / (2 * a)
-    t2   <- (-b - sqrt(disc)) / (2 * a)
-    pos  <- c(t1, t2)[c(t1, t2) > 0]
+    t1  <- (-b + sqrt(disc)) / (2 * a)
+    t2  <- (-b - sqrt(disc)) / (2 * a)
+    pos <- c(t1, t2)[c(t1, t2) > 0]
     if (length(pos) == 0) 0 else min(pos)
 }
 
