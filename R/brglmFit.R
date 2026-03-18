@@ -265,6 +265,8 @@
 #' summary(endometrialBR_mean)
 #' summary(endometrialBR_median)
 #'
+#' TODO: Vignette write,  
+
 #' @export
 brglmFit <- function(x, y, weights = rep(1, nobs),
                      start = NULL, etastart = NULL,
@@ -569,17 +571,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         theta                  <- c(betas, dispersion)
         transformed_dispersion <- eval(control$Trans)
 
-        # Fallback logic for dispersion: if update would make it non-positive, reset to previous or default value
-        if (dispersion <= 0) {
-            warning("Dispersion update resulted in non-positive value; resetting to default (1).")
-            dispersion <- 1
-            theta[length(theta)] <- dispersion
-            transformed_dispersion <- eval(control$Trans)
-        }
-
         # Determine if we need to compute the inverse of the information matrix for the dispersion parameter
-        needs_inverse <- !no_dispersion || 
-                 control$type %in% c("AS_median", "AS_mixed", "correction")
+        needs_inverse <- !no_dispersion || control$type %in% c("AS_median", "AS_mixed")
 
         # Avoid unconstrained trust-region steps for dispersion in null/intercept-only models
         # Only update dispersion if model is not empty/null
@@ -617,11 +610,18 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         expand_factor <- 2.0
         cg_maxiter    <- min(nvars, 50)
 
+        # Attempt infrequent hatvalue updates
+        hatvalues_cached <- fit$hatvalues
+        hat_accept_count <- 0L
+        hat_update_freq  <- control$hat_update_freq
+        #hat_update_freq <- max(3L, min(10L, as.integer(floor(nobs / (5 * nvars)))))
+
         failed <- FALSE
         if (control$maxit == 0) {
             iter <- 0L
         } else {
             for (iter in seq.int(control$maxit)) {
+                recomp <- FALSE
 
                 # Preconditioned CG-Steihaug trust-region step 
                 # Minimise  -r_adj' p + 0.5 p' F p  s.t. ||p|| <= Delta
@@ -630,23 +630,23 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                 r_adj_sq  <- sum(adjusted_grad_beta^2)
 
                 # Adaptive tolerance: loose early, tight near convergence
-                # cg_tol_adapt <- min(0.5, sqrt(sqrt(r_adj_sq))) 
+                #cg_tol_adapt <- min(0.5, sqrt(sqrt(r_adj_sq))) 
 
                 # Eisenstat-Walker Choice 2 (Theorem 2.3)
                 # https://softlib.rice.edu/pub/CRPC-TRs/reports/CRPC-TR94463.pdf
-                # gamma <- 0.9; alpha <- 2.0
-                # cg_tol_ew <- if (iter == 1) 0.5 else
-                #     min(0.5, gamma * (sqrt(r_adj_sq) / r_adj_sq_prev)^alpha)
-                # r_adj_sq_prev <- r_adj_sq   # store for next iteration
+                gamma <- 0.9; alpha <- 2.0
+                cg_tol_ew <- if (iter == 1) 0.5 else
+                    min(0.5, gamma * (sqrt(r_adj_sq) / r_adj_sq_prev)^alpha)
+                r_adj_sq_prev <- r_adj_sq   # store for next iteration
                 # store only on accept? 
 
-                cg_tol = 0.1
+                #cg_tol = 0.1
 
                 step <- cg_steihaug_pcg(
                     r_adj   = adjusted_grad_beta,
                     F_info  = fit$info_beta,
                     Delta   = Delta,
-                    tol     = cg_tol,
+                    tol     = cg_tol_ew,
                     maxiter = cg_maxiter)
 
                 # Predicted reduction (||r_adj||^2 objective) 
@@ -662,7 +662,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                                 offset = offset, family = family,
                                 fixed_totals = fixed_totals, row_totals = row_totals,
                                 no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-                                keep = keep, need_qr = TRUE, need_hatvalues = TRUE,
+                                keep = keep, need_qr = TRUE, need_hatvalues = FALSE,
+                                hatvalues_precomputed = hatvalues_cached,
                                 need_inverse = needs_inverse),
                     silent = TRUE)
 
@@ -700,6 +701,18 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                     betas <- betas_candidate
                     theta <- theta_candidate
                     fit <- fit_candidate
+                    hat_accept_count <- hat_accept_count + 1L
+ 
+                    # Periodic hat-value refresh: call qr.Q() on the already-stored
+                    # qr_decomposition - no extra QR factorisation required.
+                    if (hat_accept_count %% hat_update_freq == 0L) {
+                        Q_tmp            <- qr.Q(fit$qr_decomposition)
+                        hatvalues_cached <- .rowSums(Q_tmp * Q_tmp, nobs, nvars, TRUE)
+                        Q_tmp            <- NULL   # free n×p matrix immediately
+                        fit$hatvalues <- hatvalues_cached
+                        recomp <- TRUE
+                    }
+
                     step_components_beta <- compute_step_components(theta, level = 0, fit = fit)
                     adjusted_grad_beta <- with(step_components_beta, grad + adjustment)
                     accept_status <- "ACCEPT"
@@ -737,14 +750,15 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
 
                 if (control$trace) {
                     cat(sprintf(
-                        "Iter %3d: f=%.4e  ||r||=%.4e  ||p||=%.4e  dDisp=%.3e  Delta=%.3e  rho=%6.3f  %s%s\n",
+                        "Iter %3d: f=%.4e  ||r||=%.4e  ||p||=%.4e  dDisp=%.3e  Delta=%.3e  rho=%6.3f  %s%s%s\n",
                         iter,
                         0.5 * r_adj_sq,
                         sqrt(r_adj_sq),
                         sqrt(sum(step$p^2)),
                         if (is.na(step_zeta_conv)) 0 else abs(step_zeta_conv),
                         Delta, rho, accept_status,
-                        if (step$on_boundary) " [BOUND]" else ""))
+                        if (step$on_boundary) " [BOUND]" else "",
+                        if(recomp) " [HAT UPDATE]" else ""))
                 }
 
                 # Convergence: step-size criterion matching brglmFit_original.

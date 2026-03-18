@@ -31,13 +31,22 @@
 #' @param nvars Number of variables
 #' @param keep Logical vector indicating which observations to keep
 #' @param need_qr Logical indicating if QR decomposition is needed
-#' @param need_hatvalues Logical indicating if hat values are needed
+#' @param need_hatvalues Logical indicating if hat values are needed (ignored when
+#'   hatvalues_precomputed is non-NULL)
+#' @param hatvalues_precomputed Optional numeric vector of pre-computed hat values.
+#'   When non-NULL the O(np^2) qr.Q() call is skipped entirely and these
+#'   values are injected directly into the returned object.  Used by the trust-region
+#'   loop to pass a cached copy into candidate evaluations.
+#' @param need_inverse Logical; if FALSE the O(p^3) chol2inv() call
+#'   for inverse_info_beta is skipped (leaving it NULL).  Safe to set
+#'   FALSE for families with fixed dispersion when AS_median & AS_mixed is not used.
 #'
 #' @return A list of class "brglmFit_quantities" containing all computed quantities
 compute_fit <- function(pars, y, x, weights, offset, family, 
                         fixed_totals = NULL, row_totals = NULL, 
                         no_dispersion = FALSE, nobs, nvars, keep,
                         need_qr = TRUE, need_hatvalues = TRUE,
+                        hatvalues_precomputed = NULL,
                         need_inverse = TRUE) {
     
     # Extract Parameters
@@ -73,12 +82,15 @@ compute_fit <- function(pars, y, x, weights, offset, family,
         
         # Information Matrices
         info_beta <- precision * crossprod(R_matrix)
-        # chol2inv is O(p^3) — skip when solver does not need the explicit inverse
+        # chol2inv is O(p^3) - skip when solver does not need the explicit inverse
         inverse_info_beta <- if (need_inverse) dispersion * chol2inv(R_matrix) else NULL
         
-        # Hat Values (only if needed and we have QR)
-        if (need_hatvalues) {
-            Q_matrix <- qr.Q(qr_decomposition) 
+        # Hat Values: use precomputed cache when provided to skip the O(np^2)
+        # qr.Q() call.  Otherwise compute from scratch only if requested.
+        if (!is.null(hatvalues_precomputed)) {
+            hatvalues <- hatvalues_precomputed
+        } else if (need_hatvalues) {
+            Q_matrix  <- qr.Q(qr_decomposition)
             hatvalues <- .rowSums(Q_matrix * Q_matrix, nobs, nvars, TRUE)
         }
     }
