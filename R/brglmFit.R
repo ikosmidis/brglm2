@@ -621,7 +621,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
             iter <- 0L
         } else {
             for (iter in seq.int(control$maxit)) {
-                recomp <- FALSE
+                recomp <- FALSE # flag purely for trace output
 
                 # Preconditioned CG-Steihaug trust-region step 
                 # Minimise  -r_adj' p + 0.5 p' F p  s.t. ||p|| <= Delta
@@ -726,21 +726,50 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                 adjusted_grad_zeta   <- if (no_dispersion) NA_real_ else
                                         with(step_components_zeta, grad + adjustment)
 
-                # dispersion Newton step after accept/reject
+                # dispersion Newton step with step-halving
                 if (!no_dispersion & df_residual > 0 &
                     !step_components_zeta$failed_inversion &
                     !step_components_zeta$failed_adjustment) {
 
                     step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
-                    transformed_dispersion <- transformed_dispersion + step_zeta
-                    dispersion             <- eval(control$inverseTrans)
-                    if (!is.na(dispersion) && dispersion <= 0) {
-                        warning(sprintf("Dispersion became non-positive (%.6g); resetting to small positive value.", dispersion))
-                        dispersion <- .Machine$double.eps
-                        theta <- c(betas, dispersion)
-                        transformed_dispersion <- eval(control$Trans)
+                    td_prev   <- transformed_dispersion
+                    sf        <- 0L
+                    repeat {
+                        td_new <- td_prev + 2^(-sf) * step_zeta
+                        transformed_dispersion <- td_new
+                        d_new  <- eval(control$inverseTrans)
+                        if (is.finite(d_new) && d_new > 0) break
+                        sf <- sf + 1L
+                        if (sf > control$max_step_factor) {
+                            transformed_dispersion <- td_prev
+                            d_new <- eval(control$inverseTrans)
+                            break
+                        }
                     }
-                    theta <- c(betas, dispersion)
+                    # Recupte the fit at the new dispersion value but with the same betas
+                    fit_new <- compute_fit(pars = c(betas, d_new), y = y, x = x,
+                                           weights = weights, offset = offset,
+                                           family = family,
+                                           fixed_totals = fixed_totals,
+                                           row_totals = row_totals,
+                                           no_dispersion = no_dispersion,
+                                           nobs = nobs, nvars = nvars, keep = keep,
+                                           need_qr = FALSE, need_hatvalues = FALSE,
+                                           need_inverse = FALSE)
+
+                    # Rescale dispersion-dependent fields that aren't recomputed in fit_new
+                    # Check these steps for completeness
+                    scale                     <- d_new / dispersion
+                    fit_new$info_beta         <- fit$info_beta         / scale
+                    fit_new$inverse_info_beta <- fit$inverse_info_beta * scale
+                    fit_new$hatvalues         <- fit$hatvalues
+                    fit_new$qr_decomposition  <- fit$qr_decomposition
+                    fit_new$R_matrix          <- fit$R_matrix
+                    fit                       <- fit_new
+                    dispersion                <- d_new
+                    theta                     <- c(betas, dispersion)
+                    step_components_beta      <- compute_step_components(theta, level = 0, fit = fit)
+                    adjusted_grad_beta        <- with(step_components_beta, grad + adjustment)
                 }
 
                 step_zeta_conv <- if (no_dispersion || df_residual < 1 ||
