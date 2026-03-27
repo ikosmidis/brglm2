@@ -563,6 +563,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         names(adjusted_grad_all) <- c(betas_names_all, "Transformed dispersion")
 
         if (is_correction) {
+            ## Needs original fisher scoring implementation to work for correction as this is specific to a single fisher scoring step
             if (control$maxit > 0) control$maxit <- 1
             control$slowit <- 1
             control$max_step_factor <- 1
@@ -604,11 +605,12 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         # trust region parameters (Nocedal & Wright 2006)
         Delta         <- 1.0
         Delta_max     <- 1e10
-        eta_shrink    <- 0.25
-        eta_expand    <- 0.75
+        radius_shrink <- 0.25
+        radius_expand <- 0.75
         shrink_factor <- 0.25
         expand_factor <- 2.0
         cg_maxiter    <- min(nvars, 50)
+        eta           <- 0.1 ## Add to control?
 
         # Attempt infrequent hatvalue updates
         hatvalues_cached <- fit$hatvalues
@@ -636,9 +638,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                 # https://softlib.rice.edu/pub/CRPC-TRs/reports/CRPC-TR94463.pdf
                 gamma <- 0.9; alpha <- 2.0
                 cg_tol_ew <- if (iter == 1) 0.5 else
-                    min(0.5, gamma * (sqrt(r_adj_sq) / r_adj_sq_prev)^alpha)
+                    min(0.5, gamma * (r_adj_sq / r_adj_sq_prev)^alpha)
                 r_adj_sq_prev <- r_adj_sq   # store for next iteration
-                # store only on accept? 
 
                 #cg_tol = 0.1
 
@@ -650,7 +651,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                     maxiter = cg_maxiter)
 
                 # Predicted reduction (||r_adj||^2 objective) 
-                # pred = 0.5(||r_adj||^2 - ||r_adj - F p||^2), F stored as p x p.
+                # pred = 0.5(||r_adj||^2 - ||r_adj + (-F) p||^2), F stored as p x p.
                 r_adj_model    <- adjusted_grad_beta - drop(fit$info_beta %*% step$p) # Matrix free?
                 pred_reduction <- 0.5 * (r_adj_sq - sum(r_adj_model^2))
 
@@ -689,14 +690,14 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                 }
 
                 # adapt radius (Nocedal & Wright Algo 4.1)
-                if (rho < eta_shrink) {
+                if (rho < radius_shrink) {
                     Delta <- shrink_factor * Delta
-                } else if (rho > eta_expand) {
+                } else if (rho > radius_expand) {
                     Delta <- min(expand_factor * Delta, Delta_max)
                 }
 
                 # Accept/reject candidate, 0.1 threshold is fairly loose could be tightened to 0.25
-                if (rho > 0.1) {
+                if (rho > eta) {
                     # Update with candidate 
                     betas <- betas_candidate
                     theta <- theta_candidate
@@ -734,18 +735,18 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                     step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
                     td_prev   <- transformed_dispersion
                     sf        <- 0L
-                    repeat {
+                    
+                    # Main step-halving loop: 
+                    # keep halving the step until we get a positive dispersion 
+                    # value or exceed max_step_factor
+                    while (sf <= control$max_step_factor) {
                         td_new <- td_prev + 2^(-sf) * step_zeta
                         transformed_dispersion <- td_new
                         d_new  <- eval(control$inverseTrans)
                         if (is.finite(d_new) && d_new > 0) break
                         sf <- sf + 1L
-                        if (sf > control$max_step_factor) {
-                            transformed_dispersion <- td_prev
-                            d_new <- eval(control$inverseTrans)
-                            break
-                        }
                     }
+
                     # Recupte the fit at the new dispersion value but with the same betas
                     fit_new <- compute_fit(pars = c(betas, d_new), y = y, x = x,
                                            weights = weights, offset = offset,
