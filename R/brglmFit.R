@@ -354,7 +354,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
     ## Ensure x is a matrix, extract variable names, observation
     ## names, nobs, nvars, and initialize weights and offsets if
     ## needed
-
+    
     x <- as.matrix(x)
     betas_names <- dimnames(x)[[2L]]
     nvars <- ncol(x)
@@ -573,7 +573,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         transformed_dispersion <- eval(control$Trans)
 
         # Determine if we need to compute the inverse of the information matrix for the dispersion parameter
-        needs_inverse <- !no_dispersion || control$type %in% c("AS_median", "AS_mixed")
+        needs_inverse <- !no_dispersion || control$type == "AS_median"
 
         # Avoid unconstrained trust-region steps for dispersion in null/intercept-only models
         # Only update dispersion if model is not empty/null
@@ -653,7 +653,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                 # Predicted reduction (||r_adj||^2 objective) 
                 # pred = 0.5(||r_adj||^2 - ||r_adj + (-F) p||^2), F stored as p x p.
                 r_adj_model    <- adjusted_grad_beta - drop(fit$info_beta %*% step$p) # Matrix free?
-                pred_reduction <- 0.5 * (r_adj_sq - sum(r_adj_model^2))
+                pred_reduction <- (r_adj_sq - sum(r_adj_model^2))
 
                 betas_candidate <- betas + step$p
                 theta_candidate <- c(betas_candidate, dispersion)
@@ -679,7 +679,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                 adj_candidate   <- adjustment_function(theta_candidate, fit = fit_candidate,
                                                        level = 0, x, nobs, nvars, weights)
                 r_adj_candidate <- fit_candidate$grad_beta + adj_candidate
-                actual_reduction <- 0.5 * (r_adj_sq - sum(r_adj_candidate^2))
+                actual_reduction <- (r_adj_sq - sum(r_adj_candidate^2))
 
                 # Reduction ratio (Nocedal & Wright 4.4) 
                 # Avoids numerical issues when pred_reduction is small
@@ -747,7 +747,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                         sf <- sf + 1L
                     }
 
-                    # Recupte the fit at the new dispersion value but with the same betas
+                    # Recompute the fit at the new dispersion value but with the same betas
                     fit_new <- compute_fit(pars = c(betas, d_new), y = y, x = x,
                                            weights = weights, offset = offset,
                                            family = family,

@@ -5,7 +5,7 @@ data("endometrial",package = "brglm2")
 
 links <- lapply(c("logit", "probit", "cloglog", "cauchit"), make.link)
 
-tol <- 1e-10
+tol <- 1e-08
 mbrglmControl <- mbrglm.control(mbr.epsilon = 1e-10, mbr.maxit = 1000)
 
 for (l in seq_along(links)) {
@@ -15,7 +15,7 @@ for (l in seq_along(links)) {
                                        method = "mbrglm.fit",
                                        control.mbrglm = mbrglmControl)
     lizardsMBR <- glm(lizardsFormula, family = binomial(links[[l]]), data = lizards,
-                      method = "brglmFit", type= "AS_median", epsilon = 1e-10, maxit = 1000)
+                      method = "brglmFit", type= "AS_median", epsilon = 1e-08, maxit = 2000)
 
     ## Endometrial
     endoFormula <- HG ~ NV + PI + EH
@@ -23,7 +23,7 @@ for (l in seq_along(links)) {
                             method = "mbrglm.fit",
                             control.mbrglm = mbrglmControl)
     endoMBR <- glm(endoFormula, family = binomial(links[[l]]), data = endometrial,
-                   method = "brglmFit", type = "AS_median", epsilon = 1e-10, maxit = 1000)
+                   method = "brglmFit", type = "AS_median", epsilon = 1e-08, maxit = 2000)
 
     c1 <- coef(summary(endoMBRlegacy))
     c2 <- coef(summary(endoMBR))

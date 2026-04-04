@@ -1,103 +1,83 @@
 # BRGLM2 Benchmarking Suite
 
-Comprehensive performance benchmarking framework for comparing original and optimized versions of the brglm2 R package.
+Benchmarking framework for comparing original and optimised versions of the brglm2 R package.
 
 ## Overview
 
-This suite compares the performance of two versions of brglm2:
-- **Original**: Main branch implementation
-- **New**: Optimized implementation with performance improvements
+The suite compares two versions of brglm2:
+- **Original**: Main branch implementation (reference)
+- **New**: Optimised implementation under development
 
-The benchmarks test across multiple datasets (small, medium, and large) and different fitting methods (brglmFit and mdyplFit).
+Tests cover small, medium, and large datasets using both `brglmFit` and `mdyplFit` methods.
 
-## Repository Structure
+---
+
+## File Structure
+
 ```
 parent-directory/
-├── brglm2/                      # Your working branch 
+├── brglm2/                          # Your working branch
 │   ├── benchmarks/
-│   │   ├── benchmark_readme.md  # You're here (if this wasnt obvious)
-│   │   ├── setup.R              # Configuration and setup
-│   │   ├── check_setup.R        # Validation script
-│   │   ├── main_benchmark.R     # Core benchmarking tests
-│   │   ├── visualize_results.R  # Plot generation
-│   │   ├── run_all.R            # Master execution script
-│   │   └── results/             # Output directory (auto-created)
-│   │       └── YYYYMMDD_HHMMSS/ # Timestamped results
+│   │   ├── benchmark_readme.md      # This file
+│   │   ├── setup.R                  # Config, validation, CPU pinning, utilities
+│   │   ├── main_benchmark.R         # Benchmark tests (sourced by run_all.R)
+│   │   ├── visualize_results.R      # Plot generation (sourced by run_all.R)
+│   │   ├── run_all.R                # Master execution script — run this
+│   │   └── results/                 # Auto-created output directory
+│   │       └── YYYYMMDD_HHMMSS/
 │   │           ├── benchmark_results.txt
 │   │           ├── benchmark_data.RData
 │   │           └── plots/
-│   ├── R/                       # Your source code
+│   ├── R/
 │   ├── tests/
 │   └── ...
 │
-├── brglm2-original/             # Clone of main branch (reference)
-│   └── ...
+├── brglm2-original/                 # Clone of main branch (reference)
 │
-└── benchmark_libs/              # Installed package versions
-    ├── original/
-    │   └── brglm2/              # Compiled original version
-    │       ├── R/
-    │       ├── data/
-    │       ├── libs/
-    │       ├── Meta/
-    │       ├── DESCRIPTION
-    │       └── ...
-    └── new/
-        └── brglm2/              # Compiled optimized version
-            ├── R/
-            ├── data/
-            ├── libs/
-            ├── Meta/
-            ├── DESCRIPTION
-            └── ...
+└── benchmark_libs/
+    ├── original/brglm2/             # Compiled original version
+    └── new/brglm2/                  # Compiled optimised version
 ```
 
-The `benchmark_libs` folder contains **installed (compiled) R packages**. This is essential for dual loading for comparison.
+There is no separate `check_setup.R` — validation is now handled inside `setup.R`.
+
+---
 
 ## Initial Setup
 
-### 1. Directory Structure Setup
+### 1. Directory Structure
 
-Starting from your parent directory (containing all projects):
+From your parent directory:
 
 ```bash
-# Navigate to parent directory
-cd /path/to/parent-directory
+mkdir -p benchmark_libs/original benchmark_libs/new
 
-# If not already present, create benchmark_libs
-mkdir -p benchmark_libs/original
-mkdir -p benchmark_libs/new
-
-# Clone main branch for reference (if not already done)
+# Reference clone of main branch
 git clone <repository-url> brglm2-original
-cd brglm2-original
-git checkout main
-cd ..
+cd brglm2-original && git checkout main && cd ..
 
 # Your working branch (if not already present)
 git clone <repository-url> brglm2
-cd brglm2
-git checkout -b benchmark-testing  # or your optimization branch
-
-# Create results directory
-mkdir -p benchmarks/results
+cd brglm2 && git checkout -b your-optimisation-branch
 ```
 
-### 2. Install Package Versions to `benchmark_libs`
-
-From the parent directory:
+### 2. Install Both Package Versions
 
 ```bash
-# Install original version from main branch clone
+# Install original (reference) version
 cd brglm2-original
 R CMD INSTALL . --library=../benchmark_libs/original
+# or
+Rscript -e "install.packages('.', repos=NULL, type='source', lib='../benchmark_libs/new')"
 
-# Install new version from your working branch
+# Install new (optimised) version
 cd ../brglm2
 R CMD INSTALL . --library=../benchmark_libs/new
+# or
+Rscript -e "install.packages('.', repos=NULL, type='source', lib='../benchmark_libs/new')"
 ```
 
-**Important**: After making changes to your optimized code, reinstall to `benchmark_libs/new`:
+After any code change, reinstall the new version before re-running benchmarks:
 
 ```bash
 cd brglm2
@@ -106,279 +86,161 @@ R CMD INSTALL . --library=../benchmark_libs/new
 
 ### 3. Configure Paths
 
-Edit `brglm2/benchmarks/setup.R` to point to the correct locations.
-
-**If running from `brglm2/` directory** (recommended), use relative paths:
+Open `benchmarks/setup.R` and update the two path variables at the top:
 
 ```r
-# Paths relative to brglm2/ directory
-LIB_ORIGINAL <- "../benchmark_libs/original"
-LIB_NEW <- "../benchmark_libs/new"
+LIB_ORIGINAL <- "../benchmark_libs/original"   # relative to brglm2/
+LIB_NEW      <- "../benchmark_libs/new"
 ```
 
-**Or use absolute paths**:
+Absolute paths also work if you prefer:
 
 ```r
-# Example absolute paths (adjust for your system)
 LIB_ORIGINAL <- "C:/path/to/parent-directory/benchmark_libs/original"
-LIB_NEW <- "C:/path/to/parent-directory/benchmark_libs/new"
-```
-
-Also update the package path in `brglm2/benchmarks/check_setup.R`:
-
-```r
-# Absolute path to your working brglm2 source
-pkg_path <- "C:/path/to/parent-directory/brglm2"
+LIB_NEW      <- "C:/path/to/parent-directory/benchmark_libs/new"
 ```
 
 ### 4. Install Required R Packages
 
 ```r
-install.packages(c("tictoc", "rbenchmark", "microbenchmark", 
-                   "ggplot2", "tinytest"))
+install.packages(c("microbenchmark", "bench", "ggplot2", "tinytest"))
 ```
 
-### 5. Verify Setup
+Note: `tictoc` and `rbenchmark` are no longer used.
 
-From the `brglm2/` directory:
-
-```r
-setwd("C:/path/to/parent-directory/brglm2")  # Set working directory
-source("benchmarks/check_setup.R")
-```
-
-This will verify:
-- R version compatibility
-- Required packages installed
-- Library paths exist and contain brglm2
-- Test datasets accessible
-- Results directory structure
+---
 
 ## Running Benchmarks
 
-### Quick Start
-
-**From the `brglm2/` directory** (your working branch):
+### Option A: From the R Terminal (Easiest)
+If you are already inside an R session (like RStudio or the R GUI), you can run the suite by manually setting the "Pinned" flag to bypass the auto-relaunch logic. Note that this runs without CPU pinning (slightly higher timing variance).
 
 ```r
-# Set working directory (if not already there)
-setwd("C:/path/to/parent-directory/brglm2")
-
-# Run complete benchmark suite
+setwd("C:/path/to/brglm2")
+Sys.setenv(BRGLM2_PINNED = "1")
 source("benchmarks/run_all.R")
 ```
 
-This executes:
-1. Setup validation
-2. Test suite execution (both versions)
-3. Microbenchmark comparisons (100 evaluations)
-4. Large dataset tests
-5. MDYPL method comparison
-6. Visualization generation
+### Option B: From PowerShell (Recommended for Accuracy)
+To get the benefit of CPU pinning while ensuring your keyboard input (the `y/n` prompt) works correctly, use this two-step approach in your PowerShell terminal:
 
-Expected runtime: ~5 minutes (default settings)
+```powershell
+# 1. Set the environment variable so setup.R doesn't try to relaunch
+$env:BRGLM2_PINNED="1"
 
-### Individual Components
-
-Run specific benchmark sections:
-
-```r
-# Setup and configuration
-source("benchmarks/setup.R")
-
-# Main benchmarks only
-source("benchmarks/main_benchmark.R")
-
-# Generate plots from existing results
-source("benchmarks/visualize_results.R")
+# 2. Run the script directly
+Rscript.exe benchmarks\run_all.R
 ```
 
-### Workflow After Code Changes
+### Option C: Manual Pinning (CMD / Batch)
+If you are using a standard Windows Command Prompt (not PowerShell), use the `start` command:
 
-When you modify your optimized code:
-
-```bash
-# 1. Reinstall the new version
-cd /path/to/parent-directory/brglm2
-R CMD INSTALL . --library=../benchmark_libs/new
-
-# 2. Re-run benchmarks
-# In R:
-setwd("C:/path/to/parent-directory/brglm2")
-source("benchmarks/run_all.R")
+```bat
+set BRGLM2_PINNED=1
+start /AFFINITY 1 /B /WAIT Rscript.exe benchmarks\run_all.R
 ```
+*Note: If you try this in PowerShell, you must wrap it: `cmd.exe /c "..."`*
+
+---
+
 
 ## Benchmark Components
 
-### 1. Test Suite Validation
-- Runs complete tinytest suite for both versions
-- Verifies numerical correctness
-- Reports pass/fail rates and execution time
+### Sections in `main_benchmark.R`
 
-### 2. Microbenchmark Tests
+| Section | Dataset | Method | Tool | Iterations |
+|---------|---------|--------|------|------------|
+| 1 | — | tinytest suite | — | — |
+| 2 | Lizards (n=409) | brglmFit / binomial | `microbenchmark` | 500 |
+| 3 | Endometrial (n=79) | brglmFit / probit | `microbenchmark` | 250 |
+| 4 | MultipleFeatures (n=2000, p=432) | brglmFit | `bench::mark` | 30 |
+| 5 | MultipleFeatures (n=2000, p=432) | mdyplFit | `bench::mark` | 30 |
 
-#### Small Dataset (Lizards)
-- Dataset: 409 observations, binomial GLM
-- Default: 100 evaluations
-- Tests: brglmFit method
+All sections interleave `original` and `new` evaluations automatically. Sections 4 and 5 previously ran all original reps then all new reps, which was the main cause of inconsistent speedup estimates.
 
-#### Medium Dataset (Endometrial)
-- Dataset: 79 observations, probit link
-- Default: 50 evaluations
-- Tests: brglmFit method
+### Why Sections 4 & 5 Use `bench::mark` Instead of `microbenchmark`
 
-### 3. Large Dataset Tests
+`bench::mark` runs a gc() before each iteration and interleaves expressions by default, both of which `microbenchmark` does not do. For long-running fits (seconds each), this produces noticeably more stable medians. It also reports memory allocation and gc counts, which is useful for diagnosing regressions.
 
-#### MultipleFeatures Dataset
-- Dataset: 2000 observations, 432 features
-- High-dimensional classification problem
-- Single timing test (computationally intensive)
-- Tests: brglmFit and mdyplFit methods
+### Speedup Reporting
 
-### 4. Visualizations
+All speedup factors are reported with a 95% confidence interval derived from the Q25/Q75 ratio bounds, not just a single median ratio. A result like `1.8× (CI: 1.6–2.0×)` tells you the improvement is consistent; a wide CI like `1.8× (CI: 0.9–3.2×)` means you need more iterations.
 
-Generated plots:
-- `01_lizards_comparison.png` - Boxplot comparison
-- `02_endometrial_comparison.png` - Boxplot comparison
-- `03_speedup_summary.png` - Speedup factor bar chart
-- `04_absolute_timing.png` - Absolute execution times
-- `05_lizards_distribution.png` - Distribution densities
+---
 
-## Increasing Evaluation Counts
+## Adjusting Iteration Counts
 
-To improve consistency and reduce variability:
-
-### In `main_benchmark.R`
-
-**Lizards microbenchmark** (Line ~68):
-```r
-lizards_bench <- microbenchmark(
-  # ... 
-  times = 1000,  # Change to increase/decrease test numbers
-  unit = "s"
-)
-```
-
-**Endometrial microbenchmark** (Line ~91):
-```r
-endo_bench <- microbenchmark(
-  # ...
-  times = 500,  # Change to increase/decrease test numbers
-  unit = "s"
-)
-```
-
-**MultipleFeatures tests** (Lines ~138-162):
-For more robust timing on large datasets, increase replications.
+Edit these values in `main_benchmark.R`:
 
 ```r
-time_mf_orig <- system.time({
-  replicate(5, {  # Change from 5 replications
-    fit_mf_orig <- glm(full_mf_fm, data = MultipleFeatures, 
-                       family = binomial(),
-                       method = brglm2_original, 
-                       subset = training, 
-                       maxit = 200)
-  })
-})
+# Section 2 — Lizards
+times = 500          # change for faster/slower runs
 
-# Divide elapsed time by number of replications for average
-cat("Average time per run:", time_mf_orig["elapsed"] / 5, "s\n")
+# Section 3 — Endometrial
+times = 250
+
+# Section 4 — MultipleFeatures brglmFit
+iterations = 30      # bench::mark parameter
+
+# Section 5 — MultipleFeatures mdyplFit
+iterations = 30
 ```
 
-**MDYPL tests** (Lines ~195-221):
-Similarly change replications:
+Rough runtime guide:
 
-```r
-time_mdypl_orig <- system.time({
-  replicate(5, {  # Change from 5 replications
-    fit_mdypl_orig <- glm(full_mf_fm, data = MultipleFeatures,
-                          family = binomial(),
-                          method = mdypl_original,
-                          alpha = alpha_val,
-                          subset = training,
-                          maxit = 200)
-  })
-})
-```
+| Config | Approx. runtime |
+|--------|----------------|
+| Default (as shipped) | ~10–15 min |
+| Lizards 100, Endo 50, Large 10 | ~3–5 min |
+| Lizards 1000, Endo 500, Large 50 | ~30–45 min |
 
-### Recommended Settings for 10-Minute Runtime
+---
 
-```r
-# Microbenchmarks
-lizards:     times = 400 
-endometrial: times = 200  
+## Outputs
 
-# Large dataset tests
-MultipleFeatures (brglmFit): replicate(5, ...) 
-MDYPL:                       replicate(5, ...) 
-```
-
-## Output Files
-
-### Results Directory Structure
-
-Each run creates a timestamped directory:
+Each run creates a timestamped directory under `benchmarks/results/`:
 
 ```
 benchmarks/results/YYYYMMDD_HHMMSS/
-├── benchmark_results.txt      # Complete text output
-├── benchmark_data.RData       # R objects for plotting
+├── benchmark_results.txt            # Full console output
+├── benchmark_data.RData             # R objects (reload for re-plotting)
 └── plots/
     ├── 01_lizards_comparison.png
     ├── 02_endometrial_comparison.png
-    ├── 03_speedup_summary.png
-    ├── 04_absolute_timing.png
-    └── 05_lizards_distribution.png
+    ├── 03_mf_brglmfit_comparison.png
+    ├── 04_mf_mdyplfit_comparison.png
+    ├── 05_speedup_summary.png
+    └── 06_lizards_distribution.png
 ```
 
-### Key Metrics Reported
+To regenerate plots from a previous run without re-running benchmarks:
 
-- **Speedup factors**: New vs Original execution time ratios
-- **Absolute timings**: Median/mean execution times
-- **Test results**: Pass/fail counts for validation
-- **Numerical accuracy**: Coefficient and deviance comparisons
+```r
+setwd("C:/path/to/brglm2")
+source("benchmarks/setup.R")        # sets results_dir to new timestamp — override if needed:
+# results_dir <- "benchmarks/results/20250101_120000"
+source("benchmarks/visualize_results.R")
+```
+
+---
 
 ## Troubleshooting
 
-### Common Issues
+| Error | Fix |
+|-------|-----|
+| `Original library path does not exist` | Update `LIB_ORIGINAL` in `setup.R` |
+| `brglm2 not found in original library` | Run `R CMD INSTALL . --library=../benchmark_libs/original` from `brglm2-original/` |
+| `__RELAUNCHED__` error in console | Normal — this is the CPU-pinning re-launch. The real run continues in the new process. |
+| Plots fail | Check `benchmark_data.RData` exists; verify `ggplot2` is installed |
+| Wide CI / high variance | Increase iteration counts; use the manual CPU-pinning command (Option B above) |
 
-**"Original library path does not exist"**
-- Update `LIB_ORIGINAL` in `benchmarks/setup.R`
-- Ensure brglm2 is installed: `R CMD INSTALL . --library=path/to/original`
-
-**"brglm2 package NOT found"**
-- Reinstall packages in both library locations
-- Verify installation: `library(brglm2, lib.loc="path/to/lib")`
-
-**"Package directory does NOT exist"**
-- Update `pkg_path` in `benchmarks/check_setup.R` and `main_benchmark.R`
-- Ensure you're running from project root
-
-**Plots fail to generate**
-- Check that `benchmark_data.RData` was created
-- Verify ggplot2 is installed
-- Review error messages in console output
-
-### Verifying Results
-
-Successful benchmarks should show:
-- All tests passing (or matching pass rate between versions)
-- Speedup factors > 1.0 (new faster than original)
-- Numerical accuracy: coefficient differences < 1e-10
-
-## Notes
-
-- The test suite execution times are included in overall speedup metrics
-- Large dataset tests use single evaluations due to computational cost
-- All visualizations use consistent color scheme: Red (original), Green (new)
-- Benchmark data is saved for regenerating plots without re-running tests
+---
 
 ## Citations
 
-- Kosmidis, I., & Firth, D. (2021). Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models. *Biometrika*, 108(1), 71-82.
+- Kosmidis, I., & Firth, D. (2021). Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models. *Biometrika*, 108(1), 71–82.
 - Sterzinger, P., & Kosmidis, I. (2024). An iteratively reweighted least squares algorithm for the maximum Diaconis-Ylvisaker prior penalized likelihood in binomial-response generalized linear models.
 
 ## License
 
-Same as parent brglm2 package.
+Same as the parent brglm2 package.

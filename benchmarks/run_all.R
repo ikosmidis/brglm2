@@ -1,66 +1,66 @@
-# Master script to run all benchmarks
-# This script runs the complete benchmarking suite and generates visualizations
+# =============================================================================
+# run_all.R
+# Master execution script for the brglm2 benchmark suite.
+# Run this from the brglm2/ working directory:
+#
+#   setwd("C:/path/to/brglm2")
+#   source("benchmarks/run_all.R")
+#
+# Or from a terminal (recommended for CPU pinning):
+#   set BRGLM2_PINNED=1
+#   start /AFFINITY 1 /B /WAIT Rscript.exe benchmarks\run_all.R
+# =============================================================================
 
-cat("======================================================================\n")
+cat(strrep("=", 70), "\n")
 cat("BRGLM2 COMPREHENSIVE BENCHMARK SUITE\n")
-cat("======================================================================\n\n")
+cat(strrep("=", 70), "\n\n")
 
 cat("This will run:\n")
-cat("  1. Test suite validation\n")
-cat("  2. Microbenchmark comparisons (small & medium datasets)\n")
-cat("  3. Large dataset tests (MultipleFeatures)\n")
-cat("  4. MDYPL method comparison\n")
-cat("  5. Visualization generation\n\n")
-
-cat("Expected runtime: ~ 5 minutes depending on system\n\n")
+cat("  1. Setup verification\n")
+cat("  2. tinytest suite validation\n")
+cat("  3. Microbenchmarks: Lizards (500 iters) & Endometrial (250 iters)\n")
+cat("  4. Large dataset: MultipleFeatures brglmFit  (30 iters, interleaved)\n")
+cat("  5. Large dataset: MultipleFeatures mdyplFit  (30 iters, interleaved)\n")
+cat("  6. Visualisation generation\n\n")
+cat("Expected runtime: ~10-15 minutes\n\n")
 
 response <- readline(prompt = "Continue? (y/n): ")
-
-if (tolower(response) != "y") {
+if (tolower(trimws(response)) != "y") {
   cat("Benchmark cancelled.\n")
-  quit(save = "no")
+  stop("Cancelled by user.", call. = FALSE)
 }
 
-cat("\n======================================================================\n")
-cat("PHASE 1: Running validation and setup\n")
-cat("======================================================================\n\n")
-
-# Verify and Setup
-source("benchmarks/check_setup.R")
+# ---- Phase 1: Setup --------------------------------------------------------
+cat("\n--- Phase 1: Setup & Verification ---\n\n")
 source("benchmarks/setup.R")
 
-cat("\n======================================================================\n")
-cat("PHASE 2: Running main benchmark script\n")
-cat("======================================================================\n\n")
-
-# Run main benchmark
-start_time <- Sys.time()
+# ---- Phase 2: Benchmarks ---------------------------------------------------
+cat("\n--- Phase 2: Running Benchmarks ---\n\n")
+suite_start <- Sys.time()
 source("benchmarks/main_benchmark.R")
-end_time <- Sys.time()
+suite_end <- Sys.time()
 
-cat("\n======================================================================\n")
-cat("PHASE 3: Generating visualizations\n")
-cat("======================================================================\n\n")
-
-# Generate plots
+# ---- Phase 3: Visualisations -----------------------------------------------
+cat("\n--- Phase 3: Generating Visualisations ---\n\n")
 source("benchmarks/visualize_results.R")
 
-cat("\n======================================================================\n")
+# ---- Summary ---------------------------------------------------------------
+cat("\n", strrep("=", 70), "\n")
 cat("BENCHMARK SUITE COMPLETE\n")
-cat("======================================================================\n\n")
+cat(strrep("=", 70), "\n\n")
 
-cat("Total runtime:", format(difftime(end_time, start_time)), "\n")
-cat("Results directory:", file.path("benchmarks", "results"), "\n\n")
+cat("Total benchmark runtime:", format(difftime(suite_end, suite_start)), "\n")
+cat("Results saved to:       ", results_dir, "\n\n")
 
-cat("Summary of benchmarks:\n")
-results_dir <- file.path("benchmarks", "results")
-dirs <- list.dirs(results_dir, recursive = FALSE)
-latest_dir <- dirs[which.max(file.info(dirs)$mtime)]
-load(file.path(latest_dir, "benchmark_data.RData"))
+# Load the saved speedups and print a clean table
+load(file.path(results_dir, "benchmark_data.RData"))
 
-speedups <- c("Test suite" = orig_results$elapsed / new_results$elapsed, speedups)
-
-for (i in seq_along(speedups)) {
-  cat(sprintf("  %-30s: %.2fx faster\n", names(speedups)[i], speedups[i]))
+cat("Speedup summary:\n")
+cat(sprintf("  %-35s %s\n", "Test", "Speedup"))
+cat("  ", strrep("-", 45), "\n")
+for (nm in names(speedups)) {
+  cat(sprintf("  %-35s %.2fx\n", nm, speedups[[nm]]))
 }
-cat(sprintf("  %-30s: %.2fx faster\n", "Average", mean(speedups)))
+cat("  ", strrep("-", 45), "\n")
+cat(sprintf("  %-35s %.2fx\n", "Mean", mean(unlist(speedups))))
+cat("\n")

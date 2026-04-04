@@ -1,209 +1,172 @@
-# Fixed Benchmark Visualization Script
-# This version properly handles the benchmark data structure
+# =============================================================================
+# visualize_results.R
+# Generates plots from the most recent benchmark run.
+# Can be sourced standalone to regenerate plots without re-running benchmarks:
+#
+#   source("benchmarks/setup.R")     # sets results_dir to latest automatically
+#   source("benchmarks/visualize_results.R")
+# =============================================================================
 
 library(ggplot2)
-library(microbenchmark)
 
-# Find the most recent results directory
-results_base <- "benchmarks/results"
-dirs <- list.dirs(results_base, recursive = FALSE)
-latest_dir <- dirs[which.max(file.info(dirs)$mtime)]
+# If sourced standalone, pick the most recent results folder
+if (!exists("results_dir")) {
+  dirs       <- list.dirs("benchmarks/results", recursive = FALSE)
+  results_dir <- dirs[which.max(file.info(dirs)$mtime)]
+  cat("Auto-detected latest results:", results_dir, "\n\n")
+  load(file.path(results_dir, "benchmark_data.RData"))
+} else if (!exists("lizards_bench")) {
+  load(file.path(results_dir, "benchmark_data.RData"))
+}
 
-cat("Loading benchmark data from:", latest_dir, "\n")
-
-# Load the benchmark data
-load(file.path(latest_dir, "benchmark_data.RData"))
-
-# Create plots directory
-plots_dir <- file.path(latest_dir, "plots")
+plots_dir <- file.path(results_dir, "plots")
 dir.create(plots_dir, showWarnings = FALSE)
 
-cat("\n=== Checking loaded data ===\n")
-cat("lizards_bench dimensions:", nrow(lizards_bench), "rows\n")
-cat("endo_bench dimensions:", nrow(endo_bench), "rows\n")
-cat("Speedups vector:", names(speedups), "\n")
-cat("Speedup values:", speedups, "\n\n")
+theme_bench <- theme_minimal(base_size = 12) +
+  theme(legend.position = "none",
+        plot.subtitle = element_text(size = 10, color = "grey40"))
 
-# ====== Plot 1: Microbenchmark comparison (Lizards) ======
-cat("Creating Plot 1: Lizards comparison...\n")
-tryCatch({
-  png(file.path(plots_dir, "01_lizards_comparison.png"), 
-      width = 800, height = 600, res = 100)
-  
-  # Manual boxplot approach (more reliable than autoplot)
-  lizards_df <- data.frame(
-    time_seconds = lizards_bench$time / 1e9,
-    version = lizards_bench$expr
+version_colours <- c("original" = "#E41A1C", "new" = "#4DAF4A")
+
+# Helper: extract bench::mark timings into a tidy data frame (nanoseconds -> s)
+bench_to_df <- function(bench_obj) {
+  data.frame(
+    time_s  = c(as.numeric(bench_obj$time[[1]]) / 1e9,
+                as.numeric(bench_obj$time[[2]]) / 1e9),
+    version = factor(c(rep("original", length(bench_obj$time[[1]])),
+                       rep("new",      length(bench_obj$time[[2]]))),
+                     levels = c("original", "new"))
   )
-  
-  p1 <- ggplot(lizards_df, aes(x = version, y = time_seconds, fill = version)) +
-    geom_boxplot() +
-    labs(title = "Lizards Dataset: Original vs New Implementation",
-         subtitle = "100 evaluations each",
-         x = "Version",
-         y = "Time (seconds)") +
-    scale_fill_manual(values = c("original" = "#E41A1C", "new" = "#4DAF4A")) +
-    theme_minimal(base_size = 12) +
-    theme(legend.position = "none")
-  
-  print(p1)
-  dev.off()
-  cat("Plot 1 saved\n")
-}, error = function(e) {
-  cat("Error in Plot 1:", conditionMessage(e), "\n")
-  dev.off()
-})
+}
 
-# ====== Plot 2: Microbenchmark comparison (Endometrial) ======
-cat("Creating Plot 2: Endometrial comparison...\n")
-tryCatch({
-  png(file.path(plots_dir, "02_endometrial_comparison.png"), 
-      width = 800, height = 600, res = 100)
-  
-  endo_df <- data.frame(
-    time_seconds = endo_bench$time / 1e9,
-    version = endo_bench$expr
+# Helper: extract microbenchmark timings into a tidy data frame
+mb_to_df <- function(mb_obj) {
+  data.frame(
+    time_s  = mb_obj$time / 1e9,
+    version = factor(mb_obj$expr, levels = c("original", "new"))
   )
-  
-  p2 <- ggplot(endo_df, aes(x = version, y = time_seconds, fill = version)) +
-    geom_boxplot() +
-    labs(title = "Endometrial Dataset: Original vs New Implementation",
-         subtitle = "50 evaluations each",
-         x = "Version",
-         y = "Time (seconds)") +
-    scale_fill_manual(values = c("original" = "#E41A1C", "new" = "#4DAF4A")) +
-    theme_minimal(base_size = 12) +
-    theme(legend.position = "none")
-  
-  print(p2)
-  dev.off()
-  cat("Plot 2 saved\n")
-}, error = function(e) {
-  cat("Error in Plot 2:", conditionMessage(e), "\n")
-  dev.off()
-})
+}
 
-# ====== Plot 3: Speedup summary bar chart ======
-cat("Creating Plot 3: Speedup summary...\n")
+# ====== Plot 1: Lizards boxplot ======
+cat("Plot 1: Lizards comparison...\n")
 tryCatch({
-  # Clean up speedup names if they have .elapsed suffix
+  df <- mb_to_df(lizards_bench)
+  n  <- nrow(lizards_bench) / 2
+  p  <- ggplot(df, aes(x = version, y = time_s, fill = version)) +
+    geom_boxplot(outlier.size = 0.8, outlier.alpha = 0.4) +
+    scale_fill_manual(values = version_colours) +
+    labs(title    = "Lizards Dataset: Original vs New",
+         subtitle = paste0(n, " evaluations each (interleaved)"),
+         x = NULL, y = "Time (seconds)") +
+    theme_bench
+  ggsave(file.path(plots_dir, "01_lizards_comparison.png"), p,
+         width = 7, height = 5, dpi = 120)
+  cat("  Saved.\n")
+}, error = function(e) cat("  Error:", conditionMessage(e), "\n"))
+
+# ====== Plot 2: Endometrial boxplot ======
+cat("Plot 2: Endometrial comparison...\n")
+tryCatch({
+  df <- mb_to_df(endo_bench)
+  n  <- nrow(endo_bench) / 2
+  p  <- ggplot(df, aes(x = version, y = time_s, fill = version)) +
+    geom_boxplot(outlier.size = 0.8, outlier.alpha = 0.4) +
+    scale_fill_manual(values = version_colours) +
+    labs(title    = "Endometrial Dataset: Original vs New",
+         subtitle = paste0(n, " evaluations each (interleaved)"),
+         x = NULL, y = "Time (seconds)") +
+    theme_bench
+  ggsave(file.path(plots_dir, "02_endometrial_comparison.png"), p,
+         width = 7, height = 5, dpi = 120)
+  cat("  Saved.\n")
+}, error = function(e) cat("  Error:", conditionMessage(e), "\n"))
+
+# ====== Plot 3: MultipleFeatures brglmFit boxplot ======
+cat("Plot 3: MultipleFeatures (brglmFit) comparison...\n")
+tryCatch({
+  df <- bench_to_df(mf_bench)
+  n  <- length(mf_bench$time[[1]])
+  p  <- ggplot(df, aes(x = version, y = time_s, fill = version)) +
+    geom_boxplot(outlier.size = 0.8, outlier.alpha = 0.4) +
+    scale_fill_manual(values = version_colours) +
+    labs(title    = "MultipleFeatures (brglmFit): Original vs New",
+         subtitle = paste0(n, " iterations each (interleaved via bench::mark)"),
+         x = NULL, y = "Time (seconds)") +
+    theme_bench
+  ggsave(file.path(plots_dir, "03_mf_brglmfit_comparison.png"), p,
+         width = 7, height = 5, dpi = 120)
+  cat("  Saved.\n")
+}, error = function(e) cat("  Error:", conditionMessage(e), "\n"))
+
+# ====== Plot 4: MultipleFeatures mdyplFit boxplot ======
+cat("Plot 4: MultipleFeatures (mdyplFit) comparison...\n")
+tryCatch({
+  df <- bench_to_df(mdypl_bench)
+  n  <- length(mdypl_bench$time[[1]])
+  p  <- ggplot(df, aes(x = version, y = time_s, fill = version)) +
+    geom_boxplot(outlier.size = 0.8, outlier.alpha = 0.4) +
+    scale_fill_manual(values = version_colours) +
+    labs(title    = "MultipleFeatures (mdyplFit): Original vs New",
+         subtitle = paste0(n, " iterations each (interleaved via bench::mark)"),
+         x = NULL, y = "Time (seconds)") +
+    theme_bench
+  ggsave(file.path(plots_dir, "04_mf_mdyplfit_comparison.png"), p,
+         width = 7, height = 5, dpi = 120)
+  cat("  Saved.\n")
+}, error = function(e) cat("  Error:", conditionMessage(e), "\n"))
+
+# ====== Plot 5: Speedup summary bar chart ======
+cat("Plot 5: Speedup summary...\n")
+tryCatch({
   clean_names <- gsub("\\.elapsed$", "", names(speedups))
-  
-  speedup_df <- data.frame(
-    Test = factor(clean_names, levels = clean_names),
+  speedup_df  <- data.frame(
+    Test    = factor(clean_names, levels = clean_names),
     Speedup = as.numeric(speedups),
-    Category = c("Small", "Medium", "Large", "Large (MDYPL)")
+    Size    = c("Small", "Medium", "Large", "Large")
   )
-  
-  png(file.path(plots_dir, "03_speedup_summary.png"), 
-      width = 800, height = 600, res = 100)
-  
-  p3 <- ggplot(speedup_df, aes(x = Test, y = Speedup, fill = Category)) +
-    geom_bar(stat = "identity", width = 0.7) +
-    geom_text(aes(label = sprintf("%.2fx", Speedup)), 
-              vjust = -0.5, size = 4) +
-    geom_hline(yintercept = 1, linetype = "dashed", color = "red", size = 0.8) +
-    labs(title = "Performance Improvement: New vs Original Implementation",
-         subtitle = "Higher is better (baseline = 1.0)",
-         x = "Test Case",
-         y = "Speedup Factor") +
+  p <- ggplot(speedup_df, aes(x = Test, y = Speedup, fill = Size)) +
+    geom_col(width = 0.65) +
+    geom_text(aes(label = sprintf("%.2fx", Speedup)), vjust = -0.4, size = 3.5) +
+    geom_hline(yintercept = 1, linetype = "dashed", colour = "red", linewidth = 0.7) +
     scale_fill_brewer(palette = "Set2") +
-    ylim(0, max(speedup_df$Speedup) * 1.15) +
+    ylim(0, max(speedup_df$Speedup) * 1.18) +
+    labs(title    = "Speedup: New vs Original",
+         subtitle = "Dashed line = no improvement (1.0×).  Higher is better.",
+         x = NULL, y = "Speedup factor") +
     theme_minimal(base_size = 12) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+    theme(axis.text.x = element_text(angle = 35, hjust = 1),
           legend.position = "top")
-  
-  print(p3)
-  dev.off()
-  cat("Plot 3 saved\n")
-}, error = function(e) {
-  cat("Error in Plot 3:", conditionMessage(e), "\n")
-  dev.off()
-})
+  ggsave(file.path(plots_dir, "05_speedup_summary.png"), p,
+         width = 8, height = 5, dpi = 120)
+  cat("  Saved.\n")
+}, error = function(e) cat("  Error:", conditionMessage(e), "\n"))
 
-# ====== Plot 4: Absolute timing comparison ======
-cat("Creating Plot 4: Absolute timing...\n")
+# ====== Plot 6: Lizards density ======
+cat("Plot 6: Lizards distribution...\n")
 tryCatch({
-  timing_df <- data.frame(
-    Test = rep(c("Lizards", "Endometrial", "MultipleFeatures", "MDYPL"), each = 2),
-    Version = rep(c("Original", "New"), 4),
-    Time = c(
-      median(lizards_bench$time[lizards_bench$expr == "original"]) / 1e9,
-      median(lizards_bench$time[lizards_bench$expr == "new"]) / 1e9,
-      median(endo_bench$time[endo_bench$expr == "original"]) / 1e9,
-      median(endo_bench$time[endo_bench$expr == "new"]) / 1e9,
-      as.numeric(time_mf_orig["elapsed"]),
-      as.numeric(time_mf_new["elapsed"]),
-      as.numeric(time_mdypl_orig["elapsed"]),
-      as.numeric(time_mdypl_new["elapsed"])
-    )
-  )
-  
-  png(file.path(plots_dir, "04_absolute_timing.png"), 
-      width = 800, height = 600, res = 100)
-  
-  p4 <- ggplot(timing_df, aes(x = Test, y = Time, fill = Version)) +
-    geom_bar(stat = "identity", position = "dodge", width = 0.7) +
-    geom_text(aes(label = sprintf("%.3fs", Time)), 
-              position = position_dodge(width = 0.7),
-              vjust = -0.5, size = 3) +
-    labs(title = "Absolute Execution Time Comparison",
-         subtitle = "Lower is better",
-         x = "Test Case",
-         y = "Time (seconds)") +
-    scale_fill_manual(values = c("Original" = "#E41A1C", "New" = "#4DAF4A")) +
-    theme_minimal(base_size = 12) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1),
-          legend.position = "top")
-  
-  print(p4)
-  dev.off()
-  cat("Plot 4 saved\n")
-}, error = function(e) {
-  cat("Error in Plot 4:", conditionMessage(e), "\n")
-  dev.off()
-})
-
-# ====== Plot 5: Distribution comparison (Lizards) ======
-cat("Creating Plot 5: Lizards distribution...\n")
-tryCatch({
-  lizards_df <- data.frame(
-    Time = lizards_bench$time / 1e9,
-    Version = lizards_bench$expr
-  )
-  
-  medians <- aggregate(Time ~ Version, lizards_df, median)
-  
-  png(file.path(plots_dir, "05_lizards_distribution.png"), 
-      width = 800, height = 600, res = 100)
-  
-  p5 <- ggplot(lizards_df, aes(x = Time, fill = Version)) +
-    geom_density(alpha = 0.6) +
-    geom_vline(data = medians,
-               aes(xintercept = Time, color = Version),
-               linetype = "dashed", size = 1) +
-    labs(title = "Execution Time Distribution: Lizards Dataset",
-         subtitle = "Dashed lines show median values",
-         x = "Time (seconds)",
-         y = "Density") +
-    scale_fill_manual(values = c("original" = "#E41A1C", "new" = "#4DAF4A")) +
-    scale_color_manual(values = c("original" = "#E41A1C", "new" = "#4DAF4A")) +
+  df      <- mb_to_df(lizards_bench)
+  medians <- aggregate(time_s ~ version, df, median)
+  p <- ggplot(df, aes(x = time_s, fill = version)) +
+    geom_density(alpha = 0.55) +
+    geom_vline(data = medians, aes(xintercept = time_s, colour = version),
+               linetype = "dashed", linewidth = 0.9) +
+    scale_fill_manual(values   = version_colours) +
+    scale_colour_manual(values = version_colours) +
+    labs(title    = "Execution Time Distribution — Lizards",
+         subtitle = "Dashed lines = medians",
+         x = "Time (seconds)", y = "Density") +
     theme_minimal(base_size = 12) +
     theme(legend.position = "top")
-  
-  print(p5)
-  dev.off()
-  cat("Plot 5 saved\n")
-}, error = function(e) {
-  cat("Error in Plot 5:", conditionMessage(e), "\n")
-  dev.off()
-})
+  ggsave(file.path(plots_dir, "06_lizards_distribution.png"), p,
+         width = 7, height = 5, dpi = 120)
+  cat("  Saved.\n")
+}, error = function(e) cat("  Error:", conditionMessage(e), "\n"))
 
-cat("\n=== Visualization Complete ===\n")
-cat("All plots saved to:", plots_dir, "\n\n")
-cat("Generated files:\n")
-cat("  01_lizards_comparison.png - Boxplot comparison\n")
-cat("  02_endometrial_comparison.png - Boxplot comparison\n")
-cat("  03_speedup_summary.png - Speedup bar chart\n")
-cat("  04_absolute_timing.png - Absolute time comparison\n")
-cat("  05_lizards_distribution.png - Distribution densities\n")
+cat("\nAll plots saved to:", plots_dir, "\n\n")
+cat("Files generated:\n")
+cat("  01_lizards_comparison.png\n")
+cat("  02_endometrial_comparison.png\n")
+cat("  03_mf_brglmfit_comparison.png\n")
+cat("  04_mf_mdyplfit_comparison.png\n")
+cat("  05_speedup_summary.png\n")
+cat("  06_lizards_distribution.png\n")
