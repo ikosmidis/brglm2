@@ -316,7 +316,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
     adjustment_function <- switch(control$type,
         "correction"   = AS_mean_adjustment,
         "AS_mean"      = AS_mean_adjustment,
-        "AS_median"    = AS_median_adjustment,
+        "AS_median"    = AS_median_adjustment_new,
         "AS_mixed"     = AS_mixed_adjustment,
         "MPL_Jeffreys" = AS_Jeffreys_adjustment,
         "ML"           = function(pars, ...) 0)
@@ -351,11 +351,14 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         }
     }
 
-    ## Ensure x is a matrix, extract variable names, observation
+    ## Ensure x is a matrix (or sparse matrix), extract variable names, observation
     ## names, nobs, nvars, and initialize weights and offsets if
     ## needed
-    
-    x <- as.matrix(x)
+
+    # Sparse detection 
+    is_already_sparse <- inherits(x, "sparseMatrix")
+    if (!is_already_sparse) x <- as.matrix(x)
+
     betas_names <- dimnames(x)[[2L]]
     nvars <- ncol(x)
     EMPTY <- nvars == 0
@@ -364,7 +367,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
     ynames <- if (is.matrix(y)) rownames(y) else names(y)
     converged <- FALSE
     nobs   <- NROW(y)
-    if (is.null(weights))              weights <- rep.int(1, nobs)
+    if (is.null(weights)) weights <- rep.int(1, nobs)
     if (missing_offset <- is.null(offset)) offset  <- rep.int(0, nobs)
 
     ok_links <- c("logit", "probit", "cauchit", "cloglog",
@@ -372,6 +375,23 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
 
     if (isTRUE(family$family %in% c("quasi", "quasibinomial", "quasipoisson")))
         stop("`brglmFit` does not currently support quasi families.")
+
+    # ---------------------------------------------------------------------------
+    # Sparse path decision
+    #
+    # The sparse path replaces the dense QR of sqrt(W)X (cost O(n*p^2)) with a
+    # Cholesky of X'WX (cost O(nnz) to form + O(p^3) to factor).  This wins
+    # when forming the n x p weighted matrix is the bottleneck, i.e. when n*p >> nnz.
+    # ---------------------------------------------------------------------------
+
+    nnz <- if (is_already_sparse) Matrix::nnzero(x) else sum(x != 0)
+    fill_rate <- nnz / (nobs * nvars)
+    use_sparse <- nnz < 5e5 && nvars > 20L && fill_rate < 0.20
+
+    if (use_sparse && !is_already_sparse) x <- Matrix::Matrix(x, sparse = TRUE)
+    if (!use_sparse &&  is_already_sparse) x <- as.matrix(x)
+
+    if (control$trace && use_sparse) cat("Using sparse matrix representation for design matrix x. Fill rate - ", fill_rate, "\n")
 
     ## Enrich family
     family <- enrichwith::enrich(family, with = c("d1afun", "d2afun", "d3afun", "d1variance"))
@@ -443,7 +463,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
             rank <- nvars_all <- nvars
             betas_names_all <- betas_names
         } else {
-            qrx <- qr(x)
+            qrx <- qr(if (use_sparse) as.matrix(x) else x)   # force dense for S3 accessors
             rank <- qrx$rank
             is_full_rank <- rank == nvars
             if (!isTRUE(singular.ok) && !isTRUE(is_full_rank))
@@ -482,7 +502,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
             ## ML fit to get starting values
             ## Get startng values and kill warnings whilst doing that
             suppressWarnings(
-                tempFit <- glm.fit(x = x, y = y.adj, weights = weights.adj,
+                tempFit <- glm.fit(x = if (use_sparse) as.matrix(x) else x,
+                                   y = y.adj, weights = weights.adj,
                                    etastart = etastart, mustart = mustart,
                                    offset = offset, family = family,
                                    control = list(epsilon = control$epsilon,
@@ -497,7 +518,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                                             row_totals = row_totals,
                                             no_dispersion = no_dispersion,
                                             nobs = nobs, nvars = nvars, keep = keep,
-                                            df_residual = df_residual, control = control)
+                                            df_residual = df_residual, control = control,
+                                            use_sparse = use_sparse)
             dispersion <- dispList$dispersion
             if (is.na(dispersion))
                 dispersion <- var(y) / variance(sum(weights * y) / sum(weights))
@@ -525,7 +547,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                                                 row_totals = row_totals,
                                                 no_dispersion = no_dispersion,
                                                 nobs = nobs, nvars = nvars, keep = keep,
-                                                df_residual = df_residual, control = control)
+                                                df_residual = df_residual, control = control,
+                                                use_sparse = use_sparse)
                 dispersion <- dispList$dispersion
                 if (is.na(dispersion))
                     dispersion <- var(y) / variance(sum(weights * y) / sum(weights))
@@ -569,7 +592,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
             control$max_step_factor <- 1
         }
 
-        theta                  <- c(betas, dispersion)
+        theta <- c(betas, dispersion)
         transformed_dispersion <- eval(control$Trans)
 
         # Determine if we need to compute the inverse of the information matrix for the dispersion parameter
@@ -583,7 +606,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                            fixed_totals = fixed_totals, row_totals = row_totals,
                            no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
                            keep = keep, need_qr = TRUE, need_hatvalues = TRUE,
-                           need_inverse = needs_inverse)
+                           need_inverse = needs_inverse, use_sparse = use_sparse)
         } else {
             # For null/intercept-only models, use safe default for dispersion
             dispersion <- 1
@@ -643,16 +666,29 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
 
                 #cg_tol = 0.1
 
+                # Define Fmatvec for sparse path avoiding explicit formation of the dense info matrix 
+                Fmatvec <- if (use_sparse) {
+                    pr <- fit$precision; ww <- fit$working_weights
+                    function(d) { wd <- ww * drop(x %*% d); pr * .sparse_crossprod_vec(x, wd) }
+                } else NULL
+
+                # Again for the sparse path we use specialised sparse safe 
+                # diagonal of X^T diag(w) X (column squared norms) with helper
+                diag_F <- if (use_sparse) fit$precision * .sparse_wtd_colnorms2(x, fit$working_weights) else NULL
+
                 step <- cg_steihaug_pcg(
                     r_adj   = adjusted_grad_beta,
-                    F_info  = fit$info_beta,
+                    F_info  = if (use_sparse) NULL else fit$info_beta,
+                    Fmatvec = Fmatvec,
+                    diag_F  = diag_F,
                     Delta   = Delta,
                     tol     = cg_tol_ew,
                     maxiter = cg_maxiter)
 
                 # Predicted reduction (||r_adj||^2 objective) 
                 # pred = 0.5(||r_adj||^2 - ||r_adj + (-F) p||^2), F stored as p x p.
-                r_adj_model    <- adjusted_grad_beta - drop(fit$info_beta %*% step$p) # Matrix free?
+                Fp <- if (use_sparse) Fmatvec(step$p) else drop(fit$info_beta %*% step$p)
+                r_adj_model <- adjusted_grad_beta - Fp
                 pred_reduction <- (r_adj_sq - sum(r_adj_model^2))
 
                 betas_candidate <- betas + step$p
@@ -665,7 +701,8 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                                 no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
                                 keep = keep, need_qr = TRUE, need_hatvalues = FALSE,
                                 hatvalues_precomputed = hatvalues_cached,
-                                need_inverse = needs_inverse),
+                                need_inverse = needs_inverse,
+                                use_sparse = use_sparse),
                     silent = TRUE)
 
                 if (inherits(fit_candidate, "try-error")) {
@@ -704,12 +741,31 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                     fit <- fit_candidate
                     hat_accept_count <- hat_accept_count + 1L
  
-                    # Periodic hat-value refresh: call qr.Q() on the already-stored
-                    # qr_decomposition - no extra QR factorisation required.
+                    # Periodic hat-value refresh.
+                    # Sparse path: re-use R_matrix from Cholesky (already p x p dense).
+                    #   R_matrix is always non-NULL when use_sparse=TRUE (compute_fit
+                    #   always attempts Cholesky when need_qr=TRUE).  The inverse_info_beta
+                    #   fallback below handles the rare rank-deficient edge case.
+                    # Dense path: call qr.Q() on the stored QR - no extra factorisation.
                     if (hat_accept_count %% hat_update_freq == 0L) {
-                        Q_tmp            <- qr.Q(fit$qr_decomposition)
-                        hatvalues_cached <- .rowSums(Q_tmp * Q_tmp, nobs, nvars, TRUE)
-                        Q_tmp            <- NULL   # free n×p matrix immediately
+                        if (use_sparse) {
+                            if (!is.null(fit$R_matrix)) {
+                                # Same lower-triangular solve as in compute_fit
+                                Xd <- as.matrix(x)
+                                Z  <- backsolve(fit$R_matrix, t(Xd), transpose = TRUE)
+                                hatvalues_cached <- fit$working_weights * colSums(Z * Z)
+                                Xd <- Z  <- NULL
+                            } else if (!is.null(fit$inverse_info_beta)) {
+                                Xd <- as.matrix(x)
+                                XV <- Xd %*% fit$inverse_info_beta
+                                hatvalues_cached <- fit$working_weights * rowSums(XV * Xd)
+                                Xd <- XV  <- NULL
+                            }
+                        } else {
+                            Q_tmp  <- qr.Q(fit$qr_decomposition)
+                            hatvalues_cached <- .rowSums(Q_tmp * Q_tmp, nobs, nvars, TRUE)
+                            Q_tmp  <- NULL
+                        }
                         fit$hatvalues <- hatvalues_cached
                         recomp <- TRUE
                     }
@@ -756,7 +812,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                                            no_dispersion = no_dispersion,
                                            nobs = nobs, nvars = nvars, keep = keep,
                                            need_qr = FALSE, need_hatvalues = FALSE,
-                                           need_inverse = FALSE)
+                                           need_inverse = FALSE, use_sparse = use_sparse)
 
                     # Rescale dispersion-dependent fields that aren't recomputed in fit_new
                     # Check these steps for completeness
@@ -837,9 +893,18 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                            weights = weights, offset = offset, family = family,
                            fixed_totals = fixed_totals, row_totals = row_totals,
                            no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
-                           keep = keep, need_qr = TRUE, need_hatvalues = FALSE)
+                           keep = keep, need_qr = TRUE, need_hatvalues = FALSE,
+                           use_sparse = use_sparse)
 
+        # For downstream glm infrastructure we need a real dense QR object.
+        # Sparse path: build it once from dense(sqrt(w)*x); this happens only at
+        # the end of fitting so the cost is paid once
         qr.Wx <- fit$qr_decomposition
+        if (use_sparse || !inherits(qr.Wx, "qr")) {
+            wx_dense <- as.matrix(sqrt(fit$working_weights) * x)
+            qr.Wx    <- qr(wx_dense)
+            wx_dense <- NULL
+        }
         mus <- fit$mus
         etas <- fit$etas
         residuals <- with(fit, (y - mus) / d1mus)
@@ -972,12 +1037,12 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
 #' @param maxiter Maximum CG iterations
 #'
 #' @references Steihaug (1983) SIAM J. Numer. Anal. 20(3), 626-637.
-#'             Nocedal & Wright (2006) Numerical Optimization, Alg. 7.2.
+#'             Nocedal & Wright (2006) Numerical Optimization, Alg. 7.2 & Algo 5.3 for pcg adaptation.
 #'             Eisenstat & Walker (1996) SIAM J. Optim. 6(4), 1190-1206.
-cg_steihaug_pcg <- function(r_adj, F_info, Delta, tol = 0.1, maxiter = 50) {
+cg_steihaug_pcg <- function(r_adj, F_info, Fmatvec = NULL, diag_F = NULL, Delta, tol = 0.1, maxiter = 50) {
     # Jacobi preconditioner: M = diag(F), M^{-1} v = v / diag(F)
     # Guard against near-zero diagonal entries
-    d_F <- diag(F_info)
+    d_F <- if (!is.null(diag_F)) diag_F else diag(F_info)
     d_F <- pmax(d_F, .Machine$double.eps * max(d_F))
     Minv <- function(v) v / d_F              # O(p), just element-wise division
 
@@ -989,7 +1054,7 @@ cg_steihaug_pcg <- function(r_adj, F_info, Delta, tol = 0.1, maxiter = 50) {
     ry0 <- ry                            # for convergence check
 
     for (j in seq_len(maxiter)) {
-        Fd  <- drop(F_info %*% d)            # O(p²), maybe matrix free matvec in future?
+        Fd <- if (!is.null(Fmatvec)) Fmatvec(d) else drop(F_info %*% d)
         dFd <- sum(d * Fd)
 
         if (dFd <= 0) {
