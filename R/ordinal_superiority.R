@@ -73,37 +73,60 @@ ordinal_superiority.bracl <- function(object, formula, data,
                                       level = 0.95,
                                       bc = FALSE) {
     measure <- match.arg(measure)
-    ## If bc is TRUE and object is not a reduced mean-bias fit then
-    ## compute reduced mean-bias estimators.
     if (!inherits(object, "bracl")) {
         stop("ordinal superiority measures are not available for objects of class ", class(object)[1])
     }
-    ## if (!isTRUE(object$parallel)) {
-    ##     stop("ordinal superiority measures are available only for \"bracl\" objects with `parallel = TRUE`")
-    ## }
-    .ordsup <-if (isTRUE(object$parallel)) .ordsup_p else .ordsup_np
+    ## If bc is TRUE and object is not a reduced mean-bias fit then
+    ## compute reduced mean-bias estimators.
     if (isTRUE(bc) & !(object$type %in% c("AS_mean", "AS_mixed"))) {
         object <- update(object, type = "AS_mean")
     }
-    mf <- model.frame(formula, model.frame(object))
+    source_data <- if (missing(data)) {
+        if (!is.null(object$call$data)) {
+            eval(object$call$data, environment(formula(object)), parent.frame())
+        } else {
+            environment(formula(object))
+        }
+    } else {
+        data
+    }
+    source_data <- get_all_vars(delete.response(object$terms), source_data)
+    row_ids <- if (missing(data)) {
+        row.names(model.frame(object))
+    } else {
+        row.names(model.frame(delete.response(object$terms), source_data,
+                              na.action = na.omit, xlev = object$xlevels))
+    }
+    source_data <- source_data[row_ids, , drop = FALSE]
+    mf <- model.frame(formula, source_data)
     Terms <- attr(mf, "terms")
     z <- model.matrix(Terms, mf, object$contrasts[all.vars(formula)])
     znames <- colnames(z)[-match("(Intercept)", colnames(z), nomatch = 0L)]
     if (isTRUE(length(znames) > 1) | !isTRUE(all(sort(unique(z[, znames])) %in% c(0, 1)))) {
         stop("`formula` can have only one grouping explanatory variable with two levels")
     }
-    X <- model.matrix(object, data = data)
-    z_ind <- match(znames, colnames(X), nomatch = 0L)
-    if (isTRUE(z_ind == 0)) {
+    group_name <- all.vars(formula)
+    if (length(group_name) != 1L) {
+        stop("`formula` can have only one grouping explanatory variable with two levels")
+    }
+    predictor_data <- source_data[, !(names(source_data) %in% c(as.character(formula(object)[[2L]]), "(weights)")), drop = FALSE]
+    if (!(group_name %in% names(predictor_data))) {
         stop("the grouping explanatory variable must be one of the explanatory variables in `object`")
     }
-    Xnoz <- unique(X[, -z_ind, drop = FALSE])
-    X <- matrix(NA, nrow = nrow(Xnoz), ncol = ncol(X), dimnames = list(NULL, colnames(X)))
-    X[, -z_ind] <- Xnoz
-    nx <- nrow(X)
+    group_values <- if (is.factor(mf[[1L]])) levels(droplevels(mf[[1L]])) else sort(unique(mf[[1L]]))
+    base_data <- unique(predictor_data[, setdiff(names(predictor_data), group_name), drop = FALSE])
+    X0data <- X1data <- base_data
+    X0data[[group_name]] <- rep(group_values[1L], nrow(base_data))
+    X1data[[group_name]] <- rep(group_values[2L], nrow(base_data))
+    X0 <- model.matrix(object, data = X0data)
+    X1 <- model.matrix(object, data = X1data)
+    same_cols <- colSums(abs(X0 - X1)) == 0
+    Xnoz <- X0[, same_cols, drop = FALSE]
+    nx <- nrow(X0)
     gammas <- .ordsup(coef(object),
-                      X = X, group_id = z_ind, ncat = object$ncat,
-                      ref = object$ref, lev = object$lev, measure = "gamma")
+                      X0 = X0, X1 = X1, ncat = object$ncat,
+                      ref = object$ref, lev = object$lev, measure = "gamma",
+                      po = object$parallel)
     coef_vcov <- vcov(object)
     ## mean bias reduction of gammas
     bias_gammas <- numeric(length(gammas))
@@ -111,8 +134,9 @@ ordinal_superiority.bracl <- function(object, formula, data,
         for (j in seq.int(nx)) {
             hess <- numDeriv::hessian(function(theta, ...) .ordsup(theta, ...)[j],
                                       x = coef(object),
-                                      X = X, group_id = z_ind, ncat = object$ncat,
-                                      ref = object$ref, lev = object$lev, measure = "gamma")
+                                      X0 = X0, X1 = X1, ncat = object$ncat,
+                                      ref = object$ref, lev = object$lev, measure = "gamma",
+                                      po = object$parallel)
             bias_gammas[j] <- sum(diag(coef_vcov %*% hess)) / 2
         }
     }
@@ -120,8 +144,9 @@ ordinal_superiority.bracl <- function(object, formula, data,
     ## mean_gammas <- mean(gammas)
     ## compute standard error for gamma
     grads <- numDeriv::jacobian(.ordsup, x = coef(object),
-                                X = X, group_id = z_ind, ncat = object$ncat,
-                                ref = object$ref, lev = object$lev, measure = "gamma")
+                                X0 = X0, X1 = X1, ncat = object$ncat,
+                                ref = object$ref, lev = object$lev, measure = "gamma",
+                                po = object$parallel)
     ## grad_mean <- apply(grads, 2, mean)
     se <- apply(grads, 1, function(x) sqrt(crossprod(x, (coef_vcov %*% x))))
     ## se_mean <- sqrt(crossprod(grad_mean, (coef_vcov %*% grad_mean)))
@@ -147,61 +172,34 @@ ordinal_superiority.bracl <- function(object, formula, data,
     out
 }
 
-## X should be the covariate values where the ordsup is computed and a column for z. X is duplicated internally with z == 1 and z == 0
-.ordsup_p <- function(coef, X, group_id, ncat, ref, lev, measure = "gamma") {
-    X <- rbind(X, X)
-    nX <- nrow(X)
-    X[, group_id] <- z <- rep(c(0, 1), each = nX / 2)
+.ordsup <- function(coef, X0, X1, ncat, ref, lev, measure = "gamma", po = TRUE) {
     nams <- names(coef)
     int <- (ncat - 1):1
     sl <- nams[-int]
-    coefs <- cbind(rev(cumsum(coef[int])),
-                   int * matrix(coef[sl], nrow = ncat - 1, ncol = length(sl), byrow = TRUE))
+    if (po) {
+        coefs <- cbind(rev(cumsum(coef[int])),
+                       int * matrix(coef[sl], nrow = ncat - 1, ncol = length(sl), byrow = TRUE))
+    } else {
+        coefs <- matrix(coef, nrow = ncat - 1)
+        coefs <- apply(coefs, 2, function(x) rev(cumsum(x[int])))
+    }
     rownames(coefs) <- lev[-ref]
-    fits <- matrix(0, nrow = nrow(X), ncol = ncat, dimnames = list(rownames(X), lev))
-    fits1 <- apply(coefs, 1, function(b) X %*% b)
-    fits[, rownames(coefs)] <- fits1
-    Y <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
-    probs0 <- Y[z == 0, , drop = FALSE]
-    probs1 <- Y[z == 1, , drop = FALSE]
+    probs0 <- .bracl_probs(coefs, X0, ncat, lev)
+    probs1 <- .bracl_probs(coefs, X1, ncat, lev)
     gamma_fun <- function(p0, p1) {
         out <- outer(p0, p1, "*")
         sum(out[upper.tri(out)]) + sum(diag(out)) / 2
     }
-    out <- numeric(nX / 2)
-    for (i in seq.int(nX / 2)) {
+    out <- numeric(nrow(X0))
+    for (i in seq_len(nrow(X0))) {
         out[i] <- gamma_fun(probs0[i, ], probs1[i, ])
     }
     if (measure == "gamma") out else 2 * out - 1
 }
 
-
-.ordsup_np <- function(coef, X, group_id, ncat, ref, lev, measure = "gamma") {
-    X <- rbind(X, X)
-    nX <- nrow(X)
-    X[, group_id] <- z <- rep(c(0, 1), each = nX / 2)
-    nams <- names(coef)
-    int <- (ncat - 1):1
-    sl <- nams[-int]
-    coef_mat <- matrix(coef, nrow = ncat - 1)
-    rownames(coef_mat) <- lev[-ref]
-    coefs <- apply(coef_mat, 2, function(x) rev(cumsum(x[int])))
-    rownames(coefs) <- lev[-ref]
+.bracl_probs <- function(coefs, X, ncat, lev) {
     fits <- matrix(0, nrow = nrow(X), ncol = ncat, dimnames = list(rownames(X), lev))
     fits1 <- apply(coefs, 1, function(b) X %*% b)
     fits[, rownames(coefs)] <- fits1
-    Y <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
-    probs0 <- Y[z == 0, , drop = FALSE]
-    probs1 <- Y[z == 1, , drop = FALSE]
-    gamma_fun <- function(p0, p1) {
-        out <- outer(p0, p1, "*")
-        sum(out[upper.tri(out)]) + sum(diag(out)) / 2
-    }
-    out <- numeric(nX / 2)
-    for (i in seq.int(nX / 2)) {
-        out[i] <- gamma_fun(probs0[i, ], probs1[i, ])
-    }
-    if (measure == "gamma") out else 2 * out - 1
+    t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
 }
-
-
