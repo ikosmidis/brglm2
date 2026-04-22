@@ -78,9 +78,10 @@ ordinal_superiority.bracl <- function(object, formula, data,
     if (!inherits(object, "bracl")) {
         stop("ordinal superiority measures are not available for objects of class ", class(object)[1])
     }
-    if (!isTRUE(object$parallel)) {
-        stop("ordinal superiority measures are available only for \"bracl\" objects with `parallel = TRUE`")
-    }
+    ## if (!isTRUE(object$parallel)) {
+    ##     stop("ordinal superiority measures are available only for \"bracl\" objects with `parallel = TRUE`")
+    ## }
+    .ordsup <-if (isTRUE(object$parallel)) .ordsup_p else .ordsup_np
     if (isTRUE(bc) & !(object$type %in% c("AS_mean", "AS_mixed"))) {
         object <- update(object, type = "AS_mean")
     }
@@ -147,9 +148,7 @@ ordinal_superiority.bracl <- function(object, formula, data,
 }
 
 ## X should be the covariate values where the ordsup is computed and a column for z. X is duplicated internally with z == 1 and z == 0
-## only for parallel = TRUE
-## group_varianble: indicator of x
-.ordsup <- function(coef, X, group_id, ncat, ref, lev, measure = "gamma") {
+.ordsup_p <- function(coef, X, group_id, ncat, ref, lev, measure = "gamma") {
     X <- rbind(X, X)
     nX <- nrow(X)
     X[, group_id] <- z <- rep(c(0, 1), each = nX / 2)
@@ -175,3 +174,34 @@ ordinal_superiority.bracl <- function(object, formula, data,
     }
     if (measure == "gamma") out else 2 * out - 1
 }
+
+
+.ordsup_np <- function(coef, X, group_id, ncat, ref, lev, measure = "gamma") {
+    X <- rbind(X, X)
+    nX <- nrow(X)
+    X[, group_id] <- z <- rep(c(0, 1), each = nX / 2)
+    nams <- names(coef)
+    int <- (ncat - 1):1
+    sl <- nams[-int]
+    coef_mat <- matrix(coef, nrow = ncat - 1)
+    rownames(coef_mat) <- lev[-ref]
+    coefs <- apply(coef_mat, 2, function(x) rev(cumsum(x[int])))
+    rownames(coefs) <- lev[-ref]
+    fits <- matrix(0, nrow = nrow(X), ncol = ncat, dimnames = list(rownames(X), lev))
+    fits1 <- apply(coefs, 1, function(b) X %*% b)
+    fits[, rownames(coefs)] <- fits1
+    Y <- t(apply(fits, 1, function(x) exp(x) / sum(exp(x))))
+    probs0 <- Y[z == 0, , drop = FALSE]
+    probs1 <- Y[z == 1, , drop = FALSE]
+    gamma_fun <- function(p0, p1) {
+        out <- outer(p0, p1, "*")
+        sum(out[upper.tri(out)]) + sum(diag(out)) / 2
+    }
+    out <- numeric(nX / 2)
+    for (i in seq.int(nX / 2)) {
+        out[i] <- gamma_fun(probs0[i, ], probs1[i, ])
+    }
+    if (measure == "gamma") out else 2 * out - 1
+}
+
+
