@@ -38,7 +38,9 @@ brnb(
     typically the environment from which \code{glm} is called.}
 
 \item{subset}{an optional vector specifying a subset of observations
-    to be used in the fitting process.}
+    to be used in the fitting process.  (See additional details about how
+    this argument interacts with data-dependent bases in the
+    \sQuote{Details} below.)}
 
 \item{weights}{an optional vector of \sQuote{prior weights} to be used
     in the fitting process.  Should be \code{NULL} or a numeric vector.}
