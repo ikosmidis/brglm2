@@ -80,6 +80,7 @@ ordinal_superiority.bracl <- function(object, formula, data,
     ## compute reduced mean-bias estimators.
     if (isTRUE(bc) & !(object$type %in% c("AS_mean", "AS_mixed"))) {
         object <- update(object, type = "AS_mean")
+        warning('`object` was refitted using `type = "AS_mean"`.')
     }
     source_data <- if (missing(data)) {
         if (!is.null(object$call$data)) {
