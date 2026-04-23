@@ -879,12 +879,11 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
             for (iter in seq.int(control$maxit)) {
                 step_factor <- 0
                 testhalf <- TRUE
-
                 ## Inner iteration
                 while (testhalf & step_factor < control$max_step_factor) {
                     ## store previous values
-                    ## betas0 <- betas
-                    ## dispersion0 <- dispersion
+                    betas0 <- betas
+                    dispersion0 <- dispersion
                     step_beta_previous <- step_beta
                     step_zeta_previous <- step_zeta
 
@@ -906,18 +905,22 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                     quantities <- try(key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE), silent = TRUE)
                     ## This is to capture qr failing and revering to previous estimates
                     if (failed_adjustment_beta <- inherits(quantities, "try-error")) {
-                        ## betas <- betas0
-                        ## dispersion <- dispersion0
+                        betas <- betas0
+                        dispersion <- dispersion0
                         warning("failed to calculate score adjustment")
                         break
                     }
                     step_components_beta <- compute_step_components(theta, level = 0, fit = quantities)
                     step_components_zeta <- compute_step_components(theta, level = 1, fit = quantities)
                     if (failed_inversion_beta <- step_components_beta$failed_inversion) {
+                        betas <- betas0
+                        dispersion <- dispersion0
                         warning("failed to invert the information matrix")
                         break
                     }
                     if (failed_adjustment_beta <- step_components_beta$failed_adjustment) {
+                        betas <- betas0
+                        dispersion <- dispersion0
                         warning("failed to calculate score adjustment")
                         break
                     }
