@@ -1,8 +1,3 @@
-## benchmark_largep.R
-## Compares brglmFit_original, brglmFit (base/CG default), brglmFit_dogleg,
-## and brglmFit_cg across multiple synthetic data scenarios covering different
-## families, link functions, sparsity structures, and high-dim settings.
-
 library(brglm2)
 library(microbenchmark)
 
@@ -13,11 +8,9 @@ TYPE <- "AS_median"
 
 cat(sprintf("Benchmarking with type = '%s'\n", TYPE))
 
-# ══════════════════════════════════════════════════════════════════════════════
 # Data generators
-# ══════════════════════════════════════════════════════════════════════════════
 
-# ── 1. Logistic regression, AR-1 predictors (baseline) ───────────────────────
+#  1. Logistic regression, AR-1 predictors (baseline) 
 make_logistic_ar1 <- function(n, p, rho = 0.5, seed = 42) {
     set.seed(seed)
     p_pred <- p - 1L
@@ -29,7 +22,7 @@ make_logistic_ar1 <- function(n, p, rho = 0.5, seed = 42) {
          label = "logistic AR-1")
 }
 
-# ── 2. Probit regression, block-correlated predictors ────────────────────────
+#  2. Probit regression, block-correlated predictors 
 # Simulates groups of correlated biomarkers (e.g. gene expression modules)
 make_probit_blocks <- function(n, p, n_blocks = 5, rho = 0.7, seed = 43) {
     set.seed(seed)
@@ -51,7 +44,7 @@ make_probit_blocks <- function(n, p, n_blocks = 5, rho = 0.7, seed = 43) {
          label = "probit block-corr")
 }
 
-# ── 3. Poisson log-linear, sparse predictors ─────────────────────────────────
+#  3. Poisson log-linear, sparse predictors 
 # Simulates rare-event count data, e.g. adverse events in a clinical trial
 make_poisson_sparse <- function(n, p, prop_signal = 0.2, seed = 44) {
     set.seed(seed)
@@ -66,8 +59,8 @@ make_poisson_sparse <- function(n, p, prop_signal = 0.2, seed = 44) {
          label = "Poisson sparse")
 }
 
-# ── 4. Logistic regression, high-dimensional medical (n ~ 5p) ────────────────
-# Toeplitz covariance, sparse signal — mimics omics/GWAS logistic models
+#  4. Logistic regression, high-dimensional medical (n approx 5p) 
+# Toeplitz covariance, sparse signal -  mimics omics/GWAS logistic models
 make_highdim_medical <- function(n, p, rho = 0.3, seed = 45) {
     set.seed(seed)
     p_pred   <- p - 1L
@@ -82,7 +75,7 @@ make_highdim_medical <- function(n, p, rho = 0.3, seed = 45) {
          label = "logistic high-dim")
 }
 
-# ── 5. Complementary log-log, survival-style binary outcome ──────────────────
+#  5. Complementary log-log, survival-style binary outcome 
 # Discrete-time survival model; cloglog link common in epidemiology
 make_cloglog_survival <- function(n, p, rho = 0.4, seed = 46) {
     set.seed(seed)
@@ -96,9 +89,9 @@ make_cloglog_survival <- function(n, p, rho = 0.4, seed = 46) {
          label = "cloglog survival")
 }
 
-# ══════════════════════════════════════════════════════════════════════════════
+
 # Scenarios: (generator, n, p)
-# ══════════════════════════════════════════════════════════════════════════════
+
 scenarios <- list(
     list(gen = make_logistic_ar1,     n =  200, p =   5),
     list(gen = make_logistic_ar1,     n = 1000, p =  20),
@@ -117,9 +110,9 @@ scenarios <- list(
 
 cat(sprintf("Benchmarking dense with %d iterations per scenario\n", DENSE_TIMES+1))
 
-# ══════════════════════════════════════════════════════════════════════════════
+
 # Run
-# ══════════════════════════════════════════════════════════════════════════════
+
 results <- lapply(scenarios, function(sc) {
     sc_data <- sc$gen(sc$n, sc$p)
     n       <- sc$n;  p <- sc$p
@@ -128,7 +121,7 @@ results <- lapply(scenarios, function(sc) {
     dat     <- sc_data$data
     fmla    <- as.formula(paste("y ~", paste(names(dat)[-1], collapse = " + ")))
 
-    cat(sprintf("\n── %s  n=%d  p=%d ──\n", label, n, p))
+    cat(sprintf("\n %s  n=%d  p=%d \n", label, n, p))
 
     mb <- microbenchmark(
         original = glm(fmla, data = dat, family = fam, type = TYPE,
@@ -156,11 +149,11 @@ results <- lapply(scenarios, function(sc) {
     mb
 })
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Additional sparse synthetic data scenarios
-# ══════════════════════════════════════════════════════════════════════════════
 
-# ── 1. One-hot categoricals — the most common real sparse structure ────────────
+# Additional sparse synthetic data scenarios
+
+
+#  1. One-hot categoricals, the most common real sparse structure 
 # Each factor with k levels contributes k-1 binary columns, one 1 per row.
 # With enough levels fill rate = 1/(k-1) which gets sparse quickly.
 make_onehot_logistic <- function(n, n_factors, levels_per_factor, seed = 101) {
@@ -179,7 +172,7 @@ make_onehot_logistic <- function(n, n_factors, levels_per_factor, seed = 101) {
          label = sprintf("onehot %d factors x %d levels", n_factors, levels_per_factor))
 }
 
-# ── 2. Interaction dummies — sparser than main effects alone ──────────────────
+#  2. Interaction dummies, sparser than main effects alone 
 # Two-way interactions between binary indicators; 
 # each interaction column has fill = p(A=1) * p(B=1)
 make_interaction_logistic <- function(n, n_base, seed = 102) {
@@ -229,6 +222,7 @@ make_block_diagonal <- function(n, n_categories, p_per_cat, seed = 103) {
 sparse_scenarios <- list(
     # One-hot: fill = 1/(levels-1), gets sparse with many levels
     list(gen = make_onehot_logistic, n = 2000, n_factors = 10, levels_per_factor = 20),
+    # Commented out due to required time
     #list(gen = make_onehot_logistic, n = 5000, n_factors = 20, levels_per_factor = 50), 
     list(gen = make_onehot_logistic, n = 10000, n_factors = 5,  levels_per_factor = 100),
     # Interaction dummies: fill = 0.15^2 = 0.0225 for interactions
@@ -257,7 +251,7 @@ results_sparse <- lapply(sparse_scenarios, function(sc) {
     dat <- data.frame(y = y, X)
     fmla <- as.formula(paste("y ~", paste(names(dat)[-1], collapse = " + ")))
 
-    cat(sprintf("\n── %s ──\n", sc_data$label))
+    cat(sprintf("\n %s \n", sc_data$label))
 
     mb <- microbenchmark(
         original = glm(fmla, data = dat, family = fam, type = TYPE,
@@ -285,9 +279,9 @@ results_sparse <- lapply(sparse_scenarios, function(sc) {
     mb
 })
 
-# ══════════════════════════════════════════════════════════════════════════════
+
 # Summary table
-# ══════════════════════════════════════════════════════════════════════════════
+
 cat("\n\n== Timing summary (ms) ==\n")
 cat(sprintf("%-40s  %-6s %-4s  %-9s  %12s  %12s\n",
             "scenario", "n", "p", "stat", "original", "new"))

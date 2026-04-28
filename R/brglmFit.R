@@ -376,13 +376,10 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
     if (isTRUE(family$family %in% c("quasi", "quasibinomial", "quasipoisson")))
         stop("`brglmFit` does not currently support quasi families.")
 
-    # ---------------------------------------------------------------------------
     # Sparse path decision
-    #
     # The sparse path replaces the dense QR of sqrt(W)X (cost O(n*p^2)) with a
     # Cholesky of X'WX (cost O(nnz) to form + O(p^3) to factor).  This wins
     # when forming the n x p weighted matrix is the bottleneck, i.e. when n*p >> nnz.
-    # ---------------------------------------------------------------------------
 
     nnz <- if (is_already_sparse) Matrix::nnzero(x) else sum(x != 0)
     fill_rate <- nnz / (nobs * nvars)

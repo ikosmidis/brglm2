@@ -135,16 +135,15 @@ compute_fit <- function(pars, y, x, weights, offset, family,
 
     if (need_qr) {
         if (use_sparse) {
-            # ---------------------------------------------------------------
             # Sparse path: avoid ever forming a dense n x p matrix until the
             # very end (hat values) when it's unavoidable.
             #
             # Core identity:  X'WX = (sqrt(W)X)^T (sqrt(W)X)
             # Form sqrt_w_x once (sparse, O(nnz)) and reuse for:
-            #   (i) info_beta  = precision * crossprod(sqrt_w_x)       [p×p dense]
-            #   (ii) R_chol     = chol(X'WX)                           [p×p dense]
-            #   (iii) hat values = w_i ||R_chol^{-T} x_i||^2           [n dense vec]
-            # ---------------------------------------------------------------
+            #   (i) info_beta  = precision * crossprod(sqrt_w_x) (p×p dense)
+            #   (ii) R_chol     = chol(X'WX) (p×p dense)
+            #   (iii) hat values = w_i ||R_chol^{-T} x_i||^2 (n dense vec)
+
             sqrt_w_x  <- .sparse_row_scale(x, sqrt(working_weights))  # sparse n×p
             XtWX_dense <- as.matrix(Matrix::crossprod(sqrt_w_x))       # p×p dense
 
@@ -170,13 +169,8 @@ compute_fit <- function(pars, y, x, weights, offset, family,
             #                 = ||R_chol^{-T} x_i||^2  * w_i
             #
             # Since R_chol is upper-triangular with R_chol^T R_chol = X'WX,
-            # we need  z_i = R_chol^{-T} x_i  via a *lower*-triangular solve:
+            # we need  z_i = R_chol^{-T} x_i  via a lower-triangular solve:
             #   forwardsolve(t(R_chol), x_i) <=> backsolve(R_chol, x_i, transpose=TRUE)
-            #
-            # Equivalently: the rows of sqrt_w_x are already sqrt(w_i)*x_i, and
-            #   QR of sqrt_w_x gives Q with h_i = rowSums(Q^2).
-            # But to avoid forming sqrt_w_x dense we use the R_chol route:
-            #   R_chol^T R_chol = X'WX  ->  R_chol^{-T} x_i  ->  ||.||^2 * w_i
             if (is.null(hatvalues_precomputed) && need_hatvalues) {
                 if (!is.null(R_matrix)) {
                     # backsolve with transpose=TRUE solves R_chol^T z = x_i for each col
@@ -198,9 +192,9 @@ compute_fit <- function(pars, y, x, weights, offset, family,
             qr_decomposition <- list(R = R_matrix, sparse_chol = TRUE)
 
         } else {
-            # ---------------------------------------------------------------
+            
             # Dense path (unchanged)
-            # ---------------------------------------------------------------
+            
             wx <- sqrt(working_weights) * x
             qr_decomposition <- qr(wx)
             R_matrix <- qr.R(qr_decomposition)
@@ -446,10 +440,7 @@ AS_median_adjustment_new <- function(pars, fit, level = 0,
         info_unscaled         <- fit$info_beta / fit$precision
         inverse_info_unscaled <- fit$inverse_info_beta / fit$dispersion
 
-        # XV = X V where V = inverse_info_unscaled (p x p)
-        # For sparse x: XV is n x p — this is the unavoidable O(np^2) step for AS_median
-        # but we keep x sparse through the multiply so only XV materialises as dense
-        XV    <- as.matrix(x %*% inverse_info_unscaled)   # n x p dense
+        XV    <- as.matrix(x %*% inverse_info_unscaled)   # n x p (unfortunately) dense
         d_V   <- diag(inverse_info_unscaled)               # length-p diagonal
 
         # Per-observation weight for the cubic term
@@ -512,6 +503,7 @@ AS_mixed_adjustment <- function(pars, fit, level = 0,
 #' @param keep Logical vector indicating which observations to keep
 #' @param df_residual Residual degrees of freedom
 #' @param control Control parameters
+#' @param use_sparse Logical; if TRUE use sparse-optimised paths (no densification).
 #' 
 #' @seealso compute_fit
 #'
