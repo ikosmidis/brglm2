@@ -7,8 +7,11 @@
 
 ## Improvements, updates and additions
 
-`ordinal_superiority.bracl()` now handles adjacent category logit
-models with or without proportional odds.
+* `ordinal_superiority.bracl()` now handles adjacent category logit
+  models with or without proportional odds.
+  
+* `brglm_fit()` fails more gracefully, returning the fit based on the
+  latest estimates with warnings.
 
 # brglm2 1.0.1
 
