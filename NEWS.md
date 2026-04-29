@@ -1,5 +1,14 @@
-# brglm2 1.0.1.900
+# brglm2 1.1.0
 
+## Bug fixes
+
+* Fixed a bug in the computation of ordinal superiority measures in
+  the presence of interactions.
+
+## Improvements, updates and additions
+
+`ordinal_superiority.bracl()` now handles adjacent category logit
+models with or without proportional odds.
 
 # brglm2 1.0.1
 
