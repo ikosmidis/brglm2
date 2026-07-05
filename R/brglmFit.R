@@ -1029,8 +1029,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
 #' @param r_adj   Adjusted score vector (length p)
 #' @param F_info  Fisher information matrix (p x p), i.e. fit$info_beta
 #' @param Delta   Trust-region radius
-#' @param tol     Relative residual tolerance (use Eisenstat-Walker adaptive
-#'                value: min(0.5, sqrt(||r_adj||)) for best performance)
+#' @param tol     Relative residual tolerance Eisenstat-Walker Choice 2
 #' @param maxiter Maximum CG iterations
 #'
 #' @references Steihaug (1983) SIAM J. Numer. Anal. 20(3), 626-637.
