@@ -121,3 +121,9 @@ flycheck_*.el
 
 # Benchmarks
 benchmarks/results/
+
+### Compiled sources ###
+src/*.o
+src/*.so
+src/*.dll
+src/symbols.rds
