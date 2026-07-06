@@ -593,7 +593,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
         transformed_dispersion <- eval(control$Trans)
 
         # Determine if we need to compute the inverse of the information matrix for the dispersion parameter
-        needs_inverse <- !no_dispersion || control$type == "AS_median"
+        needs_inverse <- !no_dispersion || control$type == "AS_median" || is_correction
 
         # Avoid unconstrained trust-region steps for dispersion in null/intercept-only models
         # Only update dispersion if model is not empty/null
@@ -645,14 +645,68 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
             for (iter in seq.int(control$maxit)) {
                 recomp <- FALSE # flag purely for trace output
 
-                # Preconditioned CG-Steihaug trust-region step 
+                if (is_correction) {
+                    # type = "correction" (Cordeiro & McCullagh, 1991) is a single
+                    # closed-form Fisher-scoring step away from the MLE, not an
+                    # iterative refinement -- control$maxit is forced to 1 above,
+                    # so there is no later iteration to absorb any error left by
+                    # an inexact solve. The CG-Steihaug trust-region step below is
+                    # deliberately inexact (adaptive tolerance, radius truncation)
+                    # which is fine when further iterations can correct for it, but
+                    # leaks straight into the final estimate here. Solve exactly
+                    # instead, matching the direct Newton step used previously.
+                    #
+                    # The mean and dispersion corrections are also a *joint* one-step
+                    # update evaluated at the same point (the MLE): step_components_zeta
+                    # / adjusted_grad_zeta at this point in the loop still hold the
+                    # values computed before the iteration started (i.e. at the MLE),
+                    # so the dispersion step below must be taken from those, not
+                    # recomputed after betas have already moved (which is what the
+                    # generic sequential beta-then-dispersion update below does).
+                    step <- list(p = drop(fit$inverse_info_beta %*% adjusted_grad_beta), on_boundary = FALSE)
+                    betas <- betas + step$p
+
+                    if (!no_dispersion && df_residual > 0 &&
+                        !step_components_zeta$failed_inversion &&
+                        !step_components_zeta$failed_adjustment) {
+                        step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
+                        td_prev   <- eval(control$Trans)
+                        sf        <- 0L
+                        while (sf <= control$max_step_factor) {
+                            td_new <- td_prev + 2^(-sf) * step_zeta
+                            transformed_dispersion <- td_new
+                            d_new  <- eval(control$inverseTrans)
+                            if (is.finite(d_new) && d_new > 0) break
+                            sf <- sf + 1L
+                        }
+                        dispersion <- d_new
+                    }
+
+                    theta <- c(betas, dispersion)
+                    fit <- compute_fit(pars = theta, y = y, x = x,
+                                weights = weights, offset = offset, family = family,
+                                fixed_totals = fixed_totals, row_totals = row_totals,
+                                no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                                keep = keep, need_qr = TRUE, need_hatvalues = TRUE,
+                                need_inverse = needs_inverse, use_sparse = use_sparse)
+
+                    step_components_beta <- compute_step_components(theta, level = 0, fit = fit)
+                    adjusted_grad_beta <- with(step_components_beta, grad + adjustment)
+                    step_components_zeta <- compute_step_components(theta, level = 1, fit = fit)
+                    adjusted_grad_zeta <- if (no_dispersion) NA_real_ else
+                                          with(step_components_zeta, grad + adjustment)
+                    accept_status <- "ACCEPT"
+                    recomp <- TRUE
+                } else {
+
+                # Preconditioned CG-Steihaug trust-region step
                 # Minimise  -r_adj' p + 0.5 p' F p  s.t. ||p|| <= Delta
                 # Uses stored fit$info_beta (p x p, O(p^2) matvec) with Jacobi
                 # diagonal preconditioner M = diag(F) to reduce inner iterations.
                 r_adj_sq  <- sum(adjusted_grad_beta^2)
 
                 # Adaptive tolerance: loose early, tight near convergence
-                #cg_tol_adapt <- min(0.5, sqrt(sqrt(r_adj_sq))) 
+                #cg_tol_adapt <- min(0.5, sqrt(sqrt(r_adj_sq)))
 
                 # Eisenstat-Walker Choice 2 (Theorem 2.3)
                 # https://softlib.rice.edu/pub/CRPC-TRs/reports/CRPC-TR94463.pdf
@@ -663,13 +717,13 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
 
                 #cg_tol = 0.1
 
-                # Define Fmatvec for sparse path avoiding explicit formation of the dense info matrix 
+                # Define Fmatvec for sparse path avoiding explicit formation of the dense info matrix
                 Fmatvec <- if (use_sparse) {
                     pr <- fit$precision; ww <- fit$working_weights
                     function(d) { wd <- ww * drop(x %*% d); pr * .sparse_crossprod_vec(x, wd) }
                 } else NULL
 
-                # Again for the sparse path we use specialised sparse safe 
+                # Again for the sparse path we use specialised sparse safe
                 # diagonal of X^T diag(w) X (column squared norms) with helper
                 diag_F <- if (use_sparse) fit$precision * .sparse_wtd_colnorms2(x, fit$working_weights) else NULL
 
@@ -682,7 +736,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                     tol     = cg_tol_ew,
                     maxiter = cg_maxiter)
 
-                # Predicted reduction (||r_adj||^2 objective) 
+                # Predicted reduction (||r_adj||^2 objective)
                 # pred = 0.5(||r_adj||^2 - ||r_adj + (-F) p||^2), F stored as p x p.
                 Fp <- if (use_sparse) Fmatvec(step$p) else drop(fit$info_beta %*% step$p)
                 r_adj_model <- adjusted_grad_beta - Fp
@@ -708,14 +762,14 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                     next
                 }
 
-                # Actual reduction (||r_adj||^2 objective) 
+                # Actual reduction (||r_adj||^2 objective)
                 # Compute adjusted score at the candidate point.
                 adj_candidate   <- adjustment_function(theta_candidate, fit = fit_candidate,
                                                        level = 0, x, nobs, nvars, weights)
                 r_adj_candidate <- fit_candidate$grad_beta + adj_candidate
                 actual_reduction <- (r_adj_sq - sum(r_adj_candidate^2))
 
-                # Reduction ratio (Nocedal & Wright 4.4) 
+                # Reduction ratio (Nocedal & Wright 4.4)
                 # Avoids numerical issues when pred_reduction is small
                 rho <- if (abs(pred_reduction) < 1e-16) {
                     if (actual_reduction > 0) 1.0 else 0.0
@@ -732,12 +786,12 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
 
                 # Accept/reject candidate, 0.1 threshold is fairly loose could be tightened to 0.25
                 if (rho > eta) {
-                    # Update with candidate 
+                    # Update with candidate
                     betas <- betas_candidate
                     theta <- theta_candidate
                     fit <- fit_candidate
                     hat_accept_count <- hat_accept_count + 1L
- 
+
                     # Periodic hat-value refresh.
                     # Sparse path: re-use R_matrix from Cholesky (already p x p dense).
                     #   R_matrix is always non-NULL when use_sparse=TRUE (compute_fit
@@ -788,9 +842,9 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                     step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
                     td_prev   <- transformed_dispersion
                     sf        <- 0L
-                    
-                    # Main step-halving loop: 
-                    # keep halving the step until we get a positive dispersion 
+
+                    # Main step-halving loop:
+                    # keep halving the step until we get a positive dispersion
                     # value or exceed max_step_factor
                     while (sf <= control$max_step_factor) {
                         td_new <- td_prev + 2^(-sf) * step_zeta
@@ -825,13 +879,14 @@ brglmFit <- function(x, y, weights = rep(1, nobs),
                     step_components_beta      <- compute_step_components(theta, level = 0, fit = fit)
                     adjusted_grad_beta        <- with(step_components_beta, grad + adjustment)
                 }
+                }
 
                 step_zeta_conv <- if (no_dispersion || df_residual < 1 ||
                                       step_components_zeta$failed_inversion ||
                                       step_components_zeta$failed_adjustment) NA_real_ else
                                   as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
 
-                if (control$trace) {
+                if (control$trace && !is_correction) {
                     cat(sprintf(
                         "Iter %3d: f=%.4e  ||r||=%.4e  ||p||=%.4e  dDisp=%.3e  Delta=%.3e  rho=%6.3f  %s%s%s\n",
                         iter,
