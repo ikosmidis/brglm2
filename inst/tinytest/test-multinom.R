@@ -14,7 +14,7 @@ hepbr <- brmultinom(type ~ group * time,
 
 ## ML fails when there is separation
 expect_warning(brmultinom(type ~ group * time, data = hepat, weights = counts, type = "ML"),
-               pattern = "algorithm did not converge|failed to calculate score adjustment")
+               pattern = "algorithm did not converge|failed to calculate score adjustment|fitted rates numerically 0")
 
 ## brmultinom returns the same estimates as in Table 3 of Bull et al. (2002)
 bulletall2002table3 <- matrix(c(-2.43, -1.57, 1.96, -0.36, -0.38, 0.26), ncol = 2)

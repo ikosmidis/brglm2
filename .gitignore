@@ -118,3 +118,12 @@ flycheck_*.el
 /network-security.data
 /doc/
 /Meta/
+
+# Benchmarks
+benchmarks/results/
+
+### Compiled sources ###
+src/*.o
+src/*.so
+src/*.dll
+src/symbols.rds

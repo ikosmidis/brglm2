@@ -1,4 +1,4 @@
-# Copyright (C) 2016- Ioannis Kosmidis
+# Copyright (C) 2016 - Ioannis Kosmidis, Oliver Clark
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -27,10 +27,7 @@
 #' Cordeiro & McCullagh (1991), the mixed bias-reduction adjusted
 #' scores approach in Kosmidis et al (2020), maximum penalized
 #' likelihood with powers of the Jeffreys prior as penalty, and
-#' maximum likelihood. Estimation is performed using a quasi Fisher
-#' scoring iteration (see `vignette("iteration", "brglm2")`, which, in
-#' the case of mean-bias reduction, resembles an iterative correction
-#' of the asymptotic bias of the Fisher scoring iterates.
+#' maximum likelihood.
 #'
 #' @inheritParams stats::glm.fit
 #' @aliases brglm_fit
@@ -58,14 +55,9 @@
 #'
 #' @details
 #'
-#' A detailed description of the supported adjustments and the quasi
-#' Fisher scoring iteration is given in the iteration vignette (see,
-#' `vignette("iteration", "brglm2")` or Kosmidis et al, 2020).  A
-#' shorter description of the quasi Fisher scoring iteration is also
-#' given in one of the vignettes of the *enrichwith* R package (see,
-#' \url{https://cran.r-project.org/package=enrichwith/vignettes/bias.html}).
-#' Kosmidis and Firth (2010) describe a parallel quasi Newton-Raphson
-#' iteration with the same stationary point.
+#' Trust-region fitting method for bias-reduced GLMs
+#' Fits bias-reduced GLMs by trust-region optimization of the adjusted score equations.
+#' Objective: f(beta) = ||adjusted_score_beta(beta)||^2 / 2.
 #'
 #' In the special case of generalized linear models for binomial,
 #' Poisson and multinomial responses, the adjusted score equation
@@ -128,7 +120,7 @@
 #' adjacent category logit models, respectively.
 #'
 #' [brglm_fit()] is an alias to [brglmFit()].
-#'
+#' 
 #' @return
 #'
 #' An object inheriting from [`"brglmFit"`][brglmFit()] object, which
@@ -273,327 +265,68 @@
 #' summary(endometrialBR_mean)
 #' summary(endometrialBR_median)
 #'
+#' TODO: Vignette write,  
+
 #' @export
-brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL,
-                     mustart = NULL, offset = rep(0, nobs), family = gaussian(),
+brglmFit <- function(x, y, weights = rep(1, nobs),
+                     start = NULL, etastart = NULL,
+                     mustart = NULL, offset = rep(0, nobs),
+                     family = gaussian(),
                      control = list(), intercept = TRUE,
-                     ## Arguments that glm will not use in its call to brglmFit (be wise with defaults!)
                      fixed_totals = NULL, singular.ok = TRUE) {
-    trace_iteration <- function() {
-        if (iter %% control$trace == 0) {
-            st <-  max(abs(step_beta), na.rm = TRUE)
-            gr <- max(abs(adjusted_grad_beta), na.rm = TRUE)
-            cat("Coefficients update:\t")
-            cat("Outer/Inner iteration:\t", sprintf("%03d", iter), "/", sprintf("%03d", step_factor), "\n", sep = "")
-            if (!no_dispersion) {
-                st <- abs(step_zeta)
-                gr <- abs(adjusted_grad_zeta)
-                cat("Dispersion update:\t")
-                cat("Outer iteration:\t", sprintf("%03d", iter), "\n")
-            }
-            cat("max |step|:", format(round(st, 6), nsmall = 6, scientific = FALSE), "\t",
-                "max |gradient|:", format(round(gr, 6), nsmall = 6, scientific = FALSE), "\n")
-        }
-    }
-
-    ## key_quantities, grad, info and bias are ALWAYS in beta, dispersion parameterization
-    key_quantities <- function(pars, y, level = 0, scale_totals = FALSE, qr = TRUE) {
-        betas <- pars[seq.int(nvars)]
-        dispersion <- pars[nvars + 1]
-        prec <- 1/dispersion
-        etas <- drop(x %*% betas + offset)
-        mus <- linkinv(etas)
-        if (scale_totals) {
-            ## Rescale mus
-            mus_totals <-  as.vector(tapply(mus, fixed_totals, sum))[fixed_totals]
-            mus <- mus * row_totals / mus_totals
-            etas <- linkfun(mus)
-        }
-        out <- list(precision = prec,
-                    betas = betas,
-                    dispersion = dispersion,
-                    etas = etas,
-                    mus = mus,
-                    scale_totals = scale_totals)
-        mean_quantities <- function(out) {
-            d1mus <- mu.eta(etas)
-            d2mus <- d2mu.deta(etas)
-            varmus <- variance(mus)
-            working_weights <- weights * d1mus^2 / varmus
-            wx <- sqrt(working_weights) * x
-            out$d1mus <- d1mus
-            out$d2mus <- d2mus
-            out$varmus <- varmus
-            out$d1varmus <- d1variance(mus)
-            out$working_weights <- working_weights
-            if (qr) out$qr_decomposition <- qr(wx)
-            out
-        }
-        dispersion_quantities <- function(out) {
-            zetas <- -weights * prec
-            out$zetas <- zetas
-            ## Evaluate the derivatives of the a function only for
-            ## objervations with non-zero weight
-            d1afuns <- d2afuns <- d3afuns <- rep(NA_real_, nobs)
-            d1afuns[keep] <- d1afun(zetas[keep])
-            ## because of the way dev.resids is implemented, this is
-            ## d1afun is the expectation of dev.resids + 2 for gamma
-            ## families, so subtract 2
-            if (family$family == "Gamma") d1afuns <- d1afuns - 2
-            d2afuns[keep] <- d2afun(zetas[keep])
-            d3afuns[keep] <- d3afun(zetas[keep])
-            out$d2afuns <- d2afuns
-            out$d3afuns <- d3afuns
-            out$deviance_residuals <- dev.resids(y, mus, weights)
-            out$Edeviance_residuals <- weights * d1afuns
-            out
-        }
-        if (level == 0) {
-            out <- mean_quantities(out)
-        }
-        if (level == 1) {
-            out <- dispersion_quantities(out)
-        }
-        if (level > 1) {
-            out <- mean_quantities(out)
-            out <- dispersion_quantities(out)
-        }
-        out
-    }
-
-    gradient <- function(pars, level = 0, fit = NULL) {
-        if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, level = level, qr = FALSE)
-        }
-        with(fit, {
-            if (level == 0) {
-                score_components <- weights * d1mus  * (y - mus) / varmus * x
-                return(precision * .colSums(score_components, nobs, nvars, TRUE))
-            }
-            if (level == 1) {
-                return(1/2 * precision^2 * sum(deviance_residuals - Edeviance_residuals, na.rm = TRUE))
-            }
-        })
-    }
-
-    information <- function(pars, level = 0, fit = NULL, inverse = FALSE) {
-        if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
-        }
-        with(fit, {
-            if (level == 0) {
-                R_matrix <- qr.R(qr_decomposition)
-                if (inverse) {
-                    ## return(dispersion * tcrossprod(solve(R_matrix)))
-                    return(dispersion * chol2inv(R_matrix))
-                } else {
-                    return(precision * crossprod(R_matrix))
-                }
-            }
-            if (level == 1) {
-                info <- 0.5 * sum(weights^2 * d2afuns, na.rm = TRUE)/dispersion^4
-                if (inverse) {
-                    return(1/info)
-                } else {
-                    return(info)
-                }
-            }
-        })
-    }
-
-    hat_values <- function(pars, fit = NULL) {
-        if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, level = 0, qr = TRUE)
-        }
-        with(fit, {
-            Qmat <- qr.Q(qr_decomposition)
-            .rowSums(Qmat * Qmat, nobs, nvars, TRUE)
-        })
-    }
-
-    ## FIXME: Redundant function for now
-    refit <- function(y, betas_start = NULL) {
-        ## Estimate Beta
-        betas <- coef(glm.fit(x = x, y = y, weights = weights,
-                              start = betas_start,
-                              offset = offset,
-                              family = family,
-                              control = list(epsilon = control$epsilon,
-                                             maxit = 2, trace = FALSE),
-                              intercept = intercept))
-        betas
-    }
-
-    ## Estimate the ML of the dispersion parameter for gaussian, gamma and inverse Gaussian
-    ## Set the dispersion to 1 if Poisson or binomial
-    ## betas is only the regression parameters
-    estimate_dispersion <- function(betas, y) {
-        if (no_dispersion) {
-            disp <- 1
-            dispML <- 1
-        } else {
-            if (df_residual > 0) {
-                dispFit <- try(uniroot(f = function(phi) {
-                    theta <- c(betas, phi)
-                    cfit <- key_quantities(theta, y = y, level = 1, qr = FALSE)
-                    gradient(theta, level = 1, fit = cfit)
-                }, lower = .Machine$double.eps, upper = 10000, tol = control$epsilon), silent = FALSE)
-                if (inherits(dispFit, "try-error")) {
-                    warning("the ML estimate of the dispersion could not be calculated. An alternative estimate had been used as starting value.")
-                    dispML <- NA_real_
-                    disp <- NA_real_
-                } else {
-                    disp <- dispML <- dispFit$root
-                }
-            } else { ## if the model is saturated dispML is NA_real_
-                disp <- 1 ## A convenient value
-                dispML <- NA_real_
-            }
-        }
-        list(dispersion = disp, dispersion_ML = dispML)
-    }
-
-    AS_mean_adjustment <- function(pars, level = 0, fit = NULL) {
-        if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
-        }
-        with(fit, {
-            if (level == 0) {
-                hatvalues <- hat_values(pars, fit = fit)
-                ## Use only observations with keep = TRUE to ensure that no division with zero takes place
-                return(.colSums(0.5 * hatvalues * d2mus/d1mus * x, nobs, nvars, TRUE))
-            }
-            if (level == 1) {
-                s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
-                s2 <- sum(weights^2 * d2afuns, na.rm = TRUE)
-                return((nvars - 2)/(2 * dispersion) + s1/(2 * dispersion^2 * s2))
-            }
-        })
-    }
-
-    AS_Jeffreys_adjustment <- function(pars, level = 0, fit = NULL) {
-        if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
-        }
-        with(fit, {
-            if (level == 0) {
-                hatvalues <- hat_values(pars, fit = fit)
-                ## Use only observations with keep = TRUE to ensure that no division with zero takes place
-                return(2 * control$a * .colSums(0.5 * hatvalues * (2 * d2mus/d1mus - d1varmus * d1mus / varmus) * x, nobs, nvars, TRUE))
-            }
-            if (level == 1) {
-                s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
-                s2 <- sum(weights^2 * d2afuns, na.rm = TRUE)
-                return(2 * control$a * (-(nvars + 4)/(2 * dispersion) + s1/(2 * dispersion^2 * s2)))
-            }
-        })
-    }
-
-    AS_median_adjustment <- function(pars, level = 0, fit = NULL) {
-        if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
-        }
-        with(fit, {
-            if (level == 0) {
-                hatvalues <- hat_values(pars, fit = fit)
-                R_matrix <- qr.R(qr_decomposition)
-                info_unscaled <- crossprod(R_matrix)
-                inverse_info_unscaled <- chol2inv(R_matrix)
-                ## FIXME: There is 1) definitely a better way to do this, 2) no time...
-                b_vector <- numeric(nvars)
-                for (j in seq.int(nvars)) {
-                    inverse_info_unscaled_j <- inverse_info_unscaled[j, ]
-                    vcov_j <- tcrossprod(inverse_info_unscaled_j) / inverse_info_unscaled_j[j]
-                    hats_j <- .rowSums((x %*% vcov_j) * x, nobs, nvars, TRUE) * working_weights
-                    b_vector[j] <- inverse_info_unscaled_j %*% .colSums(x * (hats_j * (d1mus * d1varmus / (6 * varmus) - 0.5 * d2mus/d1mus)), nobs, nvars, TRUE)
-                }
-                return(.colSums(0.5 * hatvalues * d2mus / d1mus * x, nobs, nvars, TRUE) +
-                       info_unscaled %*% b_vector)
-            }
-            if (level == 1) {
-                s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
-                s2 <- sum(weights^2 * d2afuns, na.rm = TRUE)
-                return(nvars/(2 * dispersion) + s1/(6 * dispersion^2 * s2))
-            }
-        })
-    }
-
-    AS_mixed_adjustment <- function(pars, level = 0, fit = NULL) {
-        if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
-        }
-        with(fit, {
-            if (level == 0) {
-                hatvalues <- hat_values(pars, fit = fit)
-                ## Use only observations with keep = TRUE to ensure that no division with zero takes place
-                return(.colSums(0.5 * hatvalues * d2mus/d1mus * x, nobs, nvars, TRUE))
-            }
-            if (level == 1) {
-                s1 <- sum(weights^3 * d3afuns, na.rm = TRUE)
-                s2 <- sum(weights^2 * d2afuns, na.rm = TRUE)
-                return(nvars/(2 * dispersion) + s1/(6 * dispersion^2 * s2))
-            }
-        })
-    }
-
 
     ## compute_step_components does everything on the scale of the /transformed/ dispersion
-    compute_step_components <- function(pars, level = 0, fit = NULL) {
-        if (is.null(fit)) {
-            fit <- key_quantities(pars, y = y, level = level, qr = TRUE)
-        }
+    compute_step_components <- function(pars, fit, level = 0) {
         if (level == 0) {
-            grad <-  gradient(pars, fit = if (has_fixed_totals) NULL else fit, level = 0)
-            inverse_info <- try(information(pars, inverse = TRUE, fit = fit, level = 0))
-            failed_inversion <- inherits(inverse_info, "try-error")
-            adjustment <- adjustment_function(pars, fit = fit, level = 0)
+            # Beta components
+            grad <- fit$grad_beta
+            inverse_info <- fit$inverse_info_beta
+            adjustment <- adjustment_function(pars, fit = fit, level = 0,
+                                                     x, nobs, nvars, weights)
             failed_adjustment <- any(is.na(adjustment))
-        }
-        if (level == 1) {
-            if (no_dispersion | df_residual < 1) {
+            failed_inversion <- FALSE # Already computed successfully
+        } else {
+            # Dispersion components
+            if (fit$no_dispersion || df_residual < 1) {
                 grad <- adjustment <- inverse_info <- NA_real_
                 failed_adjustment <- failed_inversion <- FALSE
             } else {
                 d1zeta <- eval(d1_transformed_dispersion)
                 d2zeta <- eval(d2_transformed_dispersion)
-                grad <-  gradient(theta, fit = fit, level = 1)/d1zeta
-                inverse_info <- 1/information(theta, inverse = FALSE, fit = fit, level = 1) * d1zeta^2
-                failed_inversion <- !is.finite(inverse_info)
-                ## adjustment <- adjustment_function(theta, fit = fit, level = 1)/d1zeta - if (is_ML | is_AS_median) 0 else 0.5 * d2zeta / d1zeta^2
-                adjustment <- adjustment_function(theta, fit = fit, level = 1)/d1zeta - 0.5 * d2zeta / d1zeta^2
+                grad <- fit$grad_zeta / d1zeta
+                inverse_info <- fit$inverse_info_zeta * d1zeta^2
+                adjustment <- adjustment_function(pars, fit = fit, level = 1, x, nobs, 
+                                                  nvars, weights) / d1zeta - 0.5 * d2zeta / d1zeta^2
+                failed_inversion  <- !is.finite(inverse_info)
                 failed_adjustment <- is.na(adjustment)
             }
         }
-        out <- list(grad = grad,
-                    inverse_info = inverse_info,
-                    adjustment = adjustment,
-                    failed_adjustment = failed_adjustment,
-                    failed_inversion = failed_inversion)
-        out
+        list(grad = grad, inverse_info = inverse_info, adjustment = adjustment,
+             failed_adjustment = failed_adjustment, failed_inversion = failed_inversion)
     }
 
+
+
+
     customTransformation <- is.list(control$transformation) & length(control$transformation) == 2
-    if (customTransformation) {
-        transformation0 <- control$transformation
-    }
+    if (customTransformation) transformation0 <- control$transformation
 
     control <- do.call("brglmControl", control)
 
     adjustment_function <- switch(control$type,
-                                  "correction" = AS_mean_adjustment,
-                                  "AS_mean" = AS_mean_adjustment,
-                                  "AS_median" = AS_median_adjustment,
-                                  "AS_mixed" = AS_mixed_adjustment,
-                                  "MPL_Jeffreys" = AS_Jeffreys_adjustment,
-                                  "ML" = function(pars, ...) 0)
+        "correction"   = AS_mean_adjustment,
+        "AS_mean"      = AS_mean_adjustment,
+        "AS_median"    = AS_median_adjustment_new,
+        "AS_mixed"     = AS_mixed_adjustment,
+        "MPL_Jeffreys" = AS_Jeffreys_adjustment,
+        "ML"           = function(pars, ...) 0)
 
     ## Some useful quantities
-    is_ML <- control$type == "ML"
-    is_AS_median <- control$type == "AS_median"
-    is_AS_mixed <- control$type == "AS_mixed"
+    is_ML         <- control$type == "ML"
+    is_AS_median  <- control$type == "AS_median"
+    is_AS_mixed   <- control$type == "AS_mixed"
     is_correction <- control$type == "correction"
     no_dispersion <- family$family %in% c("poisson", "binomial")
-
 
     if (is_ML | is_AS_median | is_AS_mixed) {
         transformation1 <- control$transformation
@@ -605,101 +338,100 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         control$inverseTrans <- expression(transformed_dispersion)
     }
 
-
     ## If fixed_totals is specified the compute row_totals
+    row_totals <- NULL
     if (is.null(fixed_totals)) {
         has_fixed_totals <- FALSE
     } else {
         if (family$family == "poisson") {
-            row_totals <-  as.vector(tapply(y, fixed_totals, sum))[fixed_totals]
+            row_totals  <- as.vector(tapply(y, fixed_totals, sum))[fixed_totals]
             has_fixed_totals <- TRUE
         } else {
             has_fixed_totals <- FALSE
         }
     }
 
-    ## Ensure x is a matrix, extract variable names, observation
+    ## Ensure x is a matrix (or sparse matrix), extract variable names, observation
     ## names, nobs, nvars, and initialize weights and offsets if
     ## needed
 
-    x <- as.matrix(x)
+    # Sparse detection 
+    is_already_sparse <- inherits(x, "sparseMatrix")
+    if (!is_already_sparse) x <- as.matrix(x)
+
     betas_names <- dimnames(x)[[2L]]
     nvars <- ncol(x)
     EMPTY <- nvars == 0
-    if (is.null(betas_names) & !EMPTY) {
+    if (is.null(betas_names) & !EMPTY)
         betas_names <- colnames(x) <- paste0("x", seq.int(nvars))
-    }
     ynames <- if (is.matrix(y)) rownames(y) else names(y)
     converged <- FALSE
-    nobs <- NROW(y)
-    if (is.null(weights)) {
-        weights <- rep.int(1, nobs)
-    }
-    if (missing_offset <- is.null(offset)) {
-        offset <- rep.int(0, nobs)
-    }
+    nobs   <- NROW(y)
+    if (is.null(weights)) weights <- rep.int(1, nobs)
+    if (missing_offset <- is.null(offset)) offset  <- rep.int(0, nobs)
 
-    ok_links <- c("logit", "probit", "cauchit",
-                  "cloglog", "identity", "log",
-                  "sqrt", "inverse")
+    ok_links <- c("logit", "probit", "cauchit", "cloglog",
+                  "identity", "log", "sqrt", "inverse")
 
+    if (isTRUE(family$family %in% c("quasi", "quasibinomial", "quasipoisson")))
+        stop("`brglmFit` does not currently support quasi families.")
 
-    if (isTRUE(family$family %in% c("quasi", "quasibinomial", "quasipoisson"))) {
-        stop("`brglmFit` does not currently support the `quasi`, `quasipoisson` and `quasibinomial` families.")
-    }
+    # Sparse path decision
+    # The sparse path replaces the dense QR of sqrt(W)X (cost O(n*p^2)) with a
+    # Cholesky of X'WX (cost O(nnz) to form + O(p^3) to factor).  This wins
+    # when forming the n x p weighted matrix is the bottleneck, i.e. when n*p >> nnz.
+
+    nnz <- if (is_already_sparse) Matrix::nnzero(x) else sum(x != 0)
+    fill_rate <- nnz / (nobs * nvars)
+    use_sparse <- nnz < 5e5 && nvars > 20L && fill_rate < 0.20
+
+    if (use_sparse && !is_already_sparse) x <- Matrix::Matrix(x, sparse = TRUE)
+    if (!use_sparse &&  is_already_sparse) x <- as.matrix(x)
+
+    if (control$trace && use_sparse) cat("Using sparse matrix representation for design matrix x. Fill rate - ", fill_rate, "\n")
 
     ## Enrich family
     family <- enrichwith::enrich(family, with = c("d1afun", "d2afun", "d3afun", "d1variance"))
-    if ((family$link %in% ok_links) | (grepl("mu\\^", family$link))) {
+    if ((family$link %in% ok_links) | grepl("mu\\^", family$link)) {
         ## Enrich the link object with d2mu.deta and update family object
-        linkglm <- make.link(family$link)
-        linkglm <- enrichwith::enrich(linkglm, with = "d2mu.deta")
+        linkglm <- enrichwith::enrich(make.link(family$link), with = "d2mu.deta")
         ## Put everything into the family object
         family[names(linkglm)] <- linkglm
     }
+
     ## Annoying thing is that link-glm components other than the
     ## standard ones disappear when extra arguments are passed to a
     ## family functions... Anyway, we only require d2mu.deta here.
 
     ## Extract functions from the enriched family object
+
     variance <- family$variance
     d1variance <- family$d1variance
     linkinv <- family$linkinv
     linkfun <- family$linkfun
     if (!is.function(variance) || !is.function(linkinv))
-        stop("'family' argument seems not to be a valid family object",
-             call. = FALSE)
+        stop("'family' argument seems not to be a valid family object", call. = FALSE)
+    mu.eta  <- family$mu.eta
     dev.resids <- family$dev.resids
-    aic <- family$aic
-    mu.eta <- family$mu.eta
+    aic  <- family$aic
+
     ## If the family is custom then d2mu.deta cannot survive when
     ## passing throguh current family functions. But mu.eta does; so
     ## we compute d2mu.deta numerically; this allows also generality,
     ## as the users can then keep their custom link implementations
     ## unaltered. Issue is scalability, due to the need of evaluating
     ## n numerical derivatives
-    if (is.null(family$d2mu.deta)) {
-        d2mu.deta <- function(eta) {
-            numDeriv::grad(mu.eta, eta)
-        }
-    } else {
-        d2mu.deta <- family$d2mu.deta
-    }
-    d1afun <- family$d1afun
-    d2afun <- family$d2afun
-    d3afun <- family$d3afun
-    simulate <- family$simulate
+    if (is.null(family$d2mu.deta))
+        family$d2mu.deta <- function(eta) numDeriv::grad(mu.eta, eta)
+
     d1_transformed_dispersion <- DD(control$Trans, "dispersion", order = 1)
     d2_transformed_dispersion <- DD(control$Trans, "dispersion", order = 2)
 
-
     ## Check for invalid etas and mus
     valid_eta <- unless_null(family$valideta, function(eta) TRUE)
-    valid_mu <- unless_null(family$validmu, function(mu) TRUE)
+    valid_mu <- unless_null(family$validmu,  function(mu)  TRUE)
 
-    ## FIXME: mustart and etastart set to NULL by default
-    mustart <- NULL
-    etastart <- NULL
+    mustart <- NULL; etastart <- NULL
 
     ## Initialize as prescribed in family
     eval(family$initialize)
@@ -707,23 +439,20 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     ## If there are no covariates in the model then evaluate only the offset
     if (EMPTY) {
         etas <- rep.int(0, nobs) + offset
-        if (!valid_eta(etas))
-            stop("invalid linear predictor values in empty model", call. = FALSE)
-        mus <- linkinv(etas)
-        if (!valid_mu(mus))
-            stop("invalid fitted means in empty model", call. = FALSE)
-        ## deviance <- sum(dev.resids(y, mus, weights))
-        working_weights <- ((weights * mu.eta(etas)^2)/variance(mus))^0.5
-        residuals <- (y - mus)/mu.eta(etas)
-        keep <- rep(TRUE, length(residuals))
+        if (!valid_eta(etas)) stop("invalid linear predictor values in empty model", call. = FALSE)
+        mus  <- linkinv(etas)
+        if (!valid_mu(mus))   stop("invalid fitted means in empty model", call. = FALSE)
+        working_weights <- ((weights * mu.eta(etas)^2) / variance(mus))^0.5
+        residuals <- (y - mus) / mu.eta(etas)
         boundary <- converged <- TRUE
         betas_all <- numeric()
         rank <- 0
         iter <- 0L
-        keep <- weights > 0
+        keep  <- weights > 0
         nkeep <- sum(keep)
         df_residual <- nkeep
     } else {
+
         boundary <- converged <- FALSE
         ## Detect aliasing
         if (!isTRUE(control$check_aliasing)) {
@@ -731,12 +460,11 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
             rank <- nvars_all <- nvars
             betas_names_all <- betas_names
         } else {
-            qrx <- qr(x)
+            qrx <- qr(if (use_sparse) as.matrix(x) else x)   # force dense for S3 accessors
             rank <- qrx$rank
             is_full_rank <- rank == nvars
-            if (!isTRUE(singular.ok) && !isTRUE(is_full_rank)) {
+            if (!isTRUE(singular.ok) && !isTRUE(is_full_rank))
                 stop("singular fit encountered")
-            }
             if (!isTRUE(is_full_rank)) {
                 aliased <- qrx$pivot[seq.int(qrx$rank + 1, nvars)]
                 X_all <- x
@@ -752,48 +480,56 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         }
         betas_all <- structure(rep(NA_real_, nvars_all), .Names = betas_names_all)
         keep <- weights > 0
-        ## Check for zero weights
-        ## if (any(!keep)) {
-        ##     warning("Observations with non-positive weights have been omited from the computations")
-        ## }
         nkeep <- sum(keep)
         df_residual <- nkeep - rank
+
         ## Handle starting values
         ## If start is NULL then start at the ML estimator else use start
         if (is.null(start)) {
             ## Adjust counts if binomial or Poisson in order to avoid infinite estimates
             adj <- control$response_adjustment
-            if (is.null(adj)) {
-                adj <- nvars/nobs
-            }
+            if (is.null(adj)) adj <- nvars / nobs
             if (family$family == "binomial") {
                 weights.adj <- weights + (!(is_correction)) * adj
-                y.adj <- (weights * y + (!(is_correction)) * 0.5 * adj)/weights.adj
+                y.adj       <- (weights * y + (!(is_correction)) * 0.5 * adj) / weights.adj
             } else {
                 weights.adj <- weights
-                y.adj <- y + if (family$family == "poisson") (!(is_correction)) * 0.5 * adj else 0
+                y.adj       <- y + if (family$family == "poisson") (!(is_correction)) * 0.5 * adj else 0
             }
             ## ML fit to get starting values
             ## Get startng values and kill warnings whilst doing that
             suppressWarnings(
-                tempFit <- glm.fit(x = x, y = y.adj, weights = weights.adj,
+                tempFit <- glm.fit(x = if (use_sparse) as.matrix(x) else x,
+                                   y = y.adj, weights = weights.adj,
                                    etastart = etastart, mustart = mustart,
                                    offset = offset, family = family,
                                    control = list(epsilon = control$epsilon,
                                                   maxit = 10000, trace = FALSE),
                                    intercept = intercept)
             )
-            betas <- coef(tempFit)
-            names(betas) <- betas_names
-            dispList <- estimate_dispersion(betas, y = y)
+            betas <- coef(tempFit); names(betas) <- betas_names
+            dispList <- estimate_dispersion(betas = betas, y = y, x = x,
+                                            weights = weights, offset = offset,
+                                            family = family,
+                                            fixed_totals = fixed_totals,
+                                            row_totals = row_totals,
+                                            no_dispersion = no_dispersion,
+                                            nobs = nobs, nvars = nvars, keep = keep,
+                                            df_residual = df_residual, control = control,
+                                            use_sparse = use_sparse)
             dispersion <- dispList$dispersion
-            if (is.na(dispersion)) dispersion <- var(y)/variance(sum(weights * y)/sum(weights))
+            if (is.na(dispersion))
+                dispersion <- var(y) / variance(sum(weights * y) / sum(weights))
+            # Enforce positivity constraint
+            if (!is.na(dispersion) && dispersion <= 0) {
+                warning(sprintf("Dispersion became non-positive (%.6g); resetting to small positive value.", dispersion))
+                dispersion <- .Machine$double.eps
+            }
             dispersion_ML <- dispList$dispersion_ML
             transformed_dispersion <- eval(control$Trans)
         } else {
             if ((length(start) == nvars_all) & is.numeric(start)) {
-                betas_all <- start
-                names(betas_all) <- betas_names_all
+                betas_all <- start; names(betas_all) <- betas_names_all
                 if (!isTRUE(is_full_rank)) {
                     betas_all[aliased] <- NA_real_
                     betas <- betas_all[-aliased]
@@ -801,15 +537,27 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                     betas <- betas_all
                 }
                 ## Estimate dispersion based on current value for betas
-                dispList <- estimate_dispersion(betas, y = y)
+                dispList <- estimate_dispersion(betas = betas, y = y, x = x,
+                                                weights = weights, offset = offset,
+                                                family = family,
+                                                fixed_totals = fixed_totals,
+                                                row_totals = row_totals,
+                                                no_dispersion = no_dispersion,
+                                                nobs = nobs, nvars = nvars, keep = keep,
+                                                df_residual = df_residual, control = control,
+                                                use_sparse = use_sparse)
                 dispersion <- dispList$dispersion
-                if (is.na(dispersion)) dispersion <- var(y)/variance(sum(weights * y)/sum(weights))
-                dispersion_ML <- dispList$dispersion_ML
+                if (is.na(dispersion))
+                    dispersion <- var(y) / variance(sum(weights * y) / sum(weights))
+                # Enforce positivity constraint
+                if (!is.na(dispersion) && dispersion <= 0) {
+                    warning(sprintf("Dispersion became non-positive (%.6g); resetting to small positive value.", dispersion))
+                    dispersion <- .Machine$double.eps
+                }
+                dispersion_ML          <- dispList$dispersion_ML
                 transformed_dispersion <- eval(control$Trans)
-            }
-            if ((length(start) == nvars_all + 1) & is.numeric(start)) {
-                betas_all <- start[seq.int(nvars_all)]
-                names(betas_all) <- betas_names_all
+            } else if ((length(start) == nvars_all + 1) & is.numeric(start)) {
+                betas_all <- start[seq.int(nvars_all)]; names(betas_all) <- betas_names_all
                 if (!isTRUE(is_full_rank)) {
                     betas_all[aliased] <- NA_real_
                     betas <- betas_all[-aliased]
@@ -819,172 +567,371 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                 transformed_dispersion <- start[nvars_all + 1]
                 dispersion_ML <- NA_real_
                 dispersion <- eval(control$inverseTrans)
-            }
-            if (length(start) > nvars_all + 1 | length(start) < nvars_all) {
-                stop(paste(paste(gettextf("length of 'start' should be equal to %d and correspond to initial betas for %s", nvars_all, paste(deparse(betas_names_all), collapse = ", "), "or", gettextf("to %d and also include a starting value for the transformed dispersion", nvars_all + 1)))), domain = NA_real_)
+                # Enforce positivity constraint
+                if (!is.na(dispersion) && dispersion <= 0) {
+                    warning(sprintf("Dispersion became non-positive (%.6g); resetting to small positive value.", dispersion))
+                    dispersion <- .Machine$double.eps
+                }
+            } else {
+                stop(gettextf(
+                    "length of 'start' should equal %d (betas) or %d (betas + dispersion)",
+                    nvars_all, nvars_all + 1), domain = NA)
             }
         }
 
         adjusted_grad_all <- rep(NA_real_, nvars_all + 1)
         names(adjusted_grad_all) <- c(betas_names_all, "Transformed dispersion")
+
         if (is_correction) {
+            ## Needs original fisher scoring implementation to work for correction as this is specific to a single fisher scoring step
             if (control$maxit > 0) control$maxit <- 1
             control$slowit <- 1
             control$max_step_factor <- 1
         }
 
-        ## Evaluate at the starting values
         theta <- c(betas, dispersion)
         transformed_dispersion <- eval(control$Trans)
-        ## Mean quantities
-        ## If fixed_totals is provided (i.e. multinomial regression
-        ## via the Poisson trick) then evaluate everything expect
-        ## the score function at the scaled fitted means
-        quantities <- key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE)
-        step_components_beta <- compute_step_components(theta, level = 0, fit = quantities)
-        step_components_zeta <- compute_step_components(theta, level = 1, fit = quantities)
-        if (step_components_beta$failed_inversion) {
-            warning("failed to invert the information matrix")
-        }
-        if (step_components_beta$failed_adjustment) {
-            warning("failed to calculate score adjustment")
-        }
-        adjusted_grad_beta <- with(step_components_beta, {
-            grad + adjustment
-        })
-        step_beta <- drop(step_components_beta$inverse_info %*% adjusted_grad_beta)
-        ## Dispersion quantities
-        if (no_dispersion) {
-            adjusted_grad_zeta <- step_zeta <- NA_real_
+
+        # Determine if we need to compute the inverse of the information matrix for the dispersion parameter
+        needs_inverse <- !no_dispersion || control$type == "AS_median" || is_correction
+
+        # Avoid unconstrained trust-region steps for dispersion in null/intercept-only models
+        # Only update dispersion if model is not empty/null
+        if (!EMPTY) {
+        fit <- compute_fit(pars = theta, y = y, x = x, weights = weights,
+                           offset = offset, family = family,
+                           fixed_totals = fixed_totals, row_totals = row_totals,
+                           no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                           keep = keep, need_qr = TRUE, need_hatvalues = TRUE,
+                           need_inverse = needs_inverse, use_sparse = use_sparse)
         } else {
-            if (step_components_zeta$failed_inversion) {
-                warning("failed to invert the information matrix")
-            }
-            if (step_components_zeta$failed_adjustment) {
-                warning("failed to calculate score adjustment")
-            }
-            adjusted_grad_zeta <- with(step_components_zeta, {
-                grad + adjustment
-            })
-            step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
+            # For null/intercept-only models, use safe default for dispersion
+            dispersion <- 1
+            theta <- c(betas, dispersion)
+            transformed_dispersion <- eval(control$Trans)
+            fit <- NULL
         }
 
-        ## Main iterations
-        slowit <- control$slowit
+        step_components_beta <- compute_step_components(theta, level = 0, fit = fit)
+        step_components_zeta <- compute_step_components(theta, level = 1, fit = fit)
+        if (step_components_beta$failed_inversion)  warning("failed to invert the information matrix")
+        if (step_components_beta$failed_adjustment) warning("failed to calculate score adjustment")
+
+        adjusted_grad_beta <- with(step_components_beta, grad + adjustment)
+        adjusted_grad_zeta <- if (no_dispersion) NA_real_ else
+                              with(step_components_zeta, grad + adjustment)
+
+        
+        # trust region parameters (Nocedal & Wright 2006)
+        Delta         <- 1.0
+        Delta_max     <- 1e10
+        radius_shrink <- 0.25
+        radius_expand <- 0.75
+        shrink_factor <- 0.25
+        expand_factor <- 2.0
+        cg_maxiter    <- min(nvars, 50)
+        eta           <- 0.1 ## Add to control?
+
+        # Attempt infrequent hatvalue updates
+        hatvalues_cached <- fit$hatvalues
+        hat_accept_count <- 0L
+        hat_update_freq  <- control$hat_update_freq
+        #hat_update_freq <- max(3L, min(10L, as.integer(floor(nobs / (5 * nvars)))))
+
+        failed <- FALSE
         if (control$maxit == 0) {
-            iter <- 0
-            failed <- FALSE
+            iter <- 0L
         } else {
-            ## Outer iteration
             for (iter in seq.int(control$maxit)) {
-                step_factor <- 0
-                testhalf <- TRUE
+                recomp <- FALSE # flag purely for trace output
 
-                ## Inner iteration
-                while (testhalf & step_factor < control$max_step_factor) {
-                    ## store previous values
-                    ## betas0 <- betas
-                    ## dispersion0 <- dispersion
-                    step_beta_previous <- step_beta
-                    step_zeta_previous <- step_zeta
+                if (is_correction) {
+                    # type = "correction" (Cordeiro & McCullagh, 1991) is a single
+                    # closed-form Fisher-scoring step away from the MLE, not an
+                    # iterative refinement -- control$maxit is forced to 1 above,
+                    # so there is no later iteration to absorb any error left by
+                    # an inexact solve. The CG-Steihaug trust-region step below is
+                    # deliberately inexact (adaptive tolerance, radius truncation)
+                    # which is fine when further iterations can correct for it, but
+                    # leaks straight into the final estimate here. Solve exactly
+                    # instead, matching the direct Newton step used previously.
+                    #
+                    # The mean and dispersion corrections are also a *joint* one-step
+                    # update evaluated at the same point (the MLE): step_components_zeta
+                    # / adjusted_grad_zeta at this point in the loop still hold the
+                    # values computed before the iteration started (i.e. at the MLE),
+                    # so the dispersion step below must be taken from those, not
+                    # recomputed after betas have already moved (which is what the
+                    # generic sequential beta-then-dispersion update below does).
+                    step <- list(p = drop(fit$inverse_info_beta %*% adjusted_grad_beta), on_boundary = FALSE)
+                    betas <- betas + step$p
 
-                    ## Update betas
-                    betas <- betas + slowit * 2^(-step_factor) * step_beta
-
-                    ## Update zetas
-                    if (!no_dispersion & df_residual > 0) {
-                        transformed_dispersion <- eval(control$Trans)
-                        transformed_dispersion <- transformed_dispersion + 2^(-step_factor) * step_zeta
-                        dispersion <- eval(control$inverseTrans)
-                    }
-
-                    ## Compute key quantities
-                    theta <- c(betas, dispersion)
-                    transformed_dispersion <- eval(control$Trans)
-
-                    ## Mean quantities
-                    quantities <- try(key_quantities(theta, y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE), silent = TRUE)
-                    ## This is to capture qr failing and revering to previous estimates
-                    if (failed_adjustment_beta <- inherits(quantities, "try-error")) {
-                        ## betas <- betas0
-                        ## dispersion <- dispersion0
-                        warning("failed to calculate score adjustment")
-                        break
-                    }
-                    step_components_beta <- compute_step_components(theta, level = 0, fit = quantities)
-                    step_components_zeta <- compute_step_components(theta, level = 1, fit = quantities)
-                    if (failed_inversion_beta <- step_components_beta$failed_inversion) {
-                        warning("failed to invert the information matrix")
-                        break
-                    }
-                    if (failed_adjustment_beta <- step_components_beta$failed_adjustment) {
-                        warning("failed to calculate score adjustment")
-                        break
-                    }
-                    adjusted_grad_beta <- with(step_components_beta, grad + adjustment)
-                    step_beta <- drop(step_components_beta$inverse_info %*% adjusted_grad_beta)
-
-                    ## Dispersion quantities
-                    if (no_dispersion) {
-                        adjusted_grad_zeta <- step_zeta <- NA_real_
-                        failed_inversion_zeta <- failed_adjustment_zeta <- FALSE
-                    } else {
-                        if (failed_inversion_zeta <- step_components_zeta$failed_inversion) {
-                            warning("failed to invert the information matrix")
-                            break
-                        }
-                        if (failed_adjustment_zeta <- step_components_zeta$failed_adjustment) {
-                            warning("failed to calculate score adjustment")
-                            break
-                        }
-                        adjusted_grad_zeta <- with(step_components_zeta, grad + adjustment)
+                    if (!no_dispersion && df_residual > 0 &&
+                        !step_components_zeta$failed_inversion &&
+                        !step_components_zeta$failed_adjustment) {
                         step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
+                        td_prev   <- eval(control$Trans)
+                        sf        <- 0L
+                        while (sf <= control$max_step_factor) {
+                            td_new <- td_prev + 2^(-sf) * step_zeta
+                            transformed_dispersion <- td_new
+                            d_new  <- eval(control$inverseTrans)
+                            if (is.finite(d_new) && d_new > 0) break
+                            sf <- sf + 1L
+                        }
+                        dispersion <- d_new
                     }
 
-                    ## Convergence criteria
-                    linf_current <- max(abs(c(step_beta, step_zeta)), na.rm = TRUE)
-                    linf_previous <- max(abs(c(step_beta_previous, step_zeta_previous)), na.rm = TRUE)
-                    testhalf <- linf_current > linf_previous
+                    theta <- c(betas, dispersion)
+                    fit <- compute_fit(pars = theta, y = y, x = x,
+                                weights = weights, offset = offset, family = family,
+                                fixed_totals = fixed_totals, row_totals = row_totals,
+                                no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                                keep = keep, need_qr = TRUE, need_hatvalues = TRUE,
+                                need_inverse = needs_inverse, use_sparse = use_sparse)
 
-                    ## Continue inner loop
-                    ## if (step_factor == 0 & iter == 1)  {
-                    ##     testhalf <- TRUE
-                    ## }
-                    step_factor <- step_factor + 1
+                    step_components_beta <- compute_step_components(theta, level = 0, fit = fit)
+                    adjusted_grad_beta <- with(step_components_beta, grad + adjustment)
+                    step_components_zeta <- compute_step_components(theta, level = 1, fit = fit)
+                    adjusted_grad_zeta <- if (no_dispersion) NA_real_ else
+                                          with(step_components_zeta, grad + adjustment)
+                    accept_status <- "ACCEPT"
+                    recomp <- TRUE
+                } else {
 
-                    ##  Trace here
-                    if (control$trace) {
-                        trace_iteration()
+                # Preconditioned CG-Steihaug trust-region step
+                # Minimise  -r_adj' p + 0.5 p' F p  s.t. ||p|| <= Delta
+                # Uses stored fit$info_beta (p x p, O(p^2) matvec) with Jacobi
+                # diagonal preconditioner M = diag(F) to reduce inner iterations.
+                r_adj_sq  <- sum(adjusted_grad_beta^2)
+
+                # Adaptive tolerance: loose early, tight near convergence
+                #cg_tol_adapt <- min(0.5, sqrt(sqrt(r_adj_sq)))
+
+                # Eisenstat-Walker Choice 2 (Theorem 2.3)
+                # https://softlib.rice.edu/pub/CRPC-TRs/reports/CRPC-TR94463.pdf
+                gamma <- 0.9; alpha <- 2.0
+                cg_tol_ew <- if (iter == 1) 0.5 else
+                    min(0.5, gamma * (r_adj_sq / r_adj_sq_prev)^alpha)
+                r_adj_sq_prev <- r_adj_sq   # store for next iteration
+
+                #cg_tol = 0.1
+
+                # Define Fmatvec for sparse path avoiding explicit formation of the dense info matrix
+                Fmatvec <- if (use_sparse) {
+                    pr <- fit$precision; ww <- fit$working_weights
+                    function(d) { wd <- ww * drop(x %*% d); pr * .sparse_crossprod_vec(x, wd) }
+                } else NULL
+
+                # Again for the sparse path we use specialised sparse safe
+                # diagonal of X^T diag(w) X (column squared norms) with helper
+                diag_F <- if (use_sparse) fit$precision * .sparse_wtd_colnorms2(x, fit$working_weights) else NULL
+
+                step <- cg_steihaug_pcg(
+                    r_adj   = adjusted_grad_beta,
+                    F_info  = if (use_sparse) NULL else fit$info_beta,
+                    Fmatvec = Fmatvec,
+                    diag_F  = diag_F,
+                    Delta   = Delta,
+                    tol     = cg_tol_ew,
+                    maxiter = cg_maxiter)
+
+                # Predicted reduction (||r_adj||^2 objective)
+                # pred = 0.5(||r_adj||^2 - ||r_adj + (-F) p||^2), F stored as p x p.
+                Fp <- if (use_sparse) Fmatvec(step$p) else drop(fit$info_beta %*% step$p)
+                r_adj_model <- adjusted_grad_beta - Fp
+                pred_reduction <- (r_adj_sq - sum(r_adj_model^2))
+
+                betas_candidate <- betas + step$p
+                theta_candidate <- c(betas_candidate, dispersion)
+
+                fit_candidate <- try(
+                    compute_fit(pars = theta_candidate, y = y, x = x, weights = weights,
+                                offset = offset, family = family,
+                                fixed_totals = fixed_totals, row_totals = row_totals,
+                                no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                                keep = keep, need_qr = TRUE, need_hatvalues = FALSE,
+                                hatvalues_precomputed = hatvalues_cached,
+                                need_inverse = needs_inverse,
+                                use_sparse = use_sparse),
+                    silent = TRUE)
+
+                if (inherits(fit_candidate, "try-error")) {
+                    Delta <- shrink_factor * Delta
+                    if (Delta < 1e-16) { warning("Trust region radius became too small"); break }
+                    next
+                }
+
+                # Actual reduction (||r_adj||^2 objective)
+                # Compute adjusted score at the candidate point.
+                adj_candidate   <- adjustment_function(theta_candidate, fit = fit_candidate,
+                                                       level = 0, x, nobs, nvars, weights)
+                r_adj_candidate <- fit_candidate$grad_beta + adj_candidate
+                actual_reduction <- (r_adj_sq - sum(r_adj_candidate^2))
+
+                # Reduction ratio (Nocedal & Wright 4.4)
+                # Avoids numerical issues when pred_reduction is small
+                rho <- if (abs(pred_reduction) < 1e-16) {
+                    if (actual_reduction > 0) 1.0 else 0.0
+                } else {
+                    actual_reduction / pred_reduction
+                }
+
+                # adapt radius (Nocedal & Wright Algo 4.1)
+                if (rho < radius_shrink) {
+                    Delta <- shrink_factor * Delta
+                } else if (rho > radius_expand) {
+                    Delta <- min(expand_factor * Delta, Delta_max)
+                }
+
+                # Accept/reject candidate, 0.1 threshold is fairly loose could be tightened to 0.25
+                if (rho > eta) {
+                    # Update with candidate
+                    betas <- betas_candidate
+                    theta <- theta_candidate
+                    fit <- fit_candidate
+                    hat_accept_count <- hat_accept_count + 1L
+
+                    # Periodic hat-value refresh.
+                    # Sparse path: re-use R_matrix from Cholesky (already p x p dense).
+                    #   R_matrix is always non-NULL when use_sparse=TRUE (compute_fit
+                    #   always attempts Cholesky when need_qr=TRUE).  The inverse_info_beta
+                    #   fallback below handles the rare rank-deficient edge case.
+                    # Dense path: call qr.Q() on the stored QR - no extra factorisation.
+                    if (hat_accept_count %% hat_update_freq == 0L) {
+                        if (use_sparse) {
+                            if (!is.null(fit$R_matrix)) {
+                                # Same lower-triangular solve as in compute_fit
+                                Xd <- as.matrix(x)
+                                Z  <- backsolve(fit$R_matrix, t(Xd), transpose = TRUE)
+                                hatvalues_cached <- fit$working_weights * colSums(Z * Z)
+                                Xd <- Z  <- NULL
+                            } else if (!is.null(fit$inverse_info_beta)) {
+                                Xd <- as.matrix(x)
+                                XV <- Xd %*% fit$inverse_info_beta
+                                hatvalues_cached <- fit$working_weights * rowSums(XV * Xd)
+                                Xd <- XV  <- NULL
+                            }
+                        } else {
+                            Q_tmp  <- qr.Q(fit$qr_decomposition)
+                            hatvalues_cached <- .rowSums(Q_tmp * Q_tmp, nobs, nvars, TRUE)
+                            Q_tmp  <- NULL
+                        }
+                        fit$hatvalues <- hatvalues_cached
+                        recomp <- TRUE
                     }
+
+                    step_components_beta <- compute_step_components(theta, level = 0, fit = fit)
+                    adjusted_grad_beta <- with(step_components_beta, grad + adjustment)
+                    accept_status <- "ACCEPT"
+                } else {
+                    accept_status <- "REJECT"
                 }
-                failed <- failed_adjustment_beta || failed_inversion_beta || failed_adjustment_zeta || failed_inversion_zeta
-                if (failed || linf_current < control$epsilon) {
-                    break
+
+                if (Delta < 1e-16) { warning("Trust region radius became too small"); break }
+
+                step_components_zeta <- compute_step_components(theta, level = 1, fit = fit)
+                adjusted_grad_zeta   <- if (no_dispersion) NA_real_ else
+                                        with(step_components_zeta, grad + adjustment)
+
+                # dispersion Newton step with step-halving
+                if (!no_dispersion & df_residual > 0 &
+                    !step_components_zeta$failed_inversion &
+                    !step_components_zeta$failed_adjustment) {
+
+                    step_zeta <- as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
+                    td_prev   <- transformed_dispersion
+                    sf        <- 0L
+
+                    # Main step-halving loop:
+                    # keep halving the step until we get a positive dispersion
+                    # value or exceed max_step_factor
+                    while (sf <= control$max_step_factor) {
+                        td_new <- td_prev + 2^(-sf) * step_zeta
+                        transformed_dispersion <- td_new
+                        d_new  <- eval(control$inverseTrans)
+                        if (is.finite(d_new) && d_new > 0) break
+                        sf <- sf + 1L
+                    }
+
+                    # Recompute the fit at the new dispersion value but with the same betas
+                    fit_new <- compute_fit(pars = c(betas, d_new), y = y, x = x,
+                                           weights = weights, offset = offset,
+                                           family = family,
+                                           fixed_totals = fixed_totals,
+                                           row_totals = row_totals,
+                                           no_dispersion = no_dispersion,
+                                           nobs = nobs, nvars = nvars, keep = keep,
+                                           need_qr = FALSE, need_hatvalues = FALSE,
+                                           need_inverse = FALSE, use_sparse = use_sparse)
+
+                    # Rescale dispersion-dependent fields that aren't recomputed in fit_new
+                    # Check these steps for completeness
+                    scale                     <- d_new / dispersion
+                    fit_new$info_beta         <- fit$info_beta         / scale
+                    fit_new$inverse_info_beta <- fit$inverse_info_beta * scale
+                    fit_new$hatvalues         <- fit$hatvalues
+                    fit_new$qr_decomposition  <- fit$qr_decomposition
+                    fit_new$R_matrix          <- fit$R_matrix
+                    fit                       <- fit_new
+                    dispersion                <- d_new
+                    theta                     <- c(betas, dispersion)
+                    step_components_beta      <- compute_step_components(theta, level = 0, fit = fit)
+                    adjusted_grad_beta        <- with(step_components_beta, grad + adjustment)
                 }
+                }
+
+                step_zeta_conv <- if (no_dispersion || df_residual < 1 ||
+                                      step_components_zeta$failed_inversion ||
+                                      step_components_zeta$failed_adjustment) NA_real_ else
+                                  as.vector(adjusted_grad_zeta * step_components_zeta$inverse_info)
+
+                if (control$trace && !is_correction) {
+                    cat(sprintf(
+                        "Iter %3d: f=%.4e  ||r||=%.4e  ||p||=%.4e  dDisp=%.3e  Delta=%.3e  rho=%6.3f  %s%s%s\n",
+                        iter,
+                        0.5 * r_adj_sq,
+                        sqrt(r_adj_sq),
+                        sqrt(sum(step$p^2)),
+                        if (is.na(step_zeta_conv)) 0 else abs(step_zeta_conv),
+                        Delta, rho, accept_status,
+                        if (step$on_boundary) " [BOUND]" else "",
+                        if(recomp) " [HAT UPDATE]" else ""))
+                }
+
+                # Convergence: step-size criterion matching brglmFit_original.
+                step_zeta_conv_abs <- if (is.na(step_zeta_conv)) NA_real_ else abs(step_zeta_conv)
+                failed <- step_components_beta$failed_inversion ||
+                          step_components_beta$failed_adjustment
+                beta_converged <- max(abs(step$p)) < control$epsilon
+                zeta_converged <- no_dispersion || df_residual < 1 ||
+                                  is.na(step_zeta_conv_abs) ||
+                                  step_zeta_conv_abs < control$epsilon
+                if (failed || (beta_converged && zeta_converged)) break
             }
         }
 
-        adjusted_grad_all[betas_names] <- adjusted_grad_beta
+        adjusted_grad_all[betas_names]              <- adjusted_grad_beta
         adjusted_grad_all["Transformed dispersion"] <- adjusted_grad_zeta
-        betas_all[betas_names] <- betas
+        betas_all[betas_names]                      <- betas
 
         ## Convergence analysis
         if ((failed | iter >= control$maxit) & !(is_correction)) {
-            warning("brglmFit: algorithm did not converge. Try changing the optimization algorithm defaults, e.g. the defaults for one or more of `maxit`, `epsilon`, `slowit`, and `response_adjustment`; see `?brglm_control` for default values and available options", call. = FALSE)
+            warning(paste("brglmFit: algorithm did not converge.",
+                          "Try changing maxit, epsilon, slowit, or response_adjustment;",
+                          "see ?brglm_control for defaults."), call. = FALSE)
             converged <- FALSE
         } else {
             converged <- TRUE
         }
-
-        if (boundary) {
-            warning("brglmFit: algorithm stopped at boundary value", call. = FALSE)
-        }
+        if (boundary) warning("brglmFit: algorithm stopped at boundary value", call. = FALSE)
 
         ## QR decomposition and fitted values are at the final value
         ## for the coefficients
-        ## QR decomposition for cov.unscaled
+        ## QR decomposition for cov.unscaled        
         if (!isTRUE(is_full_rank)) {
             x <- X_all
+            betas_all[betas_names] <- betas
             betas <- betas_all
             betas[is.na(betas)] <- 0
             nvars <- nvars_all
@@ -994,68 +941,58 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         ## calculating QR decompositions, fitted values, etas,
         ## residuals and working_weights
 
-        quantities <- key_quantities(c(betas, dispersion), y = y, level = 2 * !no_dispersion, scale_totals = has_fixed_totals, qr = TRUE)
+        fit <- compute_fit(pars = c(betas, dispersion), y = y, x = x,
+                           weights = weights, offset = offset, family = family,
+                           fixed_totals = fixed_totals, row_totals = row_totals,
+                           no_dispersion = no_dispersion, nobs = nobs, nvars = nvars,
+                           keep = keep, need_qr = TRUE, need_hatvalues = FALSE,
+                           use_sparse = use_sparse)
 
-        qr.Wx <- quantities$qr_decomposition
-
-        mus <- quantities$mus
-        etas <- quantities$etas
-        ## Residuals
-        residuals <- with(quantities, (y - mus)/d1mus)
-        working_weights <- quantities$working_weights
+        # For downstream glm infrastructure we need a real dense QR object.
+        # Sparse path: build it once from dense(sqrt(w)*x); this happens only at
+        # the end of fitting so the cost is paid once
+        qr.Wx <- fit$qr_decomposition
+        if (use_sparse || !inherits(qr.Wx, "qr")) {
+            wx_dense <- as.matrix(sqrt(fit$working_weights) * x)
+            qr.Wx    <- qr(wx_dense)
+            wx_dense <- NULL
+        }
+        mus <- fit$mus
+        etas <- fit$etas
+        residuals <- with(fit, (y - mus) / d1mus)
+        working_weights <- fit$working_weights
 
         ## info_transformed_dispersion will be NA if is_ML | is_AS_median | is_AS_mixed
-        info_transformed_dispersion <- 1/step_components_zeta$inverse_info
+        info_transformed_dispersion <- 1 / step_components_zeta$inverse_info
         if (is_ML | is_AS_median | is_AS_mixed) {
             transformed_dispersion <- eval(Trans1)
-            d1zeta <- eval(DD(Trans1, "dispersion", order = 1))
-            adjusted_grad_all["Transformed dispersion"] <- adjusted_grad_all["Transformed dispersion"] / d1zeta
-            info_transformed_dispersion <- info_transformed_dispersion / d1zeta^2
+            d1zeta_1 <- eval(DD(Trans1, "dispersion", order = 1))
+            adjusted_grad_all["Transformed dispersion"] <-
+                adjusted_grad_all["Transformed dispersion"] / d1zeta_1
+            info_transformed_dispersion <- info_transformed_dispersion / d1zeta_1^2
             control$transformation <- transformation1
-            control$trans <- Trans1
-            control$inverseTrans <- inverseTrans1
+            control$Trans          <- Trans1
+            control$inverseTrans   <- inverseTrans1
         }
 
         eps <- 10 * .Machine$double.eps
-        if (family$family == "binomial") {
-            if (any(mus > 1 - eps) || any(mus < eps)) {
-                warning("brglmFit: fitted probabilities numerically 0 or 1 occurred", call. = FALSE)
-                boundary <- TRUE
-            }
+        if (family$family == "binomial" && (any(mus > 1 - eps) || any(mus < eps))) {
+            warning("brglmFit: fitted probabilities numerically 0 or 1 occurred", call. = FALSE)
+            boundary <- TRUE
         }
-        if (family$family == "poisson") {
-            if (any(mus < eps)) {
-                warning("brglmFit: fitted rates numerically 0 occurred", call. = FALSE)
-                boundary <- TRUE
-            }
+        if (family$family == "poisson" && any(mus < eps)) {
+            warning("brglmFit: fitted rates numerically 0 occurred", call. = FALSE)
+            boundary <- TRUE
         }
-        if (df_residual == 0 & !no_dispersion) {
-            dispersion <- NA_real_
-        }
-
-        ## ## Estimate of first-order bias from the last iteration (so
-        ## ## not at the final value for the coefficients)
-        ## if (is_ML) {
-        ##     ## For now... To be set to calculate biases at a later version
-        ##     bias_betas <- bias_zeta <- NULL
-        ## }
-        ## else {
-        ##     bias_betas <- with(step_components_beta, -drop(inverse_info %*% adjustment))
-        ##     bias_zeta <- with(step_components_zeta, -drop(inverse_info %*% adjustment))
-        ##     bias_betas_all <- betas_all
-        ##     bias_betas_all[betas_names] <- bias_betas
-        ##     ## If correction has been requested then add estimated biases an attribute to the coefficients
-        ##     if (is_correction) {
-        ##         attr(betas_all, "biases") <- bias_betas_all
-        ##         attr(transformed_dispersion, "biases") <- bias_zeta
-        ##     }
-        ## }
+        if (df_residual == 0 & !no_dispersion) dispersion <- NA_real_
     }
 
     ## Working weights
     wt <- rep.int(0, nobs)
     wt[keep] <- working_weights[keep]
-    names(wt) <- names(residuals) <- names(mus) <- names(etas) <- names(weights) <- names(y) <- ynames
+    names(wt) <- names(residuals) <- names(mus) <- names(etas) <-
+        names(weights) <- names(y) <- ynames
+
     ## For the null deviance:
     ##
     ## If there is an intercept but not an offset then the ML fitted
@@ -1064,15 +1001,14 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     ##
     control0 <- control
     control0$maxit <- 1000
-    if (customTransformation) {
-        control0$transformation <- transformation0
-    }
+    if (customTransformation) control0$transformation <- transformation0
+
     if (intercept & missing_offset) {
-        nullFit <- brglmFit(x = x[, "(Intercept)", drop = FALSE], y = y, weights = weights,
-                            offset = rep(0, nobs), family = family, intercept = TRUE,
-                            control = control0[c("epsilon", "maxit", "type", "transformation", "slowit")],
-                            start = if (no_dispersion) linkfun(mean(y)) else c(linkfun(mean(y)), 1))
-        ## FIX: Starting values above are hard-coded. Change in future versions
+        nullFit <- brglmFit(
+            x = x[, "(Intercept)", drop = FALSE], y = y, weights = weights,
+            offset = rep(0, nobs), family = family, intercept = TRUE,
+            control = control0[c("epsilon", "maxit", "type", "transformation", "slowit")],
+            start = if (no_dispersion) linkfun(mean(y)) else c(linkfun(mean(y)), 1))
         nullmus <- nullFit$fitted.values
     }
     ## If there is an offset but not an intercept then the fitted
@@ -1093,48 +1029,131 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
         ## a new call to brglmFit and use the deviance from that call
         ## as null
     }
-    nulldev <- sum(dev.resids(y, nullmus, weights))
-    nulldf <- nkeep - as.integer(intercept)
-    deviance <- sum(dev.resids(y, mus, weights))
+
+    nulldev   <- sum(dev.resids(y, nullmus, weights))
+    nulldf    <- nkeep - as.integer(intercept)
+    deviance  <- sum(dev.resids(y, mus, weights))
     aic.model <- aic(y, n, mus, weights, deviance) + 2 * rank
 
-    list(coefficients = betas_all,
-         residuals = residuals,
-         fitted.values = mus,
-         ## TODO: see effects?
-         ## effects = if (!EMPTY) effects,
-         R = if (!EMPTY) qr.R(qr.Wx),
-         rank = rank,
-         qr = if (!EMPTY) structure(qr.Wx[c("qr", "rank", "qraux", "pivot", "tol")], class = "qr"),
-         family = family,
-         linear.predictors = etas,
-         deviance = deviance,
-         aic = aic.model,
-         null.deviance = nulldev,
-         iter = iter,
-         weights = wt,
-         prior.weights = weights,
-         df.residual = df_residual,
-         df.null = nulldf,
-         y = y,
-         converged = converged,
-         boundary = boundary,
-         dispersion = dispersion,
-         dispersion_ML = dispersion_ML,
-         transformed_dispersion = transformed_dispersion,
+    list(coefficients                = betas_all,
+         residuals                   = residuals,
+         fitted.values               = mus,
+         R                           = if (!EMPTY) qr.R(qr.Wx),
+         rank                        = rank,
+         qr                          = if (!EMPTY) structure(
+                                           qr.Wx[c("qr","rank","qraux","pivot","tol")],
+                                           class = "qr"),
+         family                      = family,
+         linear.predictors           = etas,
+         deviance                    = deviance,
+         aic                         = aic.model,
+         null.deviance               = nulldev,
+         iter                        = iter,
+         weights                     = wt,
+         prior.weights               = weights,
+         df.residual                 = df_residual,
+         df.null                     = nulldf,
+         y                           = y,
+         converged                   = converged,
+         boundary                    = boundary,
+         dispersion                  = dispersion,
+         dispersion_ML               = dispersion_ML,
+         transformed_dispersion      = transformed_dispersion,
          info_transformed_dispersion = if (no_dispersion) NA_real_ else info_transformed_dispersion,
-         grad = adjusted_grad_all,
-         transformation = control$transformation,
-         ## cov.unscaled = tcrossprod(R_matrix),
-         type = control$type,
-         control = control,
-         class = "brglmFit")
+         grad                        = adjusted_grad_all,
+         transformation              = control$transformation,
+         type                        = control$type,
+         control                     = control,
+         class                       = "brglmFit")
 }
+
+
+#' Preconditioned CG-Steihaug trust-region subproblem solver
+#'
+#' Solves:  min_p { -r_adj' p + 0.5 p' F p }  s.t.  ||p|| <= Delta
+#' where F = fit$info_beta (p x p Fisher information, already formed).
+#'
+#' Uses a Jacobi (diagonal) preconditioner  M = diag(F).  This costs
+#' one O(p) divide per inner step and replaces the CG convergence rate
+#' governed by kappa(F) with kappa(M^{-1} F), which is substantially
+#' smaller when predictors have very different scales or block-correlated
+#' structure.  In practice this halves or quarters the number of inner iterations k 
+#' relative to unpreconditioned CG, directly reducing the k * O(p^2) inner-loop cost.
+#'
+#'
+#' @param r_adj   Adjusted score vector (length p)
+#' @param F_info  Fisher information matrix (p x p), i.e. fit$info_beta
+#' @param Delta   Trust-region radius
+#' @param tol     Relative residual tolerance Eisenstat-Walker Choice 2
+#' @param maxiter Maximum CG iterations
+#'
+#' @references Steihaug (1983) SIAM J. Numer. Anal. 20(3), 626-637.
+#'             Nocedal & Wright (2006) Numerical Optimization, Alg. 7.2 & Algo 5.3 for pcg adaptation.
+#'             Eisenstat & Walker (1996) SIAM J. Optim. 6(4), 1190-1206.
+cg_steihaug_pcg <- function(r_adj, F_info, Fmatvec = NULL, diag_F = NULL, Delta, tol = 0.1, maxiter = 50) {
+    # Jacobi preconditioner: M = diag(F), M^{-1} v = v / diag(F)
+    # Guard against near-zero diagonal entries
+    d_F <- if (!is.null(diag_F)) diag_F else diag(F_info)
+    d_F <- pmax(d_F, .Machine$double.eps * max(d_F))
+    Minv <- function(v) v / d_F              # O(p), just element-wise division
+
+    z <- numeric(length(r_adj))
+    r <- r_adj
+    y <- Minv(r)                       # preconditioned residual
+    d <- y
+    ry <- sum(r * y)
+    ry0 <- ry                            # for convergence check
+
+    for (j in seq_len(maxiter)) {
+        Fd <- if (!is.null(Fmatvec)) Fmatvec(d) else drop(F_info %*% d)
+        dFd <- sum(d * Fd)
+
+        if (dFd <= 0) {
+            tau <- find_boundary_step(z, d, Delta)
+            return(list(p = z + tau * d, on_boundary = TRUE, cg_iter = j))
+        }
+
+        alpha <- ry / dFd
+        z_new <- z + alpha * d
+
+        if (sqrt(sum(z_new^2)) >= Delta) {
+            tau <- find_boundary_step(z, d, Delta)
+            return(list(p = z + tau * d, on_boundary = TRUE, cg_iter = j))
+        }
+
+        z <- z_new
+        r <- r - alpha * Fd
+        y <- Minv(r)
+        ry_new <- sum(r * y)
+
+        # convergence in the M-norm of the residual, relative to initial
+        if (sqrt(abs(ry_new)) < tol * sqrt(abs(ry0)))
+            return(list(p = z, on_boundary = FALSE, cg_iter = j))
+
+        d  <- y + (ry_new / ry) * d
+        ry <- ry_new
+    }
+    list(p = z, on_boundary = FALSE, cg_iter = maxiter)
+}
+
+#' Boundary step: finds tau >= 0 s.t. ||z + tau*d|| = Delta
+find_boundary_step <- function(z, d, Delta) {
+    a    <- sum(d^2)
+    b    <- 2 * sum(z * d)
+    cc   <- sum(z^2) - Delta^2
+    disc <- b^2 - 4 * a * cc
+    if (disc < 0) return(0)
+    t1  <- (-b + sqrt(disc)) / (2 * a)
+    t2  <- (-b - sqrt(disc)) / (2 * a)
+    pos <- c(t1, t2)[c(t1, t2) > 0]
+    if (length(pos) == 0) 0 else min(pos)
+}
+
 
 #' Extract model coefficients from [`"brglmFit"`][brglmFit] objects
 #'
 #' @inheritParams stats::coef
-#' @param model one of `"mean"` (default), `"dispersion"`, `"full",
+#' @param model one of `"mean"` (default), `"dispersion"`, `"full"`,
 #'     to return the estimates of the parameters in the linear
 #'     prediction only, the estimate of the dispersion parameter only,
 #'     or both, respectively.
@@ -1143,9 +1162,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
 #'
 #' See [coef()] for more details.
 #'
-#' @seealso
-#'
-#' [coef()]
+#' @seealso [coef()]
 #'
 #' @export
 coef.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) {
@@ -1157,8 +1174,7 @@ coef.brglmFit <- function(object, model = c("mean", "full", "dispersion"), ...) 
     "dispersion" = {
         transDisp <- object$transformed_dispersion
         names(transDisp) <- paste0(object$transformation, "(dispersion)")
-        transDisp
-        ## This will ALWAYS be on the scale of the TRANSFORMED dispersion
+        transDisp  # always on the scale of the transformed dispersion
     },
     "full" = {
         transDisp <- object$transformed_dispersion
@@ -1262,17 +1278,7 @@ vcov.brglmFit <- function(object, model = c("mean", "full", "dispersion"), compl
     })
 }
 
-
-DD <- function(expr,name, order = 1) {
-    if(order < 1) stop("'order' must be >= 1")
-    if(order == 1) D(expr,name)
-    else DD(D(expr, name), name, order - 1)
-}
-
-
-
-## Almost all code in print.summary.brglmFit is from
-## stats:::print.summary.glm apart from minor modifications
+## Almost all code here is from stats:::print.summary.glm with minor modifications
 #' @rdname summary.brglmFit
 #' @method print summary.brglmFit
 #' @export
