@@ -74,7 +74,7 @@ process. See \code{\link[=mdyplControl]{mdyplControl()}} for details.}
 \value{
 An object inheriting from \code{\link[=mdyplFit]{"mdyplFit"}} object, which
 is a list having the same elements to the list that
-\code{\link[stats:glm]{stats::glm.fit()}} returns, with a few extra arguments.
+\code{\link[stats:glm.fit]{stats::glm.fit()}} returns, with a few extra arguments.
 }
 \description{
 \code{\link[=mdyplFit]{mdyplFit()}} is a fitting method for \code{\link[=glm]{glm()}} that fits logistic
@@ -82,7 +82,7 @@ regression models using maximum Diaconis-Ylvisaker prior penalized
 likelihood estimation.
 }
 \details{
-\code{\link[=mdyplFit]{mdyplFit()}} uses \code{\link[stats:glm]{stats::glm.fit()}} to fit a logistic regression
+\code{\link[=mdyplFit]{mdyplFit()}} uses \code{\link[stats:glm.fit]{stats::glm.fit()}} to fit a logistic regression
 model on responses \code{alpha * y + (1 - alpha) / 2}, where \code{y} are the
 original binomial responses scaled by the binomial totals. This is
 equivalent to penalizing the likelihood by the Diaconis-Ylvisaker

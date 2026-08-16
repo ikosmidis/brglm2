@@ -89,7 +89,7 @@ error.}
 \value{
 An object inheriting from \code{\link[=brglmFit]{"brglmFit"}} object, which
 is a list having the same elements to the list that
-\code{\link[stats:glm]{stats::glm.fit()}} returns, with a few extra arguments.
+\code{\link[stats:glm.fit]{stats::glm.fit()}} returns, with a few extra arguments.
 }
 \description{
 \code{\link[=brglmFit]{brglmFit()}} is a fitting method for \code{\link[=glm]{glm()}} that fits generalized

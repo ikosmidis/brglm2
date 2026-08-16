@@ -16,7 +16,7 @@ Imports: MASS, stats, Matrix, graphics, nnet, enrichwith, numDeriv, statmod, nle
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Suggests: detectseparation, knitr, rmarkdown, covr, tinytest, VGAM, brglm
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.0.0
