@@ -1,3 +1,11 @@
+# brglm2 1.2.0
+
+## Bug fixes
+
+* Fixed a bug in `vcov.bracl()` that returned incorrect covariances
+  between coefficients for adjacent category logit models without
+  proportional odds.
+
 # brglm2 1.1.0
 
 ## Bug fixes
@@ -353,6 +361,5 @@ Added `residuals()` methods for `brmultinom` and `bracl` objects
 # brglm2 0.1.2
 
 * First release.
-
 
 
