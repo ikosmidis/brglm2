@@ -71,6 +71,16 @@ tol  <-  1e-02
 expect_equal(vcov(fit_vgam_p), vcov(fit_bracl_p), tolerance = tol, check.attributes = FALSE)
 expect_equal(vcov(fit_vgam), vcov(fit_bracl), tolerance = tol, check.attributes = FALSE)
 
+## vcov for non-proportional odds agrees with the delta method
+ncat1 <- fit_bracl$ncat - 1L
+coefficient_names <- names(coef(fit_bracl))
+raw_vcov <- vcov.brglmFit(fit_bracl)[coefficient_names, coefficient_names]
+difference <- -diff(rbind(diag(ncat1), 0))
+transformation <- kronecker(diag(length(fit_bracl$coefNames)), difference)
+expected_vcov <- transformation %*% raw_vcov %*% t(transformation)
+expect_equal(vcov(fit_bracl), expected_vcov, tolerance = 1e-10,
+             check.attributes = FALSE)
+
 s1 <- summary(fit_bracl)
 s1p <- summary(fit_bracl_p)
 s2 <- summary(fit_vgam)

@@ -244,7 +244,7 @@ vcov.bracl <- function(object, ...) {
     intercept_names <- paste0(levs, ":", "(Intercept)")
     ddiff <- function(mat) {
         mat <- diff(rbind(mat, 0))
-        diff(rbind(t(mat), 0))
+        t(diff(rbind(t(mat), 0)))
     }
     if (object$parallel) {
         beta_names <- ofInterest
