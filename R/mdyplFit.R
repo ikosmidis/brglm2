@@ -234,6 +234,7 @@ mdyplFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
     out$residuals <- (y - mus) / (mus * (1 - mus))
     out$y_adj <- y_adj
     out$y <- y
+    out$offset <- offset
     out$alpha <- alpha
     out$type <- "MPL_DY"
     out$control <- control
