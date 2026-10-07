@@ -201,7 +201,7 @@ summary.mdyplFit <- function(object, hd_correction = FALSE,
 
         family <- object$family
         dev.resids <- family$dev.resids
-        mus <- family$linkinv(drop(xx %*% coefs[, "Estimate"]))
+        mus <- family$linkinv(drop(xx %*% coefs[, "Estimate"]) + object$offset)
         y <- object$y
         ## Null deviance is not updated
         d_res <- sqrt(pmax(family$dev.resids(y, mus, pw), 0))
