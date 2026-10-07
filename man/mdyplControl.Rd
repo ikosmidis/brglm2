@@ -6,9 +6,9 @@
 \title{Auxiliary function for \code{\link[=glm]{glm()}} fitting using the \code{\link[=brglmFit]{brglmFit()}}
 method.}
 \usage{
-mdyplControl(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALSE)
+mdyplControl(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALSE, ...)
 
-mdypl_control(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALSE)
+mdypl_control(alpha = NULL, epsilon = 1e-08, maxit = 25, trace = FALSE, ...)
 }
 \arguments{
 \item{alpha}{the shrinkage parameter (in \verb{[0, 1]}) in the
@@ -26,6 +26,9 @@ allowed. Default is \code{25}.}
 
 \item{trace}{logical indicating if output should be produced for
 each iteration. Default is \code{FALSE}.}
+
+\item{...}{further arguments passed to \code{\link[=mdyplControl]{mdyplControl()}}. Currently
+ignored in the output.}
 }
 \value{
 A list with components named as the arguments.

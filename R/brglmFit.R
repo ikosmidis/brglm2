@@ -750,7 +750,7 @@ brglmFit <- function(x, y, weights = rep(1, nobs), start = NULL, etastart = NULL
                 betas_names_all <- betas_names
             }
         }
-        betas_all <- structure(rep(NA_real_, nvars_all), .Names = betas_names_all)
+        betas_all <- structure(rep(NA_real_, nvars_all), names = betas_names_all)
         keep <- weights > 0
         ## Check for zero weights
         ## if (any(!keep)) {
