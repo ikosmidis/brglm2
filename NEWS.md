@@ -1,8 +1,10 @@
-# brglm2 1.2.0
+# brglm2 1.1.1
 
 ## Bug fixes
 * Added `...` in `mdyplControl()` to allow for `tol` and `wtol`
   arguments in `glm.fit()`.
+
+* Fixed a bug where offsets were ignored in `summary.mdyplFit()`.
 
 * Fixed a bug in `vcov.bracl()` that returned incorrect covariances
   between coefficients for adjacent category logit models without
