@@ -5,6 +5,7 @@ inst/demos
 inst/mbrpr
 inst/other
 inst/useR!2016
+inst/simulation
 inst/glmbias_code\+results
 inst/dev_resids.R
 inst/TODO.org
